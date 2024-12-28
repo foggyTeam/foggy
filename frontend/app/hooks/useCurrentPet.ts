@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { fetcher } from "@/app/utils/fetcher";
+import { fetcher } from "@/app/lib/utils/fetcher";
 import { useEffect } from "react";
 import petStore from "@/app/stores/petStore";
 
