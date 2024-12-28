@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { use, useEffect } from "react";
 import { Button, Form, Input } from "@nextui-org/react";
+import { addNewPet, getPetById } from "@/app/utils/services/loginService";
 
-export default function Login() {
+export default function Login(data) {
   const [submitted, setSubmitted] = React.useState(null);
+  addNewPet("Samantha", "dog", 5).finally();
+  getPetById(5).then((pet) => console.log(pet.name, pet.category.name, pet.id));
 
   const onSubmit = (e) => {
     e.preventDefault();
