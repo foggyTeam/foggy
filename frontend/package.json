@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "types": "openapi-typescript https://petstore.swagger.io/v2/swagger.json --output ./app/lib/utils/definitions_generated.ts"
+    "types": "openapi-typescript http://localhost:3001/api-json --output ./app/lib/utils/definitions_generated.ts && prettier --write ./app/lib/utils/definitions_generated.ts"
   },
   "dependencies": {
     "@nextui-org/button": "^2.2.8",
