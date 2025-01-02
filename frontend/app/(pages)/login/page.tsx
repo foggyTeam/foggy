@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from 'react';
 import { Button, Form, Input } from "@nextui-org/react";
 import petStore from "@/app/stores/petStore";
 import { observer } from "mobx-react-lite";
 import { useCurrentPet } from "@/app/hooks/useCurrentPet";
 
+type FormDataType = { [k: string]: FormDataEntryValue };
+
 const Login = React.memo(
   observer(() => {
-    const [submitted, setSubmitted] = React.useState(null);
+    const [submitted, setSubmitted] = useState<FormDataType | null>(null);
+
     const id = 5;
 
     const { data, error } = useCurrentPet(id);
@@ -17,11 +20,9 @@ const Login = React.memo(
       return <div>{petStore.error}</div>;
     }
 
-    const onSubmit = (e) => {
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      const data = Object.fromEntries(new FormData(e.currentTarget));
-
+      const data: FormDataType = Object.fromEntries(new FormData(e.currentTarget)) as FormDataType;
       setSubmitted(data);
     };
 
