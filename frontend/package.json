@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --fix",
     "types": "openapi-typescript http://localhost:3001/api-json --output ./app/lib/utils/definitions_generated.ts && prettier --write ./app/lib/utils/definitions_generated.ts"
   },
   "dependencies": {
