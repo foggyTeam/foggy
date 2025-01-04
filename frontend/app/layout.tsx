@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import React from "react";
-import { geistMono, geistSans } from "@/public/fonts/fonts";
-import { Providers } from "@/app/providers";
+import type { Metadata } from 'next';
+import './globals.css';
+import React from 'react';
+import { geistMono, geistSans } from '@/public/fonts/fonts';
+import { Providers } from '@/app/providers';
 
 export const metadata: Metadata = {
-  title: { template: `foggy | %s`, default: "foggy" },
+  title: { template: `foggy | %s`, default: 'foggy' },
   description:
-    "Foggy is a web-app for collaborative work on multiple interactive boards.",
+    'Foggy is a web-app for collaborative work on multiple interactive boards.',
 };
 
 export default function RootLayout({

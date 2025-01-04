@@ -1,4 +1,4 @@
-name: Linting via ESLint & Prettier
+name: Linting via ESLint
 run-name: Linting...
 on: [ push ]
 jobs:
@@ -7,10 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - name: Set up
+      - name: Lint
         run: |
           pnpm install
-          pnpm eslint "{src,apps,libs,test}/**/*.ts" --check
+          pnpm eslint "{src,apps,libs,test}/**/*.ts"
         working-directory: backend
       - run: echo "Backend / ${{ job.status }}."
   LintFrontend:
@@ -18,9 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-      - name: Set up
+      - name: Lint
         run: |
           pnpm install
-          pnpm next lint --check
+          pnpm next lint
         working-directory: frontend
       - run: echo "Frontend / ${{ job.status }}."
