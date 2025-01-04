@@ -1,6 +1,7 @@
 {
   "name": "foggy",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "frontend:dev": "cd frontend && pnpm dev",
     "backend:dev": "cd backend && pnpm start:dev",
@@ -10,6 +11,10 @@
     "backend": "cd backend && pnpm start",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\""
   },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "devDependencies": {
     "concurrently": "^7.0.0"
   },
