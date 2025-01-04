@@ -5,9 +5,8 @@ jobs:
   LintBackend:
     runs-on: ubuntu-latest
     steps:
-      - uses: |
-          actions/checkout@v4
-          pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - name: Set up
         run: |
           pnpm install
@@ -17,9 +16,8 @@ jobs:
   LintFrontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: |
-              actions/checkout@v4
-              pnpm/action-setup@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - name: Set up
         run: |
           pnpm install
