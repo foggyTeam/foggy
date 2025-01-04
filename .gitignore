@@ -1,0 +1,10 @@
+# ide
+/.idea
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# env files (can opt-in for committing if needed)
+.env*

@@ -18,5 +18,5 @@ export function useCurrentPet(id: number) {
     }
   }, [data, error]);
 
-  return [data, error];
+  return { data, error };
 }
