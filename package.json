@@ -9,7 +9,6 @@
     "frontend": "cd frontend && pnpm build && pnpm start",
     "backend": "cd backend && pnpm start",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
-
     "prepare": "husky install",
     "docker": "docker-compose up --build"
   },

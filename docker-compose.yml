@@ -27,8 +27,8 @@ services:
       - ./backend:/app
       - /app/node_modules
     environment:
-      NODE_ENV: "production"
-      MONGO_URI: "mongodb://mongo:27017/foggydatabase"
+      NODE_ENV: 'docker'
+      MONGO_URI_DOCKER: 'mongodb://mongo:27017/foggydatabase'
     command: "pnpm start"
     working_dir: "/foggy/backend"
     depends_on:
