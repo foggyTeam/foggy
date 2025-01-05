@@ -1,4 +1,2 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-pnpm prettier --write .
+cd frontend && pnpm prettier --write .
+cd ../backend && pnpm prettier --write .
