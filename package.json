@@ -6,7 +6,7 @@
     "frontend:dev": "cd frontend && pnpm dev",
     "backend:dev": "cd backend && pnpm start:dev",
     "dev": "concurrently \"pnpm run frontend:dev\" \"pnpm run backend:dev\"",
-    "build": "cd frontend && && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build",
+    "build": "cd frontend && pnpm install && pnpm build && cd ../backend && pnpm install && pnpm build",
     "frontend": "cd frontend && pnpm start",
     "backend": "cd backend && pnpm start",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
