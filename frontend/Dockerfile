@@ -21,7 +21,7 @@ RUN pnpm install && cd frontend && pnpm install
 # Открываем порт
 EXPOSE 3000
 
-WORKDIR /frontend
+WORKDIR foggy/frontend
 RUN pnpm next build
 # Запуск приложения
-CMD ["pnpm", "next", "start"]
+CMD ["pnpm", "start"]

@@ -22,6 +22,6 @@ RUN pnpm install && cd backend && pnpm install
 # Открываем порт
 EXPOSE 3001
 
-WORKDIR /backend
+WORKDIR foggy/backend
 # Запуск приложения
-CMD ["pnpm", "nest", "start"]
+CMD ["pnpm", "start"]
