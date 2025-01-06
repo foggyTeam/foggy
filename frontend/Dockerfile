@@ -21,5 +21,6 @@ RUN pnpm install && cd frontend && pnpm install
 # Открываем порт
 EXPOSE 3000
 
+WORKDIR /frontend
 # Запуск приложения
 CMD ["pnpm", "start"]

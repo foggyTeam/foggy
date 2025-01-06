@@ -22,5 +22,6 @@ RUN pnpm install && cd backend && pnpm install
 # Открываем порт
 EXPOSE 3001
 
+WORKDIR /backend
 # Запуск приложения
 CMD ["pnpm", "start"]
