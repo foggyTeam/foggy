@@ -24,4 +24,4 @@ EXPOSE 3001
 
 WORKDIR /backend
 # Запуск приложения
-CMD ["pnpm", "start"]
+CMD ["pnpm", "nest", "start"]
