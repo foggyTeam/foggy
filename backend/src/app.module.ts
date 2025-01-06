@@ -12,9 +12,9 @@ import { env } from 'process';
       isGlobal: true,
     }),
     MongooseModule.forRoot(
-      env.NODE_ENV === 'development'
-        ? env.MONGO_URI_LOCAL
-        : env.MONGO_URI_DOCKER,
+      env.NODE_ENV === 'production'
+        ? env.MONGO_URI_DOCKER
+        : 'mongodb://localhost/foggydatabase',
     ),
     UsersModule,
   ],
