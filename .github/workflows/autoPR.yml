@@ -50,3 +50,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "Release v${{ env.PREV_MAJOR_VERSION }}.${{ env.PREV_MINOR_VERSION }}.${{ env.HOTFIX_COMMITS }}"
+          base: master
