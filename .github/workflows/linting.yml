@@ -1,0 +1,22 @@
+name: Linting via ESLint
+run-name: Linting...
+on: [ push ]
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - name: Lint backend
+        run: |
+          pnpm install
+          pnpm eslint "{src,apps,libs,test}/**/*.ts"
+        working-directory: backend
+      - run: echo "Backend / ${{ job.status }}."
+
+      - name: Lint frontend
+        run: |
+          pnpm install
+          pnpm next lint
+        working-directory: frontend
+      - run: echo "Frontend / ${{ job.status }}."

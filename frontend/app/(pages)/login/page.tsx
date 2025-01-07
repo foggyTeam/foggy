@@ -21,7 +21,7 @@ const Login = memo(
       return <div>{petStore.error}</div>;
     }*/
 
-    const { users, error } = useAllUsers();
+    const { data, error } = useAllUsers();
 
     if (error) {
       return <div>{usersStore.error}</div>;

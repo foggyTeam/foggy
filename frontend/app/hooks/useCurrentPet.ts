@@ -1,7 +1,7 @@
-import useSWR from "swr";
-import { fetcher } from "@/app/lib/utils/fetcher";
-import { useEffect } from "react";
-import petStore from "@/app/stores/petStore";
+import useSWR from 'swr';
+import { fetcher } from '@/app/lib/utils/fetcher';
+import { useEffect } from 'react';
+import petStore from '@/app/stores/petStore';
 
 export function useCurrentPet(id: number) {
   const { data, error } = useSWR(
@@ -14,7 +14,7 @@ export function useCurrentPet(id: number) {
       petStore.setCurrentPet(data);
     }
     if (error) {
-      petStore.setError("Failed to fetch pets");
+      petStore.setError('Failed to fetch pets');
     }
   }, [data, error]);
 

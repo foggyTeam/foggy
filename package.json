@@ -6,17 +6,18 @@
     "frontend:dev": "cd frontend && pnpm dev",
     "backend:dev": "cd backend && pnpm start:dev",
     "dev": "concurrently \"pnpm run frontend:dev\" \"pnpm run backend:dev\"",
-
-    "frontend": "cd frontend && pnpm build && pnpm start",
+    "frontend": "cd frontend && pnpm start",
     "backend": "cd backend && pnpm start",
-    "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\""
+    "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
+    "docker": "docker-compose up --build"
   },
   "workspaces": [
     "frontend",
     "backend"
   ],
   "devDependencies": {
-    "concurrently": "^7.0.0"
+    "husky": "^9.1.7",
+    "concurrently": "^9.1.2"
   },
   "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }

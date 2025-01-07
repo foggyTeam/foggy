@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 import usersStore from '@/app/stores/usersStore';
 
 export function useAllUsers() {
-  const { data, error } = useSWR(`http://localhost:3001/users`, fetcher);
+  const apiUri = process.env.NEXT_PUBLIC_API_URI;
+
+  const { data, error } = useSWR(`${apiUri}/users`, fetcher);
 
   useEffect(() => {
     if (data) {
