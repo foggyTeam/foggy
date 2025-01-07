@@ -17,6 +17,7 @@ COPY . .
 
 # Устанавливаем зависимости
 RUN pnpm install && cd frontend && pnpm install
+RUN pnpm build
 
 # Открываем порт
 EXPOSE 3000
