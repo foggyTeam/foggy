@@ -7,32 +7,35 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) {}
 
-    @Post()
-    @ApiOperation({ summary: 'Create a new user' })
-    @ApiResponse({ status: 201, description: 'User successfully created' })
-    @ApiResponse({ status: 400, description: 'Invalid data' })
-    @ApiBody({
-        description: 'User data to create a new user',
-        examples: {
-            example1: {
-                value: {
-                    nickname: 'John Doe',
-                    email: 'johndoe@gmail.com',
-                    password: '123456'
-                },
-            },
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: 201, description: 'User successfully created' })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiBody({
+    description: 'User data to create a new user',
+    examples: {
+      example1: {
+        value: {
+          nickname: 'John Doe',
+          email: 'johndoe@gmail.com',
+          password: '123456',
         },
-    })
-    async create(@Body() userDto: CreateUserDto): Promise<User> {
-        return this.usersService.create(userDto);
-    }
+      },
+    },
+  })
+  async create(@Body() userDto: CreateUserDto): Promise<User> {
+    return this.usersService.create(userDto);
+  }
 
-    @Get()
-    @ApiOperation({ summary: 'Retrieve all users' })
-    @ApiResponse({ status: 200, description: 'List of users successfully retrieved' })
-    async findAll(): Promise<User[]> {
-        return this.usersService.findAll();
-    }
+  @Get()
+  @ApiOperation({ summary: 'Retrieve all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of users successfully retrieved',
+  })
+  async findAll(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
 }

@@ -1,0 +1,53 @@
+name: Auto PR names
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+
+jobs:
+  NamePR:
+    runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
+
+    steps:
+      # Шаг 1: Клонирование репозитория
+      - name: Check out
+        uses: actions/checkout@v2
+
+      # Шаг 2: Получение номера предыдущего пулл-реквеста и его хеша коммита
+      - name: Previous PR version and commit
+        id: get_previous_pr
+        run: |
+          PREV_PR=$(gh pr list --state closed --base master --json number,title --jq '.[0]')
+          if [ -z "$PREV_PR" ]; then
+            PREV_MAJOR_VERSION=0
+            PREV_MINOR_VERSION=${{ github.event.number }}
+            LAST_COMMIT_HASH=$(git rev-list --max-parents=0 HEAD)
+          else
+            PREV_MAJOR_VERSION=$(echo $PREV_PR | jq -r '.title' | grep -oP '(?<=v)\d+' | head -n 1)
+            PREV_MINOR_VERSION=$(echo $PREV_PR | jq -r '.title' | grep -oP '(?<=v\d+\.)\d+' | head -n 1)
+            PREV_MINOR_VERSION=$((PREV_MINOR_VERSION + 1))
+            LAST_COMMIT_HASH=$(echo $PREV_PR | jq -r '.merge_commit_sha')
+          fi
+          echo "PREV_MAJOR_VERSION=$PREV_MAJOR_VERSION" >> $GITHUB_ENV
+          echo "PREV_MINOR_VERSION=$PREV_MINOR_VERSION" >> $GITHUB_ENV
+          echo "LAST_COMMIT_HASH=$LAST_COMMIT_HASH" >> $GITHUB_ENV
+
+      # Шаг 3: Проверка на наличие коммитов с меткой "hotfix" с последнего пулл-реквеста
+      - name: Check for hotfix commits
+        id: check_hotfix
+        run: |
+          HOTFIX_COMMITS=$(git log $LAST_COMMIT_HASH..HEAD --oneline | grep -i hotfix | wc -l)
+          echo "HOTFIX_COMMITS=$HOTFIX_COMMITS" >> $GITHUB_ENV
+
+      # Шаг 4: Обновление заголовка пулл-реквеста
+      - name: Update pull request title
+        run: |
+          NEW_TITLE="release v${{ env.PREV_MAJOR_VERSION }}.${{ env.PREV_MINOR_VERSION }}.${{ env.HOTFIX_COMMITS }}"
+          gh pr edit ${{ github.event.pull_request.number }} --title "$NEW_TITLE" --repo foggyTeam/foggy
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTION_ACCESS_TOKEN }}
