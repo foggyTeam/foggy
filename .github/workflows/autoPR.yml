@@ -33,20 +33,20 @@ jobs:
             PREV_MINOR_VERSION=$((PREV_MINOR_VERSION + 1))
             LAST_COMMIT_HASH=$(echo $PREV_PR | jq -r '.mergeCommit.oid')
           fi
-          echo "::set-output name=PREV_MAJOR_VERSION::$PREV_MAJOR_VERSION"
-          echo "::set-output name=PREV_MINOR_VERSION::$PREV_MINOR_VERSION"
-          echo "::set-output name=LAST_COMMIT_HASH::$LAST_COMMIT_HASH"
+          echo "PREV_MAJOR_VERSION=$PREV_MAJOR_VERSION" >> $GITHUB_ENV
+          echo "PREV_MINOR_VERSION=$PREV_MINOR_VERSION" >> $GITHUB_ENV
+          echo "LAST_COMMIT_HASH=$LAST_COMMIT_HASH" >> $GITHUB_ENV
 
       # Шаг 3: Проверка на наличие коммитов с меткой "hotfix" с последнего пулл-реквеста
       - name: Check for hotfix commits
         id: check_hotfix
         run: |
-          HOTFIX_COMMITS=$(git log ${{ steps.get_previous_pr.outputs.LAST_COMMIT_HASH }}..HEAD --oneline | grep -i hotfix | wc -l)
-          echo "::set-output name=HOTFIX_COMMITS::$HOTFIX_COMMITS"
+          HOTFIX_COMMITS=$(git log $LAST_COMMIT_HASH..HEAD --oneline | grep -i hotfix | wc -l)
+          echo "HOTFIX_COMMITS=$HOTFIX_COMMITS" >> $GITHUB_ENV
 
       # Шаг 4: Обновление заголовка пулл-реквеста
       - name: Update pull request title
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          title: "release v${{ steps.get_previous_pr.outputs.PREV_MAJOR_VERSION }}.${{ steps.get_previous_pr.outputs.PREV_MINOR_VERSION }}.${{ steps.check_hotfix.outputs.HOTFIX_COMMITS }}"
+          title: "Release v${{ env.PREV_MAJOR_VERSION }}.${{ env.PREV_MINOR_VERSION }}.${{ env.HOTFIX_COMMITS }}"
