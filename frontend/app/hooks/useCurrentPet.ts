@@ -1,12 +1,12 @@
 import useSWR from 'swr';
-import { fetcher } from '@/app/lib/utils/fetcher';
+import { getRequest } from '@/app/lib/utils/requests';
 import { useEffect } from 'react';
 import petStore from '@/app/stores/petStore';
 
 export function useCurrentPet(id: number) {
   const { data, error } = useSWR(
     `https://petstore.swagger.io/v2/pet/${id}`,
-    fetcher,
+    getRequest,
   );
 
   useEffect(() => {
