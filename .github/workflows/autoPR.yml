@@ -43,7 +43,7 @@ jobs:
 
       # Шаг 4: Обновление заголовка пулл-реквеста
       - name: Update pull request title
-        uses: peter-evans/update-pull-request@v3
+        uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           title: "release v${{ steps.get_previous_pr.outputs.PREV_MAJOR_VERSION }}.${{ steps.get_previous_pr.outputs.PREV_MINOR_VERSION }}.${{ steps.check_hotfix.outputs.HOTFIX_COMMITS }}"
