@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import React from 'react';
-import { geistMono, geistSans } from '@/public/fonts/fonts';
+import { geistMono, geistSans, montserrat } from '@/public/fonts/fonts';
 import { Providers } from '@/app/providers';
 
 export const metadata: Metadata = {
@@ -18,9 +18,13 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${montserrat.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="h-full w-full bg-gradient-to-r from-[#B999B1] to-[#AA99B9]">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );
