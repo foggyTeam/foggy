@@ -1,0 +1,49 @@
+name: Auto PR names
+
+on:
+  pull_request:
+    branches:
+      - master
+    types: [opened, synchronize]
+
+jobs:
+  NamePR:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Клонирование репозитория
+      - name: Check out
+        uses: actions/checkout@v2
+
+      # Шаг 2: Получение номера предыдущего пулл-реквеста и его хеша коммита
+      - name: Previous PR version and commit
+        id: get_previous_pr
+        run: |
+          PREV_PR=$(gh pr list --state closed --base master --json number,title --jq '.[0]')
+          if [ -z "$PREV_PR" ]; then
+            PREV_MAJOR_VERSION=0
+            PREV_MINOR_VERSION=${{ github.event.number }}
+            LAST_COMMIT_HASH=$(git rev-list --max-parents=0 HEAD)
+          else
+            PREV_MAJOR_VERSION=$(echo $PREV_PR | jq -r '.title' | grep -oP '(?<=v)\d+' | head -n 1)
+            PREV_MINOR_VERSION=$(echo $PREV_PR | jq -r '.title' | grep -oP '(?<=v\d+\.)\d+' | head -n 1)
+            PREV_MINOR_VERSION=$((PREV_MINOR_VERSION + 1))
+            LAST_COMMIT_HASH=$(echo $PREV_PR | jq -r '.mergeCommit.oid')
+          fi
+          echo "::set-output name=PREV_MAJOR_VERSION::$PREV_MAJOR_VERSION"
+          echo "::set-output name=PREV_MINOR_VERSION::$PREV_MINOR_VERSION"
+          echo "::set-output name=LAST_COMMIT_HASH::$LAST_COMMIT_HASH"
+
+      # Шаг 3: Проверка на наличие коммитов с меткой "hotfix" с последнего пулл-реквеста
+      - name: Check for hotfix commits
+        id: check_hotfix
+        run: |
+          HOTFIX_COMMITS=$(git log ${{ steps.get_previous_pr.outputs.LAST_COMMIT_HASH }}..HEAD --oneline | grep -i hotfix | wc -l)
+          echo "::set-output name=HOTFIX_COMMITS::$HOTFIX_COMMITS"
+
+      # Шаг 4: Обновление заголовка пулл-реквеста
+      - name: Update pull request title
+        uses: peter-evans/update-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "release v${{ steps.get_previous_pr.outputs.PREV_MAJOR_VERSION }}.${{ steps.get_previous_pr.outputs.PREV_MINOR_VERSION }}.${{ steps.check_hotfix.outputs.HOTFIX_COMMITS }}"
