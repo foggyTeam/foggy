@@ -10,6 +10,9 @@ jobs:
   NamePR:
     runs-on: ubuntu-latest
 
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       # Шаг 1: Клонирование репозитория
       - name: Check out
