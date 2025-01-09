@@ -64,17 +64,17 @@ const errorMessages = {
   login: {
     wrongPassword: {
       en: 'Invalid password',
-      ru: 'Неверные данные'
+      ru: 'Неверные данные',
     },
     notFound: {
       en: 'User not found',
-      ru: 'Пользователь не найден'
-    }
+      ru: 'Пользователь не найден',
+    },
   },
   general: {
     required: {
       en: 'Field is required',
-      ru: "Поле обязательно"
+      ru: 'Поле обязательно',
     },
     invalidType: {
       en: 'Field must be a string',

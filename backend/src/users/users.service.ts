@@ -50,7 +50,7 @@ export class UsersService {
       }
 
       if (!user) {
-        throw new UnauthorizedException(getErrorMessage("login", "notFound"));
+        throw new UnauthorizedException(getErrorMessage('login', 'notFound'));
       }
 
       const isPasswordValid = await bcrypt.compare(
@@ -59,12 +59,16 @@ export class UsersService {
       );
 
       if (!isPasswordValid) {
-        throw new UnauthorizedException(getErrorMessage("login", "wrongPassword"));
+        throw new UnauthorizedException(
+          getErrorMessage('login', 'wrongPassword'),
+        );
       }
 
       return { message: 'Login successful' };
     } catch (error) {
-      throw new UnauthorizedException(error.message || getErrorMessage("general", "errorNotRecognized"));
+      throw new UnauthorizedException(
+        error.message || getErrorMessage('general', 'errorNotRecognized'),
+      );
     }
   }
 
