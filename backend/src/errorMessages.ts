@@ -26,7 +26,7 @@ const errorMessages = {
       en: 'Email is required',
       ru: 'Email обязателен',
     },
-    invalid: {
+    invalidType: {
       en: 'Email must be a valid address',
       ru: 'Email должен быть действительным адресом',
     },
@@ -61,7 +61,25 @@ const errorMessages = {
       ru: 'Пароль должен содержать хотя бы одну цифру',
     },
   },
+  login: {
+    wrongPassword: {
+      en: 'Invalid password',
+      ru: 'Неверные данные'
+    },
+    notFound: {
+      en: 'User not found',
+      ru: 'Пользователь не найден'
+    }
+  },
   general: {
+    required: {
+      en: 'Field is required',
+      ru: "Поле обязательно"
+    },
+    invalidType: {
+      en: 'Field must be a string',
+      ru: 'Поле должно быть строкой',
+    },
     fieldNotRecognized: {
       en: 'Field is not recognized',
       ru: 'Поле не распознано',

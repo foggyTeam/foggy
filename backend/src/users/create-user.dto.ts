@@ -16,7 +16,7 @@ export class CreateUserDto {
   nickname: string;
 
   @IsNotEmpty({ message: getErrorMessage('email', 'required') })
-  @IsEmail({}, { message: getErrorMessage('email', 'invalid') })
+  @IsEmail({}, { message: getErrorMessage('email', 'invalidType') })
   email: string;
 
   @IsNotEmpty({ message: getErrorMessage('password', 'required') })

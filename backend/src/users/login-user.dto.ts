@@ -1,9 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { getErrorMessage } from '../errorMessages';
 
 export class LoginUserDto {
-  @IsString()
+  @IsNotEmpty({ message: getErrorMessage('general', 'required') })
+  @IsString({ message: getErrorMessage('general', 'invalidType') })
   userIdentifier: string;
 
-  @IsNotEmpty()
+  @IsNotEmpty({ message: getErrorMessage('password', 'required') })
+  @IsString({ message: getErrorMessage('password', 'invalidType') })
   password: string;
 }
