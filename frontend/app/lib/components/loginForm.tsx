@@ -3,11 +3,10 @@
 import { FC, JSX, memo } from 'react';
 import Image from 'next/image';
 import foggy from '../../../public/foggy.svg';
-import bg from '../../../public//images/bg.png';
+import bg from '../../../public//images/1.webp';
 import Form from 'next/form';
 import { Button } from '@nextui-org/button';
 import { Input } from '@nextui-org/input';
-import '../../styles/common.css';
 
 const LoginForm: FC = (): JSX.Element => {
   return (
@@ -35,7 +34,7 @@ const LoginForm: FC = (): JSX.Element => {
 
         <Form
           className={'flex min-w-24 flex-col gap-2 sm:w-80'}
-          action={(data) => console.log('log in')}
+          action={(data) => console.log(`log in ${data.get('email')}`)}
         >
           <Input
             isRequired
@@ -63,12 +62,12 @@ const LoginForm: FC = (): JSX.Element => {
             <Button
               onPress={() => console.log('sign in')}
               variant="light"
-              size="lg"
-              className={'btn'}
+              color="primary"
+              size="md"
             >
               sign in
             </Button>
-            <Button variant="solid" type="submit" size="lg" className={'btn'}>
+            <Button variant="solid" color="primary" type="submit" size="md">
               log in
             </Button>
           </div>
@@ -76,7 +75,7 @@ const LoginForm: FC = (): JSX.Element => {
           <Button
             onPress={() => console.log('sign in via Google / Yandex')}
             variant="bordered"
-            size="lg"
+            size="md"
             className={'w-fit border-none px-0'}
           >
             Login with Google / Yandex
