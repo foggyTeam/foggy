@@ -1,39 +1,39 @@
 const errorMessages = {
   nickname: {
     required: {
-      en: "Nickname is required",
-      ru: "Никнейм обязателен"
+      en: 'Nickname is required',
+      ru: 'Никнейм обязателен',
     },
     invalidType: {
-      en: "Nickname must be a string",
-      ru: "Никнейм должен быть строкой"
+      en: 'Nickname must be a string',
+      ru: 'Никнейм должен быть строкой',
     },
     minLength: {
-      en: "Nickname must be at least 3 characters long",
-      ru: "Никнейм должен содержать минимум 3 символа"
+      en: 'Nickname must be at least 3 characters long',
+      ru: 'Никнейм должен содержать минимум 3 символа',
     },
     maxLength: {
-      en: "Nickname must be at most 20 characters long",
-      ru: "Никнейм должен содержать максимум 20 символов"
+      en: 'Nickname must be at most 20 characters long',
+      ru: 'Никнейм должен содержать максимум 20 символов',
     },
     unique: {
-      en: "User with this nickname already exists",
-      ru: "Пользователь с данным никнеймом уже существует"
-    }
+      en: 'User with this nickname already exists',
+      ru: 'Пользователь с данным никнеймом уже существует',
+    },
   },
   email: {
     required: {
-      en: "Email is required",
-      ru: "Email обязателен"
+      en: 'Email is required',
+      ru: 'Email обязателен',
     },
     invalid: {
-      en: "Email must be a valid address",
-      ru: "Email должен быть действительным адресом"
+      en: 'Email must be a valid address',
+      ru: 'Email должен быть действительным адресом',
     },
     unique: {
-      en: "User with this email already exists",
-      ru: "Пользователь с данным почтовым адресом уже существует"
-    }
+      en: 'User with this email already exists',
+      ru: 'Пользователь с данным почтовым адресом уже существует',
+    },
   },
   password: {
     required: {
@@ -42,7 +42,7 @@ const errorMessages = {
     },
     invalidType: {
       en: 'Invalid password',
-      ru: 'Пароль содержит недоступные символы'
+      ru: 'Пароль содержит недоступные символы',
     },
     minLength: {
       en: 'Password must be at least 8 characters long',
@@ -50,7 +50,7 @@ const errorMessages = {
     },
     maxLength: {
       en: 'Password must be at least 8 characters long',
-      ru: 'Пароль не должен быть больше 20 символов'
+      ru: 'Пароль не должен быть больше 20 символов',
     },
     containsLetter: {
       en: 'Password must contain at least one letter',
@@ -64,19 +64,23 @@ const errorMessages = {
   general: {
     fieldNotRecognized: {
       en: 'Field is not recognized',
-      ru: 'Поле не распознано'
+      ru: 'Поле не распознано',
     },
     errorNotRecognized: {
       en: 'The error type is not recognized',
-      ru: 'Тип ошибки не распознан'
+      ru: 'Тип ошибки не распознан',
     },
-  }
+  },
 };
 
 type Field = keyof typeof errorMessages;
-type ErrorType<T extends Field> = keyof typeof errorMessages[T];
+type ErrorType<T extends Field> = keyof (typeof errorMessages)[T];
 
-export function getErrorMessage<T extends Field>(field: T, type: ErrorType<T>, lang: 'en' | 'ru' = 'en'): string {
+export function getErrorMessage<T extends Field>(
+  field: T,
+  type: ErrorType<T>,
+  lang: 'en' | 'ru' = 'en',
+): string {
   const fieldMessages = errorMessages[field];
 
   if (!fieldMessages) {
