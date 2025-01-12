@@ -1,89 +1,160 @@
 'use client';
 
-import { FC, JSX, memo } from 'react';
-import Image from 'next/image';
-import foggy from '../../../public/foggy.svg';
-import bg from '../../../public//images/1.webp';
-import Form from 'next/form';
+import React, { useState } from 'react';
 import { Button } from '@nextui-org/button';
+import { Form } from '@nextui-org/form';
 import { Input } from '@nextui-org/input';
 
-const LoginForm: FC = (): JSX.Element => {
+enum ButtonAction {
+  UNDEFINED,
+  LOGIN,
+  SIGNIN,
+}
+
+export default function LoginForm() {
+  const [errors, setErrors] = useState({});
+  const [action, setAction] = useState(ButtonAction.UNDEFINED);
+  const [loginButtonLoading, setLoginButtonLoading] = useState(false);
+  const [signinButtonLoading, setSigninButtonLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const getUsernameError = (value: string): string | null => {
+    if (!value) {
+      return 'Nickname or email is required';
+    }
+    if (value.includes('@')) {
+      if (value.length > 100)
+        return 'Email must be no more than 100 characters long';
+      if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
+        return 'Email must be valid';
+    } else {
+      if (value.length < 3)
+        return 'Nickname must be at least 3 characters long';
+      if (!value.match(/^[a-zA-Z0-9._@]+$/)) return 'Invalid password';
+      if (value.length > 20)
+        return 'Nickname must be no more than 20 characters long';
+    }
+    return null;
+  };
+
+  const getPasswordError = (value): string | null => {
+    if (value == '') return 'Password is required';
+
+    if (value.length < 8) return 'Password must be at least 8 characters long';
+
+    if (value.length > 20)
+      return 'Password must be no more than 20 characters long';
+
+    if (!value.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/))
+      return 'Password must contain at least 1 letter and 1 number';
+
+    return null;
+  };
+
+  function isFormValid(
+    usernameError: string | null,
+    passwordError: string | null,
+  ) {
+    const newErrors: any = {};
+
+    if (usernameError) newErrors.username = usernameError;
+    if (passwordError) newErrors.password = passwordError;
+
+    if (Object.keys(newErrors).length) {
+      setErrors(newErrors);
+      return false;
+    }
+    return true;
+  }
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+    if (
+      !isFormValid(
+        getUsernameError(data.username),
+        getPasswordError(data.password),
+      )
+    )
+      return;
+
+    if (action === ButtonAction.SIGNIN) {
+      setSigninButtonLoading(true);
+      console.log('await sign in check backend');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setSigninButtonLoading(false);
+      // if (!isFormValid(usernameError, passwordError)) return;
+      setAction(ButtonAction.UNDEFINED);
+    } else if (action === ButtonAction.LOGIN) {
+      setLoginButtonLoading(true);
+      console.log('await log in check backend');
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setLoginButtonLoading(false);
+      // if (!isFormValid(usernameError, passwordError)) return;
+    } else return;
+
+    setErrors({});
+
+    console.log('Submitted!');
+  };
+
   return (
-    <div
-      className={
-        'flex h-[560] w-4/5 max-w-[1040px] overflow-clip rounded-2xl border-1 border-white border-opacity-10 bg-white bg-opacity-50 backdrop-blur-3xl sm:w-3/4'
-      }
+    <Form
+      className={'flex min-w-24 flex-col gap-2 sm:w-80'}
+      onSubmit={onSubmit}
+      validationErrors={errors}
     >
-      <div
-        className={'hidden h-auto w-[420] items-center justify-center md:flex'}
-      >
-        <Image
-          className={'h-full w-full object-cover'}
-          alt={'bg-picture'}
-          src={bg}
-        ></Image>
-      </div>
+      <Input
+        isClearable
+        isRequired
+        errorMessage={errors.username}
+        label="Email or nickname"
+        labelPlacement="inside"
+        name="username"
+        type="username"
+        autocomplete="username"
+        size="md"
+      />
 
-      <div
-        className={
-          'flex h-full w-full flex-col items-center justify-center gap-2 p-4'
-        }
-      >
-        <Image className={'h-64 w-64'} alt={'foggy logo'} src={foggy}></Image>
+      <Input
+        isClearable
+        isRequired
+        errorMessage={errors.password}
+        label="Password"
+        labelPlacement="inside"
+        name="password"
+        type={passwordVisible ? 'text' : 'password'}
+        size="md"
+        autocomplete="current-password"
+      />
 
-        <Form
-          className={'flex min-w-24 flex-col gap-2 sm:w-80'}
-          action={(data) => console.log(`log in ${data.get('email')}`)}
+      <div className={'flex w-full justify-between'}>
+        <Button
+          onPress={() => setAction(ButtonAction.SIGNIN)}
+          type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
+          isLoading={signinButtonLoading}
+          variant="light"
+          color="primary"
+          size="md"
         >
-          <Input
-            isRequired
-            isClearable
-            errorMessage="Please enter a valid email"
-            label="Email"
-            labelPlacement="inside"
-            name="email"
-            type="email"
-            size="md"
-          />
-
-          <Input
-            isRequired
-            isClearable
-            errorMessage="Please enter a valid password"
-            label="Password"
-            labelPlacement="inside"
-            name="password"
-            type="password"
-            size="md"
-          />
-
-          <div className={'flex justify-between'}>
-            <Button
-              onPress={() => console.log('sign in')}
-              variant="light"
-              color="primary"
-              size="md"
-            >
-              sign in
-            </Button>
-            <Button variant="solid" color="primary" type="submit" size="md">
-              log in
-            </Button>
-          </div>
-
-          <Button
-            onPress={() => console.log('sign in via Google / Yandex')}
-            variant="bordered"
-            size="md"
-            className={'w-fit border-none px-0'}
-          >
-            Login with Google / Yandex
-          </Button>
-        </Form>
+          sign in
+        </Button>
+        <Button
+          onPress={() => setAction(ButtonAction.LOGIN)}
+          isLoading={loginButtonLoading}
+          type="submit"
+          variant="solid"
+          color="primary"
+          size="md"
+        >
+          log in
+        </Button>
       </div>
-    </div>
-  );
-};
 
-export default memo(LoginForm);
+      <Button variant="bordered" size="md" className={'border-none'}>
+        Login with Google / Yandex
+      </Button>
+    </Form>
+  );
+}
