@@ -5,3 +5,6 @@
 /node_modules
 /.pnp
 .pnp.*
+
+# файл должен автоматически генерироваться на основе package.json
+pnpm-lock.yaml

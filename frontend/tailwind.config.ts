@@ -136,7 +136,7 @@ export default {
               foreground: '#FFFFFF',
               DEFAULT: '#C7952B',
             },
-            info: {
+            /* info: {
               50: '#ecfffe',
               100: '#CBFDFC',
               200: '#98F8FC',
@@ -149,7 +149,7 @@ export default {
               900: '#00346F',
               foreground: '#FFFFFF',
               DEFAULT: '#02AEE8',
-            },
+            }, */
             success: {
               50: '#f5f8f5',
               100: '#E0EBE0',
@@ -193,7 +193,7 @@ export default {
         },
       },
     }),
-    function ({ addUtilities }) {
+    function ({ addUtilities }: any) {
       const avatars = {
         '.accent-avatar': {
           color: foggy_accent.foreground,
