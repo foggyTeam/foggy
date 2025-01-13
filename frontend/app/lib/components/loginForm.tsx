@@ -18,22 +18,15 @@ export default function LoginForm() {
   const [signinButtonLoading, setSigninButtonLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const getUsernameError = (value: string): string | null => {
+  const getEmailError = (value: string): string | null => {
     if (!value) {
-      return 'Nickname or email is required';
+      return 'Email is required';
     }
-    if (value.includes('@')) {
-      if (value.length > 100)
-        return 'Email must be no more than 100 characters long';
-      if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
-        return 'Email must be valid';
-    } else {
-      if (value.length < 3)
-        return 'Nickname must be at least 3 characters long';
-      if (!value.match(/^[a-zA-Z0-9._@]+$/)) return 'Invalid password';
-      if (value.length > 20)
-        return 'Nickname must be no more than 20 characters long';
-    }
+    if (value.length > 100)
+      return 'Email must be no more than 100 characters long';
+    if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
+      return 'Email must be valid';
+
     return null;
   };
 
@@ -52,12 +45,12 @@ export default function LoginForm() {
   };
 
   function isFormValid(
-    usernameError: string | null,
+    emailError: string | null,
     passwordError: string | null,
   ) {
     const newErrors: any = {};
 
-    if (usernameError) newErrors.username = usernameError;
+    if (emailError) newErrors.email = emailError;
     if (passwordError) newErrors.password = passwordError;
 
     if (Object.keys(newErrors).length) {
@@ -72,10 +65,7 @@ export default function LoginForm() {
 
     const data = Object.fromEntries(new FormData(e.currentTarget));
     if (
-      !isFormValid(
-        getUsernameError(data.username),
-        getPasswordError(data.password),
-      )
+      !isFormValid(getEmailError(data.email), getPasswordError(data.password))
     )
       return;
 
@@ -84,14 +74,14 @@ export default function LoginForm() {
       console.log('await sign in check backend');
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setSigninButtonLoading(false);
-      // if (!isFormValid(usernameError, passwordError)) return;
+      // if (!isFormValid(emailError, passwordError)) return;
       setAction(ButtonAction.UNDEFINED);
     } else if (action === ButtonAction.LOGIN) {
       setLoginButtonLoading(true);
       console.log('await log in check backend');
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoginButtonLoading(false);
-      // if (!isFormValid(usernameError, passwordError)) return;
+      // if (!isFormValid(emailError, passwordError)) return;
     } else return;
 
     setErrors({});
@@ -108,12 +98,12 @@ export default function LoginForm() {
       <Input
         isClearable
         isRequired
-        errorMessage={errors.username}
-        label="Email or nickname"
+        errorMessage={errors.email}
+        label="Email"
         labelPlacement="inside"
-        name="username"
-        type="username"
-        autocomplete="username"
+        name="email"
+        type="email"
+        autocomplete="email"
         size="md"
       />
 
