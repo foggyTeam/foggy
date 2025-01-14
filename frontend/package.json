@@ -23,6 +23,7 @@
     "@types/tailwindcss": "^3.1.0",
     "axios": "^1.7.9",
     "framer-motion": "^11.17.0",
+    "lucide-react": "^0.471.1",
     "mobx": "^6.13.5",
     "mobx-react-lite": "^4.1.0",
     "next": "15.1.2",
