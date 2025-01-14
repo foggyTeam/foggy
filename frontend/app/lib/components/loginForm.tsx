@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button } from '@nextui-org/button';
 import { Form } from '@nextui-org/form';
 import { Input } from '@nextui-org/input';
+import { Eye, EyeClosed, X } from 'lucide-react';
+import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
+import { postRequest } from '@/app/lib/utils/requests';
+import { useRouter } from 'next/navigation';
 
 enum ButtonAction {
   UNDEFINED,
@@ -12,6 +15,9 @@ enum ButtonAction {
 }
 
 export default function LoginForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [action, setAction] = useState(ButtonAction.UNDEFINED);
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
@@ -71,22 +77,34 @@ export default function LoginForm() {
 
     if (action === ButtonAction.SIGNIN) {
       setSigninButtonLoading(true);
-      console.log('await sign in check backend');
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const signUpErrors = await postRequest('users/register', {
+        nickname: 'user1',
+        email: data.email,
+        password: data.password,
+      });
       setSigninButtonLoading(false);
-      // if (!isFormValid(emailError, passwordError)) return;
+
       setAction(ButtonAction.UNDEFINED);
+      if (!isFormValid(signUpErrors.error, null)) {
+        return;
+      }
     } else if (action === ButtonAction.LOGIN) {
       setLoginButtonLoading(true);
-      console.log('await log in check backend');
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const loginErrors = await postRequest('users/login', {
+        userIdentifier: data.email,
+        password: data.password,
+      });
       setLoginButtonLoading(false);
-      // if (!isFormValid(emailError, passwordError)) return;
+      if (!isFormValid(loginErrors.error, null)) {
+        return;
+      }
     } else return;
 
     setErrors({});
 
     console.log('Submitted!');
+    await router.push('/');
   };
 
   return (
@@ -96,31 +114,73 @@ export default function LoginForm() {
       validationErrors={errors}
     >
       <Input
-        isClearable
         isRequired
         errorMessage={errors.email}
         label="Email"
         labelPlacement="inside"
+        placeholder="hoggyfoggy@example.com"
         name="email"
         type="email"
         autocomplete="email"
         size="md"
+        value={email}
+        onValueChange={setEmail}
+        endContent={
+          email && (
+            <button
+              aria-label="clear field"
+              className="h-fit w-fit"
+              type="button"
+              onClick={() => setEmail('')}
+            >
+              <X className="stroke-default-400" />
+            </button>
+          )
+        }
       />
 
       <Input
-        isClearable
         isRequired
         errorMessage={errors.password}
         label="Password"
         labelPlacement="inside"
+        placeholder="qwerty123"
         name="password"
+        value={password}
+        onValueChange={setPassword}
         type={passwordVisible ? 'text' : 'password'}
+        endContent={
+          <div className="flex items-center gap-2">
+            <button
+              aria-label="clear field"
+              className="h-fit w-fit"
+              type="button"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+            >
+              {passwordVisible ? (
+                <Eye className="stroke-default-400" />
+              ) : (
+                <EyeClosed className="stroke-default-400" />
+              )}
+            </button>
+            {password && (
+              <button
+                aria-label="clear field"
+                className="h-fit w-fit"
+                type="button"
+                onClick={() => setPassword('')}
+              >
+                <X className="stroke-default-400" />
+              </button>
+            )}
+          </div>
+        }
         size="md"
         autocomplete="current-password"
       />
 
       <div className={'flex w-full justify-between'}>
-        <Button
+        <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
           isLoading={signinButtonLoading}
@@ -128,9 +188,10 @@ export default function LoginForm() {
           color="primary"
           size="md"
         >
-          sign in
-        </Button>
-        <Button
+          sign up
+        </FButton>
+
+        <FButton
           onPress={() => setAction(ButtonAction.LOGIN)}
           isLoading={loginButtonLoading}
           type="submit"
@@ -139,12 +200,12 @@ export default function LoginForm() {
           size="md"
         >
           log in
-        </Button>
+        </FButton>
       </div>
 
-      <Button variant="bordered" size="md" className={'border-none'}>
+      <FButton variant="bordered" size="md" className={'border-none'}>
         Login with Google / Yandex
-      </Button>
+      </FButton>
     </Form>
   );
 }

@@ -19,7 +19,3 @@ body {
   background: var(--background);
   font-family: Helvetica, sans-serif;
 }
-
-Button {
-  padding: 1.5rem 2.75rem !important ;
-}
