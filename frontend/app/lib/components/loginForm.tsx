@@ -5,8 +5,9 @@ import { Form } from '@nextui-org/form';
 import { Input } from '@nextui-org/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
-import { postRequest } from '@/app/lib/utils/requests';
 import { useRouter } from 'next/navigation';
+import { Button } from '@nextui-org/button';
+import { signUserIn } from '@/app/lib/server/actions/signUserIn';
 
 enum ButtonAction {
   UNDEFINED,
@@ -16,6 +17,7 @@ enum ButtonAction {
 
 export default function LoginForm() {
   const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -78,32 +80,41 @@ export default function LoginForm() {
     if (action === ButtonAction.SIGNIN) {
       setSigninButtonLoading(true);
 
-      const signUpErrors = await postRequest('users/register', {
-        nickname: 'user1',
-        email: data.email,
-        password: data.password,
-      });
-      setSigninButtonLoading(false);
-
-      setAction(ButtonAction.UNDEFINED);
-      if (!isFormValid(signUpErrors.error, null)) {
+      try {
+        await signUserIn(
+          {
+            nickname: 'user1',
+            email: data.email,
+            password: data.password,
+          },
+          true,
+        ).finally(() => {
+          setSigninButtonLoading(false);
+          setAction(ButtonAction.UNDEFINED);
+        });
+      } catch (e) {
+        !isFormValid(e.message, null);
         return;
       }
     } else if (action === ButtonAction.LOGIN) {
       setLoginButtonLoading(true);
-      const loginErrors = await postRequest('users/login', {
-        userIdentifier: data.email,
-        password: data.password,
-      });
-      setLoginButtonLoading(false);
-      if (!isFormValid(loginErrors.error, null)) {
+
+      try {
+        await signUserIn({
+          email: data.email,
+          password: data.password,
+        }).finally(() => {
+          setLoginButtonLoading(false);
+          setAction(ButtonAction.UNDEFINED);
+        });
+      } catch (e) {
+        !isFormValid(e.message, null);
         return;
       }
     } else return;
 
     setErrors({});
 
-    console.log('Submitted!');
     await router.push('/');
   };
 
@@ -203,9 +214,16 @@ export default function LoginForm() {
         </FButton>
       </div>
 
-      <FButton variant="bordered" size="md" className={'border-none'}>
-        Login with Google / Yandex
-      </FButton>
+      <p className="text-small">
+        Login with
+        <Button variant="bordered" size="md" className={'border-none px-0'}>
+          Google
+        </Button>
+        /
+        <Button variant="bordered" size="md" className={'border-none px-0'}>
+          Yandex
+        </Button>
+      </p>
     </Form>
   );
 }
