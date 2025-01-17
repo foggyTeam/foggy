@@ -6,3 +6,9 @@ export type SessionPayload = {
   userId: string;
   expiresAt: string;
 };
+
+export enum AvailableProviders {
+  CREDENTIALS,
+  GOOGLE,
+  YANDEX,
+}

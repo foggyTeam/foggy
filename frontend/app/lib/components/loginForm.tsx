@@ -8,6 +8,8 @@ import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { useRouter } from 'next/navigation';
 import { Button } from '@nextui-org/button';
 import { signUserIn } from '@/app/lib/server/actions/signUserIn';
+import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProviders';
+import { AvailableProviders } from '@/app/lib/utils/definitions';
 
 enum ButtonAction {
   UNDEFINED,
@@ -93,7 +95,7 @@ export default function LoginForm() {
           setAction(ButtonAction.UNDEFINED);
         });
       } catch (e) {
-        !isFormValid(e.message, null);
+        isFormValid(e.message, null);
         return;
       }
     } else if (action === ButtonAction.LOGIN) {
@@ -108,7 +110,7 @@ export default function LoginForm() {
           setAction(ButtonAction.UNDEFINED);
         });
       } catch (e) {
-        !isFormValid(e.message, null);
+        isFormValid(e.message, null);
         return;
       }
     } else return;
@@ -216,11 +218,21 @@ export default function LoginForm() {
 
       <p className="text-small">
         Login with
-        <Button variant="bordered" size="md" className={'border-none px-0'}>
+        <Button
+          onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
+          variant="bordered"
+          size="md"
+          className={'border-none px-0'}
+        >
           Google
         </Button>
         /
-        <Button variant="bordered" size="md" className={'border-none px-0'}>
+        <Button
+          onPress={() => signUserViaProviders(AvailableProviders.YANDEX)}
+          variant="bordered"
+          size="md"
+          className={'border-none px-0'}
+        >
           Yandex
         </Button>
       </p>
