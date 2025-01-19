@@ -1,7 +1,7 @@
 'use client';
-import { NextUIProvider } from '@nextui-org/react';
+import { HeroUIProvider } from "@heroui/react";
 import React from 'react';
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <NextUIProvider>{children}</NextUIProvider>;
+  return <HeroUIProvider>{children}</HeroUIProvider>;
 }
