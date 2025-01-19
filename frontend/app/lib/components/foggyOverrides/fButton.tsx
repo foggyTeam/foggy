@@ -1,4 +1,4 @@
-import { Button, extendVariants } from "@heroui/react";
+import { Button, extendVariants } from '@heroui/react';
 
 export const FButton = extendVariants(Button, {
   variants: {

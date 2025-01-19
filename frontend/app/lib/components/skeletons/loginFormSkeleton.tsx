@@ -1,6 +1,6 @@
 import React, { FC, JSX } from 'react';
-import { Skeleton } from "@heroui/skeleton";
-import { Input } from "@heroui/input";
+import { Skeleton } from '@heroui/skeleton';
+import { Input } from '@heroui/input';
 
 const LoginFormSkeleton: FC = (): JSX.Element => {
   return (

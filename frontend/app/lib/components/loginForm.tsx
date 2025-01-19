@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Form } from "@heroui/form";
-import { Input } from "@heroui/input";
+import { Form } from '@heroui/form';
+import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { useRouter } from 'next/navigation';
-import { Button } from "@heroui/button";
+import { Button } from '@heroui/button';
 import { signUserIn } from '@/app/lib/server/actions/signUserIn';
 import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProviders';
 import { AvailableProviders } from '@/app/lib/utils/definitions';
