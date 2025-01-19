@@ -4,8 +4,6 @@ import LoginForm from '@/app/lib/components/loginForm';
 import Image from 'next/image';
 import bg from '@/public/images/1.webp';
 import foggy from '@/public/foggy.svg';
-import { Skeleton } from '@nextui-org/skeleton';
-import loginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 
 const Login = () => {
