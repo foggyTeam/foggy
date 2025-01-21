@@ -1,6 +1,6 @@
-import { Button } from '@nextui-org/button';
-import { Avatar } from '@nextui-org/avatar';
-import { Badge } from '@nextui-org/badge';
+import { Button } from '@heroui/button';
+import { Avatar } from '@heroui/avatar';
+import { Badge } from '@heroui/badge';
 
 export default function Main() {
   return (

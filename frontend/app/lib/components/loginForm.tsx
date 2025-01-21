@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Form } from '@nextui-org/form';
-import { Input } from '@nextui-org/input';
+import { Form } from '@heroui/form';
+import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { useRouter } from 'next/navigation';
-import { Button } from '@nextui-org/button';
+import { Button } from '@heroui/button';
 import { signUserIn } from '@/app/lib/server/actions/signUserIn';
 import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProviders';
 import { AvailableProviders } from '@/app/lib/utils/definitions';
+import { loginFormSchema } from '@/app/lib/utils/schemas';
+import z from 'zod';
 
 enum ButtonAction {
   UNDEFINED,
@@ -28,61 +30,39 @@ export default function LoginForm() {
   const [signinButtonLoading, setSigninButtonLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  const getEmailError = (value: string): string | null => {
-    if (!value) {
-      return 'Email is required';
-    }
-    if (value.length > 100)
-      return 'Email must be no more than 100 characters long';
-    if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/))
-      return 'Email must be valid';
-
-    return null;
-  };
-
-  const getPasswordError = (value): string | null => {
-    if (value == '') return 'Password is required';
-
-    if (value.length < 8) return 'Password must be at least 8 characters long';
-
-    if (value.length > 20)
-      return 'Password must be no more than 20 characters long';
-
-    if (!value.match(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/))
-      return 'Password must contain at least 1 letter and 1 number';
-
-    return null;
-  };
-
-  function isFormValid(
-    emailError: string | null,
-    passwordError: string | null,
-  ) {
-    const newErrors: any = {};
-
-    if (emailError) newErrors.email = emailError;
-    if (passwordError) newErrors.password = passwordError;
-
-    if (Object.keys(newErrors).length) {
-      setErrors(newErrors);
+  function isFormValid(data: { email: string; password: string }) {
+    try {
+      loginFormSchema.parse(data);
+      setErrors({});
+      return true;
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        const newErrors: any = {};
+        e.errors.forEach((error) => {
+          if (error.path.length > 0) {
+            newErrors[error.path[0]] = error.message;
+          }
+        });
+        setErrors(newErrors);
+      }
       return false;
     }
-    return true;
   }
 
   const onSubmit = async (e) => {
     e.preventDefault();
 
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    if (
-      !isFormValid(getEmailError(data.email), getPasswordError(data.password))
-    )
-      return;
+    const data = Object.fromEntries(new FormData(e.currentTarget)) as {
+      email: string;
+      password: string;
+    };
 
-    if (action === ButtonAction.SIGNIN) {
-      setSigninButtonLoading(true);
+    if (!isFormValid(data)) return;
 
-      try {
+    try {
+      if (action === ButtonAction.SIGNIN) {
+        setSigninButtonLoading(true);
+
         await signUserIn(
           {
             nickname: 'user1',
@@ -92,28 +72,23 @@ export default function LoginForm() {
           true,
         ).finally(() => {
           setSigninButtonLoading(false);
-          setAction(ButtonAction.UNDEFINED);
         });
-      } catch (e) {
-        isFormValid(e.message, null);
-        return;
-      }
-    } else if (action === ButtonAction.LOGIN) {
-      setLoginButtonLoading(true);
+      } else if (action === ButtonAction.LOGIN) {
+        setLoginButtonLoading(true);
 
-      try {
         await signUserIn({
           email: data.email,
           password: data.password,
         }).finally(() => {
           setLoginButtonLoading(false);
-          setAction(ButtonAction.UNDEFINED);
         });
-      } catch (e) {
-        isFormValid(e.message, null);
-        return;
-      }
-    } else return;
+      } else return;
+
+      setAction(ButtonAction.UNDEFINED);
+    } catch (e) {
+      setErrors({ email: e.message });
+      return;
+    }
 
     setErrors({});
 

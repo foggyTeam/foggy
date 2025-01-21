@@ -1,5 +1,5 @@
 import type { Config } from 'tailwindcss';
-import { nextui } from '@nextui-org/react';
+import { heroui } from '@heroui/react';
 
 export function to_rgb(hex: string): string {
   let r = 0;
@@ -60,7 +60,7 @@ export default {
     './(pages)/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
-    '../node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
+    '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
@@ -73,7 +73,7 @@ export default {
   },
   darkMode: 'class',
   plugins: [
-    nextui({
+    heroui({
       addCommonColors: true,
       themes: {
         light: {
@@ -198,27 +198,27 @@ export default {
         '.accent-avatar': {
           color: foggy_accent.foreground,
           backgroundColor: foggy_accent.DEFAULT,
-          boxShadow: `var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) hsl(var(--nextui-background)), var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) ${foggy_accent.DEFAULT}, var(--tw-shadow, 0 0 #00000)`,
+          boxShadow: `var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) hsl(var(--heroui-background)), var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) ${foggy_accent.DEFAULT}, var(--tw-shadow, 0 0 #00000)`,
         },
       };
       const badges = {
         '.accent-badge-s': {
-          borderColor: 'hsl(var(--nextui-background))',
+          borderColor: 'hsl(var(--heroui-background))',
           backgroundColor: foggy_accent.DEFAULT,
           color: foggy_accent.foreground,
         },
         '.accent-badge-fl': {
-          borderColor: 'hsl(var(--nextui-background))',
+          borderColor: 'hsl(var(--heroui-background))',
           backgroundColor: `rgba(${foggy_accent_rgb.DEFAULT}, 0.2)`,
           color: foggy_accent['700'],
         },
         '.accent-badge-f': {
           color: foggy_accent.DEFAULT,
-          borderColor: 'hsl(var(--nextui-default))',
-          backgroundColor: 'hsl(var(--nextui-default-100))',
+          borderColor: 'hsl(var(--heroui-default))',
+          backgroundColor: 'hsl(var(--heroui-default-100))',
         },
         '.accent-badge-sh': {
-          borderColor: 'hsl(var(--nextui-background))',
+          borderColor: 'hsl(var(--heroui-background))',
           backgroundColor: foggy_accent.DEFAULT,
           color: foggy_accent.foreground,
           boxShadow: `0 10px 15px -3px rgba(${foggy_accent_rgb.DEFAULT}, 0.4), 0 4px 6px -4px rgba(${foggy_accent_rgb.DEFAULT}, 0.4)`,
@@ -232,15 +232,15 @@ export default {
         },
         /* accent-faded */
         '.accent-f': {
-          backgroundColor: 'hsl(var(--nextui-default-100))',
+          backgroundColor: 'hsl(var(--heroui-default-100))',
           border:
-            'var(--nextui-border-width-medium) solid hsl(var(--nextui-default))',
+            'var(--heroui-border-width-medium) solid hsl(var(--heroui-default))',
           color: foggy_accent.DEFAULT,
         },
         /* accent-bordered */
         '.accent-b': {
           backgroundColor: 'rgba(0, 0, 0, 0)',
-          border: `var(--nextui-border-width-medium) solid ${foggy_accent.DEFAULT}`,
+          border: `var(--heroui-border-width-medium) solid ${foggy_accent.DEFAULT}`,
           color: foggy_accent.DEFAULT,
         },
         /* accent-light */
@@ -260,7 +260,7 @@ export default {
         /* accent-ghost */
         '.accent-g': {
           backgroundColor: 'rgba(0, 0, 0, 0)',
-          border: `var(--nextui-border-width-medium) solid ${foggy_accent.DEFAULT}`,
+          border: `var(--heroui-border-width-medium) solid ${foggy_accent.DEFAULT}`,
           color: foggy_accent.DEFAULT,
         },
         '.accent-g:hover': {
