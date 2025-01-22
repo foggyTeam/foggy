@@ -10,6 +10,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { LoginUserDto } from './login-user.dto';
+import { GoogleUserDto } from './login-google.dto';
 import { User } from '../schemas/user.schema';
 
 @ApiTags('users')
@@ -31,7 +32,6 @@ export class UsersController {
     examples: {
       example1: {
         value: {
-          nickname: 'John Doe',
           email: 'johndoe@gmail.com',
           password: '12345678a',
         },
@@ -52,13 +52,7 @@ export class UsersController {
     examples: {
       example1: {
         value: {
-          userIdentifier: 'John Doe',
-          password: '12345678a',
-        },
-      },
-      example2: {
-        value: {
-          userIdentifier: 'johndoe@gmail.com',
+          email: 'johndoe@gmail.com',
           password: '12345678a',
         },
       },
@@ -66,6 +60,27 @@ export class UsersController {
   })
   async login(@Body() loginUserDto: LoginUserDto) {
     return this.usersService.login(loginUserDto);
+  }
+
+  @Post('google-login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login or register a user via Google/Yandex' })
+  @ApiResponse({ status: 200, description: 'Login or registration successful' })
+  @ApiResponse({ status: 409, description: 'User ID already exists' })
+  @ApiBody({
+    description: 'User data from Google/Yandex',
+    examples: {
+      example1: {
+        value: {
+          id: 'unique-google-yandex-id',
+          email: 'user@gmail.com',
+          nickname: 'Русское имя',
+        },
+      },
+    },
+  })
+  async googleLogin(@Body() googleUserDto: GoogleUserDto): Promise<User> {
+    return this.usersService.handleGoogleYandexUser(googleUserDto);
   }
 
   @Get()

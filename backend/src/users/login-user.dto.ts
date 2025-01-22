@@ -1,12 +1,12 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { getErrorMessage } from '../errorMessages';
+import { getErrorMessages } from '../errorMessages';
 
 export class LoginUserDto {
-  @IsNotEmpty({ message: getErrorMessage('general', 'required') })
-  @IsString({ message: getErrorMessage('general', 'invalidType') })
-  userIdentifier: string;
+  @IsNotEmpty({ message: getErrorMessages({ email: 'required' }).email })
+  @IsString({ message: getErrorMessages({ email: 'invalidType' }).email })
+  email: string;
 
-  @IsNotEmpty({ message: getErrorMessage('password', 'required') })
-  @IsString({ message: getErrorMessage('password', 'invalidType') })
+  @IsNotEmpty({ message: getErrorMessages({ password: 'required' }).password })
+  @IsString({ message: getErrorMessages({ password: 'invalidType' }).password })
   password: string;
 }

@@ -6,26 +6,30 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { getErrorMessage } from '../errorMessages';
+import { getErrorMessages } from '../errorMessages';
 
 export class CreateUserDto {
-  @IsNotEmpty({ message: getErrorMessage('nickname', 'required') })
-  @IsString({ message: getErrorMessage('nickname', 'invalidType') })
-  @MinLength(3, { message: getErrorMessage('nickname', 'minLength') })
-  @MaxLength(20, { message: getErrorMessage('nickname', 'maxLength') })
-  nickname: string;
-
-  @IsNotEmpty({ message: getErrorMessage('email', 'required') })
-  @IsEmail({}, { message: getErrorMessage('email', 'invalidType') })
+  @IsNotEmpty({ message: getErrorMessages({ email: 'required' }).email })
+  @IsEmail({}, { message: getErrorMessages({ email: 'invalidType' }).email })
   email: string;
 
-  @IsNotEmpty({ message: getErrorMessage('password', 'required') })
-  @IsString({ message: getErrorMessage('password', 'invalidType') })
-  @MinLength(8, { message: getErrorMessage('password', 'minLength') })
-  @MaxLength(20, { message: getErrorMessage('password', 'maxLength') })
-  @Matches(/[A-Za-z]/, {
-    message: getErrorMessage('password', 'containsLetter'),
+  @IsNotEmpty({
+    message: getErrorMessages({ password: 'required' }).password,
   })
-  @Matches(/[0-9]/, { message: getErrorMessage('password', 'containsNumber') })
+  @IsString({
+    message: getErrorMessages({ password: 'invalidType' }).password,
+  })
+  @MinLength(8, {
+    message: getErrorMessages({ password: 'minLength' }).password,
+  })
+  @MaxLength(20, {
+    message: getErrorMessages({ password: 'maxLength' }).password,
+  })
+  @Matches(/[A-Za-z]/, {
+    message: getErrorMessages({ password: 'containsLetter' }).password,
+  })
+  @Matches(/[0-9]/, {
+    message: getErrorMessages({ password: 'containsNumber' }).password,
+  })
   password: string;
 }
