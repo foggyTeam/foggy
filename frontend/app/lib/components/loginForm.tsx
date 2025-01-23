@@ -24,7 +24,7 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({} as any);
   const [action, setAction] = useState(ButtonAction.UNDEFINED);
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [signinButtonLoading, setSigninButtonLoading] = useState(false);
@@ -65,7 +65,6 @@ export default function LoginForm() {
 
         await signUserIn(
           {
-            nickname: 'user1',
             email: data.email,
             password: data.password,
           },
@@ -86,7 +85,13 @@ export default function LoginForm() {
 
       setAction(ButtonAction.UNDEFINED);
     } catch (e) {
-      setErrors({ email: e.message });
+      console.log(e.message);
+      e.message
+        ? setErrors({ email: e.message.split('.')[0] })
+        : setErrors({
+            email: 'Invalid credentials',
+            password: 'Invalid credentials',
+          });
       return;
     }
 

@@ -1,4 +1,4 @@
-import NextAuth, { AuthError } from 'next-auth';
+import NextAuth, { CredentialsSignin } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { createSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/utils/requests';
@@ -14,7 +14,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         register: {
           label: 'Are you new to foggy?',
           placeholder: "Leave this field empty if you aren't",
-          type: 'text',
+          type: 'string',
         },
       },
       authorize: async (credentials: any) => {
@@ -22,7 +22,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           ? {
               url: 'users/register',
               data: {
-                nickname: 'user1',
                 email: credentials.email,
                 password: credentials.password,
               },
@@ -30,25 +29,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           : {
               url: 'users/login',
               data: {
-                userIdentifier: credentials.email,
+                email: credentials.email,
                 password: credentials.password,
               },
             };
 
         const result = await postRequest(request.url, request.data);
 
-        if (result.error) throw new AuthError(result.error);
+        if (result.errors || !result) {
+          const errorMessage =
+            result.errors?.email && credentials.register
+              ? result.errors.email
+              : undefined;
+          throw new CredentialsSignin(errorMessage);
+        }
 
         // 3. create user session
         const user = {
-          email: credentials.email,
-          nickname: 'hoggyfoggy0',
-          id: '123456qwrewa125dt',
+          id: result.id,
+          email: result.email,
+          nickname: result.nickname,
         };
 
         await createSession(user.id);
 
-        return {};
+        // 4. return user
+        return user;
       },
     }),
     Google,
@@ -75,37 +81,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     } as Provider,
   ],
   callbacks: {
-    async redirect({ url, baseUrl }) {
-      return baseUrl;
+    authorized: async ({ auth }) => {
+      return !!auth;
     },
   },
   events: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account }) {
       if (account.provider === 'google' || account.provider === 'yandex') {
-        /*
-        const request = credentials.register
-          ? {
-            url: 'users/register',
-            data: {
-              nickname: 'user1',
-              email: credentials.email,
-              password: credentials.password,
-            },
-          }
-          : {
-            url: 'users/login',
-            data: {
-              userIdentifier: credentials.email,
-              password: credentials.password,
-            },
-          };
+        const request = {
+          url: 'users/google-login',
+          data: {
+            id: user.id,
+            nickname: user.name,
+            email: user.email,
+          },
+        };
 
         const result = await postRequest(request.url, request.data);
-        
 
-        if (result.error) throw new AuthError(result.error);*/
+        console.log(result);
+        if (result.errors || !result) {
+          throw new CredentialsSignin(result.errors);
+        }
 
         await createSession(user.id);
+
+        return { ...user, nickname: result.nickname };
       }
     },
 
@@ -113,4 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       console.error('Error event:', message);
     },
   } as any,
+  pages: {
+    signIn: '/login',
+  },
 });
