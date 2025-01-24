@@ -1,13 +1,35 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
+import { getErrorMessages } from '../errorMessages';
 
 export class CreateUserDto {
-  @IsString()
-  nickname: string;
-
-  @IsEmail()
+  @IsNotEmpty({ message: getErrorMessages({ email: 'required' }).email })
+  @IsEmail({}, { message: getErrorMessages({ email: 'invalidType' }).email })
   email: string;
 
-  @IsString()
-  @MinLength(6)
+  @IsNotEmpty({
+    message: getErrorMessages({ password: 'required' }).password,
+  })
+  @IsString({
+    message: getErrorMessages({ password: 'invalidType' }).password,
+  })
+  @MinLength(8, {
+    message: getErrorMessages({ password: 'minLength' }).password,
+  })
+  @MaxLength(20, {
+    message: getErrorMessages({ password: 'maxLength' }).password,
+  })
+  @Matches(/[A-Za-z]/, {
+    message: getErrorMessages({ password: 'containsLetter' }).password,
+  })
+  @Matches(/[0-9]/, {
+    message: getErrorMessages({ password: 'containsNumber' }).password,
+  })
   password: string;
 }

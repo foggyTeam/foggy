@@ -1,13 +1,43 @@
-import { Schema, Document } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export const UserSchema = new Schema({
-  nickname: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
-
-export interface User extends Document {
-  nickname: string;
-  email: string;
-  password: string;
+interface UserSettings {
+  emailNotifications: boolean;
+  projectNotifications: boolean;
+  favoriteProjectNotifications: boolean;
 }
+
+const defaultSettings: UserSettings = {
+  emailNotifications: false,
+  projectNotifications: false,
+  favoriteProjectNotifications: true,
+};
+
+@Schema()
+export class User extends Document {
+  @Prop({ required: true, unique: true })
+  nickname: string;
+
+  @Prop({ required: true, unique: true })
+  email: string;
+
+  @Prop()
+  password?: string;
+
+  @Prop({ unique: true, sparse: true })
+  googleYandexId?: string;
+
+  @Prop({ default: Date.now })
+  registrationDate: Date;
+
+  @Prop({ type: Object, default: defaultSettings })
+  settings: UserSettings;
+
+  @Prop({ default: '' })
+  profileDescription: string;
+
+  @Prop({ default: '' })
+  avatar: string;
+}
+
+export const UserSchema = SchemaFactory.createForClass(User);
