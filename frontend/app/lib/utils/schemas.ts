@@ -1,4 +1,5 @@
 import z from 'zod';
+import settingsStore from '../../stores/settingsStore';
 
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
 const emailRegex = /^[a-zA-Z0-9._]+@[a-zA-Z0-9._]+\.[a-zA-Z]{2,}$/;
@@ -6,22 +7,19 @@ const emailRegex = /^[a-zA-Z0-9._]+@[a-zA-Z0-9._]+\.[a-zA-Z]{2,}$/;
 export const loginFormSchema = z.object({
   email: z
     .string()
-    .nonempty('Email is required')
-    .max(100, 'Email must be no more than 100 characters long')
-    .email('Email must be valid')
-    .regex(
-      emailRegex,
-      'Email may contain only latin letters, digits and special symbols ".@_"',
-    ),
+    .nonempty(settingsStore.t.validationErrors.email.required)
+    .max(100, settingsStore.t.validationErrors.email.maxLength)
+    .email(settingsStore.t.validationErrors.email.invalidEmail)
+    .regex(emailRegex, settingsStore.t.validationErrors.email.invalidSymbols),
 
   password: z
     .string()
-    .nonempty('Password is required')
-    .min(8, 'Password must be at least 8 characters long')
-    .max(20, 'Password must be no more than 20 characters long')
+    .nonempty(settingsStore.t.validationErrors.password.required)
+    .min(8, settingsStore.t.validationErrors.password.minLength)
+    .max(20, settingsStore.t.validationErrors.password.maxLength)
     .regex(
       passwordRegex,
-      'Password must contain at least 1 letter and 1 number',
+      settingsStore.t.validationErrors.password.invalidPassword,
     ),
 });
 

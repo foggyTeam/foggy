@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Form } from '@heroui/form';
 import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
@@ -12,6 +12,7 @@ import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProvid
 import { AvailableProviders } from '@/app/lib/utils/definitions';
 import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
+import { SettingsContext } from '@/app/stores/settingsContext';
 
 enum ButtonAction {
   UNDEFINED,
@@ -21,6 +22,7 @@ enum ButtonAction {
 
 export default function LoginForm() {
   const router = useRouter();
+  const { t } = useContext(SettingsContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -88,8 +90,8 @@ export default function LoginForm() {
       if (e.message) setErrors({ email: e.message.split('.')[0] });
       else
         setErrors({
-          email: 'Invalid credentials',
-          password: 'Invalid credentials',
+          email: t.errors.invalidCredentials,
+          password: t.errors.invalidCredentials,
         });
       return;
     }
@@ -108,9 +110,9 @@ export default function LoginForm() {
       <Input
         isRequired
         errorMessage={errors.email}
-        label="Email"
+        label={t.login.email}
         labelPlacement="inside"
-        placeholder="hoggyfoggy@example.com"
+        placeholder={t.login.emailPlaceholder}
         name="email"
         type="email"
         autoComplete="email"
@@ -134,9 +136,9 @@ export default function LoginForm() {
       <Input
         isRequired
         errorMessage={errors.password}
-        label="Password"
+        label={t.login.password}
         labelPlacement="inside"
-        placeholder="qwerty123"
+        placeholder={t.login.passwordPlaceholder}
         name="password"
         value={password}
         onValueChange={setPassword}
@@ -171,16 +173,16 @@ export default function LoginForm() {
         autoComplete="current-password"
       />
 
-      <div className={'flex w-full justify-between'}>
+      <div className={'mt-2 flex w-full justify-between'}>
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
           isLoading={signinButtonLoading}
-          variant="light"
+          variant="bordered"
           color="primary"
           size="md"
         >
-          sign up
+          {t.login.signUpButton}
         </FButton>
 
         <FButton
@@ -191,12 +193,12 @@ export default function LoginForm() {
           color="primary"
           size="md"
         >
-          log in
+          {t.login.signInButton}
         </FButton>
       </div>
 
       <p className="text-small text-default-900">
-        Login with
+        {t.login.loginViaProviders}
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
           variant="bordered"

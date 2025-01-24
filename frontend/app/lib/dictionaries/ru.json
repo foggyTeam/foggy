@@ -1,0 +1,28 @@
+{
+  "login": {
+    "email": "Адрес эл. почты",
+    "password": "Пароль",
+    "emailPlaceholder": "hoggyfoggy@example.com",
+    "passwordPlaceholder": "qwerty123",
+    "signInButton": "Вход",
+    "signUpButton": "Регистрация",
+    "loginViaProviders": "Войти через"
+  },
+  "validationErrors": {
+    "email": {
+      "required": "Адрес эл. почты обязателен",
+      "maxLength": "Адрес эл. почты не может быть длиннее 100 символов",
+      "invalidEmail": "Некорректный адрес эл. почты",
+      "invalidSymbols": "Адрес эл. почты может состоять только из латинских букв, цифр и специальных символов \".@_\""
+    },
+    "password": {
+      "required": "Пароль обязателен",
+      "minLength": "Пароль не может быть короче 8 символов",
+      "maxLength": "Пароль не может быть длиннее 20 символов",
+      "invalidPassword": "Пароль должен содержать хотя бы одну букву и хотя бы одну цифру"
+    }
+  },
+  "errors": {
+    "invalidCredentials": "Указаны неверные данные"
+  }
+}
