@@ -1,4 +1,4 @@
-import NextAuth, { CredentialsSignin } from 'next-auth';
+import NextAuth, { Account, CredentialsSignin, Profile, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { createSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/utils/requests';
@@ -71,11 +71,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       userinfo: 'https://login.yandex.ru/info',
       clientId: process.env.YANDEX_CLIENT_ID,
       clientSecret: process.env.YANDEX_CLIENT_SECRET,
-      profile(profile) {
+      profile(profile: Profile) {
         return {
           id: profile.id,
-          name: profile.real_name,
-          email: profile.default_email,
+          name: profile.name,
+          email: profile.email,
         };
       },
     } as Provider,
@@ -86,8 +86,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   events: {
-    async signIn({ user, account }) {
+    async signIn({ user, account }: { user: User; account: Account }) {
       if (account.provider === 'google' || account.provider === 'yandex') {
+        if (!user || !account) throw new CredentialsSignin();
         const request = {
           url: 'users/google-login',
           data: {
@@ -99,18 +100,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const result = await postRequest(request.url, request.data);
 
-        console.log(result);
-        if (result.errors || !result) {
+        if (result.errors || !result || !user)
           throw new CredentialsSignin(result.errors);
-        }
 
-        await createSession(user.id);
+        await createSession(user.id as string);
 
         return { ...user, nickname: result.nickname };
       }
     },
 
-    async error(message) {
+    async error(message: string) {
       console.error('Error event:', message);
     },
   } as any,
