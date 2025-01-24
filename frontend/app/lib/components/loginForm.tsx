@@ -24,7 +24,7 @@ export default function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({} as any);
   const [action, setAction] = useState(ButtonAction.UNDEFINED);
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
   const [signinButtonLoading, setSigninButtonLoading] = useState(false);
@@ -49,10 +49,10 @@ export default function LoginForm() {
     }
   }
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (formData: any) => {
+    formData.preventDefault();
 
-    const data = Object.fromEntries(new FormData(e.currentTarget)) as {
+    const data = Object.fromEntries(new FormData(formData.currentTarget)) as {
       email: string;
       password: string;
     };
@@ -65,7 +65,6 @@ export default function LoginForm() {
 
         await signUserIn(
           {
-            nickname: 'user1',
             email: data.email,
             password: data.password,
           },
@@ -85,8 +84,13 @@ export default function LoginForm() {
       } else return;
 
       setAction(ButtonAction.UNDEFINED);
-    } catch (e) {
-      setErrors({ email: e.message });
+    } catch (e: any) {
+      if (e.message) setErrors({ email: e.message.split('.')[0] });
+      else
+        setErrors({
+          email: 'Invalid credentials',
+          password: 'Invalid credentials',
+        });
       return;
     }
 
@@ -99,7 +103,7 @@ export default function LoginForm() {
     <Form
       className={'flex min-w-24 flex-col gap-2 sm:w-80'}
       onSubmit={onSubmit}
-      validationErrors={errors}
+      validationErrors={errors as any}
     >
       <Input
         isRequired
@@ -109,7 +113,7 @@ export default function LoginForm() {
         placeholder="hoggyfoggy@example.com"
         name="email"
         type="email"
-        autocomplete="email"
+        autoComplete="email"
         size="md"
         value={email}
         onValueChange={setEmail}
@@ -164,7 +168,7 @@ export default function LoginForm() {
           </div>
         }
         size="md"
-        autocomplete="current-password"
+        autoComplete="current-password"
       />
 
       <div className={'flex w-full justify-between'}>
@@ -191,11 +195,12 @@ export default function LoginForm() {
         </FButton>
       </div>
 
-      <p className="text-small">
+      <p className="text-small text-default-900">
         Login with
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
           variant="bordered"
+          color="default"
           size="md"
           className={'border-none px-0'}
         >
@@ -205,6 +210,7 @@ export default function LoginForm() {
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.YANDEX)}
           variant="bordered"
+          color="default"
           size="md"
           className={'border-none px-0'}
         >

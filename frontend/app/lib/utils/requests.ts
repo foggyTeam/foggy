@@ -13,13 +13,12 @@ export const getRequest: any = (url: string) =>
 
 // poster accepts relative request's url.
 export const postRequest: any = async (url: string, data: any) => {
-  try {
-    const response = await axios.post(`${apiUri}/${url}`, data);
-    return { data: response.data, error: null };
-  } catch (error) {
-    return {
-      data: null,
-      error: error.response.data.message,
-    };
-  }
+  return await axios
+    .post(`${apiUri}/${url}`, data)
+    .then((data) => {
+      return data.data;
+    })
+    .catch((data) => {
+      return data.response.data;
+    });
 };

@@ -65,8 +65,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
         f_accent: foggy_accent,
       },
     },

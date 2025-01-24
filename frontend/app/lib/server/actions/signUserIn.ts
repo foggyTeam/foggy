@@ -2,14 +2,15 @@
 
 import { signIn } from '@/auth';
 
-export async function signUserIn(credentials, register: boolean = false) {
+export async function signUserIn(
+  credentials: { email: string; password: string },
+  register: boolean = false,
+) {
   await signIn('credentials', {
     ...credentials,
-    register: register ? 'true' : '',
+    register: register ? 'yes' : '',
     redirect: false,
-  }).catch((e) => {
-    throw new Error(`${e.message.split('.')[0]}.`);
+  }).catch((error: any) => {
+    throw error;
   });
-
-  return;
 }

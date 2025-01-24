@@ -17,9 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={`${montserrat.className} antialiased`}>
+      <body className={`${montserrat.className} antialiased light`}>
         <Providers>
-          {/* bg-gradient-to-r from-[#B999B1] to-[#AA99B9] */}
           <main className="h-screen w-screen bg-gradient-to-r from-primary-400 to-secondary-300">
             {children}
           </main>
