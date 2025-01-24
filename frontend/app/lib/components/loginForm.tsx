@@ -13,6 +13,7 @@ import { AvailableProviders } from '@/app/lib/utils/definitions';
 import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
 import { SettingsContext } from '@/app/stores/settingsContext';
+import { observer } from 'mobx-react-lite';
 
 enum ButtonAction {
   UNDEFINED,
@@ -20,7 +21,7 @@ enum ButtonAction {
   SIGNIN,
 }
 
-export default function LoginForm() {
+const LoginForm = observer(() => {
   const router = useRouter();
   const { t } = useContext(SettingsContext);
 
@@ -173,7 +174,7 @@ export default function LoginForm() {
         autoComplete="current-password"
       />
 
-      <div className={'mt-2 flex w-full justify-between'}>
+      <div className={'mt-2 flex w-full justify-between gap-2'}>
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
@@ -181,6 +182,7 @@ export default function LoginForm() {
           variant="bordered"
           color="primary"
           size="md"
+          className="w-full"
         >
           {t.login.signUpButton}
         </FButton>
@@ -221,4 +223,6 @@ export default function LoginForm() {
       </p>
     </Form>
   );
-}
+});
+
+export default LoginForm;
