@@ -25,14 +25,14 @@ class SettingsStore {
         getLocale().then((l) => {
           this.setLocale(l);
         });
-      } catch (e) {
+      } catch (e: any) {
         console.error(e.message);
       }
     });
     autorun(async () => {
       try {
         await updateLocale(this.locale);
-      } catch (e) {
+      } catch (e: any) {
         console.error(e.message);
       }
     });

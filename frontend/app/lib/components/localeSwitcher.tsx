@@ -10,9 +10,8 @@ const LocaleSwitcher = observer(() => {
     <div className="absolute bottom-4 right-4 z-50">
       <Button
         onPress={() => {
-          SettingsStore.locale == 'en'
-            ? SettingsStore.setLocale('ru')
-            : SettingsStore.setLocale('en');
+          if (SettingsStore.locale == 'en') SettingsStore.setLocale('ru');
+          else SettingsStore.setLocale('en');
         }}
         isIconOnly
         color="secondary"

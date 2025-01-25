@@ -4,7 +4,7 @@ personally identifiable information like phone number, email address, credit car
 information, etc, or sensitive data like passwords.*/
 export type SessionPayload = {
   userId: string;
-  expiresAt: string;
+  expiresAt: Date;
 };
 
 export type AvailableLocales = 'en' | 'ru';
