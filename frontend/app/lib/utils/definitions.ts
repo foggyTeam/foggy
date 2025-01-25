@@ -7,6 +7,8 @@ export type SessionPayload = {
   expiresAt: string;
 };
 
+export type AvailableLocales = 'en' | 'ru';
+
 export enum AvailableProviders {
   CREDENTIALS,
   GOOGLE,

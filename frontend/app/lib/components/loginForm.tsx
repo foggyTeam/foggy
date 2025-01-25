@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Form } from '@heroui/form';
 import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
@@ -12,8 +12,8 @@ import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProvid
 import { AvailableProviders } from '@/app/lib/utils/definitions';
 import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
-import { SettingsContext } from '@/app/stores/settingsContext';
 import { observer } from 'mobx-react-lite';
+import settingsStore from '../../stores/settingsStore';
 
 enum ButtonAction {
   UNDEFINED,
@@ -23,7 +23,6 @@ enum ButtonAction {
 
 const LoginForm = observer(() => {
   const router = useRouter();
-  const { t } = useContext(SettingsContext);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -91,8 +90,8 @@ const LoginForm = observer(() => {
       if (e.message) setErrors({ email: e.message.split('.')[0] });
       else
         setErrors({
-          email: t.errors.invalidCredentials,
-          password: t.errors.invalidCredentials,
+          email: settingsStore.t.errors.invalidCredentials,
+          password: settingsStore.t.errors.invalidCredentials,
         });
       return;
     }
@@ -111,9 +110,9 @@ const LoginForm = observer(() => {
       <Input
         isRequired
         errorMessage={errors.email}
-        label={t.login.email}
+        label={settingsStore.t.login.email}
         labelPlacement="inside"
-        placeholder={t.login.emailPlaceholder}
+        placeholder={settingsStore.t.login.emailPlaceholder}
         name="email"
         type="email"
         autoComplete="email"
@@ -137,9 +136,9 @@ const LoginForm = observer(() => {
       <Input
         isRequired
         errorMessage={errors.password}
-        label={t.login.password}
+        label={settingsStore.t.login.password}
         labelPlacement="inside"
-        placeholder={t.login.passwordPlaceholder}
+        placeholder={settingsStore.t.login.passwordPlaceholder}
         name="password"
         value={password}
         onValueChange={setPassword}
@@ -184,7 +183,7 @@ const LoginForm = observer(() => {
           size="md"
           className="w-full"
         >
-          {t.login.signUpButton}
+          {settingsStore.t.login.signUpButton}
         </FButton>
 
         <FButton
@@ -195,12 +194,12 @@ const LoginForm = observer(() => {
           color="primary"
           size="md"
         >
-          {t.login.signInButton}
+          {settingsStore.t.login.signInButton}
         </FButton>
       </div>
 
       <p className="text-small text-default-900">
-        {t.login.loginViaProviders}
+        {settingsStore.t.login.loginViaProviders}
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
           variant="bordered"

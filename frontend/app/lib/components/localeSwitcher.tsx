@@ -3,6 +3,7 @@
 import { Button } from '@heroui/button';
 import SettingsStore from '@/app/stores/settingsStore';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 
 const LocaleSwitcher = observer(() => {
   return (

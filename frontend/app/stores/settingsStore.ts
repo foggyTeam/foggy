@@ -1,26 +1,49 @@
-import { makeAutoObservable } from 'mobx';
+import {
+  action,
+  autorun,
+  computed,
+  makeAutoObservable,
+  observable,
+} from 'mobx';
 import en from '../lib/dictionaries/en.json';
 import ru from '../lib/dictionaries/ru.json';
-
-export type availableLocales = 'en' | 'ru';
+import { AvailableLocales } from '@/app/lib/utils/definitions';
+import { getLocale, updateLocale } from '@/app/lib/locale';
 
 class SettingsStore {
-  locale: availableLocales = 'ru';
-  translations = {
-    en: en,
-    ru: ru,
-  };
+  locale: AvailableLocales = 'en';
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      locale: observable,
+      t: computed,
+      setLocale: action,
+    });
+
+    autorun(() => {
+      try {
+        getLocale().then((l) => {
+          this.setLocale(l);
+        });
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+    autorun(async () => {
+      try {
+        await updateLocale(this.locale);
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
   }
 
-  setLocale(newLocale: availableLocales) {
+  setLocale(newLocale: AvailableLocales) {
     this.locale = newLocale;
   }
 
   get t() {
-    return this.translations[this.locale];
+    return this.locale == 'en' ? en : ru;
   }
 }
 
