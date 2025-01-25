@@ -14,6 +14,9 @@ import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
 import { observer } from 'mobx-react-lite';
 import settingsStore from '../../stores/settingsStore';
+import Image from 'next/image';
+import YandexIcon from '../../../public/YandexIcon.svg';
+import GoogleIcon from '../../../public/GoogleIcon.svg';
 
 enum ButtonAction {
   UNDEFINED,
@@ -173,7 +176,7 @@ const LoginForm = observer(() => {
         autoComplete="current-password"
       />
 
-      <div className={'mt-2 flex w-full justify-between gap-2'}>
+      <div className="mt-1 flex w-full items-center justify-between gap-2">
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
@@ -198,28 +201,27 @@ const LoginForm = observer(() => {
         </FButton>
       </div>
 
-      <p className="text-small text-default-900">
-        {settingsStore.t.login.loginViaProviders}
+      <div className="mt-1 flex w-full items-center justify-center gap-3">
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
-          variant="bordered"
-          color="default"
+          isIconOnly
+          variant="light"
+          color="secondary"
           size="md"
-          className={'border-none px-0'}
         >
-          Google
+          <Image src={GoogleIcon} alt="Google" width="32" height="32" />
         </Button>
-        /
+
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.YANDEX)}
-          variant="bordered"
-          color="default"
+          isIconOnly
+          variant="light"
+          color="secondary"
           size="md"
-          className={'border-none px-0'}
         >
-          Yandex
+          <Image src={YandexIcon} alt="Yandex" width="32" height="32" />
         </Button>
-      </p>
+      </div>
     </Form>
   );
 });

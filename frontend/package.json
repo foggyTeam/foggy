@@ -22,7 +22,6 @@
     "@types/tailwindcss": "^3.1.0",
     "axios": "^1.7.9",
     "framer-motion": "^11.17.0",
-    "i18n": "^0.15.1",
     "jose": "^5.9.6",
     "lucide-react": "^0.471.1",
     "mobx": "^6.13.5",
