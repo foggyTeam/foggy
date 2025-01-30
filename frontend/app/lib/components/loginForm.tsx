@@ -12,6 +12,11 @@ import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProvid
 import { AvailableProviders } from '@/app/lib/utils/definitions';
 import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
+import { observer } from 'mobx-react-lite';
+import settingsStore from '../../stores/settingsStore';
+import Image from 'next/image';
+import YandexIcon from '../../../public/YandexIcon.svg';
+import GoogleIcon from '../../../public/GoogleIcon.svg';
 
 enum ButtonAction {
   UNDEFINED,
@@ -19,7 +24,7 @@ enum ButtonAction {
   SIGNIN,
 }
 
-export default function LoginForm() {
+const LoginForm = observer(() => {
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -88,8 +93,8 @@ export default function LoginForm() {
       if (e.message) setErrors({ email: e.message.split('.')[0] });
       else
         setErrors({
-          email: 'Invalid credentials',
-          password: 'Invalid credentials',
+          email: settingsStore.t.errors.invalidCredentials,
+          password: settingsStore.t.errors.invalidCredentials,
         });
       return;
     }
@@ -108,9 +113,9 @@ export default function LoginForm() {
       <Input
         isRequired
         errorMessage={errors.email}
-        label="Email"
+        label={settingsStore.t.login.email}
         labelPlacement="inside"
-        placeholder="hoggyfoggy@example.com"
+        placeholder={settingsStore.t.login.emailPlaceholder}
         name="email"
         type="email"
         autoComplete="email"
@@ -134,9 +139,9 @@ export default function LoginForm() {
       <Input
         isRequired
         errorMessage={errors.password}
-        label="Password"
+        label={settingsStore.t.login.password}
         labelPlacement="inside"
-        placeholder="qwerty123"
+        placeholder={settingsStore.t.login.passwordPlaceholder}
         name="password"
         value={password}
         onValueChange={setPassword}
@@ -171,16 +176,17 @@ export default function LoginForm() {
         autoComplete="current-password"
       />
 
-      <div className={'flex w-full justify-between'}>
+      <div className="mt-1 flex w-full items-center justify-between gap-2">
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
           isLoading={signinButtonLoading}
-          variant="light"
+          variant="bordered"
           color="primary"
           size="md"
+          className="w-full"
         >
-          sign up
+          {settingsStore.t.login.signUpButton}
         </FButton>
 
         <FButton
@@ -191,32 +197,33 @@ export default function LoginForm() {
           color="primary"
           size="md"
         >
-          log in
+          {settingsStore.t.login.signInButton}
         </FButton>
       </div>
 
-      <p className="text-small text-default-900">
-        Login with
+      <div className="mt-1 flex w-full items-center justify-center gap-3">
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
-          variant="bordered"
-          color="default"
+          isIconOnly
+          variant="light"
+          color="secondary"
           size="md"
-          className={'border-none px-0'}
         >
-          Google
+          <Image src={GoogleIcon} alt="Google" width="32" height="32" />
         </Button>
-        /
+
         <Button
           onPress={() => signUserViaProviders(AvailableProviders.YANDEX)}
-          variant="bordered"
-          color="default"
+          isIconOnly
+          variant="light"
+          color="secondary"
           size="md"
-          className={'border-none px-0'}
         >
-          Yandex
+          <Image src={YandexIcon} alt="Yandex" width="32" height="32" />
         </Button>
-      </p>
+      </div>
     </Form>
   );
-}
+});
+
+export default LoginForm;

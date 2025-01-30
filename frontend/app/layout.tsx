@@ -3,6 +3,7 @@ import './globals.css';
 import React from 'react';
 import { montserrat } from '@/public/fonts/fonts';
 import { Providers } from '@/app/providers';
+import LocaleSwitcher from '@/app/lib/components/localeSwitcher';
 
 export const metadata: Metadata = {
   title: { template: `foggy | %s`, default: 'foggy' },
@@ -22,6 +23,8 @@ export default function RootLayout({
           <main className="h-screen w-screen bg-gradient-to-r from-primary-400 to-secondary-300">
             {children}
           </main>
+
+          <LocaleSwitcher />
         </Providers>
       </body>
     </html>

@@ -1,5 +1,4 @@
 import { makeAutoObservable } from 'mobx';
-import { user } from '@heroui/react';
 
 class UsersStore {
   users: any[] = [];
