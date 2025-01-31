@@ -30,38 +30,30 @@ export class UsersService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<any> {
-    let user;
-    try {
-      user = await this.userModel.findOne({
-        email: loginUserDto.email,
-      });
+    const user = await this.findUserByEmail(loginUserDto.email);
+    await this.verifyPassword(loginUserDto.password, user.password);
+    return this.transformUserResponse(user);
+  }
 
-      if (!user) {
-        throw new CustomException(
-          getErrorMessages({ email: 'notFound' }),
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      const isPasswordValid = await bcrypt.compare(
-        loginUserDto.password,
-        user.password,
-      );
-
-      if (!isPasswordValid) {
-        throw new CustomException(
-          getErrorMessages({ password: 'wrongPassword' }),
-          HttpStatus.UNAUTHORIZED,
-        );
-      }
-
-      return this.transformUserResponse(user);
-    } catch (error) {
-      if (error instanceof CustomException) {
-        throw error;
-      }
+  private async findUserByEmail(email: string): Promise<User> {
+    const user = await this.userModel.findOne({ email: email });
+    if (!user) {
       throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
+        getErrorMessages({ email: 'notFound' }),
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    return user;
+  }
+
+  private async verifyPassword(
+    inputPassword: string,
+    storedPassword: string,
+  ): Promise<void> {
+    const isPasswordValid = await bcrypt.compare(inputPassword, storedPassword);
+    if (!isPasswordValid) {
+      throw new CustomException(
+        getErrorMessages({ password: 'wrongPassword' }),
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -73,19 +65,7 @@ export class UsersService {
       user = await this.userModel.findOne({ googleYandexId: userDto.id });
 
       if (!user) {
-        const originalNickname = userDto.nickname;
-        const transliteratedNickname = transliterate(originalNickname);
-
-        const isValidNickname =
-          transliteratedNickname.length >= 3 &&
-          transliteratedNickname.length <= 20;
-
-        const nickname =
-          isValidNickname &&
-          !(await this.userModel.exists({ nickname: transliteratedNickname }))
-            ? transliteratedNickname
-            : await this.generateNickname();
-
+        const nickname = await this.generateGoogleNickname(userDto.nickname);
         const newUser = new this.userModel({
           googleYandexId: userDto.id,
           email: userDto.email,
@@ -99,8 +79,9 @@ export class UsersService {
       return this.transformUserResponse(user);
     } catch (error) {
       if (error.code === 11000) {
+        const field = Object.keys(error.keyValue)[0] as 'email' | 'nickname';
         throw new CustomException(
-          getErrorMessages({ email: 'unique' }),
+          getErrorMessages({ [field]: 'unique' }),
           HttpStatus.CONFLICT,
         );
       }
@@ -143,13 +124,46 @@ export class UsersService {
     }
   }
 
+  private async generateGoogleNickname(originalNickname: string): Promise<string> {
+    const transliteratedNickname = transliterate(originalNickname).replace(/\s+/g, '');
+    const isValidNickname = transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
+    const containsHoggyFoggy = transliteratedNickname.includes('hoggyFoggy');
+
+    if (isValidNickname && !containsHoggyFoggy && !(await this.userModel.exists({ nickname: transliteratedNickname }))) {
+      return transliteratedNickname;
+    }
+
+    return await this.generateNickname();
+  }
+
   private async generateNickname(): Promise<string> {
-    const counter = await this.counterModel
-      .findOneAndUpdate({}, { $inc: { count: 1 } }, { new: true, upsert: true })
-      .exec();
+    let counter = await this.counterModel.findOne().exec();
 
     if (!counter) {
-      throw new Error('Failed to update counter');
+      const maxHoggyFoggyUser = await this.userModel
+        .find({ nickname: { $regex: /^hoggyFoggy\d+$/ } })
+        .sort({ nickname: -1 })
+        .limit(1)
+        .exec();
+
+      let initialCounter = 0;
+      if (maxHoggyFoggyUser.length > 0) {
+        initialCounter = parseInt(
+          maxHoggyFoggyUser[0].nickname.replace('hoggyFoggy', ''),
+          10,
+        );
+      }
+
+      counter = new this.counterModel({ count: initialCounter });
+      await counter.save();
+    } else {
+      counter = await this.counterModel
+        .findOneAndUpdate({}, { $inc: { count: 1 } }, { new: true })
+        .exec();
+
+      if (!counter) {
+        throw new Error('Failed to update counter');
+      }
     }
 
     return `hoggyFoggy${(counter as Counter).count}`;
