@@ -33,8 +33,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const config = new DocumentBuilder()
-    .setTitle('Foggy API Documentation')
+  const config = new DocumentBuilder().setTitle('Foggy API Documentation')
     .setDescription('The API description')
     .setVersion('1.0')
     .build();
@@ -44,5 +43,8 @@ async function bootstrap() {
 
   await app.listen(configService.get<number>('BACKEND_PORT'));
 }
+
+
+
 
 bootstrap();
