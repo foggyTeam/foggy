@@ -1,22 +1,37 @@
 'use client';
 import { Avatar } from '@heroui/avatar';
 import { Badge } from '@heroui/badge';
-import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
+import { observer } from 'mobx-react-lite';
+import userStore from '@/app/stores/userStore';
+import { BellIcon } from 'lucide-react';
+import { Button } from '@heroui/button';
 import menuStore from '@/app/stores/menuStore';
 
-export default function ClosedSideBar() {
+const ClosedSideBar = observer(() => {
   return (
-    <div className="flex items-center space-x-4">
+    <div className="flex flex-col items-center justify-center gap-4">
       <Avatar
         showFallback
-        name="Junior"
+        name={userStore.user?.name}
         size="lg"
-        className="h-12 w-12"
-        color="primary"
-        src="/images/img.png"
+        color="secondary"
+        src={userStore.user?.image}
       />
-      <Badge color="primary" content="5" />
-      <FButton onPress={menuStore.toggleRightMenu}>Open Menu</FButton>
+      <Badge color="success" content={15} variant="flat">
+        <Button
+          onPress={() => {
+            menuStore.setActiveTab(2);
+            menuStore.toggleRightMenu();
+          }}
+          isIconOnly
+          variant="light"
+          size="md"
+        >
+          <BellIcon className="stroke-default-500" />
+        </Button>
+      </Badge>
     </div>
   );
-}
+});
+
+export default ClosedSideBar;

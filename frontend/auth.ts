@@ -4,6 +4,7 @@ import { createSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/utils/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
+import userStore from '@/app/stores/userStore';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -45,14 +46,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // 3. create user session
-        const user = {
+        const user: User = {
           id: result.id,
           email: result.email,
-          nickname: result.nickname,
+          name: result.nickname,
         };
 
         await createSession(user.id);
-
+        userStore.setUser(user);
         // 4. return user
         return user;
       },
@@ -81,6 +82,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     } as Provider,
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+      }
+      return session;
+    },
     authorized: async ({ auth }) => {
       return !!auth;
     },
@@ -105,7 +118,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         await createSession(user.id as string);
 
-        return { ...user, nickname: result.nickname };
+        userStore.setUser({ ...user, name: result.nickname });
+
+        return { ...user, name: result.nickname };
       }
     },
 
