@@ -15,7 +15,7 @@ export default function LogoBar() {
       )}
     >
       <Link href="/">
-        <FoggyLogo fill={primary[600]} width={64} height={64} />
+        <FoggyLogo fill={primary[600]} width={56} height={56} />
       </Link>
     </div>
   );
