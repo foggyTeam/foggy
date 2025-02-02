@@ -6,10 +6,12 @@ import userStore from '@/app/stores/userStore';
 import { BellIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import menuStore from '@/app/stores/menuStore';
+import { bg_container, sh_container } from '@/app/lib/utils/style_definitions';
+import clsx from 'clsx';
 
-const ClosedSideBar = observer(() => {
+const ClosedSideBar = observer((props) => {
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className={clsx(bg_container, sh_container, props['sideBarLayout'])}>
       <Avatar
         showFallback
         name={userStore.user?.name}
