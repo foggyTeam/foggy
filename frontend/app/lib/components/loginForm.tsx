@@ -14,9 +14,9 @@ import { loginFormSchema } from '@/app/lib/utils/schemas';
 import z from 'zod';
 import { observer } from 'mobx-react-lite';
 import settingsStore from '../../stores/settingsStore';
-import Image from 'next/image';
-import YandexIcon from '../../../public/YandexIcon.svg';
-import GoogleIcon from '../../../public/GoogleIcon.svg';
+import GoogleIcon from '@/app/lib/components/svg/GoogleIcon';
+import YandexIcon from '@/app/lib/components/svg/YandexIcon';
+import { primary } from '@/tailwind.config';
 
 enum ButtonAction {
   UNDEFINED,
@@ -209,7 +209,12 @@ const LoginForm = observer(() => {
           color="secondary"
           size="md"
         >
-          <Image src={GoogleIcon} alt="Google" width="32" height="32" />
+          <GoogleIcon
+            alt="Google"
+            width="32"
+            height="32"
+            stroke={primary.DEFAULT}
+          />
         </Button>
 
         <Button
@@ -219,7 +224,12 @@ const LoginForm = observer(() => {
           color="secondary"
           size="md"
         >
-          <Image src={YandexIcon} alt="Yandex" width="32" height="32" />
+          <YandexIcon
+            alt="Yandex"
+            width="32"
+            height="32"
+            stroke={primary.DEFAULT}
+          />
         </Button>
       </div>
     </Form>
