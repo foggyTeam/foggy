@@ -22,6 +22,15 @@
       "invalidPassword": "Пароль должен содержать хотя бы одну букву и хотя бы одну цифру"
     }
   },
+
+  "menu": {
+    "tabs": {
+      "projects": "ПРОЕКТЫ",
+      "teams": "КОМАНДЫ",
+      "notifications": "УВЕДОМЛЕНИЯ"
+    }
+  },
+
   "errors": {
     "invalidCredentials": "Указаны неверные данные"
   }

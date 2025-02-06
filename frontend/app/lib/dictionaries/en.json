@@ -22,6 +22,15 @@
       "invalidPassword": "Password must contain at least 1 letter and 1 number"
     }
   },
+
+  "menu": {
+    "tabs": {
+      "projects": "PROJECTS",
+      "teams": "TEAMS",
+      "notifications": "NOTIFICATIONS"
+    }
+  },
+
   "errors": {
     "invalidCredentials": "Invalid credentials"
   }

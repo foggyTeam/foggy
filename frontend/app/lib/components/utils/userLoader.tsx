@@ -22,7 +22,7 @@ const UserLoader = observer(() => {
           id: userData.id,
           name: userData.nickname,
           email: userData.email,
-          image: userData.avatar,
+          image: userData.avatar ? userData.avatar : '/images/img.png',
         } as User);
       } else {
         userStore.clearUser();

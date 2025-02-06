@@ -2,7 +2,7 @@ import { action, makeAutoObservable, observable } from 'mobx';
 
 class MenuStore {
   isOpen: boolean = false;
-  activeTab: 0 | 1 | 2 = 0;
+  activeTab: '0' | '1' | '2' = '0';
 
   constructor() {
     makeAutoObservable(this, {
@@ -22,7 +22,7 @@ class MenuStore {
     this.isOpen = false;
   };
 
-  setActiveTab = (tab: 0 | 1 | 2) => {
+  setActiveTab = (tab: '0' | '1' | '2') => {
     this.activeTab = tab;
   };
 }

@@ -284,7 +284,13 @@ export default {
         },
       };
 
-      addUtilities({ ...avatars, ...badges, ...buttons }, [
+      const theme_styles = {
+        '.shadow-container': {
+          boxShadow: `2px 4px 10px 0 rgba(${to_rgb(primary.DEFAULT)}, 0.04)`,
+        },
+      };
+
+      addUtilities({ ...avatars, ...badges, ...buttons, ...theme_styles }, [
         'responsive',
         'hover',
       ]);

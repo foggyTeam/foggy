@@ -6,7 +6,7 @@ import bg from '@/public/images/1.webp';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 import Foggy from '@/app/lib/components/svg/foggy';
 import clsx from 'clsx';
-import { bg_container, sh_container } from '@/app/lib/utils/style_definitions';
+import { bg_container } from '@/app/lib/utils/style_definitions';
 
 const Login = () => {
   return (
@@ -16,7 +16,6 @@ const Login = () => {
           className={clsx(
             'flex h-[560] w-4/5 max-w-[1040px] sm:w-3/4',
             bg_container,
-            sh_container,
           )}
         >
           <div
