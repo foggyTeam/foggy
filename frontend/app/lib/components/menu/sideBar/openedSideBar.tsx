@@ -11,7 +11,7 @@ import { Tabs } from '@heroui/tabs';
 import { observer } from 'mobx-react-lite';
 import { bg_container } from '@/app/lib/utils/style_definitions';
 import clsx from 'clsx';
-import { ChevronRight, UserCog2Icon, XIcon } from 'lucide-react';
+import { ChevronRight, User2Icon, UserCog2Icon, XIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import { Avatar } from '@heroui/avatar';
@@ -20,21 +20,12 @@ import settingsStore from '@/app/stores/settingsStore';
 const OpenedSideBar = observer((props) => {
   return (
     <Drawer
-      closeButton={
-        <Button
-          onPress={menuStore.closeRightMenu}
-          isIconOnly
-          variant="light"
-          size="sm"
-        >
-          <XIcon className="stroke-default-400" />
-        </Button>
-      }
       isOpen={menuStore.isOpen}
       onClose={menuStore.closeRightMenu}
       onOpenChange={menuStore.toggleRightMenu}
       placement="right"
       backdrop="transparent"
+      hideCloseButton
       className={clsx(bg_container, props['sideBarLayout'], 'h-fit w-fit')}
     >
       <DrawerContent>
@@ -52,10 +43,11 @@ const OpenedSideBar = observer((props) => {
           <div className="flex items-center justify-between gap-4">
             <Avatar
               showFallback
+              icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
               name={userStore.user?.name}
-              size="lg"
-              color="secondary"
               src={userStore.user?.image}
+              size="lg"
+              color="default"
             />
             <p className="text-small font-medium text-default-800">
               {userStore.user?.name}
@@ -75,14 +67,16 @@ const OpenedSideBar = observer((props) => {
         </DrawerHeader>
         <DrawerBody>
           <Tabs
+            defaultSelectedKey={menuStore.activeTab}
+            onSelectionChange={menuStore.setActiveTab}
             variant="underlined"
             className="font-medium"
             fullWidth={true}
             classNames={{
               cursor: 'invisible',
-              tab: 'justify-start pl-0',
+              tabList: 'justify-between',
+              tab: 'w-fit px-0 justify-center',
             }}
-            defaultSelectedKey={menuStore.activeTab}
           >
             <Tab key="0" title={settingsStore.t.menu.tabs.projects}>
               Your projects!
