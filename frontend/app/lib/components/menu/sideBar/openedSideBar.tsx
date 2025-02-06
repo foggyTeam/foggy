@@ -71,11 +71,9 @@ const OpenedSideBar = observer((props) => {
             onSelectionChange={menuStore.setActiveTab}
             variant="underlined"
             className="font-medium"
-            fullWidth={true}
             classNames={{
               cursor: 'invisible',
-              tabList: 'justify-between',
-              tab: 'w-fit px-0 justify-center',
+              tab: 'pl-0',
             }}
           >
             <Tab key="0" title={settingsStore.t.menu.tabs.projects}>
