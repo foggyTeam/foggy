@@ -36,7 +36,7 @@ const RecentBar = observer(() => {
             id: 'lufglglyg1',
             name: 'First project',
             boards: [],
-            lastChange: Date.now(),
+            lastChange: Date.now().toString(),
           } as Project);
           projectsStore.setActiveProject('lufglglyg1');
 
@@ -47,7 +47,7 @@ const RecentBar = observer(() => {
               id: `jhgluygs${i}`,
               name: `file ${i}`,
               type: BoardTypes.SIMPLE,
-              lastChange: Date.now(),
+              lastChange: Date.now().toString(),
             } as Board);
             projectsStore.addBoard({
               projectId: 'lufglglyg1',
@@ -55,7 +55,7 @@ const RecentBar = observer(() => {
               id: `jhgluygg${i}`,
               name: `file ${i}`,
               type: BoardTypes.GRAPH,
-              lastChange: Date.now(),
+              lastChange: Date.now().toString(),
             } as Board);
             projectsStore.addBoard({
               projectId: 'lufglglyg1',
@@ -63,7 +63,7 @@ const RecentBar = observer(() => {
               id: `jhgluygt${i}`,
               name: `file ${i}`,
               type: BoardTypes.TREE,
-              lastChange: Date.now(),
+              lastChange: Date.now().toString(),
             } as Board);
           }
         }}

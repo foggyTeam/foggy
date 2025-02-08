@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-function Foggy(props) {
+function Foggy(props: any) {
   return (
     <svg
       width={296}

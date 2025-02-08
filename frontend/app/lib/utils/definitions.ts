@@ -27,12 +27,12 @@ export type Board = {
   id: string;
   name: string;
   type: BoardTypes;
-  lastChange: Date;
+  lastChange: string;
 };
 
 export class Project {
-  id: string;
-  name: string;
+  id: string = '';
+  name: string = 'unknown';
   boards: Board[] = [];
-  lastChange: Date;
+  lastChange: string = '';
 }

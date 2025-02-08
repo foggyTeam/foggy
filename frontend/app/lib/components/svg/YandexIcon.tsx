@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-function YandexIcon(props) {
+function YandexIcon(props: any) {
   return (
     <svg
       baseProfile="basic"

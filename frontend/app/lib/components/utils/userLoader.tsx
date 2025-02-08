@@ -16,7 +16,7 @@ const UserLoader = observer(() => {
         const response: any[] = await getRequest('users');
 
         const userData: any = response.find(
-          (user) => user['_id'] == session.user.id,
+          (user) => user['_id'] == session.user?.id,
         );
         userStore.setUser({
           id: userData.id,

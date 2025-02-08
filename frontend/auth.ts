@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: result.nickname,
         };
 
-        await createSession(user.id);
+        await createSession(user.id as string);
         userStore.setUser(user);
         // 4. return user
         return user;
@@ -90,7 +90,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id;
+        session.user.id = token.id as string;
       }
       return session;
     },

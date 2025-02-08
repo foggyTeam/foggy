@@ -2,8 +2,8 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import { Board, Project } from '@/app/lib/utils/definitions';
 
 class ProjectsStore {
-  activeBoard: Board | null = null;
-  activeProject: Project = new Project();
+  activeBoard: Board | undefined = undefined;
+  activeProject: Project | undefined = new Project();
   allProjects: Project[] = [];
 
   constructor() {
@@ -19,15 +19,15 @@ class ProjectsStore {
     });
   }
 
-  setActiveBoard = (id) => {
+  setActiveBoard = (id: string) => {
     this.activeBoard = this.activeProject?.boards.find(
       (board: Board) => board.id == id,
     );
   };
-  setActiveProject = (id) => {
+  setActiveProject = (id: string) => {
     this.activeProject = this.allProjects.find((project) => project.id == id);
   };
-  setAllProjects = (projects) => {
+  setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
   };
 

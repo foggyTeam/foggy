@@ -17,7 +17,7 @@ import userStore from '@/app/stores/userStore';
 import { Avatar } from '@heroui/avatar';
 import settingsStore from '@/app/stores/settingsStore';
 
-const OpenedSideBar = observer((props) => {
+const OpenedSideBar = observer((props: { sideBarLayout: string }) => {
   return (
     <Drawer
       isOpen={menuStore.isOpen}
@@ -44,8 +44,8 @@ const OpenedSideBar = observer((props) => {
             <Avatar
               showFallback
               icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
-              name={userStore.user?.name}
-              src={userStore.user?.image}
+              name={userStore.user?.name as string}
+              src={userStore.user?.image as string}
               size="lg"
               color="default"
             />
@@ -67,8 +67,8 @@ const OpenedSideBar = observer((props) => {
         </DrawerHeader>
         <DrawerBody>
           <Tabs
-            defaultSelectedKey={menuStore.activeTab}
-            onSelectionChange={menuStore.setActiveTab}
+            defaultSelectedKey={menuStore.activeTab as string}
+            onSelectionChange={menuStore.setActiveTab.toString}
             variant="underlined"
             className="font-medium"
             classNames={{

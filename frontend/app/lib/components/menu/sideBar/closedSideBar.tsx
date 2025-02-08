@@ -9,7 +9,7 @@ import menuStore from '@/app/stores/menuStore';
 import { bg_container } from '@/app/lib/utils/style_definitions';
 import clsx from 'clsx';
 
-const ClosedSideBar = observer((props) => {
+const ClosedSideBar = observer((props: { sideBarLayout: string }) => {
   return (
     <div
       className={clsx(
@@ -32,8 +32,8 @@ const ClosedSideBar = observer((props) => {
       <Avatar
         showFallback
         icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
-        name={userStore.user?.name}
-        src={userStore.user?.image}
+        name={userStore.user?.name as string}
+        src={userStore.user?.image as string}
         size="lg"
         color="default"
       />
