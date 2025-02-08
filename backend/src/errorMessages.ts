@@ -82,6 +82,10 @@ const errorMessages = {
       en: 'Please try another way',
       ru: 'Пожалуйста, попробуйте другой способ',
     },
+    API: {
+      en: 'Invalid API Key',
+      ru: 'Неверный API ключ',
+    },
   },
 };
 

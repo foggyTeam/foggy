@@ -59,10 +59,7 @@ export class UsersService {
     }
   }
 
-  async handleGoogleYandexUser(
-    userDto: GoogleUserDto,
-    token: string,
-  ): Promise<User> {
+  async handleGoogleYandexUser(userDto: GoogleUserDto): Promise<User> {
     let user;
     try {
       user = await this.userModel.findOne({ email: userDto.email });
