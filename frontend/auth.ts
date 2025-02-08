@@ -4,6 +4,7 @@ import { createSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/utils/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
+import userStore from '@/app/stores/userStore';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -45,14 +46,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // 3. create user session
-        const user = {
+        const user: User = {
           id: result.id,
           email: result.email,
-          nickname: result.nickname,
+          name: result.nickname,
         };
 
-        await createSession(user.id);
-
+        await createSession(user.id as string);
+        userStore.setUser(user);
         // 4. return user
         return user;
       },
@@ -73,20 +74,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.YANDEX_CLIENT_SECRET,
       profile(profile: Profile) {
         return {
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
+          id: profile.client_id,
+          name: profile.login,
+          email: profile.default_email,
         };
       },
     } as Provider,
   ],
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
     authorized: async ({ auth }) => {
       return !!auth;
     },
   },
   events: {
-    async signIn({ user, account }: { user: User; account: Account }) {
+    async signIn({
+      user,
+      profile,
+      account,
+    }: {
+      user: User;
+      profile: Profile;
+      account: Account;
+    }) {
       if (account.provider === 'google' || account.provider === 'yandex') {
         if (!user || !account) throw new CredentialsSignin();
         const request = {
@@ -105,7 +126,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         await createSession(user.id as string);
 
-        return { ...user, nickname: result.nickname };
+        userStore.setUser({ ...user, name: result.nickname });
+
+        return { ...user, name: result.nickname };
       }
     },
 

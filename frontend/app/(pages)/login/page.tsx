@@ -3,17 +3,20 @@ import React, { Suspense } from 'react';
 import LoginForm from '@/app/lib/components/loginForm';
 import Image from 'next/image';
 import bg from '@/public/images/1.webp';
-import foggy from '@/public/foggy.svg';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
+import Foggy from '@/app/lib/components/svg/foggy';
+import clsx from 'clsx';
+import { bg_container_no_padding } from '@/app/lib/utils/style_definitions';
 
 const Login = () => {
   return (
     <>
       <div className={'flex h-screen w-screen items-center justify-center'}>
         <div
-          className={
-            'flex h-[560] w-4/5 max-w-[1040px] overflow-clip rounded-2xl border-1 border-white border-opacity-10 bg-white bg-opacity-50 backdrop-blur-3xl sm:w-3/4'
-          }
+          className={clsx(
+            'flex h-[560] w-4/5 max-w-[1040px] sm:w-3/4',
+            bg_container_no_padding,
+          )}
         >
           <div
             className={
@@ -33,11 +36,7 @@ const Login = () => {
               'flex h-full w-full flex-col items-center justify-center gap-2 p-4'
             }
           >
-            <Image
-              className={'h-64 w-64'}
-              alt={'foggy logo'}
-              src={foggy}
-            ></Image>
+            <Foggy className={'h-64 w-64'} alt={'foggy logo'} />
 
             <Suspense fallback={<LoginFormSkeleton />}>
               <LoginForm />

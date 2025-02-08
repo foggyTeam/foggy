@@ -7,10 +7,32 @@ export type SessionPayload = {
   expiresAt: Date;
 };
 
-export type AvailableLocales = 'en' | 'ru';
-
 export enum AvailableProviders {
   CREDENTIALS,
   GOOGLE,
   YANDEX,
+}
+
+export type AvailableLocales = 'en' | 'ru';
+
+export enum BoardTypes {
+  SIMPLE,
+  GRAPH,
+  TREE,
+}
+
+export type Board = {
+  projectId: string;
+  section: string;
+  id: string;
+  name: string;
+  type: BoardTypes;
+  lastChange: string;
+};
+
+export class Project {
+  id: string = '';
+  name: string = 'unknown';
+  boards: Board[] = [];
+  lastChange: string = '';
 }
