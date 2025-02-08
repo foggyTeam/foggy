@@ -24,7 +24,6 @@ const RecentBar = observer(() => {
               key={board.id}
               isIconOnly
               variant="light"
-              color="primary"
               size="md"
             >
               <BoardIcon boardType={board.type} />
