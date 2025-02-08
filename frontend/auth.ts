@@ -73,7 +73,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.YANDEX_CLIENT_SECRET,
       profile(profile: Profile) {
         return {
-          id: profile.id,
           name: profile.name,
           email: profile.email,
         };
@@ -92,7 +91,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const request = {
           url: 'users/google-login',
           data: {
-            id: user.id,
             nickname: user.name,
             email: user.email,
           },
@@ -103,9 +101,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (result.errors || !result || !user)
           throw new CredentialsSignin(result.errors);
 
-        await createSession(user.id as string);
+        await createSession(result.id as string);
 
-        return { ...user, nickname: result.nickname };
+        return { ...user, id: result.id, nickname: result.nickname };
       }
     },
 
