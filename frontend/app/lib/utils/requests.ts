@@ -7,7 +7,7 @@ export const getRequest: any = (url: string) =>
   axios
     .get(`${apiUri}/${url}`, {
       headers: {
-        'X-API-KEY': process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        'X-API-KEY': process.env.VERIFICATION_KEY,
       },
     } as AxiosRequestConfig)
     .then((response) => {
@@ -20,7 +20,7 @@ export const postRequest: any = async (url: string, data: any) => {
   return await axios
     .post(`${apiUri}/${url}`, data, {
       headers: {
-        'X-API-KEY': process.env.NEXT_PUBLIC_API_SECRET_KEY,
+        'X-API-KEY': process.env.VERIFICATION_KEY,
       },
     } as AxiosRequestConfig)
     .then((data) => {
