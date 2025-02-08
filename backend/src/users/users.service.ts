@@ -59,7 +59,10 @@ export class UsersService {
     }
   }
 
-  async handleGoogleYandexUser(userDto: GoogleUserDto, token: string): Promise<User> {
+  async handleGoogleYandexUser(
+    userDto: GoogleUserDto,
+    token: string,
+  ): Promise<User> {
     let user;
     try {
       user = await this.userModel.findOne({ email: userDto.email });
@@ -123,12 +126,22 @@ export class UsersService {
     }
   }
 
-  private async generateGoogleNickname(originalNickname: string): Promise<string> {
-    const transliteratedNickname = transliterate(originalNickname).replace(/\s+/g, '');
-    const isValidNickname = transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
+  private async generateGoogleNickname(
+    originalNickname: string,
+  ): Promise<string> {
+    const transliteratedNickname = transliterate(originalNickname).replace(
+      /\s+/g,
+      '',
+    );
+    const isValidNickname =
+      transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
     const containsHoggyFoggy = transliteratedNickname.includes('hoggyFoggy');
 
-    if (isValidNickname && !containsHoggyFoggy && !(await this.userModel.exists({ nickname: transliteratedNickname }))) {
+    if (
+      isValidNickname &&
+      !containsHoggyFoggy &&
+      !(await this.userModel.exists({ nickname: transliteratedNickname }))
+    ) {
       return transliteratedNickname;
     }
 
