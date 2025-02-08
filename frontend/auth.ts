@@ -74,9 +74,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.YANDEX_CLIENT_SECRET,
       profile(profile: Profile) {
         return {
-          id: profile.id,
-          name: profile.name,
-          email: profile.email,
+          id: profile.client_id,
+          name: profile.login,
+          email: profile.default_email,
         };
       },
     } as Provider,
@@ -99,7 +99,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   events: {
-    async signIn({ user, account }: { user: User; account: Account }) {
+    async signIn({
+      user,
+      profile,
+      account,
+    }: {
+      user: User;
+      profile: Profile;
+      account: Account;
+    }) {
       if (account.provider === 'google' || account.provider === 'yandex') {
         if (!user || !account) throw new CredentialsSignin();
         const request = {

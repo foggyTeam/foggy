@@ -1,3 +1,9 @@
+import RecentBar from '@/app/lib/components/menu/projectBar/recentBar';
+
 export default function Board() {
-  return <p>I am a board!</p>;
+  return (
+    <>
+      <RecentBar />
+    </>
+  );
 }
