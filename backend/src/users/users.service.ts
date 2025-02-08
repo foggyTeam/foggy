@@ -59,15 +59,14 @@ export class UsersService {
     }
   }
 
-  async handleGoogleYandexUser(userDto: GoogleUserDto): Promise<User> {
+  async handleGoogleYandexUser(userDto: GoogleUserDto, token: string): Promise<User> {
     let user;
     try {
-      user = await this.userModel.findOne({ googleYandexId: userDto.id });
+      user = await this.userModel.findOne({ email: userDto.email });
 
       if (!user) {
         const nickname = await this.generateGoogleNickname(userDto.nickname);
         const newUser = new this.userModel({
-          googleYandexId: userDto.id,
           email: userDto.email,
           nickname,
           password: '',
