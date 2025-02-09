@@ -7,7 +7,7 @@ import {
 } from 'mobx';
 import en from '../lib/dictionaries/en.json';
 import ru from '../lib/dictionaries/ru.json';
-import { AvailableLocales } from '@/app/lib/utils/definitions';
+import { AvailableLocales } from '@/app/lib/types/definitions';
 import { getLocale, updateLocale } from '@/app/lib/locale';
 
 class SettingsStore {

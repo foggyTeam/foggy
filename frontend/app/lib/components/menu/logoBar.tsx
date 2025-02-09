@@ -1,7 +1,7 @@
 import FoggyLogo from '@/app/lib/components/svg/foggyLogo';
 import { primary } from '@/tailwind.config';
 import clsx from 'clsx';
-import { bg_container } from '@/app/lib/utils/style_definitions';
+import { bg_container } from '@/app/lib/types/style_definitions';
 import Link from 'next/link';
 
 export default function LogoBar() {

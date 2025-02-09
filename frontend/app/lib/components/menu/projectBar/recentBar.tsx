@@ -1,11 +1,11 @@
 'use client';
 import clsx from 'clsx';
-import { bg_container } from '@/app/lib/utils/style_definitions';
+import { bg_container } from '@/app/lib/types/style_definitions';
 import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import { Board, BoardTypes, Project } from '@/app/lib/utils/definitions';
+import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
 import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
 
 const RecentBar = observer(() => {

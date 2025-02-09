@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --fix",
-    "types": "openapi-typescript http:/localhost:3001/api-json --output app/lib/utils/definitions_generated.ts && prettier --write ./app/lib/utils/definitions_generated.ts"
+    "types": "openapi-typescript http:/localhost:3001/api-json --output app/lib/types/definitions_generated.ts && prettier --write app/lib/types/definitions_generated.ts"
   },
   "dependencies": {
     "@heroui/avatar": "^2.2.7",

@@ -2,7 +2,7 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import { User } from 'next-auth';
 
 class UserStore {
-  user: User | null = null;
+  user: User | undefined = undefined;
   isAuthenticated = false;
 
   constructor() {
@@ -15,12 +15,17 @@ class UserStore {
   }
 
   setUser(userData: User) {
-    this.user = userData;
+    this.user = {
+      id: userData.id,
+      name: userData.name,
+      email: userData.email,
+      image: userData.image,
+    };
     this.isAuthenticated = true;
   }
 
   clearUser() {
-    this.user = null;
+    this.user = undefined;
     this.isAuthenticated = false;
   }
 }

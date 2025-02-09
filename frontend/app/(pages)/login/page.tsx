@@ -6,7 +6,7 @@ import bg from '@/public/images/1.webp';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 import Foggy from '@/app/lib/components/svg/foggy';
 import clsx from 'clsx';
-import { bg_container_no_padding } from '@/app/lib/utils/style_definitions';
+import { bg_container_no_padding } from '@/app/lib/types/style_definitions';
 
 const Login = () => {
   return (

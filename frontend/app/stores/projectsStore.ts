@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { Board, Project } from '@/app/lib/utils/definitions';
+import { Board, Project } from '@/app/lib/types/definitions';
 
 class ProjectsStore {
   activeBoard: Board | undefined = undefined;

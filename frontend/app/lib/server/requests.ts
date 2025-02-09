@@ -1,10 +1,11 @@
+import 'server-only';
 import axios, { AxiosRequestConfig } from 'axios';
 
 const apiUri = process.env.NEXT_PUBLIC_API_URI;
 const verificationKey = process.env.VERIFICATION_KEY;
 
 // fetcher accepts relative request's url.
-export const getRequest: any = (url: string) =>
+export const getRequest: any = async (url: string) =>
   axios
     .get(`${apiUri}/${url}`, {
       headers: {

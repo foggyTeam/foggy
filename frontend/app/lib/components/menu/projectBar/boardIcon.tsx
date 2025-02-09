@@ -1,4 +1,4 @@
-import { BoardTypes } from '@/app/lib/utils/definitions';
+import { BoardTypes } from '@/app/lib/types/definitions';
 import { CableIcon, LayoutDashboardIcon, NetworkIcon } from 'lucide-react';
 
 export default function BoardIcon({ boardType }: { boardType: BoardTypes }) {

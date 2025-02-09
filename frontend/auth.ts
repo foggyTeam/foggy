@@ -1,10 +1,9 @@
 import NextAuth, { Account, CredentialsSignin, Profile, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { createSession } from '@/app/lib/session';
-import { postRequest } from '@/app/lib/utils/requests';
+import { postRequest } from '@/app/lib/server/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
-import userStore from '@/app/stores/userStore';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -53,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
 
         await createSession(user.id as string);
-        userStore.setUser(user);
+
         // 4. return user
         return user;
       },
@@ -118,13 +117,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
 
         const result = await postRequest(request.url, request.data);
-        S;
+
         if (result.errors || !result || !user)
           throw new CredentialsSignin(result.errors);
 
         await createSession(result.id as string);
-
-        userStore.setUser({ ...user, id: result.id, name: result.nickname });
 
         return { ...user, id: result.id, name: result.nickname };
       }
