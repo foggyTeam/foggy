@@ -118,13 +118,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
 
         const result = await postRequest(request.url, request.data);
-
+        S;
         if (result.errors || !result || !user)
           throw new CredentialsSignin(result.errors);
 
         await createSession(result.id as string);
 
-        userStore.setUser({ ...user, name: result.nickname });
+        userStore.setUser({ ...user, id: result.id, name: result.nickname });
 
         return { ...user, id: result.id, name: result.nickname };
       }
