@@ -1,5 +1,5 @@
 'use server';
-import { AvailableLocales } from '@/app/lib/utils/definitions';
+import { AvailableLocales } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
 
 export async function updateLocale(locale: AvailableLocales) {

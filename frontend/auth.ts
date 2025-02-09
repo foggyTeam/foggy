@@ -1,10 +1,9 @@
 import NextAuth, { Account, CredentialsSignin, Profile, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import { createSession } from '@/app/lib/session';
-import { postRequest } from '@/app/lib/utils/requests';
+import { postRequest } from '@/app/lib/server/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
-import userStore from '@/app/stores/userStore';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -53,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
 
         await createSession(user.id as string);
-        userStore.setUser(user);
+
         // 4. return user
         return user;
       },
@@ -74,7 +73,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.YANDEX_CLIENT_SECRET,
       profile(profile: Profile) {
         return {
-          id: profile.client_id,
           name: profile.login,
           email: profile.default_email,
         };
@@ -113,7 +111,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const request = {
           url: 'users/google-login',
           data: {
-            id: user.id,
             nickname: user.name,
             email: user.email,
           },
@@ -124,11 +121,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (result.errors || !result || !user)
           throw new CredentialsSignin(result.errors);
 
-        await createSession(user.id as string);
+        await createSession(result.id as string);
 
-        userStore.setUser({ ...user, name: result.nickname });
-
-        return { ...user, name: result.nickname };
+        return { ...user, id: result.id, name: result.nickname };
       }
     },
 

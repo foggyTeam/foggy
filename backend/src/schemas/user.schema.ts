@@ -24,9 +24,6 @@ export class User extends Document {
   @Prop()
   password?: string;
 
-  @Prop({ unique: true, sparse: true })
-  googleYandexId?: string;
-
   @Prop({ default: Date.now })
   registrationDate: Date;
 
