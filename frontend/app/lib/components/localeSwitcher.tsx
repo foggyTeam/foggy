@@ -7,7 +7,7 @@ import React from 'react';
 
 const LocaleSwitcher = observer(() => {
   return (
-    <div className="absolute bottom-4 right-4 z-50">
+    <div className="invisible absolute bottom-4 right-4 z-50 sm:visible">
       <Button
         onPress={() => {
           if (SettingsStore.locale == 'en') SettingsStore.setLocale('ru');

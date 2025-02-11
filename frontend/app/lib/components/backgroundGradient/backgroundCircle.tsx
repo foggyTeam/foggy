@@ -15,11 +15,7 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
   };
 
   useEffect(() => {
-    if (path === '/board') {
-      setIsBoardPage(true);
-    } else {
-      setIsBoardPage(false);
-    }
+    setIsBoardPage(path === '/board');
   }, [path]);
 
   return (
