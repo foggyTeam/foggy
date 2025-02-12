@@ -37,6 +37,7 @@ async function bootstrap() {
     .setTitle('Foggy API Documentation')
     .setDescription('The API description')
     .setVersion('1.0')
+    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

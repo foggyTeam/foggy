@@ -173,6 +173,42 @@ export class UsersService {
     }
   }
 
+  async handleGoogleYandexUser(userDto: GoogleUserDto): Promise<User> {
+    let user;
+    try {
+      user = await this.userModel.findOne({ email: userDto.email });
+
+      if (!user) {
+        const nickname = await this.generateGoogleNickname(userDto.nickname);
+        const newUser = new this.userModel({
+          email: userDto.email,
+          nickname,
+          password: '',
+        });
+
+        return this.saveUser(newUser);
+      }
+
+      return this.transformUserResponse(user);
+    } catch (error) {
+      if (error.code === 11000) {
+        const field = Object.keys(error.keyValue)[0] as 'email' | 'nickname';
+        throw new CustomException(
+          getErrorMessages({ [field]: 'unique' }),
+          HttpStatus.CONFLICT,
+        );
+      }
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
   private transformUserResponse(user: User): Partial<User> {
     return {
       id: user.id,
@@ -194,5 +230,60 @@ export class UsersService {
       getErrorMessages({ general: 'errorNotRecognized' }),
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  private async generateGoogleNickname(
+    originalNickname: string,
+  ): Promise<string> {
+    const transliteratedNickname = transliterate(originalNickname).replace(
+      /\s+/g,
+      '',
+    );
+    const isValidNickname =
+      transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
+    const containsHoggyFoggy = transliteratedNickname.includes('hoggyFoggy');
+
+    if (
+      isValidNickname &&
+      !containsHoggyFoggy &&
+      !(await this.userModel.exists({ nickname: transliteratedNickname }))
+    ) {
+      return transliteratedNickname;
+    }
+
+    return await this.generateNickname();
+  }
+
+  private async generateNickname(): Promise<string> {
+    let counter = await this.counterModel.findOne().exec();
+
+    if (!counter) {
+      const maxHoggyFoggyUser = await this.userModel
+        .find({ nickname: { $regex: /^hoggyFoggy\d+$/ } })
+        .sort({ nickname: -1 })
+        .limit(1)
+        .exec();
+
+      let initialCounter = 0;
+      if (maxHoggyFoggyUser.length > 0) {
+        initialCounter = parseInt(
+          maxHoggyFoggyUser[0].nickname.replace('hoggyFoggy', ''),
+          10,
+        );
+      }
+
+      counter = new this.counterModel({ count: initialCounter });
+      await counter.save();
+    } else {
+      counter = await this.counterModel
+        .findOneAndUpdate({}, { $inc: { count: 1 } }, { new: true })
+        .exec();
+
+      if (!counter) {
+        throw new Error('Failed to update counter');
+      }
+    }
+
+    return `hoggyFoggy${(counter as Counter).count}`;
   }
 }

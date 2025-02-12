@@ -6,7 +6,13 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { LoginUserDto } from './login-user.dto';
@@ -63,16 +69,20 @@ export class UsersController {
   }
 
   @Post('google-login')
+  @ApiHeader({
+    name: 'x-api-key',
+    required: true,
+    description: 'API Key для авторизации',
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login or register a user via Google/Yandex' })
   @ApiResponse({ status: 200, description: 'Login or registration successful' })
-  @ApiResponse({ status: 409, description: 'User ID already exists' })
+  @ApiResponse({ status: 409, description: 'User email already exists' })
   @ApiBody({
     description: 'User data from Google/Yandex',
     examples: {
       example1: {
         value: {
-          id: 'unique-google-yandex-id',
           email: 'user@gmail.com',
           nickname: 'Русское имя',
         },
