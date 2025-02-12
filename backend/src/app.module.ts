@@ -17,6 +17,7 @@ import { ApiKeyMiddleware } from './api-key.middleware';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('MONGO_URI'),
+        autoIndex: configService.get<string>('NODE_ENV') !== 'production',
       }),
       inject: [ConfigService],
     }),

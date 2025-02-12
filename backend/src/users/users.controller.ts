@@ -44,7 +44,7 @@ export class UsersController {
       },
     },
   })
-  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async register(@Body() createUserDto: CreateUserDto): Promise<Partial<User>> {
     return this.usersService.create(createUserDto);
   }
 
@@ -64,7 +64,7 @@ export class UsersController {
       },
     },
   })
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(@Body() loginUserDto: LoginUserDto): Promise<Partial<User>> {
     return this.usersService.login(loginUserDto);
   }
 
@@ -89,7 +89,9 @@ export class UsersController {
       },
     },
   })
-  async googleLogin(@Body() googleUserDto: GoogleUserDto): Promise<User> {
+  async googleLogin(
+    @Body() googleUserDto: GoogleUserDto,
+  ): Promise<Partial<User>> {
     return this.usersService.handleGoogleYandexUser(googleUserDto);
   }
 
