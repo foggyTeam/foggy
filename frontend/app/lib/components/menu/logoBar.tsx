@@ -1,4 +1,4 @@
-import FoggyLogo from '@/app/lib/components/svg/foggyLogo';
+import FoggySmall from '@/app/lib/components/svg/foggySmall';
 import { primary } from '@/tailwind.config';
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/style_definitions';
@@ -9,12 +9,12 @@ export default function LogoBar() {
     <div
       className={clsx(
         'absolute left-0 top-8 z-50 flex flex-col items-center justify-center ' +
-          'rounded-l-none rounded-br-[64px] rounded-tr-2xl px-1 py-12',
+          'rounded-l-none rounded-br-[64px] rounded-tr-2xl px-2 py-12',
         bg_container,
       )}
     >
       <Link href="/">
-        <FoggyLogo fill={primary[600]} width={56} height={56} />
+        <FoggySmall fill={primary[500]} width={48} height={48} />
       </Link>
     </div>
   );

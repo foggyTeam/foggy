@@ -1,9 +1,9 @@
 import {
   action,
-  autorun,
   computed,
   makeAutoObservable,
   observable,
+  reaction,
 } from 'mobx';
 import en from '../lib/dictionaries/en.json';
 import ru from '../lib/dictionaries/ru.json';
@@ -20,22 +20,24 @@ class SettingsStore {
       setLocale: action,
     });
 
-    autorun(() => {
-      try {
-        getLocale().then((l) => {
-          this.setLocale(l);
-        });
-      } catch (e: any) {
-        console.error(e.message);
-      }
-    });
-    autorun(async () => {
-      try {
-        await updateLocale(this.locale);
-      } catch (e: any) {
-        console.error(e.message);
-      }
-    });
+    try {
+      getLocale().then((l) => {
+        this.setLocale(l);
+      });
+    } catch (e: any) {
+      console.error(e.message);
+    }
+
+    reaction(
+      () => this.locale,
+      async (locale) => {
+        try {
+          await updateLocale(locale);
+        } catch (e: any) {
+          console.error(e.message);
+        }
+      },
+    );
   }
 
   setLocale(newLocale: AvailableLocales) {
