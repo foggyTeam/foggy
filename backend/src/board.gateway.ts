@@ -1,18 +1,18 @@
 import {
-  SubscribeMessage,
-  WebSocketGateway,
-  OnGatewayInit,
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  MessageBody,
-  ConnectedSocket,
+  OnGatewayInit,
+  SubscribeMessage,
+  WebSocketGateway,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URI,
+    origin: ' http://localhost:3000',
     credentials: true,
   },
 })
@@ -39,6 +39,6 @@ export class BoardGateway
     @ConnectedSocket() client: Socket,
   ): void {
     this.logger.log(`Cursor move from ${client.id}: ${JSON.stringify(data)}`);
-    client.broadcast.emit('cursorMove', { id: client.id, ...data });
+    client.broadcast.emit('cursorMove', { id: client.id, ...data } as any);
   }
 }
