@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import { ApiKeyMiddleware } from './api-key.middleware';
+import { BoardGateway } from './board.gateway';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { ApiKeyMiddleware } from './api-key.middleware';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, BoardGateway],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
