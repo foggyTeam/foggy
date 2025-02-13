@@ -9,7 +9,7 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
   const [isBoardPage, setIsBoardPage] = useState(false);
   const path = usePathname();
 
-  const position = (initial) => {
+  const position = (initial: number) => {
     if (!isBoardPage) return initial;
     return initial > 50 ? 95 : -15;
   };
