@@ -10,7 +10,12 @@ import {
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: process.env.FRONTEND_URI,
+    credentials: true,
+  },
+})
 export class BoardGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
