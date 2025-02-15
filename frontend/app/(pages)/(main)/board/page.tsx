@@ -5,7 +5,7 @@ import Cursors from '@/app/lib/components/board/cursors';
 export default function Board() {
   return (
     <>
-      <Cursors className="h-screen w-screen" />
+      <Cursors />
       <RecentBar />
       <div className="flex justify-center">
         <ToolBar />

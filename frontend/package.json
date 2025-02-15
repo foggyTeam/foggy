@@ -13,6 +13,7 @@
     "@heroui/avatar": "^2.2.7",
     "@heroui/badge": "^2.2.6",
     "@heroui/button": "2.2.10",
+    "@heroui/chip": "^2.2.7",
     "@heroui/drawer": "^2.2.8",
     "@heroui/form": "2.1.9",
     "@heroui/input": "2.4.10",

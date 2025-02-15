@@ -11,7 +11,7 @@ import FoggyLarge from '@/app/lib/components/svg/foggyLarge';
 const Login = () => {
   return (
     <>
-      <div className="flex h-screen w-screen items-center justify-center">
+      <div className="flex h-full w-full items-center justify-center">
         <div
           className={clsx(
             'flex h-[560] w-4/5 max-w-[1040px] sm:w-3/4',

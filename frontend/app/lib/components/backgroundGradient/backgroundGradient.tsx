@@ -93,7 +93,7 @@ const BackgroundGradient = ({
   return (
     <div
       className={clsx(
-        'absolute left-0 top-0 -z-10 h-screen w-screen overflow-hidden',
+        'absolute left-0 top-0 -z-10 h-full w-full overflow-hidden',
         `bg-${backgroundColor}`,
       )}
     >
