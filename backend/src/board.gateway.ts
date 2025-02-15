@@ -6,9 +6,11 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Socket } from 'socket.io';
+import { ConfigService } from '@nestjs/config';
+import { Server, Socket } from 'socket.io';
 
 interface CursorMoveData {
   id: string;
@@ -24,7 +26,14 @@ interface UserDisconnectedData {
 
 @WebSocketGateway({
   cors: {
-    origin: ' http://localhost:3000',
+    origin: (origin, callback) => {
+      const allowedOrigin = process.env.FRONTEND_URI;
+      if (origin === allowedOrigin || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   },
 })
@@ -33,6 +42,14 @@ export class BoardGateway
 {
   private logger: Logger = new Logger('BoardGateway');
   private clients: Map<string, { color: string }> = new Map();
+
+  @WebSocketServer() server: Server;
+
+  constructor(private readonly configService: ConfigService) {
+    this.logger.log(
+      `FRONTEND_URI: ${this.configService.get<string>('FRONTEND_URI')}`,
+    );
+  }
 
   afterInit() {
     this.logger.log('Init');
