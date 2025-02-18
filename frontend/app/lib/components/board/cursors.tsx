@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
-import { primary, secondary, success, warning } from '@/tailwind.config';
 
 const socket = io(process.env.NEXT_PUBLIC_API_URI);
 
@@ -13,12 +12,13 @@ const Cursors = () => {
   const [cursors, setCursors] = useState<{
     [key: string]: { x: number; y: number; nickname: string; color: string };
   }>({});
-  const colors = ['primary', 'secondary', 'warning', 'success'];
+  const colors = ['primary', 'secondary', 'warning', 'success', 'danger'];
   const userColor = colors[Math.floor(Math.random() * colors.length)];
-  const userId = userStore.user?.id;
-  const nickname = userStore.user?.name;
 
   useEffect(() => {
+    const userId = userStore.user?.id;
+    const nickname = userStore.user?.name;
+
     socket.emit('userConnected', {
       id: userId,
       nickname: nickname,
