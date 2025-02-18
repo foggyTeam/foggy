@@ -14,6 +14,7 @@ import { Server, Socket } from 'socket.io';
 
 interface CursorMoveData {
   id: string;
+  nickname: string;
   color: string;
   x: number;
   y: number;
@@ -41,7 +42,7 @@ export class BoardGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private logger: Logger = new Logger('BoardGateway');
-  private clients: Map<string, { color: string }> = new Map();
+  private clients: Map<string, { color: string; nickname: string }> = new Map();
 
   @WebSocketServer() server: Server;
 
@@ -57,7 +58,7 @@ export class BoardGateway
 
   handleConnection(client: Socket) {
     const color = this.getRandomColor();
-    this.clients.set(client.id, { color });
+    this.clients.set(client.id, { color, nickname: '' });
     this.logger.log(`Client connected: ${client.id} (Color: ${color})`);
   }
 
@@ -85,6 +86,7 @@ export class BoardGateway
     if (clientData) {
       const cursorMoveData: CursorMoveData = {
         id: client.id,
+        nickname: clientData.nickname,
         color: clientData.color,
         ...data,
       };
