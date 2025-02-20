@@ -4,7 +4,7 @@ import { Badge } from '@heroui/badge';
 
 export default function Main() {
   return (
-    <div className="flex h-full w-full items-start justify-center gap-4 py-16">
+    <div className="flex h-screen w-screen items-start justify-center gap-4 py-16">
       <div className="flex w-fit flex-col items-center justify-start gap-2">
         <Avatar isBordered className="accent-avatar" name="Junior" />
       </div>

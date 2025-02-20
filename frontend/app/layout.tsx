@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="ru">
       <body className={`${montserrat.className} antialiased light`}>
         <Providers>
-          <main className="h-full w-full">{children}</main>
+          <main className="h-screen w-screen">{children}</main>
 
           <BackgroundGradient backgroundColor="default-100" />
 
