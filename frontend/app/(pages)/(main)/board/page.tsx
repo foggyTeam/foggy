@@ -6,7 +6,6 @@ export default function Board() {
   return (
     <>
       <RecentBar />
-
       <BoardStage />
       <div className="flex justify-center">
         <ToolBar />
