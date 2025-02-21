@@ -14,6 +14,8 @@ import { Server, Socket } from 'socket.io';
 
 interface CursorMoveData {
   id: string;
+  nickname: string;
+  avatar: string;
   color: string;
   x: number;
   y: number;
@@ -21,6 +23,14 @@ interface CursorMoveData {
 
 interface UserDisconnectedData {
   id: string;
+  nickname: string;
+  color: string;
+}
+
+interface UserData {
+  id: string;
+  nickname: string;
+  avatar: string;
   color: string;
 }
 
@@ -41,7 +51,7 @@ export class BoardGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private logger: Logger = new Logger('BoardGateway');
-  private clients: Map<string, { color: string }> = new Map();
+  private clients: Map<string, UserData> = new Map();
 
   @WebSocketServer() server: Server;
 
@@ -56,20 +66,28 @@ export class BoardGateway
   }
 
   handleConnection(client: Socket) {
-    const color = this.getRandomColor();
-    this.clients.set(client.id, { color });
-    this.logger.log(`Client connected: ${client.id} (Color: ${color})`);
+    const userData: UserData = {
+      id: client.handshake.query.id as string,
+      nickname: client.handshake.query.nickname as string,
+      avatar: client.handshake.query.avatar as string,
+      color: client.handshake.query.color as string,
+    };
+    this.clients.set(client.id, userData);
+    this.logger.log(
+      `Client connected: ${client.id} (User: ${userData.nickname}, Color: ${userData.color})`,
+    );
   }
 
   handleDisconnect(client: Socket) {
     const clientData = this.clients.get(client.id);
     if (clientData) {
       const userDisconnectedData: UserDisconnectedData = {
-        id: client.id,
+        id: clientData.id,
+        nickname: clientData.nickname,
         color: clientData.color,
       };
       this.logger.log(
-        `Client disconnected: ${client.id} (Color: ${clientData.color})`,
+        `Client disconnected: ${client.id} (User: ${clientData.nickname}, Color: ${clientData.color})`,
       );
       client.broadcast.emit('userDisconnected', userDisconnectedData as any);
       this.clients.delete(client.id);
@@ -84,21 +102,14 @@ export class BoardGateway
     const clientData = this.clients.get(client.id);
     if (clientData) {
       const cursorMoveData: CursorMoveData = {
-        id: client.id,
+        id: clientData.id,
+        nickname: clientData.nickname,
+        avatar: clientData.avatar,
         color: clientData.color,
         ...data,
       };
       this.logger.log(`Cursor move from ${client.id}: ${JSON.stringify(data)}`);
       client.broadcast.emit('cursorMove', cursorMoveData as any);
     }
-  }
-
-  private getRandomColor(): string {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
   }
 }
