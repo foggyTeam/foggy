@@ -3,6 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Circle, Layer, Rect, Stage } from 'react-konva';
 import GridLayer from '@/app/lib/components/board/gridLayer';
+import { Button } from '@heroui/button';
+import { BoxSelectIcon } from 'lucide-react';
 
 const GRID_SIZE = 24;
 const MAX_X = 1000;
@@ -202,19 +204,43 @@ export default function BoardStage() {
   useBoardNavigation(stageRef, scale);
   useBoardZoom(stageRef, scale, setScale);
 
+  const resetStage = () => {
+    const stage = stageRef.current;
+    if (stage) {
+      stage.position({ x: 0, y: 0 });
+      setScale(1);
+      stage.scale({ x: 1, y: 1 });
+      stage.batchDraw();
+    }
+  };
+
   return (
-    <Stage
-      width={window?.innerWidth}
-      height={window?.innerHeight}
-      ref={stageRef}
-      onDragMove={null}
-      onDragEnd={null}
-    >
-      <GridLayer stageRef={stageRef} scale={scale} gridSize={GRID_SIZE} />
-      <Layer>
-        <Rect x={50} y={50} width={100} height={100} fill="red" draggable />
-        <Circle x={200} y={200} radius={50} fill="blue" draggable />
-      </Layer>
-    </Stage>
+    <>
+      <Stage
+        width={window?.innerWidth}
+        height={window?.innerHeight}
+        ref={stageRef}
+        onDragMove={null}
+        onDragEnd={null}
+      >
+        <GridLayer stageRef={stageRef} scale={scale} gridSize={GRID_SIZE} />
+        <Layer>
+          <Rect x={50} y={50} width={100} height={100} fill="red" draggable />
+          <Circle x={200} y={200} radius={50} fill="blue" draggable />
+        </Layer>
+      </Stage>
+      <div className="invisible absolute bottom-4 right-16 z-50 sm:visible">
+        <Button
+          onPress={resetStage}
+          isIconOnly
+          color="secondary"
+          variant="light"
+          size="md"
+          className="font-semibold"
+        >
+          <BoxSelectIcon />
+        </Button>
+      </div>
+    </>
   );
 }
