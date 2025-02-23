@@ -1,12 +1,11 @@
 'use client';
 import io from 'socket.io-client';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 
 export default function Cursors() {
-  const cursorsBoardRef = useRef<HTMLDivElement>(null);
   const [cursors, setCursors] = useState<{
     [key: string]: { x: number; y: number; nickname: string; color: string };
   }>({});
@@ -25,6 +24,8 @@ export default function Cursors() {
         avatar: avatar,
         color: userColor,
       },
+      reconnectionAttempts: 3,
+      reconnectionDelay: 1000,
     });
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -38,7 +39,7 @@ export default function Cursors() {
       });
     };
 
-    cursorsBoardRef.current?.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove);
 
     socket.on(
       'cursorMove',
@@ -69,26 +70,21 @@ export default function Cursors() {
     });
 
     return () => {
-      cursorsBoardRef.current?.removeEventListener(
-        'mousemove',
-        handleMouseMove,
-      );
+      document.removeEventListener('mousemove', handleMouseMove);
       socket.off('cursorMove');
       socket.off('userDisconnected');
+      socket.disconnect();
     };
   }, []);
 
   return (
-    <div
-      ref={cursorsBoardRef}
-      className="absolute z-40 h-full w-full overflow-hidden"
-    >
+    <>
       {Object.entries(cursors).map(([id, { x, y, nickname, color }]) => (
         <Chip
           key={id}
           variant="light"
           color={color}
-          className="absolute -translate-x-1/2 -translate-y-1/2"
+          className="pointer-events-none fixed"
           classNames={{
             base: 'gap-0 p-0 m-0',
             content: 'font-semibold p-0',
@@ -96,6 +92,8 @@ export default function Cursors() {
           style={{
             top: y,
             left: x,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 50,
           }}
           startContent={
             (
@@ -108,6 +106,6 @@ export default function Cursors() {
           {nickname}
         </Chip>
       ))}
-    </div>
+    </>
   );
 }
