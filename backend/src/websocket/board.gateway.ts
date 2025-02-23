@@ -66,31 +66,50 @@ export class BoardGateway
   }
 
   handleConnection(client: Socket) {
-    const userData: UserData = {
-      id: client.handshake.query.id as string,
-      nickname: client.handshake.query.nickname as string,
-      avatar: client.handshake.query.avatar as string,
-      color: client.handshake.query.color as string,
-    };
-    this.clients.set(client.id, userData);
-    this.logger.log(
-      `Client connected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
-    );
+    try {
+      const { id, nickname, avatar, color } = client.handshake.query as {
+        id: string;
+        nickname: string;
+        avatar: string;
+        color: string;
+      };
+
+      if (!id || !nickname || !color) {
+        this.logger.error('Invalid client data');
+        client.disconnect();
+        return;
+      }
+
+      const userData: UserData = { id, nickname, avatar, color };
+      this.clients.set(client.id, userData);
+      this.logger.log(
+        `Client connected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
+      );
+    } catch (error) {
+      this.logger.error(`Error handling connection: ${error.message}`);
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
-    const userData = this.clients.get(client.id);
-    if (userData) {
-      const userDisconnectedData: UserDisconnectedData = {
-        id: userData.id,
-        nickname: userData.nickname,
-        color: userData.color,
-      };
-      this.logger.log(
-        `Client disconnected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
-      );
-      client.broadcast.emit('userDisconnected', userDisconnectedData as any);
-      this.clients.delete(client.id);
+    try {
+      const userData = this.clients.get(client.id);
+      if (userData) {
+        const userDisconnectedData: UserDisconnectedData = {
+          id: userData.id,
+          nickname: userData.nickname,
+          color: userData.color,
+        };
+        this.logger.log(
+          `Client disconnected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
+        );
+        client.broadcast.emit('userDisconnected', userDisconnectedData as any);
+        this.clients.delete(client.id);
+      } else {
+        this.logger.warn(`No user data found for client: ${client.id}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error handling disconnect: ${error.message}`);
     }
   }
 
@@ -99,16 +118,22 @@ export class BoardGateway
     @MessageBody() data: { x: number; y: number },
     @ConnectedSocket() client: Socket,
   ): void {
-    const clientData = this.clients.get(client.id);
-    if (clientData) {
-      const cursorMoveData: CursorMoveData = {
-        id: clientData.id,
-        nickname: clientData.nickname,
-        avatar: clientData.avatar,
-        color: clientData.color,
-        ...data,
-      };
-      client.broadcast.emit('cursorMove', cursorMoveData as any);
+    try {
+      const clientData = this.clients.get(client.id);
+      if (clientData) {
+        const cursorMoveData: CursorMoveData = {
+          id: clientData.id,
+          nickname: clientData.nickname,
+          avatar: clientData.avatar,
+          color: clientData.color,
+          ...data,
+        };
+        client.broadcast.emit('cursorMove', cursorMoveData as any);
+      } else {
+        this.logger.warn(`No client data found for client: ${client.id}`);
+      }
+    } catch (error) {
+      this.logger.error(`Error handling cursor move: ${error.message}`);
     }
   }
 }
