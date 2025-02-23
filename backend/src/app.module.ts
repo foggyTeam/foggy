@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import { ApiKeyMiddleware } from './api-key.middleware';
-import { BoardGateway } from './board.gateway';
+import { BoardGateway } from './websocket/board.gateway';
 
 @Module({
   imports: [
@@ -29,6 +29,6 @@ import { BoardGateway } from './board.gateway';
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ApiKeyMiddleware).forRoutes('*');
+    consumer.apply(ApiKeyMiddleware).exclude('websocket/(.*)').forRoutes('*');
   }
 }
