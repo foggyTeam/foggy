@@ -74,20 +74,20 @@ export class BoardGateway
     };
     this.clients.set(client.id, userData);
     this.logger.log(
-      `Client connected: ${client.id} (User: ${userData.nickname}, Color: ${userData.color})`,
+      `Client connected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
     );
   }
 
   handleDisconnect(client: Socket) {
-    const clientData = this.clients.get(client.id);
-    if (clientData) {
+    const userData = this.clients.get(client.id);
+    if (userData) {
       const userDisconnectedData: UserDisconnectedData = {
-        id: clientData.id,
-        nickname: clientData.nickname,
-        color: clientData.color,
+        id: userData.id,
+        nickname: userData.nickname,
+        color: userData.color,
       };
       this.logger.log(
-        `Client disconnected: ${client.id} (User: ${clientData.nickname}, Color: ${clientData.color})`,
+        `Client disconnected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
       );
       client.broadcast.emit('userDisconnected', userDisconnectedData as any);
       this.clients.delete(client.id);
@@ -108,7 +108,6 @@ export class BoardGateway
         color: clientData.color,
         ...data,
       };
-      this.logger.log(`Cursor move from ${client.id}: ${JSON.stringify(data)}`);
       client.broadcast.emit('cursorMove', cursorMoveData as any);
     }
   }
