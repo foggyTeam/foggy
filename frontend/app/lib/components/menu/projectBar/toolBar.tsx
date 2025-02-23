@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import { bg_container } from '@/app/lib/types/style_definitions';
+import { bg_container } from '@/app/lib/types/styles';
 import { Button } from '@heroui/button';
 import {
   FrameIcon,

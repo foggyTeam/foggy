@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix",
-    "types": "openapi-typescript http:/localhost:3001/api-json --output app/lib/types/definitions_generated.ts && prettier --write app/lib/types/definitions_generated.ts"
+    "lint": "next lint --fix"
   },
   "dependencies": {
     "@heroui/avatar": "^2.2.10",

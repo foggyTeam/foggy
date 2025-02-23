@@ -1,6 +1,6 @@
 'use client';
 import clsx from 'clsx';
-import { bg_container } from '@/app/lib/types/style_definitions';
+import { bg_container } from '@/app/lib/types/styles';
 import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
@@ -47,6 +47,68 @@ const RecentBar = observer(() => {
               id: `jhgluygs${i}`,
               name: `file ${i}`,
               type: BoardTypes.SIMPLE,
+              layers: [
+                {
+                  elements: [
+                    {
+                      id: 'rect1',
+                      type: 'rect',
+                      draggable: true,
+                      x: 100,
+                      y: 100,
+                      rotation: 0,
+                      color: 'red',
+                      width: 200,
+                      height: 100,
+                    },
+                    {
+                      id: 'ellipse1',
+                      type: 'ellipse',
+                      draggable: true,
+                      x: 400,
+                      y: 150,
+                      rotation: 0,
+                      color: 'blue',
+                      width: 150,
+                      height: 150,
+                    },
+                    {
+                      id: 'text1',
+                      type: 'text',
+                      draggable: true,
+                      x: 200,
+                      y: 300,
+                      rotation: 0,
+                      color: 'green',
+                      text: 'Hello, world!',
+                      fontSize: 24,
+                    },
+                    {
+                      id: 'line1',
+                      type: 'line',
+                      draggable: true,
+                      x: 50,
+                      y: 50,
+                      rotation: 0,
+                      color: 'black',
+                      points: [0, 0, 100, 100],
+                      width: 2,
+                    },
+                    {
+                      id: 'marker1',
+                      type: 'marker',
+                      draggable: true,
+                      x: 150,
+                      y: 150,
+                      rotation: 0,
+                      color: 'purple',
+                      points: [0, 0, 50, 50, 100, 0],
+                      width: 3,
+                      opacity: 0.5,
+                    },
+                  ],
+                },
+              ],
               lastChange: Date.now().toString(),
             } as Board);
             projectsStore.addBoard({
@@ -66,6 +128,8 @@ const RecentBar = observer(() => {
               lastChange: Date.now().toString(),
             } as Board);
           }
+
+          projectsStore.setActiveBoard('jhgluygs0');
         }}
         isIconOnly
         variant="light"

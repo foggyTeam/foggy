@@ -5,7 +5,7 @@ import Image from 'next/image';
 import bg from '@/public/images/1.webp';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 import clsx from 'clsx';
-import { bg_container_no_padding } from '@/app/lib/types/style_definitions';
+import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FoggyLarge from '@/app/lib/components/svg/foggyLarge';
 
 const Login = () => {
