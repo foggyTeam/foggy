@@ -9,6 +9,8 @@ import { BoardElement } from '@/app/lib/types/definitions';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
 import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
+import ToolBar from '@/app/lib/components/board/toolBar';
+import { observer } from 'mobx-react-lite';
 
 const testBoardLayers = [
   [
@@ -103,7 +105,7 @@ export const fitCoordinates = (
   return { x: newX, y: newY };
 };
 
-export default function BoardStage() {
+const BoardStage = observer(() => {
   const stageRef: any = useRef(null);
   const [layers, setLayers] = useState(testBoardLayers as BoardElement[][]);
   const [scale, setScale] = useState(1);
@@ -157,18 +159,21 @@ export default function BoardStage() {
           />
         ))}
       </Stage>
-      <div className="invisible absolute bottom-4 right-16 z-50 sm:visible">
-        <Button
-          onPress={resetStage}
-          isIconOnly
-          color="secondary"
-          variant="light"
-          size="md"
-          className="font-semibold"
-        >
-          <BoxSelectIcon />
-        </Button>
+      <div className="flex justify-center">
+        <ToolBar stageRef={stageRef} />
       </div>
+      <Button
+        onPress={resetStage}
+        isIconOnly
+        color="secondary"
+        variant="light"
+        size="md"
+        className="invisible absolute bottom-4 right-16 z-50 font-semibold sm:visible"
+      >
+        <BoxSelectIcon />
+      </Button>
     </>
   );
-}
+});
+
+export default BoardStage;
