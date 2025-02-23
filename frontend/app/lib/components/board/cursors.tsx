@@ -1,13 +1,11 @@
 'use client';
 import io from 'socket.io-client';
-import { useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 
-const socket = io(process.env.NEXT_PUBLIC_API_URI);
-
-const Cursors = () => {
+export default function Cursors() {
   const cursorsBoardRef = useRef<HTMLDivElement>(null);
   const [cursors, setCursors] = useState<{
     [key: string]: { x: number; y: number; nickname: string; color: string };
@@ -18,11 +16,15 @@ const Cursors = () => {
   useEffect(() => {
     const userId = userStore.user?.id;
     const nickname = userStore.user?.name;
+    const avatar = userStore.user?.image;
 
-    socket.emit('userConnected', {
-      id: userId,
-      nickname: nickname,
-      color: userColor,
+    const socket = io(process.env.NEXT_PUBLIC_API_URI, {
+      query: {
+        id: userId,
+        nickname: nickname,
+        avatar: avatar,
+        color: userColor,
+      },
     });
 
     const handleMouseMove = (event: MouseEvent) => {
@@ -60,7 +62,6 @@ const Cursors = () => {
     );
 
     socket.on('userDisconnected', (data: { id: string }) => {
-      console.log('Received userDisconnected event:', data);
       setCursors((prev) => {
         const { [data.id]: _, ...rest } = prev;
         return rest;
@@ -97,9 +98,11 @@ const Cursors = () => {
             left: x,
           }}
           startContent={
-            <MousePointer2Icon
-              className={`relative -left-0.5 -top-0.5 stroke-${color}-500`}
-            />
+            (
+              <MousePointer2Icon
+                className={`relative -left-0.5 -top-0.5 stroke-${color}-500`}
+              />
+            ) as ReactNode
           }
         >
           {nickname}
@@ -107,6 +110,4 @@ const Cursors = () => {
       ))}
     </div>
   );
-};
-
-export default Cursors;
+}
