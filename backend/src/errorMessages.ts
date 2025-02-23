@@ -39,6 +39,12 @@ const errorMessages = {
       ru: 'Пользователь не найден',
     },
   },
+  id: {
+    notFound: {
+      en: 'User not found',
+      ru: 'Пользователь не найден',
+    },
+  },
   password: {
     required: {
       en: 'Password is required',

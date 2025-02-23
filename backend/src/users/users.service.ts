@@ -171,6 +171,22 @@ export class UsersService {
     return this.userModel.find().exec();
   }
 
+  async findUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new CustomException(
+        getErrorMessages({ id: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return user as User;
+  }
+
+  async deleteAllUsers(): Promise<void> {
+    await this.userModel.deleteMany({});
+    await this.counterModel.updateOne({}, { count: 0 });
+  }
+
   private transformUserResponse(user: User): Partial<User> {
     return {
       id: user.id,
