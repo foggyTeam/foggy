@@ -128,8 +128,6 @@ const RecentBar = observer(() => {
               lastChange: Date.now().toString(),
             } as Board);
           }
-
-          projectsStore.setActiveBoard('jhgluygs0');
         }}
         isIconOnly
         variant="light"

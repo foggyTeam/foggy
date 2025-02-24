@@ -12,7 +12,7 @@ interface DrawingHandlersProps {
   newElement: BoardElement | null;
 }
 
-const DEFAULT_FILL = primary['100'];
+const DEFAULT_FILL = primary['200'];
 const DEFAULT_STROKE = primary['300'];
 
 const getRelativePointerPosition = (stage) => {

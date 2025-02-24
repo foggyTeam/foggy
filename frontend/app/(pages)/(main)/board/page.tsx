@@ -3,6 +3,7 @@ import BoardStage from '@/app/lib/components/board/boardStage';
 import Cursors from '@/app/lib/components/board/cursors';
 import BoardLoader from '@/app/lib/components/boardLoader';
 import { Board, BoardElement, BoardTypes } from '@/app/lib/types/definitions';
+import { info, primary, secondary, success } from '@/tailwind.config';
 
 const testBoardLayers = [
   [
@@ -13,7 +14,7 @@ const testBoardLayers = [
       x: 100,
       y: 100,
       rotation: 0,
-      fill: 'red',
+      fill: secondary['400'],
       width: 200,
       height: 100,
     },
@@ -24,7 +25,7 @@ const testBoardLayers = [
       x: 50,
       y: 50,
       rotation: 0,
-      stroke: 'black',
+      stroke: primary.DEFAULT,
       points: [0, 0, 100, 100],
       strokeWidth: 2,
     },
@@ -35,7 +36,7 @@ const testBoardLayers = [
       x: 150,
       y: 150,
       rotation: 0,
-      stroke: 'purple',
+      stroke: primary['600'],
       points: [0, 0, 50, 50, 100, 0],
       strokeWidth: 8,
       opacity: 0.5,
@@ -49,7 +50,7 @@ const testBoardLayers = [
       x: 400,
       y: 150,
       rotation: 0,
-      fill: 'blue',
+      fill: info.DEFAULT,
       width: 100,
       height: 150,
     },
@@ -60,7 +61,7 @@ const testBoardLayers = [
       x: 200,
       y: 300,
       rotation: 0,
-      color: 'green',
+      fill: success.DEFAULT,
       text: 'Hello, world!',
       fontSize: 24,
     },
