@@ -4,10 +4,11 @@ import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
 import { useState } from 'react';
 import RectTool from '@/app/lib/components/board/tools/rectTool';
+import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
 
 export default function ToolBar({ stageRef, updateElement, addElement }) {
   const [activeTool, setActiveTool] = useState('');
-  const tools = [RectTool];
+  const tools = [RectTool, EllipseTool];
 
   return (
     <div
@@ -18,13 +19,16 @@ export default function ToolBar({ stageRef, updateElement, addElement }) {
         'rounded-none',
       )}
     >
-      <RectTool
-        activeTool={activeTool}
-        setActiveTool={setActiveTool}
-        addElement={addElement}
-        updateElement={updateElement}
-        stageRef={stageRef}
-      />
+      {tools.map((Tool, index) => (
+        <Tool
+          key={index}
+          activeTool={activeTool}
+          setActiveTool={setActiveTool}
+          addElement={addElement}
+          updateElement={updateElement}
+          stageRef={stageRef}
+        ></Tool>
+      ))}
     </div>
   );
 }
