@@ -73,13 +73,13 @@ export interface MarkerElement extends BaseElement {
   opacity: number;
 }
 
-export interface Board {
+export class Board {
   projectId: string;
   section: string;
   id: string;
   name: string;
-  type: BoardTypes;
-  layers: BoardElement[][];
+  type: BoardTypes = BoardTypes.SIMPLE;
+  layers: BoardElement[][] = [[], [], [], [], []];
   lastChange: string;
 }
 

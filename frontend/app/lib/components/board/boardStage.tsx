@@ -11,69 +11,7 @@ import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
 import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
 import ToolBar from '@/app/lib/components/board/toolBar';
 import { observer } from 'mobx-react-lite';
-
-const testBoardLayers = [
-  [
-    {
-      id: 'rect1',
-      type: 'rect',
-      draggable: true,
-      x: 100,
-      y: 100,
-      rotation: 0,
-      fill: 'red',
-      width: 200,
-      height: 100,
-    },
-    {
-      id: 'line1',
-      type: 'line',
-      draggable: true,
-      x: 50,
-      y: 50,
-      rotation: 0,
-      stroke: 'black',
-      points: [0, 0, 100, 100],
-      strokeWidth: 2,
-    },
-    {
-      id: 'marker1',
-      type: 'marker',
-      draggable: true,
-      x: 150,
-      y: 150,
-      rotation: 0,
-      stroke: 'purple',
-      points: [0, 0, 50, 50, 100, 0],
-      strokeWidth: 8,
-      opacity: 0.5,
-    },
-  ],
-  [
-    {
-      id: 'ellipse1',
-      type: 'ellipse',
-      draggable: true,
-      x: 400,
-      y: 150,
-      rotation: 0,
-      fill: 'blue',
-      width: 100,
-      height: 150,
-    },
-    {
-      id: 'text1',
-      type: 'text',
-      draggable: true,
-      x: 200,
-      y: 300,
-      rotation: 0,
-      color: 'green',
-      text: 'Hello, world!',
-      fontSize: 24,
-    },
-  ],
-];
+import projectsStore from '@/app/stores/projectsStore';
 
 const GRID_SIZE = 24;
 const MAX_X = 1000;
@@ -107,7 +45,6 @@ export const fitCoordinates = (
 
 const BoardStage = observer(() => {
   const stageRef: any = useRef(null);
-  const [layers, setLayers] = useState(testBoardLayers as BoardElement[][]);
   const [scale, setScale] = useState(1);
 
   UseBoardNavigation(stageRef, scale);
@@ -123,18 +60,12 @@ const BoardStage = observer(() => {
     }
   };
 
-  const updateElement = (id: string, newAttrs: Partial<any>) => {
-    setLayers((prevLayers) => {
-      const updatedLayers = [...prevLayers];
-      updatedLayers.forEach((layer) => {
-        layer.forEach((element, index) => {
-          if (element.id === id) {
-            layer[index] = { ...element, ...newAttrs } as BoardElement;
-          }
-        });
-      });
-      return updatedLayers;
-    });
+  const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
+    projectsStore.updateElement(id, newAttrs);
+  };
+
+  const addElement = (newElement: BoardElement) => {
+    projectsStore.addElement(newElement);
   };
 
   return (
@@ -148,7 +79,7 @@ const BoardStage = observer(() => {
       >
         <GridLayer stageRef={stageRef} scale={scale} gridSize={GRID_SIZE} />
 
-        {layers?.map((layer, index) => (
+        {projectsStore.activeBoard?.layers?.map((layer, index) => (
           <BoardLayer
             key={index}
             layer={layer}
@@ -160,7 +91,11 @@ const BoardStage = observer(() => {
         ))}
       </Stage>
       <div className="flex justify-center">
-        <ToolBar stageRef={stageRef} />
+        <ToolBar
+          stageRef={stageRef}
+          addElement={addElement}
+          updateElement={updateElement}
+        />
       </div>
       <Button
         onPress={resetStage}

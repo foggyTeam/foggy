@@ -2,13 +2,12 @@
 
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
-import { Button } from '@heroui/button';
-import { MousePointer2Icon } from 'lucide-react';
 import { useState } from 'react';
-import { primary } from '@/tailwind.config';
+import RectTool from '@/app/lib/components/board/tools/rectTool';
 
-export default function ToolBar({ stageRef }) {
+export default function ToolBar({ stageRef, updateElement, addElement }) {
   const [activeTool, setActiveTool] = useState('');
+  const tools = [RectTool];
 
   return (
     <div
@@ -19,21 +18,13 @@ export default function ToolBar({ stageRef }) {
         'rounded-none',
       )}
     >
-      <Button
-        onPress={() => setActiveTool('pointer')}
-        variant={activeTool == 'pointer' ? 'flat' : 'light'}
-        color={activeTool == 'pointer' ? 'primary' : 'default'}
-        isIconOnly
-        size="md"
-      >
-        <MousePointer2Icon
-          className={
-            activeTool == 'pointer'
-              ? 'stroke-primary-500'
-              : 'stroke-default-500'
-          }
-        />
-      </Button>
+      <RectTool
+        activeTool={activeTool}
+        setActiveTool={setActiveTool}
+        addElement={addElement}
+        updateElement={updateElement}
+        stageRef={stageRef}
+      />
     </div>
   );
 }
