@@ -13,7 +13,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { GoogleUserDto } from './dto/login-google.dto';
-import { User } from '../schemas/user.schema';
+import { User } from './schemas/user.schema';
 
 @ApiTags('users')
 @Controller('users')
