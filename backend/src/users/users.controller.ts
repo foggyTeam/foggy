@@ -1,18 +1,18 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
-  Delete,
+  Post,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './create-user.dto';
-import { LoginUserDto } from './login-user.dto';
-import { GoogleUserDto } from './login-google.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { GoogleUserDto } from './dto/login-google.dto';
 import { User } from '../schemas/user.schema';
 
 @ApiTags('users')

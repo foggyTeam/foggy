@@ -5,9 +5,9 @@ import * as bcrypt from 'bcrypt';
 import { transliterate } from 'transliteration';
 import { User } from '../schemas/user.schema';
 import { Counter } from '../schemas/user-counter.schema';
-import { CreateUserDto } from './create-user.dto';
-import { LoginUserDto } from './login-user.dto';
-import { GoogleUserDto } from './login-google.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { GoogleUserDto } from './dto/login-google.dto';
 import { getErrorMessages } from '../errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 
@@ -17,19 +17,6 @@ export class UsersService {
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
   ) {}
-
-  private async saveUser(newUser: User): Promise<Partial<User>> {
-    await this.checkUniqueFields({
-      email: newUser.email,
-      nickname: newUser.nickname,
-    });
-    try {
-      const user = await newUser.save();
-      return this.transformUserResponse(user);
-    } catch (error) {
-      this.handleSaveUserError(error);
-    }
-  }
 
   async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
     const [hashedPassword, nickname] = await Promise.all([
@@ -65,6 +52,39 @@ export class UsersService {
     }
 
     return this.transformUserResponse(user as User);
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
+  async findUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new CustomException(
+        getErrorMessages({ id: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return user as User;
+  }
+
+  async deleteAllUsers(): Promise<void> {
+    await this.userModel.deleteMany({});
+    await this.counterModel.updateOne({}, { count: 0 });
+  }
+
+  private async saveUser(newUser: User): Promise<Partial<User>> {
+    await this.checkUniqueFields({
+      email: newUser.email,
+      nickname: newUser.nickname,
+    });
+    try {
+      const user = await newUser.save();
+      return this.transformUserResponse(user);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
   }
 
   private async generateNickname(): Promise<string> {
@@ -165,26 +185,6 @@ export class UsersService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
-  async findUserById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id);
-    if (!user) {
-      throw new CustomException(
-        getErrorMessages({ id: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return user as User;
-  }
-
-  async deleteAllUsers(): Promise<void> {
-    await this.userModel.deleteMany({});
-    await this.counterModel.updateOne({}, { count: 0 });
   }
 
   private transformUserResponse(user: User): Partial<User> {
