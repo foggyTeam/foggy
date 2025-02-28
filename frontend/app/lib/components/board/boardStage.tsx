@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { Stage } from 'react-konva';
+import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import GridLayer from '@/app/lib/components/board/gridLayer';
 import { Button } from '@heroui/button';
 import { BoxSelectIcon } from 'lucide-react';
@@ -60,6 +60,29 @@ const BoardStage = observer(() => {
     }
   };
 
+  const [selectedElements, changeSelection] = useState([]);
+  const selectionRef: any = useRef(null);
+
+  const handleSelect = (e) => {
+    const element: BoardElement = e.target;
+
+    changeSelection((prevState) => {
+      if (e.evt.ctrlKey || e.evt.metaKey || prevState.length === 0) {
+        return prevState.findIndex((el) => el._id === e.target._id) === -1
+          ? [...prevState, element]
+          : prevState.filter((v) => v._id !== e.target._id);
+      } else {
+        return prevState.findIndex((el) => el._id === e.target._id) === -1
+          ? [element]
+          : [];
+      }
+    });
+  };
+
+  const handleDeselect = (e) => {
+    if (e.target.parent == null) changeSelection([]);
+  };
+
   const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
     projectsStore.updateElement(id, newAttrs);
   };
@@ -74,6 +97,7 @@ const BoardStage = observer(() => {
         width={window?.innerWidth}
         height={window?.innerHeight}
         ref={stageRef}
+        onClick={handleDeselect}
         onDragMove={null}
         onDragEnd={null}
       >
@@ -83,13 +107,27 @@ const BoardStage = observer(() => {
           <BoardLayer
             key={index}
             layer={layer}
+            selectedElements={selectedElements}
+            handleSelect={handleSelect}
             fitCoordinates={(pos, element) =>
               fitCoordinates(pos.x, pos.y, element.width, element.height, scale)
             }
             updateElement={updateElement}
           />
         ))}
+
+        {selectedElements.length > 0 && (
+          <Layer>
+            <Group draggable>
+              {selectedElements.map((element, index) => (
+                <Rect key={index} />
+              ))}
+              <Transformer ref={selectionRef} nodes={selectedElements} />
+            </Group>
+          </Layer>
+        )}
       </Stage>
+
       <div className="flex justify-center">
         <ToolBar
           stageRef={stageRef}

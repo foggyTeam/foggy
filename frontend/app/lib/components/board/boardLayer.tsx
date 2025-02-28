@@ -8,9 +8,11 @@ export default function BoardLayer({
   layer,
   updateElement,
   fitCoordinates,
+  handleSelect,
 }: {
   layer: BoardElement[];
   updateElement: (id: string, newAttrs: Partial<any>) => void;
+  handleSelect: (event) => void;
   fitCoordinates: (
     pos: { x: number; y: number },
     element: any,
@@ -52,6 +54,7 @@ export default function BoardLayer({
               <Rect
                 key={element.id}
                 {...element}
+                onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
@@ -67,6 +70,7 @@ export default function BoardLayer({
               <Ellipse
                 key={element.id}
                 {...element}
+                onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
@@ -82,6 +86,7 @@ export default function BoardLayer({
               <Line
                 key={element.id}
                 {...element}
+                onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
@@ -93,6 +98,7 @@ export default function BoardLayer({
               <Text
                 key={element.id}
                 {...element}
+                onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
@@ -108,6 +114,7 @@ export default function BoardLayer({
               <Line
                 key={element.id}
                 {...element}
+                onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
