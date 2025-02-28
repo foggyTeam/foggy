@@ -75,6 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           name: profile.login,
           email: profile.default_email,
+          image: profile.picture,
         };
       },
     } as Provider,
@@ -113,6 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           data: {
             nickname: user.name,
             email: user.email,
+            // avatar: user.image,
           },
         };
 
@@ -132,6 +134,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   } as any,
   pages: {
     signIn: '/login',
-    signOut: '/login',
   },
 });

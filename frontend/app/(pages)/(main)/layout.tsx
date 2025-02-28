@@ -14,7 +14,7 @@ async function getUser() {
   const session = await decrypt(cookie);
 
   if (!session) {
-    return null;
+    return undefined;
   }
 
   try {
@@ -27,7 +27,7 @@ async function getUser() {
     } as User;
   } catch (e) {
     console.error('User with this id does not exist.');
-    return null;
+    return { id: '' };
   }
 }
 
@@ -36,7 +36,7 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user: null | User = await getUser();
+  const user: undefined | User = await getUser();
 
   return (
     <>

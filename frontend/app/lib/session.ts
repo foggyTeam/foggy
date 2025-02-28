@@ -21,7 +21,6 @@ export async function createSession(userId: string) {
 }
 
 export async function clearSession() {
-  console.log('i am here');
   const cookieStore = await cookies();
 
   cookieStore.delete('session' as any);

@@ -6,14 +6,14 @@ import userStore from '@/app/stores/userStore';
 import { signOut } from 'next-auth/react';
 import { clearUserSession } from '@/app/lib/server/actions/clearUserSession';
 
-const UserLoader = async ({ userData }: { userData: User | null }) => {
+const UserLoader = ({ userData }: { userData: User | undefined }) => {
   useEffect(() => {
     if (userData && !userStore.isAuthenticated) {
       userStore.setUser(userData);
-    } else {
-      signOut({ redirectTo: '/login' });
+    } else if (userData && !userData?.id) {
+      signOut({ redirectTo: '/login' }).catch((e) => console.error(e));
       userStore.clearUser();
-      clearUserSession();
+      clearUserSession().catch((e) => console.error(e));
     }
   }, [userData]);
 
