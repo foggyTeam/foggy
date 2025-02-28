@@ -1,3 +1,5 @@
+'use server';
+
 import React from 'react';
 import LogoBar from '@/app/lib/components/menu/logoBar';
 import SideBar from '@/app/lib/components/menu/sideBar/sideBar';
@@ -15,17 +17,18 @@ async function getUser() {
     return null;
   }
 
-  const response: any[] = await getRequest('users');
-
-  const userData: any = response.find((user) => user['_id'] == session.userId);
-  return userData
-    ? ({
-        id: userData['_id'],
-        name: userData.nickname,
-        email: userData.email,
-        image: userData.avatar ? userData.avatar : '/images/img.png',
-      } as User)
-    : null;
+  try {
+    const userData: any = await getRequest(`users/${session.userId}`);
+    return {
+      id: userData['_id'],
+      name: userData.nickname,
+      email: userData.email,
+      image: userData.avatar ? userData.avatar : '/images/img.png',
+    } as User;
+  } catch (e) {
+    console.error('User with this id does not exist.');
+    return null;
+  }
 }
 
 export default async function MainLayout({
@@ -33,7 +36,7 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user: User | null = await getUser();
+  const user: null | User = await getUser();
 
   return (
     <>

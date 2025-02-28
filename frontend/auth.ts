@@ -126,12 +126,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { ...user, id: result.id, name: result.nickname };
       }
     },
-
     async error(message: string) {
       console.error('Error event:', message);
     },
   } as any,
   pages: {
     signIn: '/login',
+    signOut: '/login',
   },
 });

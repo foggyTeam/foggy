@@ -20,6 +20,13 @@ export async function createSession(userId: string) {
   } as any);
 }
 
+export async function clearSession() {
+  console.log('i am here');
+  const cookieStore = await cookies();
+
+  cookieStore.delete('session' as any);
+}
+
 export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
