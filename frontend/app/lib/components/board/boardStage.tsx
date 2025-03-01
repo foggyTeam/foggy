@@ -9,9 +9,11 @@ import { BoardElement } from '@/app/lib/types/definitions';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
 import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
-import ToolBar from '@/app/lib/components/board/toolBar';
+import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
+import { foggy_accent, primary } from '@/tailwind.config';
+import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 
 const GRID_SIZE = 24;
 const MAX_X = 1000;
@@ -122,13 +124,29 @@ const BoardStage = observer(() => {
               {selectedElements.map((element, index) => (
                 <Rect key={index} />
               ))}
-              <Transformer ref={selectionRef} nodes={selectedElements} />
+              <Transformer
+                ref={selectionRef}
+                nodes={selectedElements}
+                rotationSnapTolerance={16}
+                boundBoxFunc={(oldBox, newBox) =>
+                  Math.abs(newBox.width) < 4 || Math.abs(newBox.height) < 4
+                    ? oldBox
+                    : newBox
+                }
+                borderStroke={primary['400']}
+                anchorStroke={primary['400']}
+                anchorCornerRadius={16}
+                rotateAnchorCursor="grab"
+              />
             </Group>
           </Layer>
         )}
       </Stage>
 
       <div className="flex justify-center">
+        {selectedElements.length === 1 && (
+          <ElementToolBar element={selectedElements[0]} />
+        )}
         <ToolBar
           stageRef={stageRef}
           addElement={addElement}
