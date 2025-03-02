@@ -31,6 +31,10 @@
     }
   },
 
+  "toolBar": {
+    "chooseColor": "Pick a color"
+  },
+
   "errors": {
     "invalidCredentials": "Invalid credentials"
   }
