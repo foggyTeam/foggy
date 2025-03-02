@@ -37,7 +37,7 @@
     "width": "Width",
     "height": "Height",
     "cornerRadius": "Corner radius",
-    "rotation":"Rotation"
+    "rotation": "Rotation"
   },
 
   "errors": {
