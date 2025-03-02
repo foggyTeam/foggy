@@ -92,3 +92,22 @@ export const handleMouseUp =
       setActiveTool('');
     }
   };
+
+const isTransparent = (color: string) => {
+  if (!color) return true;
+  return (
+    color.length === 9 && color[7] === '0' && '0123456789abc'.includes(color[8])
+  );
+};
+export const isElementVisible = (
+  elementType: string,
+  fillColor: string,
+  strokeColor: string,
+  strokeWidth: number,
+) => {
+  if (strokeWidth == 0 && isTransparent(fillColor)) return false;
+  return !(
+    (!strokeColor || isTransparent(strokeColor)) &&
+    isTransparent(fillColor)
+  );
+};

@@ -32,7 +32,12 @@
   },
 
   "toolBar": {
-    "chooseColor": "Pick a color"
+    "chooseColor": "Pick a color",
+    "strokeWidth": "Stroke width:",
+    "width": "Width",
+    "height": "Height",
+    "cornerRadius": "Corner radius",
+    "rotation":"Rotation"
   },
 
   "errors": {

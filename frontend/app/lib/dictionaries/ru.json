@@ -32,7 +32,12 @@
   },
 
   "toolBar": {
-    "chooseColor": "Выберите цвет"
+    "chooseColor": "Выберите цвет",
+    "strokeWidth": "Толщина линии:",
+    "width": "Длина",
+    "height": "Высота",
+    "cornerRadius": "Скругление",
+    "rotation": "Поворот"
   },
 
   "errors": {
