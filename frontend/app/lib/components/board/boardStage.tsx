@@ -12,7 +12,7 @@ import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
 import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
-import { foggy_accent, primary } from '@/tailwind.config';
+import { primary } from '@/tailwind.config';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 
 const GRID_SIZE = 24;
@@ -144,11 +144,9 @@ const BoardStage = observer(() => {
       </Stage>
 
       <div className="flex justify-center">
-        {selectedElements.length === 1 && (
-          <ElementToolBar element={selectedElements[0]} />
-        )}
         <ToolBar
           stageRef={stageRef}
+          element={selectedElements.length === 1 && selectedElements[0]}
           addElement={addElement}
           updateElement={updateElement}
         />

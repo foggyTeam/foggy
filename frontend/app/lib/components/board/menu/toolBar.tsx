@@ -5,30 +5,43 @@ import { bg_container } from '@/app/lib/types/styles';
 import { useState } from 'react';
 import RectTool from '@/app/lib/components/board/tools/rectTool';
 import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
+import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
+import { Divider } from '@heroui/divider';
 
-export default function ToolBar({ stageRef, updateElement, addElement }) {
+export default function ToolBar({
+  stageRef,
+  updateElement,
+  addElement,
+  element,
+}) {
   const [activeTool, setActiveTool] = useState('');
   const tools = [RectTool, EllipseTool];
 
   return (
     <div
       className={clsx(
-        'absolute bottom-0 left-0 right-0 z-50 flex w-full justify-self-center sm:bottom-4 sm:left-auto sm:right-auto sm:w-fit',
-        'justify-center gap-1 px-2 py-3 sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
+        'absolute bottom-0 left-0 right-0 z-50 w-full justify-self-center px-2 py-3',
+        'sm:bottom-4 sm:left-auto sm:right-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
         bg_container,
-        'rounded-none',
+        'flex flex-col justify-center gap-1 rounded-none',
       )}
     >
-      {tools.map((Tool, index) => (
-        <Tool
-          key={index}
-          activeTool={activeTool}
-          setActiveTool={setActiveTool}
-          addElement={addElement}
-          updateElement={updateElement}
-          stageRef={stageRef}
-        ></Tool>
-      ))}
+      {element ? (
+        <ElementToolBar updateElement={updateElement} element={element} />
+      ) : null}
+      {element ? <Divider /> : null}
+      <div className="flex justify-center gap-1">
+        {tools.map((Tool, index) => (
+          <Tool
+            key={index}
+            activeTool={activeTool}
+            setActiveTool={setActiveTool}
+            addElement={addElement}
+            updateElement={updateElement}
+            stageRef={stageRef}
+          ></Tool>
+        ))}
+      </div>
     </div>
   );
 }
