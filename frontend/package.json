@@ -25,6 +25,7 @@
     "@heroui/slider": "^2.4.12",
     "@heroui/switch": "^2.2.12",
     "@heroui/tabs": "^2.2.11",
+    "@heroui/tooltip": "^2.2.12",
     "@next/env": "^15.1.7",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

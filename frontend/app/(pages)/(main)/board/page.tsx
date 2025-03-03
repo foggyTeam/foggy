@@ -66,6 +66,7 @@ const testBoardLayers = [
       fontSize: 24,
     },
   ],
+  [],
 ];
 const testBoard = {
   projectId: 'kjgvkhb11',
