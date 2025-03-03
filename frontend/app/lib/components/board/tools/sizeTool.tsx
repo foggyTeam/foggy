@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react';
 import { NumberInput } from '@heroui/number-input';
 import settingsStore from '@/app/stores/settingsStore';
 import { BoardElement } from '@/app/lib/types/definitions';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function SizeTool({ element, updateElement }) {
   const [width, setWidth] = useState(undefined as any);
@@ -62,7 +63,9 @@ export default function SizeTool({ element, updateElement }) {
     <Popover>
       <PopoverTrigger>
         <Button variant="light" color="default" isIconOnly size="md">
-          <RulerIcon className="stroke-default-500" />
+          <FTooltip content={settingsStore.t.toolTips.tools.sizeTool}>
+            <RulerIcon className="stroke-default-500" />
+          </FTooltip>
         </Button>
       </PopoverTrigger>
       <PopoverContent

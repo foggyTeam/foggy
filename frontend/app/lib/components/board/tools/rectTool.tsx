@@ -8,6 +8,8 @@ import {
   handleMouseUp,
 } from '@/app/lib/components/board/tools/drawingHandlers';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
+import settingsStore from '@/app/stores/settingsStore';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function RectTool({
   activeTool,
@@ -70,18 +72,22 @@ export default function RectTool({
   ]);
 
   return (
-    <Button
-      onPress={() => setActiveTool('rect')}
-      variant={activeTool === 'rect' ? 'flat' : 'light'}
-      color={activeTool === 'rect' ? 'primary' : 'default'}
-      isIconOnly
-      size="md"
-    >
-      <SquareIcon
-        className={
-          activeTool === 'rect' ? 'stroke-primary-500' : 'stroke-default-500'
-        }
-      />
-    </Button>
+    <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
+      <Button
+        onPress={() => {
+          activeTool === 'rect' ? setActiveTool('') : setActiveTool('rect');
+        }}
+        variant={activeTool === 'rect' ? 'flat' : 'light'}
+        color={activeTool === 'rect' ? 'primary' : 'default'}
+        isIconOnly
+        size="md"
+      >
+        <SquareIcon
+          className={
+            activeTool === 'rect' ? 'stroke-primary-500' : 'stroke-default-500'
+          }
+        />
+      </Button>
+    </FTooltip>
   );
 }

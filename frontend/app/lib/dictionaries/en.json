@@ -40,6 +40,22 @@
     "rotation": "Rotation"
   },
 
+  "toolTips": {
+    "tools": {
+      "rectTool": "Rectangle",
+      "ellipseTool": "Ellipse",
+      "fillTool": "Fill color",
+      "strokeTool": "Stroke width and color",
+      "sizeTool": "Size, rotation, corner radius",
+      "layerTool": "Layer",
+      "layerBottom": "Send to back",
+      "layerBack": "Move back",
+      "layerForward": "Move forward",
+      "layerTop": "Bring to front"
+    },
+    "resetStage": "Reset position"
+  },
+
   "errors": {
     "invalidCredentials": "Invalid credentials"
   }

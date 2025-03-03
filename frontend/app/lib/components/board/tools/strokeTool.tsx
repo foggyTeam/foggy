@@ -10,6 +10,7 @@ import { Slider } from '@heroui/slider';
 import settingsStore from '@/app/stores/settingsStore';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function StrokeTool({ element, updateElement }) {
   const [strokeColor, changeColor] = useState(primary.DEFAULT);
@@ -47,9 +48,11 @@ export default function StrokeTool({ element, updateElement }) {
     <Popover>
       <PopoverTrigger>
         <Button variant="light" color="default" isIconOnly size="md">
-          <CircleDashedIcon
-            stroke={`rgb(${to_rgb(strokeColor ? strokeColor : primary.DEFAULT)})`}
-          />
+          <FTooltip content={settingsStore.t.toolTips.tools.strokeTool}>
+            <CircleDashedIcon
+              stroke={`rgb(${to_rgb(strokeColor ? strokeColor : primary.DEFAULT)})`}
+            />
+          </FTooltip>
         </Button>
       </PopoverTrigger>
       <PopoverContent

@@ -40,6 +40,22 @@
     "rotation": "Поворот"
   },
 
+  "toolTips": {
+    "tools": {
+      "rectTool": "Прямоугольник",
+      "ellipseTool": "Эллипс",
+      "fillTool": "Цвет заливки",
+      "strokeTool": "Цвет и толщина рамки",
+      "sizeTool": "Размеры, поворот, скругление",
+      "layerTool": "Слой",
+      "layerBottom": "На задний слой",
+      "layerBack": "Назад",
+      "layerForward": "Вперед",
+      "layerTop": "На передний слой"
+    },
+    "resetStage": "Сбросить смещение"
+  },
+
   "errors": {
     "invalidCredentials": "Указаны неверные данные"
   }

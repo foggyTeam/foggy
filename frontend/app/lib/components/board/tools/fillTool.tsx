@@ -8,6 +8,8 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { BoardElement } from '@/app/lib/types/definitions';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
+import settingsStore from '@/app/stores/settingsStore';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function FillTool({ element, updateElement }) {
   const [fillColor, changeColor] = useState(primary.DEFAULT);
@@ -35,10 +37,12 @@ export default function FillTool({ element, updateElement }) {
     <Popover>
       <PopoverTrigger>
         <Button variant="light" color="default" isIconOnly size="md">
-          <CircleIcon
-            fill={fillColor}
-            stroke={`rgba(${to_rgb(fillColor)}, .48)`}
-          />
+          <FTooltip content={settingsStore.t.toolTips.tools.fillTool}>
+            <CircleIcon
+              fill={fillColor}
+              stroke={`rgba(${to_rgb(fillColor)}, .48)`}
+            />
+          </FTooltip>
         </Button>
       </PopoverTrigger>
       <PopoverContent

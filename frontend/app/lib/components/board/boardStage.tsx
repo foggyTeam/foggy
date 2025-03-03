@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import GridLayer from '@/app/lib/components/board/gridLayer';
 import { Button } from '@heroui/button';
-import { BoxSelectIcon } from 'lucide-react';
+import { MaximizeIcon } from 'lucide-react';
 import { BoardElement } from '@/app/lib/types/definitions';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
@@ -13,7 +13,8 @@ import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
 import { primary } from '@/tailwind.config';
-import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import settingsStore from '@/app/stores/settingsStore';
 
 const GRID_SIZE = 24;
 const MAX_X = 1000;
@@ -151,16 +152,18 @@ const BoardStage = observer(() => {
           updateElement={updateElement}
         />
       </div>
-      <Button
-        onPress={resetStage}
-        isIconOnly
-        color="secondary"
-        variant="light"
-        size="md"
-        className="invisible absolute bottom-4 right-16 z-50 font-semibold sm:visible"
-      >
-        <BoxSelectIcon />
-      </Button>
+      <FTooltip content={settingsStore.t.toolTips.resetStage}>
+        <Button
+          onPress={resetStage}
+          isIconOnly
+          color="secondary"
+          variant="light"
+          size="md"
+          className="invisible absolute bottom-4 right-16 z-50 font-semibold sm:visible"
+        >
+          <MaximizeIcon />
+        </Button>
+      </FTooltip>
     </>
   );
 });
