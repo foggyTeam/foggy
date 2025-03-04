@@ -95,7 +95,7 @@ export default function BoardLayer({
             );
           case 'text':
             return (
-              <Text
+              <Image
                 key={element.id}
                 {...element}
                 onClick={handleSelect}

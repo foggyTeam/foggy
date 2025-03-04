@@ -37,11 +37,13 @@
     "width": "Width",
     "height": "Height",
     "cornerRadius": "Corner radius",
-    "rotation": "Rotation"
+    "rotation": "Rotation",
+    "textToolPlaceholder": "Type something..."
   },
 
   "toolTips": {
     "tools": {
+      "textTool": "Text",
       "rectTool": "Rectangle",
       "ellipseTool": "Ellipse",
       "fillTool": "Fill color",

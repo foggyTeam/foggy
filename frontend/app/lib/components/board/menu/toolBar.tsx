@@ -7,6 +7,7 @@ import RectTool from '@/app/lib/components/board/tools/rectTool';
 import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 import { Divider } from '@heroui/divider';
+import TextTool from '@/app/lib/components/board/tools/textTool';
 
 export default function ToolBar({
   stageRef,
@@ -15,7 +16,7 @@ export default function ToolBar({
   element,
 }) {
   const [activeTool, setActiveTool] = useState('');
-  const tools = [RectTool, EllipseTool];
+  const tools = [TextTool, RectTool, EllipseTool];
 
   return (
     <div
@@ -24,6 +25,7 @@ export default function ToolBar({
         'sm:bottom-4 sm:left-auto sm:right-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
         bg_container,
         'flex flex-col justify-center gap-1 rounded-none',
+        'overflow-visible',
       )}
     >
       {element ? (

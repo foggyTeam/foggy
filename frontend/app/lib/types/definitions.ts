@@ -55,9 +55,10 @@ export interface EllipseElement extends BaseElement {
 }
 
 export interface TextElement extends BaseElement {
+  // basically it is a Konva.image
   type: 'text';
-  text: string;
-  fontSize: number;
+  image: any;
+  content: string;
 }
 
 export interface LineElement extends BaseElement {

@@ -37,11 +37,13 @@
     "width": "Длина",
     "height": "Высота",
     "cornerRadius": "Скругление",
-    "rotation": "Поворот"
+    "rotation": "Поворот",
+    "textToolPlaceholder": "Напишите что-нибудь..."
   },
 
   "toolTips": {
     "tools": {
+      "textTool": "Текст",
       "rectTool": "Прямоугольник",
       "ellipseTool": "Эллипс",
       "fillTool": "Цвет заливки",
