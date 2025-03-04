@@ -8,7 +8,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { createPortal } from 'react-dom';
 import 'react-quill-new/dist/quill.snow.css';
-import TextEditor from '@/app/lib/components/board/tools/textEditor';
+import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 
 export default function TextTool({
   activeTool,
