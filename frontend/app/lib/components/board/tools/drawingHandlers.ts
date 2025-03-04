@@ -1,4 +1,4 @@
-import { BoardElement, TextElement } from '@/app/lib/types/definitions';
+import { BoardElement } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 
 interface DrawingHandlersProps {
@@ -94,9 +94,21 @@ export const handleMouseUp =
   };
 
 export const handlePlaceText =
-  ({ stageRef, activeTool, setActiveTool, setIsEditing, setClickPosition }) =>
+  ({
+    stageRef,
+    activeTool,
+    setActiveTool,
+    isEditing,
+    setIsEditing,
+    setContent,
+    setClickPosition,
+  }) =>
   (e: any) => {
-    if (activeTool && stageRef.current) {
+    if (isEditing) {
+      setIsEditing(false);
+      setContent('');
+      setClickPosition({ x: undefined, y: undefined });
+    } else if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage);
 

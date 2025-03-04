@@ -7,7 +7,8 @@ import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { createPortal } from 'react-dom';
-import ReactQuill from 'react-quill';
+import 'react-quill-new/dist/quill.snow.css';
+import TextEditor from '@/app/lib/components/board/tools/textEditor';
 
 export default function TextTool({
   activeTool,
@@ -30,13 +31,16 @@ export default function TextTool({
       stageRef,
       activeTool,
       setActiveTool,
+      isEditing,
       setIsEditing,
+      setContent,
       setClickPosition,
     } as any);
 
-    if (activeTool === 'text' && stageRef.current) {
+    if ((activeTool === 'text' && stageRef.current) || isEditing) {
       const stage = stageRef.current.getStage();
-      stage.container().style.cursor = `url(${cursorAdd}) 12 12, auto`;
+      if (!isEditing)
+        stage.container().style.cursor = `url(${cursorAdd}) 12 12, auto`;
       stage.on('mousedown', placeTextHandler);
     }
 
@@ -44,14 +48,10 @@ export default function TextTool({
       if (stageRef.current) {
         const stage = stageRef.current.getStage();
         stage.container().style.cursor = 'default';
-        stage.on('mousedown', placeTextHandler);
+        stage.off('mousedown', placeTextHandler);
       }
     };
   }, [activeTool, setActiveTool, stageRef, isEditing, clickPosition]);
-
-  const handleEditEnd = (e) => {
-    setIsEditing(false);
-  };
 
   return (
     <>
@@ -77,21 +77,12 @@ export default function TextTool({
       {isEditing &&
         createPortal(
           (
-            <div
-              style={{
-                position: 'fixed',
-                top: clickPosition.y,
-                left: clickPosition.x,
-              }}
-            >
-              <ReactQuill
-                value={content}
-                onValueChange={setContent}
-                placeholder={settingsStore.t.toolBar.textToolPlaceholder}
-                onBlur={handleEditEnd}
-                theme="snow"
-              />
-            </div>
+            <TextEditor
+              top={clickPosition.y}
+              left={clickPosition.x}
+              content={content}
+              setContent={setContent}
+            />
           ) as ReactNode,
           document.body,
         )}
