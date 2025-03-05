@@ -1,0 +1,9 @@
+.ql-editor {
+  font-family: 'Montserrat', sans-serif;
+  padding: 16px;
+}
+
+.ql-container.ql-snow {
+  border: none;
+  padding: 0;
+}
