@@ -34,45 +34,45 @@ export default function TextEditorToolBar({
     [
       {
         id: 'bold',
+        value: true,
         ToolIcon: BoldIcon,
       },
       {
         id: 'italic',
+        value: true,
         ToolIcon: ItalicIcon,
       },
       {
         id: 'underline',
+        value: true,
         ToolIcon: UnderlineIcon,
       },
       {
         id: 'strike',
+        value: true,
         ToolIcon: StrikethroughIcon,
       },
       {
         id: 'blockquote',
+        value: true,
         ToolIcon: QuoteIcon,
       },
     ],
     [
-      { id: 'header-1', ToolIcon: Heading1Icon },
-      { id: 'header-2', ToolIcon: Heading2Icon },
-      { id: 'header-3', ToolIcon: Heading3Icon },
+      { id: 'header', value: 1, ToolIcon: Heading1Icon },
+      { id: 'header', value: 2, ToolIcon: Heading2Icon },
+      { id: 'header', value: 3, ToolIcon: Heading3Icon },
     ],
-    [{ id: 'link', ToolIcon: LinkIcon }],
+    [{ id: 'link', value: '/', ToolIcon: LinkIcon }],
   ];
 
-  const handleClick = (event) => {
+  const handleClick = (clickType, value) => {
     if (quillRef.current) {
-      const id: string = event.target.id;
-      // если id сложный и содержит значение, отделим его
-      const { clickType, value } = id.includes('-')
-        ? { clickType: id.split('-')[0], value: parseInt(id.split('-')[1]) }
-        : { clickType: id, value: undefined };
       // получим и обновим данные о выделенном фрагменте из Quill
       const quill = quillRef.current as Quill;
-      const isType = quill.getFormat()[clickType];
-      const newFormat =
-        value && !isType ? value : isType === value ? !isType : value;
+      const currentValue = quill.getFormat()[clickType];
+      const newFormat = value == currentValue ? false : value;
+
       quill.format(clickType, newFormat);
 
       // обновим собственные данные на основе данных Quill
@@ -91,15 +91,11 @@ export default function TextEditorToolBar({
       )}
     >
       {textEditorTools.map((section, index) => {
-        let toolSection = section.map(({ id, ToolIcon }, index) => {
-          const { realId, value } = {
-            realId: id.split('-')[0],
-            value: parseInt(id.split('-')[1]),
-          };
+        let toolSection = section.map(({ id, value, ToolIcon }, index) => {
           return (
             <Button
               id={id}
-              onPress={handleClick}
+              onPress={() => handleClick(id, value)}
               key={`${id}${index}`}
               variant="light"
               isIconOnly
@@ -107,11 +103,7 @@ export default function TextEditorToolBar({
             >
               <ToolIcon
                 className={
-                  (
-                    value
-                      ? selectionFormat[realId] === value
-                      : selectionFormat[realId]
-                  )
+                  selectionFormat[id] === value
                     ? 'h-5 w-5 stroke-f_accent'
                     : 'h-5 w-5 stroke-default-500'
                 }
