@@ -66,7 +66,11 @@ export default function EditorToolButton({
 
   useEffect(() => {
     setLocalValue(
-      id === 'color' || id === 'background' ? to_hex(value as string) : value,
+      id === 'color' || id === 'background'
+        ? to_hex(value as string)
+        : value
+          ? value
+          : '',
     );
   }, [value]);
 
@@ -81,7 +85,7 @@ export default function EditorToolButton({
       ) as any;
     }
 
-    setTimeout(() => handleClick(id, newValue, 180));
+    setTimeout(() => handleClick(id, newValue), 240);
   };
 
   return popover ? (
