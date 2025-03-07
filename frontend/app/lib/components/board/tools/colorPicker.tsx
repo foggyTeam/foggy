@@ -3,17 +3,17 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
 
-export default function ColorPicker({ color, changeColor }) {
+export default function ColorPicker({ value, changeValue }) {
   return (
     <>
       <HexAlphaColorPicker
-        color={color}
-        onChange={changeColor}
+        color={value}
+        onChange={changeValue}
         className="w-full gap-1 rounded-md"
       />
       <Input
-        value={color}
-        onValueChange={changeColor}
+        value={value}
+        onValueChange={changeValue}
         color={'primary'}
         variant="underlined"
         size="sm"
@@ -25,7 +25,7 @@ export default function ColorPicker({ color, changeColor }) {
           <Button
             onPress={() => {
               navigator.clipboard
-                .writeText(color)
+                .writeText(value)
                 .catch(() => console.log('Failed to copy to clipboard.'));
               console.log('Copied to clipboard!');
             }}

@@ -7,12 +7,14 @@ import TextEditorToolBar from '@/app/lib/components/board/tools/textEditor/textE
 
 export default function CustomTextEditor({ top, left, content, setContent }) {
   const quillRef = useRef<Quill | null>(null);
-  const editorContainerRef = useRef<HTMLDivElement>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null as any);
 
   const [selectionFormat, setSelectionFormat] = useState({} as any);
 
   useEffect(() => {
     if (editorContainerRef.current) {
+      editorContainerRef.current.innerHTML = content || '';
+
       const quill: Quill = new Quill(editorContainerRef.current, {
         theme: 'snow',
         modules: {
@@ -27,8 +29,13 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         const format = quill.getFormat();
         setSelectionFormat(format);
       });
+
+      quill.on('text-change', () => {
+        const content = quill.root.innerHTML; // Получаем HTML содержимое
+        setContent(content);
+      });
     }
-  }, []);
+  }, [setContent]);
 
   return (
     <div
@@ -44,7 +51,7 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         setSelectionFormat={setSelectionFormat}
         quillRef={quillRef}
       />
-      <div ref={editorContainerRef} className="quill-editor-container"></div>
+      <div ref={editorContainerRef} className="quill-editor-container" />
     </div>
   );
 }

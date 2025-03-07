@@ -51,7 +51,7 @@ export default function FillTool({ element, updateElement }) {
           'flex w-fit flex-col gap-2 px-1 py-2 sm:px-1 sm:py-3',
         )}
       >
-        <ColorPicker color={fillColor} changeColor={changeColor} />
+        <ColorPicker value={fillColor} changeValue={changeColor} />
       </PopoverContent>
     </Popover>
   );

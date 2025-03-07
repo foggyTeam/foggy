@@ -73,7 +73,7 @@ export default function StrokeTool({ element, updateElement }) {
           minValue={0}
           step={0.5}
         />
-        <ColorPicker color={strokeColor} changeColor={changeColor} />
+        <ColorPicker value={strokeColor} changeValue={changeColor} />
       </PopoverContent>
     </Popover>
   );
