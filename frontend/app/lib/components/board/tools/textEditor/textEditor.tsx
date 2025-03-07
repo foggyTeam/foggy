@@ -71,7 +71,10 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         saveSelection={saveSelection}
         restoreSelection={restoreSelection}
       />
-      <div ref={editorContainerRef} className="quill-editor-container" />
+      <div
+        ref={editorContainerRef}
+        className="quill-editor-container caret-f_accent"
+      />
     </div>
   );
 }

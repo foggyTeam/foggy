@@ -25,6 +25,8 @@ import clsx from 'clsx';
 import { Divider } from '@heroui/divider';
 import EditorToolButton from '@/app/lib/components/board/tools/textEditor/editorToolButton';
 import LinkPicker from '@/app/lib/components/board/tools/linkPicker';
+import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
+import { to_rgb } from '@/tailwind.config';
 
 interface EditorTool {
   id?: string;
@@ -45,7 +47,7 @@ export default function TextEditorToolBar({
   restoreSelection,
 }) {
   const defaultLink = '/';
-  const defaultColor = '#171717';
+  const defaultColor = `rgba(${to_rgb('#171717')}, 1)`;
   const defaultBackground = '';
 
   const tools: {
@@ -104,7 +106,6 @@ export default function TextEditorToolBar({
 
       quill.format(clickType, newFormat);
 
-      console.log(newFormat);
       // обновим собственные данные на основе данных Quill
       setSelectionFormat({
         ...selectionFormat,
@@ -146,6 +147,25 @@ export default function TextEditorToolBar({
         saveSelection={saveSelection}
         restoreSelection={restoreSelection}
       />
+
+      <Divider key={`link`} orientation={`vertical`} />
+
+      {tools.color.map((tool, index) => {
+        return (
+          <EditorToolButton
+            id={tool.id}
+            value={selectionFormat[tool.id]}
+            Icon={tool.ToolIcon}
+            isAccent={!!selectionFormat[tool.id]}
+            popover={true}
+            PopoverInnerContent={ColorPicker}
+            handleClick={handleClick}
+            saveSelection={saveSelection}
+            restoreSelection={restoreSelection}
+            key={index}
+          />
+        );
+      })}
     </div>
   );
 }
