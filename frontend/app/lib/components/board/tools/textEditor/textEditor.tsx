@@ -10,6 +10,7 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
 
   const [selectionFormat, setSelectionFormat] = useState({} as any);
+  const [savedSelection, setSavedSelection] = useState(null as Range);
 
   useEffect(() => {
     if (editorContainerRef.current) {
@@ -26,16 +27,33 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
       quillRef.current = quill;
 
       quill.on('selection-change', () => {
-        const format = quill.getFormat();
-        setSelectionFormat(format);
+        if (quill.getSelection()) {
+          const format = quill.getFormat();
+          setSelectionFormat(format);
+        }
       });
 
       quill.on('text-change', () => {
-        const content = quill.root.innerHTML; // Получаем HTML содержимое
+        const content = quill.root.innerHTML;
         setContent(content);
       });
     }
   }, [setContent]);
+
+  const saveSelection = () => {
+    const quill = quillRef.current;
+    if (quill) {
+      const range: any = quill.getSelection();
+      setSavedSelection(range);
+    }
+  };
+
+  const restoreSelection = () => {
+    const quill = quillRef.current;
+    if (quill && savedSelection) {
+      requestAnimationFrame(() => quill.setSelection(savedSelection as any));
+    }
+  };
 
   return (
     <div
@@ -50,6 +68,8 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         selectionFormat={selectionFormat}
         setSelectionFormat={setSelectionFormat}
         quillRef={quillRef}
+        saveSelection={saveSelection}
+        restoreSelection={restoreSelection}
       />
       <div ref={editorContainerRef} className="quill-editor-container" />
     </div>

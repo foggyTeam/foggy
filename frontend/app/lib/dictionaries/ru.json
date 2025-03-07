@@ -38,7 +38,9 @@
     "height": "Высота",
     "cornerRadius": "Скругление",
     "rotation": "Поворот",
-    "textToolPlaceholder": "Напишите что-нибудь..."
+    "textToolPlaceholder": "Напишите что-нибудь...",
+    "linkPlaceholder": "https://hoggyfoggy.com",
+    "linkLabel": "Ссылка"
   },
 
   "toolTips": {

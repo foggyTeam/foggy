@@ -38,7 +38,9 @@
     "height": "Height",
     "cornerRadius": "Corner radius",
     "rotation": "Rotation",
-    "textToolPlaceholder": "Type something..."
+    "textToolPlaceholder": "Type something...",
+    "linkPlaceholder": "https://hoggyfoggy.com",
+    "linkLabel": "Link"
   },
 
   "toolTips": {

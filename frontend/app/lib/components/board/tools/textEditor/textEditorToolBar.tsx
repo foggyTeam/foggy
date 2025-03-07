@@ -24,6 +24,7 @@ import Quill from 'quill';
 import clsx from 'clsx';
 import { Divider } from '@heroui/divider';
 import EditorToolButton from '@/app/lib/components/board/tools/textEditor/editorToolButton';
+import LinkPicker from '@/app/lib/components/board/tools/linkPicker';
 
 interface EditorTool {
   id?: string;
@@ -40,6 +41,8 @@ export default function TextEditorToolBar({
   selectionFormat,
   setSelectionFormat,
   quillRef,
+  saveSelection,
+  restoreSelection,
 }) {
   const defaultLink = '/';
   const defaultColor = '#171717';
@@ -101,6 +104,7 @@ export default function TextEditorToolBar({
 
       quill.format(clickType, newFormat);
 
+      console.log(newFormat);
       // обновим собственные данные на основе данных Quill
       setSelectionFormat({
         ...selectionFormat,
@@ -133,10 +137,14 @@ export default function TextEditorToolBar({
 
       <EditorToolButton
         id={tools.link.id}
-        value={defaultLink}
+        value={selectionFormat[tools.link.id]}
         Icon={tools.link.ToolIcon}
-        handleClick={handleClick}
         isAccent={!!selectionFormat[tools.link.id]}
+        popover={true}
+        PopoverInnerContent={LinkPicker}
+        handleClick={handleClick}
+        saveSelection={saveSelection}
+        restoreSelection={restoreSelection}
       />
     </div>
   );

@@ -1,7 +1,8 @@
 import { Button } from '@heroui/button';
 import React, { JSX, useEffect, useState } from 'react';
 import clsx from 'clsx';
-import { Modal, ModalContent } from '@heroui/modal';
+import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
+import { bg_container_no_padding } from '@/app/lib/types/styles';
 
 export default function EditorToolButton({
   id,
@@ -9,6 +10,8 @@ export default function EditorToolButton({
   Icon,
   handleClick,
   isAccent,
+  saveSelection,
+  restoreSelection,
   popover = false,
   PopoverInnerContent,
 }: {
@@ -20,42 +23,45 @@ export default function EditorToolButton({
   PopoverInnerContent?;
 }) {
   const [localValue, setLocalValue] = useState(value);
-  const [modal, setModal] = useState(false);
 
   useEffect(() => {
-    if (popover) {
-      handleClick(id, localValue);
-    }
-  }, [setLocalValue, value]);
+    setLocalValue(value);
+  }, [value]);
+
+  const handlePopoverClose = () => {
+    restoreSelection();
+    setTimeout(() => handleClick(id, localValue), 180);
+  };
 
   return popover ? (
-    <>
-      <Button
-        onPress={() => setModal(!modal)}
-        id={id}
-        variant="light"
-        isIconOnly
-        size="sm"
+    <Popover onClose={handlePopoverClose}>
+      <PopoverTrigger>
+        <Button
+          onPress={() => {
+            saveSelection();
+          }}
+          id={id}
+          variant="light"
+          isIconOnly
+          size="sm"
+        >
+          <Icon
+            className={clsx(
+              'h-5 w-5',
+              isAccent ? 'stroke-f_accent' : 'stroke-default-500',
+            )}
+          />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className={clsx(
+          bg_container_no_padding,
+          'flex w-fit flex-col gap-2 px-1 py-2 sm:px-1 sm:py-3',
+        )}
       >
-        <Icon
-          className={clsx(
-            'h-5 w-5',
-            isAccent ? 'stroke-f_accent' : 'stroke-default-500',
-          )}
-        />
-      </Button>
-
-      <Modal isOpen={modal} onOpenChange={setModal}>
-        <ModalContent>
-          {(onClose) => (
-            <PopoverInnerContent
-              value={localValue}
-              changeValue={setLocalValue}
-            />
-          )}
-        </ModalContent>
-      </Modal>
-    </>
+        <PopoverInnerContent value={localValue} changeValue={setLocalValue} />
+      </PopoverContent>
+    </Popover>
   ) : (
     <Button
       id={id}
