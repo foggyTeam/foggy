@@ -62,7 +62,7 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         top: top - 65.33 - 16,
         left: left - 16,
       }}
-      className="max-w-96"
+      className="max-w-[32rem]"
     >
       <TextEditorToolBar
         selectionFormat={selectionFormat}

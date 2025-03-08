@@ -9,6 +9,7 @@ import {
   Heading1Icon,
   Heading2Icon,
   Heading3Icon,
+  HeadingIcon,
   ItalicIcon,
   LinkIcon,
   ListChecksIcon,
@@ -27,6 +28,7 @@ import EditorToolButton from '@/app/lib/components/board/tools/textEditor/editor
 import LinkPicker from '@/app/lib/components/board/tools/linkPicker';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { to_rgb } from '@/tailwind.config';
+import EditorToolDropdown from '@/app/lib/components/board/tools/textEditor/editorToolDropdown';
 
 interface EditorTool {
   id?: string;
@@ -37,6 +39,7 @@ interface EditorTool {
 interface EditorDropdown {
   id: string;
   options: EditorTool[];
+  defaultIcon: JSX.Element;
 }
 
 export default function TextEditorToolBar({
@@ -76,6 +79,7 @@ export default function TextEditorToolBar({
           { value: 2, ToolIcon: Heading2Icon },
           { value: 3, ToolIcon: Heading3Icon },
         ],
+        defaultIcon: HeadingIcon,
       },
       {
         id: 'list',
@@ -84,6 +88,7 @@ export default function TextEditorToolBar({
           { value: 'ordered', ToolIcon: ListOrderedIcon },
           { value: 'check', ToolIcon: ListChecksIcon },
         ],
+        defaultIcon: ListIcon,
       },
       {
         id: 'align',
@@ -93,6 +98,7 @@ export default function TextEditorToolBar({
           { value: 'left', ToolIcon: AlignLeftIcon },
           { value: 'right', ToolIcon: AlignRightIcon },
         ],
+        defaultIcon: AlignCenterIcon,
       },
     ] as EditorDropdown[],
   };
@@ -162,6 +168,26 @@ export default function TextEditorToolBar({
             handleClick={handleClick}
             saveSelection={saveSelection}
             restoreSelection={restoreSelection}
+            key={index}
+          />
+        );
+      })}
+
+      <Divider key={`color`} orientation={`vertical`} />
+
+      {tools.dropdown.map((dropdown, index) => {
+        return (
+          <EditorToolDropdown
+            handleClick={handleClick}
+            id={dropdown.id}
+            options={dropdown.options}
+            activeOption={selectionFormat[dropdown.id]}
+            Icon={
+              dropdown.options.find(
+                (option) => option.value === selectionFormat[dropdown.id],
+              )?.ToolIcon || dropdown.defaultIcon
+            }
+            isAccent={!!selectionFormat[dropdown.id]}
             key={index}
           />
         );
