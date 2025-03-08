@@ -12,7 +12,6 @@ import {
   HeadingIcon,
   ItalicIcon,
   LinkIcon,
-  ListChecksIcon,
   ListIcon,
   ListOrderedIcon,
   PaintBucketIcon,
@@ -86,7 +85,7 @@ export default function TextEditorToolBar({
         options: [
           { value: 'bullet', ToolIcon: ListIcon },
           { value: 'ordered', ToolIcon: ListOrderedIcon },
-          { value: 'check', ToolIcon: ListChecksIcon },
+          // { value: 'check', ToolIcon: ListChecksIcon },
         ],
         defaultIcon: ListIcon,
       },
