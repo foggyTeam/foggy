@@ -1,5 +1,6 @@
 import { BoardElement } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
+import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 
 interface DrawingHandlersProps {
   stageRef: any;
@@ -100,11 +101,13 @@ export const handlePlaceText =
     setActiveTool,
     isEditing,
     setIsEditing,
+    content,
     setContent,
     setClickPosition,
   }) =>
-  (e: any) => {
+  async (e: any) => {
     if (isEditing) {
+      const svg = HtmlToSvg(content);
       setIsEditing(false);
       setContent('');
       setClickPosition({ x: undefined, y: undefined });

@@ -26,7 +26,7 @@ export default function ColorPicker({ value, changeValue }) {
             onPress={() => {
               navigator.clipboard
                 .writeText(value)
-                .catch(() => console.log('Failed to copy to clipboard.'));
+                .catch(() => console.error('Failed to copy to clipboard.'));
               console.log('Copied to clipboard!');
             }}
             isIconOnly

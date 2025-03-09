@@ -4,8 +4,15 @@ import '@/app/lib/components/board/tools/textEditor/quillOverrides.css';
 import Quill from 'quill';
 import settingsStore from '@/app/stores/settingsStore';
 import TextEditorToolBar from '@/app/lib/components/board/tools/textEditor/textEditorToolBar';
+import clsx from 'clsx';
 
-export default function CustomTextEditor({ top, left, content, setContent }) {
+export default function CustomTextEditor({
+  top,
+  left,
+  content,
+  setContent,
+  width,
+}) {
   const quillRef = useRef<Quill | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
 
@@ -62,7 +69,6 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         top: top - 65.33 - 16,
         left: left - 16,
       }}
-      className="max-w-[32rem]"
     >
       <TextEditorToolBar
         selectionFormat={selectionFormat}
@@ -70,10 +76,14 @@ export default function CustomTextEditor({ top, left, content, setContent }) {
         quillRef={quillRef}
         saveSelection={saveSelection}
         restoreSelection={restoreSelection}
+        className="max-w-[27rem]"
       />
       <div
         ref={editorContainerRef}
-        className="quill-editor-container caret-f_accent"
+        className={clsx(
+          'quill-editor-container caret-f_accent',
+          width ? 'max-w-[${width}px]' : 'max-w-[27rem]',
+        )}
       />
     </div>
   );

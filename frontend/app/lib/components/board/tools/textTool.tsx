@@ -33,6 +33,7 @@ export default function TextTool({
       setActiveTool,
       isEditing,
       setIsEditing,
+      content,
       setContent,
       setClickPosition,
     } as any);
@@ -51,7 +52,7 @@ export default function TextTool({
         stage.off('mousedown', placeTextHandler);
       }
     };
-  }, [activeTool, setActiveTool, stageRef, isEditing, clickPosition]);
+  }, [activeTool, setActiveTool, stageRef, isEditing, clickPosition, content]);
 
   return (
     <>
