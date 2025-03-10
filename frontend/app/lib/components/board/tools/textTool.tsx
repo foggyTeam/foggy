@@ -15,7 +15,6 @@ export default function TextTool({
   setActiveTool,
   stageRef,
   addElement,
-  updateElement,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [clickPosition, setClickPosition] = useState({
@@ -23,19 +22,22 @@ export default function TextTool({
     y: undefined,
   });
   const [content, setContent] = useState('');
-
-  const [newElement, setNewElement] = useState(null);
+  const [textHeight, setTextHeight] = useState(0);
 
   useEffect(() => {
     const placeTextHandler = handlePlaceText({
       stageRef,
       activeTool,
       setActiveTool,
+      addElement,
+      clickPosition,
+      setClickPosition,
       isEditing,
       setIsEditing,
       content,
       setContent,
-      setClickPosition,
+      textHeight,
+      setTextHeight,
     } as any);
 
     if ((activeTool === 'text' && stageRef.current) || isEditing) {
@@ -52,7 +54,15 @@ export default function TextTool({
         stage.off('mousedown', placeTextHandler);
       }
     };
-  }, [activeTool, setActiveTool, stageRef, isEditing, clickPosition, content]);
+  }, [
+    activeTool,
+    setActiveTool,
+    stageRef,
+    clickPosition,
+    isEditing,
+    content,
+    textHeight,
+  ]);
 
   return (
     <>
@@ -83,6 +93,7 @@ export default function TextTool({
               left={clickPosition.x}
               content={content}
               setContent={setContent}
+              setHeight={setTextHeight}
             />
           ) as ReactNode,
           document.body,

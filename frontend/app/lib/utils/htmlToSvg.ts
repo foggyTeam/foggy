@@ -5,13 +5,17 @@ const preprocessContent = (content: string): string => {
   return content.replace(/<br>/g, '<span class="line-break"></span>');
 };
 
-const HtmlToSvg = (content: string, width?: number, height?: number) => {
+const HtmlToSvg = (
+  content: string,
+  width?: number,
+  height?: number,
+): string => {
   content = preprocessContent(content);
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-  svg.setAttribute('width', width ? `${width}` : '432px');
-  svg.setAttribute('height', height ? `${height}` : '88px');
+  svg.setAttribute('width', width ? `${width}px` : '432px');
+  svg.setAttribute('height', height ? `${height}px` : '88px');
 
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
@@ -30,6 +34,7 @@ const HtmlToSvg = (content: string, width?: number, height?: number) => {
           flex-direction: column;
           justify-content: start;
           overflow: visible;
+          padding: 16px;
         }
         .line-break {
           display: block;
@@ -103,7 +108,11 @@ const HtmlToSvg = (content: string, width?: number, height?: number) => {
 
   svg.appendChild(foreignObject);
 
-  return svg;
+  const svgString = new XMLSerializer().serializeToString(svg);
+
+  return (
+    'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)))
+  );
 };
 
 const DebouncedHtmlToSvg = debounce(

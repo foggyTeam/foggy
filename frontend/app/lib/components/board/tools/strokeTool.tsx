@@ -26,22 +26,48 @@ export default function StrokeTool({ element, updateElement }) {
   }, [element]);
 
   useEffect(() => {
-    if (
-      isElementVisible(
-        element.attrs.type,
-        element.attrs.fill,
-        strokeColor,
-        strokeWidth,
+    if (element.attrs.type !== 'text') {
+      if (
+        isElementVisible(
+          element.attrs.type,
+          element.attrs.fill,
+          strokeColor,
+          strokeWidth,
+        )
       )
-    )
-      updateElement(element.attrs.id, {
-        strokeWidth: strokeWidth,
-        stroke:
-          strokeColor && (strokeColor.length === 7 || strokeColor.length === 9)
-            ? strokeColor
-            : primary.DEFAULT,
-      } as BoardElement);
-    else console.log('Element is invisible!');
+        updateElement(element.attrs.id, {
+          strokeWidth: strokeWidth,
+          stroke:
+            strokeColor &&
+            (strokeColor.length === 7 || strokeColor.length === 9)
+              ? strokeColor
+              : primary.DEFAULT,
+        } as BoardElement);
+      else console.log('Element is invisible!');
+    } else {
+      if (
+        isElementVisible(
+          element.attrs.type,
+          primary.DEFAULT,
+          strokeColor,
+          strokeWidth,
+        )
+      ) {
+        updateElement(element.attrs.id, {
+          strokeWidth: strokeWidth,
+          stroke:
+            strokeColor &&
+            (strokeColor.length === 7 || strokeColor.length === 9)
+              ? strokeColor
+              : primary.DEFAULT,
+        } as BoardElement);
+      } else {
+        updateElement(element.attrs.id, {
+          strokeWidth: undefined,
+          stroke: undefined,
+        } as BoardElement);
+      }
+    }
   }, [strokeColor, strokeWidth]);
 
   return (

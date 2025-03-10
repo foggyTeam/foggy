@@ -1,4 +1,4 @@
-import { Ellipse, Layer, Line, Rect, Text } from 'react-konva';
+import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement } from '@/app/lib/types/definitions';
 
 const MIN_WIDTH = 4;
@@ -20,29 +20,18 @@ export default function BoardLayer({
 }) {
   const holdTransformEnd = (e, element) => {
     const node = e.target;
-    switch (element.type) {
-      case 'text':
-        updateElement(element.id, {
-          x: node.x(),
-          y: node.y(),
-          text: node.text(),
-          fontSize: node.fontSize(),
-          rotation: node.rotation(),
-        });
-        return;
-      default:
-        const scaleX = node.scaleX();
-        const scaleY = node.scaleY();
-        node.scaleX(1);
-        node.scaleY(1);
-        updateElement(element.id, {
-          x: node.x(),
-          y: node.y(),
-          width: Math.max(MIN_WIDTH, node.width() * scaleX),
-          height: Math.max(MIN_HEIGHT, node.height() * scaleY),
-          rotation: node.rotation(),
-        });
-    }
+
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+    node.scaleX(1);
+    node.scaleY(1);
+    updateElement(element.id, {
+      x: node.x(),
+      y: node.y(),
+      width: Math.max(MIN_WIDTH, node.width() * scaleX),
+      height: Math.max(MIN_HEIGHT, node.height() * scaleY),
+      rotation: node.rotation(),
+    });
   };
 
   return (
@@ -94,9 +83,22 @@ export default function BoardLayer({
               />
             );
           case 'text':
+            const imageElement = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'image',
+            ) as SVGImageElement;
+            imageElement.setAttributeNS(
+              'http://www.w3.org/1999/xlink',
+              'href',
+              element.svg,
+            );
+            imageElement.setAttribute('width', element.width.toString());
+            imageElement.setAttribute('height', element.height.toString());
+
             return (
               <Image
                 key={element.id}
+                image={imageElement}
                 {...element}
                 onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}

@@ -1,5 +1,11 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { Board, BoardElement, Project } from '@/app/lib/types/definitions';
+import {
+  Board,
+  BoardElement,
+  Project,
+  TextElement,
+} from '@/app/lib/types/definitions';
+import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 
 const MAX_LAYER = 2;
 
@@ -35,11 +41,12 @@ class ProjectsStore {
     if (this.activeBoard) {
       this.activeBoard.layers = this.activeBoard.layers.map(
         (layer: BoardElement[]) =>
-          layer.map((element) =>
-            element.id === id
-              ? ({ ...element, ...newAttrs } as BoardElement)
-              : element,
-          ),
+          layer.map((element) => {
+            if (!(element.id === id)) return element;
+            if (!(element.type === 'text'))
+              return { ...element, ...newAttrs } as BoardElement;
+            return UpdateTextElement(element, newAttrs as Partial<TextElement>);
+          }),
       );
     }
   };

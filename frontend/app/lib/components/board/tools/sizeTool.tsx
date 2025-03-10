@@ -22,21 +22,17 @@ export default function SizeTool({ element, updateElement }) {
   const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
-    if (element.attrs.type !== 'text') {
-      if (element.attrs.type === 'ellipse') {
-        setWidth(element.attrs.radiusX * 2);
-        setHeight(element.attrs.radiusY * 2);
-      } else {
-        setWidth(element.attrs.width);
-        setHeight(element.attrs.height);
-      }
-      setCornerRadius(
-        element.attrs.cornerRadius ? element.attrs.cornerRadius : 0,
-      );
-      setRotation(element.attrs.rotation);
+    if (element.attrs.type === 'ellipse') {
+      setWidth(element.attrs.radiusX * 2);
+      setHeight(element.attrs.radiusY * 2);
     } else {
-      setRotation(element.attrs.rotation);
+      setWidth(element.attrs.width);
+      setHeight(element.attrs.height);
     }
+    setCornerRadius(
+      element.attrs.cornerRadius ? element.attrs.cornerRadius : 0,
+    );
+    setRotation(element.attrs.rotation);
   }, [element]);
 
   useEffect(() => {
@@ -75,43 +71,35 @@ export default function SizeTool({ element, updateElement }) {
         )}
       >
         <div className="flex gap-2">
-          {element.attrs.type !== 'text' && (
-            <NumberInput
-              minValue={4}
-              maxValue={512}
-              value={width}
-              onValueChange={setWidth}
-              startContent={
-                <MoveHorizontalIcon className="stroke-default-500" />
-              }
-              label={settingsStore.t.toolBar.width}
-              className="max-w-32"
-            />
-          )}
-          {element.attrs.type !== 'text' && (
-            <NumberInput
-              minValue={4}
-              maxValue={512}
-              value={height}
-              onValueChange={setHeight}
-              startContent={<MoveVerticalIcon className="stroke-default-500" />}
-              label={settingsStore.t.toolBar.height}
-              className="max-w-32"
-            />
-          )}
+          <NumberInput
+            minValue={4}
+            maxValue={512}
+            value={width}
+            onValueChange={setWidth}
+            startContent={<MoveHorizontalIcon className="stroke-default-500" />}
+            label={settingsStore.t.toolBar.width}
+            className="max-w-32"
+          />
+          <NumberInput
+            minValue={4}
+            maxValue={512}
+            value={height}
+            onValueChange={setHeight}
+            startContent={<MoveVerticalIcon className="stroke-default-500" />}
+            label={settingsStore.t.toolBar.height}
+            className="max-w-32"
+          />
         </div>
         <div className="flex gap-2">
-          {element.attrs.type !== 'text' && (
-            <NumberInput
-              minValue={0}
-              maxValue={128}
-              value={cornerRadius}
-              onValueChange={setCornerRadius}
-              startContent={<ScanIcon className="stroke-default-500" />}
-              label={settingsStore.t.toolBar.cornerRadius}
-              className="max-w-32"
-            />
-          )}
+          <NumberInput
+            minValue={0}
+            maxValue={128}
+            value={cornerRadius}
+            onValueChange={setCornerRadius}
+            startContent={<ScanIcon className="stroke-default-500" />}
+            label={settingsStore.t.toolBar.cornerRadius}
+            className="max-w-32"
+          />
           <NumberInput
             minValue={-359}
             maxValue={359}

@@ -99,17 +99,43 @@ export const handlePlaceText =
     stageRef,
     activeTool,
     setActiveTool,
+    addElement,
     isEditing,
     setIsEditing,
     content,
     setContent,
+    clickPosition,
     setClickPosition,
+    textHeight,
+    setTextHeight,
   }) =>
   async (e: any) => {
     if (isEditing) {
-      const svg = HtmlToSvg(content);
+      const { x, y } = clickPosition;
+      const defaultTextWidth = 432;
+
+      const svg = HtmlToSvg(content, defaultTextWidth, textHeight);
+
+      const element = {
+        id: `${activeTool}_${Date.now()}`,
+        type: 'text',
+        draggable: true,
+        dragDistance: 4,
+        x,
+        y,
+        rotation: 0,
+        svg: svg,
+        content: content,
+        width: defaultTextWidth,
+        height: textHeight,
+        cornerRadius: 0,
+      } as BoardElement;
+
+      addElement(element);
+
       setIsEditing(false);
       setContent('');
+      setTextHeight(0);
       setClickPosition({ x: undefined, y: undefined });
     } else if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();

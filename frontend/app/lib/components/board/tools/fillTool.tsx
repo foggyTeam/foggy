@@ -13,24 +13,40 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function FillTool({ element, updateElement }) {
   const [fillColor, changeColor] = useState(primary.DEFAULT);
+
   useEffect(() => {
-    changeColor(element.attrs.fill ? element.attrs.fill : primary.DEFAULT);
+    changeColor(
+      element.attrs.fill ? element.attrs.fill : `${primary.DEFAULT}00`,
+    );
   }, [element]);
 
   useEffect(() => {
-    if (
-      (fillColor.length === 7 || fillColor.length === 9) &&
-      isElementVisible(
-        element.attrs.type,
-        fillColor,
-        element.attrs.stroke,
-        element.attrs.strokeWidth,
+    if (element.attrs.type !== 'text') {
+      if (
+        (fillColor.length === 7 || fillColor.length === 9) &&
+        isElementVisible(
+          element.attrs.type,
+          fillColor,
+          element.attrs.stroke,
+          element.attrs.strokeWidth,
+        )
       )
-    )
+        updateElement(element.attrs.id, {
+          fill: fillColor,
+        } as BoardElement);
+      else console.log('Element is invisible!');
+    } else {
       updateElement(element.attrs.id, {
-        fill: fillColor,
+        fill: isElementVisible(
+          element.attrs.type,
+          fillColor,
+          primary.DEFAULT,
+          1,
+        )
+          ? fillColor
+          : undefined,
       } as BoardElement);
-    else console.log('Element is invisible!');
+    }
   }, [fillColor]);
 
   return (
