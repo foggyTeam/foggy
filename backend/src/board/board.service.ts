@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -24,13 +23,6 @@ export class BoardService {
   constructor(
     @InjectModel(Board.name) private boardModel: Model<Board>,
     @InjectModel(Layer.name) private layerModel: Model<Layer>,
-    @InjectModel(RectElement.name) private rectElementModel: Model<RectElement>,
-    @InjectModel(EllipseElement.name)
-    private ellipseElementModel: Model<EllipseElement>,
-    @InjectModel(TextElement.name) private textElementModel: Model<TextElement>,
-    @InjectModel(LineElement.name) private lineElementModel: Model<LineElement>,
-    @InjectModel(MarkerElement.name)
-    private markerElementModel: Model<MarkerElement>,
   ) {}
 
   async createBoard(createBoardDto: any): Promise<Board> {
@@ -74,19 +66,11 @@ export class BoardService {
     }
   }
 
-  async getLayerElements(layerId: string): Promise<BaseElement[]> {
-    const layer = await this.layerModel.findById(layerId).exec();
-    if (!layer) {
-      throw new NotFoundException(`Layer with ID "${layerId}" not found`);
-    }
-    return layer.elements;
-  }
-
   async addElement(
     boardId: string,
     layerNumber: number,
     elementDto: any,
-  ): Promise<BaseElement> {
+  ): Promise<any> {
     console.log(
       `Adding element to board ${boardId} in layer number ${layerNumber}`,
     );
@@ -108,49 +92,40 @@ export class BoardService {
       throw new NotFoundException(`Layer with ID "${layerId}" not found`);
     }
 
-    const existingElement = layer.elements.find(
-      (element) => element.id === elementDto.id,
-    );
-    if (existingElement) {
+    if (!(await this.isElementIdUnique(boardId, elementDto.id))) {
       console.error(
-        `Element with ID "${elementDto.id}" already exists in layer "${layerNumber}"`,
+        `Element with ID "${elementDto.id}" already exists in board "${boardId}"`,
       );
       throw new BadRequestException(
-        `Element with ID "${elementDto.id}" already exists in layer "${layerNumber}"`,
+        `Element with ID "${elementDto.id}" already exists in board "${boardId}"`,
       );
     }
 
-    let element: BaseElement;
-    try {
-      switch (elementDto.type) {
-        case 'rect':
-          element = new this.rectElementModel(elementDto);
-          break;
-        case 'ellipse':
-          element = new this.ellipseElementModel(elementDto);
-          break;
-        case 'text':
-          element = new this.textElementModel(elementDto);
-          break;
-        case 'line':
-          element = new this.lineElementModel(elementDto);
-          break;
-        case 'marker':
-          element = new this.markerElementModel(elementDto);
-          break;
-        default:
-          throw new Error(`Unsupported element type: "${elementDto.type}"`);
-      }
-    } catch (error) {
-      console.error(`Error creating element: ${error.message}`);
-      throw new InternalServerErrorException(
-        `Error creating element: ${error.message}`,
-      );
+    let element;
+    switch (elementDto.type) {
+      case 'rect':
+        element = new RectElement(elementDto);
+        break;
+      case 'ellipse':
+        element = new EllipseElement(elementDto);
+        break;
+      case 'text':
+        element = new TextElement(elementDto);
+        break;
+      case 'line':
+        element = new LineElement(elementDto);
+        break;
+      case 'marker':
+        element = new MarkerElement(elementDto);
+        break;
+      default:
+        throw new BadRequestException(
+          `Unsupported element type: "${elementDto.type}"`,
+        );
     }
 
     layer.elements.push(element);
     await layer.save();
-    await this.updateLastChange(boardId);
     console.log(`Element added successfully: ${JSON.stringify(element)}`);
     return element;
   }
@@ -291,6 +266,20 @@ export class BoardService {
     await board.save();
     await this.updateLastChange(boardId);
     return board;
+  }
+
+  private async isElementIdUnique(
+    boardId: string,
+    elementId: string,
+  ): Promise<boolean> {
+    const board = await this.findById(boardId);
+    for (const layerId of board.layers) {
+      const layer = await this.layerModel.findById(layerId).exec();
+      if (layer && layer.elements.some((element) => element.id === elementId)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private async findLayerAndElementById(

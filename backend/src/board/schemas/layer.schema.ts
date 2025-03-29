@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-import { BaseElement, BaseElementSchema } from './element.schema';
+import { Document, Types } from 'mongoose';
+import { BaseElement } from './element.schema';
 
 @Schema()
 export class Layer extends Document {
@@ -10,8 +10,11 @@ export class Layer extends Document {
   @Prop({ required: true })
   layerNumber: number;
 
-  @Prop({ type: [BaseElementSchema], default: [] })
-  elements: BaseElement[];
+  @Prop({
+    type: [{ type: Types.ObjectId, refPath: 'elements.type' }],
+    default: [],
+  })
+  elements: Array<Types.Subdocument & BaseElement>;
 }
 
 export const LayerSchema = SchemaFactory.createForClass(Layer);
