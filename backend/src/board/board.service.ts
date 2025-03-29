@@ -7,14 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Board } from './schemas/board.schema';
 import { Layer } from './schemas/layer.schema';
-import {
-  BaseElement,
-  EllipseElement,
-  LineElement,
-  MarkerElement,
-  RectElement,
-  TextElement,
-} from './schemas/element.schema';
+import { BaseElement, BaseElementModel } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 
@@ -71,16 +64,10 @@ export class BoardService {
     layerNumber: number,
     elementDto: any,
   ): Promise<any> {
-    console.log(
-      `Adding element to board ${boardId} in layer number ${layerNumber}`,
-    );
-    console.log(`Element DTO: ${JSON.stringify(elementDto)}`);
-
     const board = await this.findById(boardId);
     const layerId = board.layers[layerNumber];
 
     if (!layerId) {
-      console.error(`Layer with number "${layerNumber}" not found`);
       throw new NotFoundException(
         `Layer with number "${layerNumber}" not found`,
       );
@@ -88,14 +75,10 @@ export class BoardService {
 
     const layer = await this.layerModel.findById(layerId).exec();
     if (!layer) {
-      console.error(`Layer with ID "${layerId}" not found`);
       throw new NotFoundException(`Layer with ID "${layerId}" not found`);
     }
 
     if (!(await this.isElementIdUnique(boardId, elementDto.id))) {
-      console.error(
-        `Element with ID "${elementDto.id}" already exists in board "${boardId}"`,
-      );
       throw new BadRequestException(
         `Element with ID "${elementDto.id}" already exists in board "${boardId}"`,
       );
@@ -104,19 +87,19 @@ export class BoardService {
     let element;
     switch (elementDto.type) {
       case 'rect':
-        element = new RectElement(elementDto);
+        element = new BaseElementModel.discriminators.rect(elementDto);
         break;
       case 'ellipse':
-        element = new EllipseElement(elementDto);
+        element = new BaseElementModel.discriminators.ellipse(elementDto);
         break;
       case 'text':
-        element = new TextElement(elementDto);
+        element = new BaseElementModel.discriminators.text(elementDto);
         break;
       case 'line':
-        element = new LineElement(elementDto);
+        element = new BaseElementModel.discriminators.line(elementDto);
         break;
       case 'marker':
-        element = new MarkerElement(elementDto);
+        element = new BaseElementModel.discriminators.marker(elementDto);
         break;
       default:
         throw new BadRequestException(
@@ -126,7 +109,6 @@ export class BoardService {
 
     layer.elements.push(element);
     await layer.save();
-    console.log(`Element added successfully: ${JSON.stringify(element)}`);
     return element;
   }
 

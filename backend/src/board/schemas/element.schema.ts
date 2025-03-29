@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, model } from 'mongoose';
 
-@Schema()
+@Schema({ discriminatorKey: 'elementType' })
 export class BaseElement extends Document {
   @Prop({ required: true, unique: true })
   id: string;
@@ -37,7 +37,7 @@ export class BaseElement extends Document {
 export const BaseElementSchema = SchemaFactory.createForClass(BaseElement);
 
 @Schema()
-export class RectElement extends BaseElement {
+class RectElement extends BaseElement {
   @Prop({ required: true })
   cornerRadius: number;
 
@@ -51,7 +51,7 @@ export class RectElement extends BaseElement {
 export const RectElementSchema = SchemaFactory.createForClass(RectElement);
 
 @Schema()
-export class EllipseElement extends BaseElement {
+class EllipseElement extends BaseElement {
   @Prop({ required: true })
   width: number;
 
@@ -63,7 +63,7 @@ export const EllipseElementSchema =
   SchemaFactory.createForClass(EllipseElement);
 
 @Schema()
-export class TextElement extends BaseElement {
+class TextElement extends BaseElement {
   @Prop({ required: true })
   svg: string;
 
@@ -80,7 +80,7 @@ export class TextElement extends BaseElement {
 export const TextElementSchema = SchemaFactory.createForClass(TextElement);
 
 @Schema()
-export class LineElement extends BaseElement {
+class LineElement extends BaseElement {
   @Prop({ required: true })
   points: number[];
 
@@ -91,7 +91,7 @@ export class LineElement extends BaseElement {
 export const LineElementSchema = SchemaFactory.createForClass(LineElement);
 
 @Schema()
-export class MarkerElement extends BaseElement {
+class MarkerElement extends BaseElement {
   @Prop({ required: true })
   points: number[];
 
@@ -103,3 +103,12 @@ export class MarkerElement extends BaseElement {
 }
 
 export const MarkerElementSchema = SchemaFactory.createForClass(MarkerElement);
+
+export { RectElement, EllipseElement, TextElement, LineElement, MarkerElement };
+
+export const BaseElementModel = model('BaseElement', BaseElementSchema);
+BaseElementModel.discriminator('rect', RectElementSchema);
+BaseElementModel.discriminator('ellipse', EllipseElementSchema);
+BaseElementModel.discriminator('text', TextElementSchema);
+BaseElementModel.discriminator('line', LineElementSchema);
+BaseElementModel.discriminator('marker', MarkerElementSchema);
