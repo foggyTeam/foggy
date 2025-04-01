@@ -1,4 +1,4 @@
-import { BoardElement } from '@/app/lib/types/definitions';
+import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 
@@ -11,6 +11,16 @@ interface DrawingHandlersProps {
   setDrawing: (drawing: boolean) => void;
   setNewElement: (element: BoardElement | null) => void;
   newElement: BoardElement | null;
+}
+
+export interface TextEdit {
+  id: string;
+  isEditing: boolean;
+  x: number;
+  y: number;
+  content: string;
+  textWidth: number;
+  textHeight: number;
 }
 
 const DEFAULT_FILL = primary['200'];
@@ -146,6 +156,65 @@ export const handlePlaceText =
       setActiveTool('');
     }
   };
+
+export const handleEditText = ({
+  stageRef,
+  target,
+  updateElement,
+  content,
+  setContent,
+  textEditing,
+  setTextEditing,
+}) => {
+  if (target.parent) {
+    const stage = stageRef.current.getStage();
+    const { x, y } = getRelativePointerPosition(stage);
+    const element: TextElement = target.attrs;
+    setContent(element.content);
+
+    setTextEditing({
+      id: element.id,
+      isEditing: true,
+      x: x - 33.4,
+      y: y - 23.6,
+      content: element.content,
+      textHeight: element.height,
+      textWidth: element.width,
+    } as TextEdit);
+
+    hideTextElement(element.id, element.width, element.height, updateElement);
+  } else {
+    const svg = HtmlToSvg(
+      content,
+      textEditing.textWidth,
+      textEditing.textHeight,
+    );
+
+    updateElement(textEditing.id, {
+      svg: svg,
+      content: content,
+      height: textEditing.textHeight,
+    });
+
+    setTextEditing(null);
+    setContent('');
+  }
+};
+
+const hideTextElement = (
+  id: string,
+  width: number,
+  height: number,
+  updateElement,
+) => {
+  const svg = HtmlToSvg('', width, height);
+
+  updateElement(id, {
+    svg: svg,
+    content: '',
+    height: height,
+  });
+};
 
 const isTransparent = (color: string) => {
   if (!color) return true;

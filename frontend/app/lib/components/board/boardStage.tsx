@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import GridLayer from '@/app/lib/components/board/gridLayer';
 import { Button } from '@heroui/button';
@@ -15,6 +15,12 @@ import projectsStore from '@/app/stores/projectsStore';
 import { primary } from '@/tailwind.config';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
+import { createPortal } from 'react-dom';
+import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
+import {
+  handleEditText,
+  TextEdit,
+} from '@/app/lib/components/board/tools/drawingHandlers';
 
 const GRID_SIZE = 24;
 const MAX_X = 1000;
@@ -66,6 +72,9 @@ const BoardStage = observer(() => {
   const [selectedElements, changeSelection] = useState([]);
   const selectionRef: any = useRef(null);
 
+  const [isEditingText, setIsEditingText] = useState(null as TextEdit);
+  const [textContent, setTextContent] = useState('');
+
   const handleSelect = (e) => {
     const element: BoardElement = e.target;
 
@@ -83,7 +92,31 @@ const BoardStage = observer(() => {
   };
 
   const handleDeselect = (e) => {
-    if (e.target.parent == null) changeSelection([]);
+    if (e.target.parent == null) {
+      changeSelection([]);
+      if (isEditingText)
+        handleEditText({
+          stageRef,
+          target: e.target,
+          updateElement,
+          content: textContent,
+          setContent: setTextContent,
+          textEditing: isEditingText,
+          setTextEditing: setIsEditingText,
+        });
+    }
+  };
+
+  const handleTextEdit = (e) => {
+    handleEditText({
+      stageRef,
+      target: e.target,
+      updateElement,
+      content: textContent,
+      setContent: setTextContent,
+      textEditing: isEditingText,
+      setTextEditing: setIsEditingText,
+    });
   };
 
   const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
@@ -116,6 +149,7 @@ const BoardStage = observer(() => {
               fitCoordinates(pos.x, pos.y, element.width, element.height, scale)
             }
             updateElement={updateElement}
+            handleTextEdit={handleTextEdit}
           />
         ))}
 
@@ -152,6 +186,25 @@ const BoardStage = observer(() => {
           updateElement={updateElement}
         />
       </div>
+
+      {isEditingText &&
+        createPortal(
+          (
+            <TextEditor
+              top={isEditingText.y}
+              left={isEditingText.x}
+              content={textContent}
+              setContent={setTextContent}
+              height={isEditingText.textHeight}
+              setHeight={(newHeight) =>
+                setIsEditingText({ ...isEditingText, textHeight: newHeight })
+              }
+              width={isEditingText.textWidth}
+            />
+          ) as ReactNode,
+          document.body,
+        )}
+
       <FTooltip content={settingsStore.t.toolTips.resetStage}>
         <Button
           onPress={resetStage}

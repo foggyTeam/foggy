@@ -10,7 +10,9 @@ export default function CustomTextEditor({
   left,
   content,
   setContent,
+  height,
   setHeight,
+  width,
 }) {
   const quillRef = useRef<Quill | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
@@ -66,8 +68,8 @@ export default function CustomTextEditor({
     <div
       style={{
         position: 'fixed',
-        top: top - 65.33 - 16,
-        left: left - 16,
+        top: top - 56,
+        left: left,
       }}
     >
       <TextEditorToolBar
@@ -79,6 +81,10 @@ export default function CustomTextEditor({
         className="max-w-[27rem]"
       />
       <div
+        style={{
+          width: width ? `${width}px` : '',
+          height: height ? `${height}px` : '',
+        }}
         ref={editorContainerRef}
         className="quill-editor-container max-w-[27rem] caret-f_accent"
       />

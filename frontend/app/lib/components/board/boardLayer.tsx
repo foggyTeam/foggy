@@ -9,10 +9,12 @@ export default function BoardLayer({
   updateElement,
   fitCoordinates,
   handleSelect,
+  handleTextEdit,
 }: {
   layer: BoardElement[];
   updateElement: (id: string, newAttrs: Partial<any>) => void;
   handleSelect: (event) => void;
+  handleTextEdit: (event) => void;
   fitCoordinates: (
     pos: { x: number; y: number },
     element: any,
@@ -92,6 +94,7 @@ export default function BoardLayer({
               'href',
               element.svg,
             );
+
             imageElement.setAttribute('width', element.width.toString());
             imageElement.setAttribute('height', element.height.toString());
 
@@ -101,6 +104,7 @@ export default function BoardLayer({
                 image={imageElement}
                 {...element}
                 onClick={handleSelect}
+                onDblClick={handleTextEdit}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
