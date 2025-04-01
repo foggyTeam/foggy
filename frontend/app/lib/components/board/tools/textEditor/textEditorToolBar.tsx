@@ -16,6 +16,7 @@ import {
   ListOrderedIcon,
   PaintBucketIcon,
   QuoteIcon,
+  RemoveFormattingIcon,
   StrikethroughIcon,
   UnderlineIcon,
 } from 'lucide-react';
@@ -57,6 +58,7 @@ export default function TextEditorToolBar({
     link: EditorTool;
     color: EditorTool[];
     dropdown: EditorDropdown[];
+    clear: any;
   } = {
     base: [
       { id: 'bold', value: true, ToolIcon: BoldIcon },
@@ -100,22 +102,30 @@ export default function TextEditorToolBar({
         defaultIcon: AlignCenterIcon,
       },
     ] as EditorDropdown[],
+    clear: { id: 'clear', ToolIcon: RemoveFormattingIcon as JSX.Element },
   };
 
   function handleClick(clickType, value) {
     if (quillRef.current) {
       // получим и обновим данные о выделенном фрагменте из Quill
       const quill = quillRef.current as Quill;
-      const currentValue = quill.getFormat()[clickType];
-      const newFormat = value == currentValue ? false : value;
+      if (clickType === 'clear') {
+        const range = quill.getSelection();
+        if (range) {
+          quill.removeFormat(range.index, range.length);
+        }
+      } else {
+        const currentValue = quill.getFormat()[clickType];
+        const newFormat = value == currentValue ? false : value;
 
-      quill.format(clickType, newFormat);
+        quill.format(clickType, newFormat);
 
-      // обновим собственные данные на основе данных Quill
-      setSelectionFormat({
-        ...selectionFormat,
-        [clickType]: newFormat,
-      });
+        // обновим собственные данные на основе данных Quill
+        setSelectionFormat({
+          ...selectionFormat,
+          [clickType]: newFormat,
+        });
+      }
     }
   }
 
@@ -191,6 +201,16 @@ export default function TextEditorToolBar({
           />
         );
       })}
+
+      <Divider key={`clear`} orientation={`vertical`} />
+
+      <EditorToolButton
+        id={tools.clear.id}
+        value={false}
+        handleClick={handleClick}
+        Icon={tools.clear.ToolIcon}
+        isAccent={false}
+      />
     </div>
   );
 }
