@@ -71,7 +71,8 @@ export default function TextTool({
       <FTooltip content={settingsStore.t.toolTips.tools.textTool}>
         <Button
           onPress={() => {
-            activeTool === 'text' ? setActiveTool('') : setActiveTool('text');
+            if (activeTool === 'text') setActiveTool('');
+            else setActiveTool('text');
           }}
           variant={activeTool === 'text' ? 'flat' : 'light'}
           color={activeTool === 'text' ? 'primary' : 'default'}
