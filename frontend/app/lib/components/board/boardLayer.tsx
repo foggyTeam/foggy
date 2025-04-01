@@ -38,7 +38,6 @@ export default function BoardLayer({
     newImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', newSvg);
     newImage.setAttribute('width', width.toString());
     newImage.setAttribute('height', height.toString());
-    newImage.setAttribute('alt', element.content);
 
     node.setAttr('attrs', {
       ...node.attrs,
@@ -123,7 +122,6 @@ export default function BoardLayer({
 
             imageElement.setAttribute('width', element.width.toString());
             imageElement.setAttribute('height', element.height.toString());
-            imageElement.setAttribute('alt', element.content);
 
             return (
               <Image
@@ -141,6 +139,7 @@ export default function BoardLayer({
                 }
                 onTransform={(e) => holdTextTransform(e, element)}
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
+                alt={element.content}
               />
             );
           case 'marker':
