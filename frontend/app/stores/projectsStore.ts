@@ -124,7 +124,7 @@ class ProjectsStore {
       );
   };
   getElementLayer = (id: string): { layer: number; index: number } => {
-    let currentIndex = { layer: -1, index: -1 };
+    const currentIndex = { layer: -1, index: -1 };
 
     this.activeBoard?.layers.map((layer, layerIndex) => {
       const index = layer.findIndex((element) => element.id === id);
@@ -138,9 +138,8 @@ class ProjectsStore {
   };
 
   setActiveBoard = (board: Board) => {
-    this.activeBoard
-      ? (this.activeBoard = { ...this.activeBoard, board })
-      : (this.activeBoard = board);
+    if (this.activeBoard) this.activeBoard = { ...this.activeBoard, board };
+    else this.activeBoard = board;
   };
   setActiveProject = (id: string) => {
     this.activeProject = this.allProjects.find((project) => project.id == id);

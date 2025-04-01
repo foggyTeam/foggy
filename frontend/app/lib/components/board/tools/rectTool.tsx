@@ -75,7 +75,8 @@ export default function RectTool({
     <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
       <Button
         onPress={() => {
-          activeTool === 'rect' ? setActiveTool('') : setActiveTool('rect');
+          if (activeTool === 'rect') setActiveTool('');
+          else setActiveTool('rect');
         }}
         variant={activeTool === 'rect' ? 'flat' : 'light'}
         color={activeTool === 'rect' ? 'primary' : 'default'}

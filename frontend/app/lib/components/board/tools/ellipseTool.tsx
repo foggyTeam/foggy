@@ -75,9 +75,8 @@ export default function EllipseTool({
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
       <Button
         onPress={() => {
-          activeTool === 'ellipse'
-            ? setActiveTool('')
-            : setActiveTool('ellipse');
+          if (activeTool === 'ellipse') setActiveTool('');
+          else setActiveTool('ellipse');
         }}
         variant={activeTool === 'ellipse' ? 'flat' : 'light'}
         color={activeTool === 'ellipse' ? 'primary' : 'default'}
