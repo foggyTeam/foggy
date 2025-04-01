@@ -3,7 +3,7 @@ import { Document, model } from 'mongoose';
 
 @Schema({ discriminatorKey: 'elementType' })
 export class BaseElement extends Document {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   id: string;
 
   @Prop({ required: true })
