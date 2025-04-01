@@ -59,13 +59,19 @@ const BoardStage = observer(() => {
   UseBoardNavigation(stageRef, scale);
   UseBoardZoom(stageRef, scale, setScale);
 
-  const resetStage = (onlyZoom = false) => {
+  const resetStage = (onlyZoom: boolean = false) => {
     const stage = stageRef.current;
     if (stage) {
-      if (!onlyZoom) stage.position({ x: 0, y: 0 });
-      setScale(1);
-      stage.scale({ x: 1, y: 1 });
-      stage.batchDraw();
+      if (onlyZoom === true) {
+        setScale(1);
+        stage.scale({ x: 1, y: 1 });
+        stage.batchDraw();
+      } else {
+        stage.position({ x: 0, y: 0 });
+        setScale(1);
+        stage.scale({ x: 1, y: 1 });
+        stage.batchDraw();
+      }
     }
   };
 
