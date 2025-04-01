@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,6 +12,7 @@ import { Layer } from './schemas/layer.schema';
 import { BaseElement, BaseElementModel } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { CreateBoardDto } from './dto/create-board.dto';
 
 @Injectable()
 export class BoardService {
@@ -18,22 +21,23 @@ export class BoardService {
     @InjectModel(Layer.name) private layerModel: Model<Layer>,
   ) {}
 
-  async createBoard(createBoardDto: any): Promise<Board> {
-    const createdBoard = new this.boardModel(createBoardDto);
+  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
+    try {
+      await this.validateBoardData(createBoardDto);
 
-    const layers = await Promise.all([
-      this.createLayer(createdBoard._id.toString(), 0),
-      this.createLayer(createdBoard._id.toString(), 1),
-      this.createLayer(createdBoard._id.toString(), 2),
-    ]);
+      const createdBoard = new this.boardModel(createBoardDto);
+      await createdBoard.save();
 
-    createdBoard.layers = layers.map((layer) => layer._id.toString());
-    return createdBoard.save();
-  }
+      const layers = await this.createLayers(createdBoard._id.toString());
+      createdBoard.layers = layers.map((layer) => layer._id.toString());
+      await createdBoard.save();
 
-  async createLayer(boardId: string, layerNumber: number): Promise<Layer> {
-    const layer = new this.layerModel({ boardId, layerNumber });
-    return layer.save();
+      return createdBoard;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to create board: ${error.message}`,
+      );
+    }
   }
 
   async findAll(): Promise<Board[]> {
@@ -248,6 +252,30 @@ export class BoardService {
     await board.save();
     await this.updateLastChange(boardId);
     return board;
+  }
+
+  private async createLayers(boardId: string): Promise<Layer[]> {
+    return Promise.all(
+      Array.from({ length: 3 }, (_, index) => {
+        const layer = new this.layerModel({ boardId, layerNumber: index });
+        return layer.save();
+      }),
+    );
+  }
+
+  private async validateBoardData(
+    createBoardDto: CreateBoardDto,
+  ): Promise<void> {
+    const { projectId, name } = createBoardDto;
+
+    const existingBoard = await this.boardModel
+      .findOne({ projectId, name })
+      .exec();
+    if (existingBoard) {
+      throw new ConflictException(
+        'Board with the same name already exists in the project',
+      );
+    }
   }
 
   private async isElementIdUnique(

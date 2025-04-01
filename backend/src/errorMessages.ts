@@ -93,6 +93,46 @@ const errorMessages = {
       ru: 'Неверный API ключ',
     },
   },
+  projectId: {
+    required: {
+      en: 'Project ID is required',
+      ru: 'ID проекта является обязательным',
+    },
+    invalidType: {
+      en: 'Project ID must be a string',
+      ru: 'ID проекта должен быть строкой',
+    },
+  },
+  section: {
+    required: {
+      en: 'Section is required',
+      ru: 'Секция является обязательным',
+    },
+    invalidType: {
+      en: 'Section must be a string',
+      ru: 'Раздел должен быть строкой',
+    },
+  },
+  name: {
+    required: {
+      en: 'Name is required',
+      ru: 'Название является обязательным',
+    },
+    invalidType: {
+      en: 'Name must be a string',
+      ru: 'Название должно быть строкой',
+    },
+  },
+  type: {
+    required: {
+      en: 'Type is required',
+      ru: 'Тип является обязательным',
+    },
+    invalidType: {
+      en: 'Type must be a string',
+      ru: 'Тип должен быть представлен строкой',
+    },
+  },
 };
 
 type Field = keyof typeof errorMessages;
