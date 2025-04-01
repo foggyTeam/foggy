@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import GridLayer from '@/app/lib/components/board/gridLayer';
 import { Button } from '@heroui/button';
@@ -126,12 +126,35 @@ const BoardStage = observer(() => {
     });
   };
 
+  const handleDelKey = (e: KeyboardEvent) => {
+    if (e.key === 'Delete' && selectedElements) {
+      selectedElements.forEach((element) => {
+        removeElement(element.attrs.id);
+      });
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleDelKey);
+    return () => {
+      window.removeEventListener('keydown', handleDelKey);
+    };
+  }, [selectedElements]);
+
   const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
     projectsStore.updateElement(id, newAttrs);
   };
 
   const addElement = (newElement: BoardElement) => {
     projectsStore.addElement(newElement);
+  };
+
+  const removeElement = (id: string) => {
+    if (selectedElements)
+      changeSelection(
+        selectedElements.filter((element) => element.attrs.id !== id),
+      );
+    projectsStore.removeElement(id);
   };
 
   return (
@@ -191,6 +214,7 @@ const BoardStage = observer(() => {
           element={selectedElements.length === 1 && selectedElements[0]}
           addElement={addElement}
           updateElement={updateElement}
+          removeElement={removeElement}
           resetStage={resetStage}
         />
       </div>

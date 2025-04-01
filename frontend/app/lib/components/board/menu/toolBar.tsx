@@ -13,6 +13,7 @@ export default function ToolBar({
   stageRef,
   updateElement,
   addElement,
+  removeElement,
   element,
   resetStage,
 }) {
@@ -30,7 +31,11 @@ export default function ToolBar({
       )}
     >
       {element ? (
-        <ElementToolBar updateElement={updateElement} element={element} />
+        <ElementToolBar
+          updateElement={updateElement}
+          removeElement={removeElement}
+          element={element}
+        />
       ) : null}
       {element ? <Divider /> : null}
       <div className="flex justify-center gap-1">

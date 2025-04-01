@@ -55,7 +55,8 @@
       "layerBottom": "На задний слой",
       "layerBack": "Назад",
       "layerForward": "Вперед",
-      "layerTop": "На передний слой"
+      "layerTop": "На передний слой",
+      "deleteTool": "Удалить"
     },
     "resetStage": "Сбросить смещение"
   },

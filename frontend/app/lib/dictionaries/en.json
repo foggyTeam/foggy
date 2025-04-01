@@ -55,7 +55,8 @@
       "layerBottom": "Send to back",
       "layerBack": "Move back",
       "layerForward": "Move forward",
-      "layerTop": "Bring to front"
+      "layerTop": "Bring to front",
+      "deleteTool": "Delete"
     },
     "resetStage": "Reset position"
   },
