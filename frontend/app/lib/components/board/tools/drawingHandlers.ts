@@ -29,8 +29,20 @@ const DEFAULT_STROKE = primary['300'];
 const getRelativePointerPosition = (stage) => {
   const transform = stage.getAbsoluteTransform().copy();
   transform.invert();
-  const pos = stage.getPointerPosition();
-  return transform.point(pos);
+  const pos = transform.point(stage.getPointerPosition());
+
+  const stagePosition = stage.getPosition();
+  return {
+    stagePosition: { x: pos.x, y: pos.y },
+    editorPosition: { x: pos.x + stagePosition.x, y: pos.y + stagePosition.y },
+  };
+};
+
+const getRelativeElementPosition = (stage, element) => {
+  const stagePosition = stage.getPosition();
+  const x = element.x + stagePosition.x;
+  const y = element.y + stagePosition.y;
+  return { x, y };
 };
 
 export const handleMouseDown =
@@ -44,7 +56,7 @@ export const handleMouseDown =
   (e: any) => {
     if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();
-      const { x, y } = getRelativePointerPosition(stage);
+      const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
       const element = {
         id: `${activeTool}_${Date.now()}`,
@@ -73,7 +85,7 @@ export const handleMouseMove =
   (e: any) => {
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
-      const { x, y } = getRelativePointerPosition(stage);
+      const { x, y } = getRelativePointerPosition(stage).stagePosition;
       const width = x - newElement.x;
       const height = y - newElement.y;
 
@@ -107,6 +119,7 @@ export const handleMouseUp =
 export const handlePlaceText =
   ({
     stageRef,
+    resetStage,
     activeTool,
     setActiveTool,
     addElement,
@@ -121,7 +134,7 @@ export const handlePlaceText =
   }) =>
   async (e: any) => {
     if (isEditing) {
-      const { x, y } = clickPosition;
+      const { x, y } = clickPosition.stagePosition;
       const defaultTextWidth = 432;
 
       const svg = HtmlToSvg(content, defaultTextWidth, textHeight);
@@ -148,11 +161,13 @@ export const handlePlaceText =
       setTextHeight(0);
       setClickPosition({ x: undefined, y: undefined });
     } else if (activeTool && stageRef.current) {
+      resetStage(true);
+
       const stage = stageRef.current.getStage();
-      const { x, y } = getRelativePointerPosition(stage);
+      const position = getRelativePointerPosition(stage);
 
       setIsEditing(true);
-      setClickPosition({ x: x, y: y });
+      setClickPosition(position);
       setActiveTool('');
     }
   };
@@ -168,15 +183,16 @@ export const handleEditText = ({
 }) => {
   if (target.parent) {
     const stage = stageRef.current.getStage();
-    const { x, y } = getRelativePointerPosition(stage);
     const element: TextElement = target.attrs;
     setContent(element.content);
+
+    const { x, y } = getRelativeElementPosition(stage, element);
 
     setTextEditing({
       id: element.id,
       isEditing: true,
-      x: x - 33.4,
-      y: y - 23.6,
+      x: x,
+      y: y,
       content: element.content,
       textHeight: element.height,
       textWidth: element.width,

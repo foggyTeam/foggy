@@ -59,10 +59,10 @@ const BoardStage = observer(() => {
   UseBoardNavigation(stageRef, scale);
   UseBoardZoom(stageRef, scale, setScale);
 
-  const resetStage = () => {
+  const resetStage = (onlyZoom = false) => {
     const stage = stageRef.current;
     if (stage) {
-      stage.position({ x: 0, y: 0 });
+      if (!onlyZoom) stage.position({ x: 0, y: 0 });
       setScale(1);
       stage.scale({ x: 1, y: 1 });
       stage.batchDraw();
@@ -108,7 +108,7 @@ const BoardStage = observer(() => {
   };
 
   const handleTextEdit = (e) => {
-    if (!isEditingText) resetStage();
+    if (!isEditingText) resetStage(true);
     handleEditText({
       stageRef,
       target: e.target,
@@ -185,6 +185,7 @@ const BoardStage = observer(() => {
           element={selectedElements.length === 1 && selectedElements[0]}
           addElement={addElement}
           updateElement={updateElement}
+          resetStage={resetStage}
         />
       </div>
 

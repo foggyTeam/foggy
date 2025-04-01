@@ -14,6 +14,7 @@ export default function ToolBar({
   updateElement,
   addElement,
   element,
+  resetStage,
 }) {
   const [activeTool, setActiveTool] = useState('');
   const tools = [TextTool, RectTool, EllipseTool];
@@ -41,6 +42,7 @@ export default function ToolBar({
             addElement={addElement}
             updateElement={updateElement}
             stageRef={stageRef}
+            resetStage={resetStage}
           ></Tool>
         ))}
       </div>

@@ -15,11 +15,12 @@ export default function TextTool({
   setActiveTool,
   stageRef,
   addElement,
+  resetStage,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [clickPosition, setClickPosition] = useState({
-    x: undefined,
-    y: undefined,
+    stagePosition: { x: undefined, y: undefined },
+    editorPosition: { x: undefined, y: undefined },
   });
   const [content, setContent] = useState('');
   const [textHeight, setTextHeight] = useState(0);
@@ -27,6 +28,7 @@ export default function TextTool({
   useEffect(() => {
     const placeTextHandler = handlePlaceText({
       stageRef,
+      resetStage,
       activeTool,
       setActiveTool,
       addElement,
@@ -89,8 +91,8 @@ export default function TextTool({
         createPortal(
           (
             <TextEditor
-              top={clickPosition.y}
-              left={clickPosition.x}
+              top={clickPosition.editorPosition.y}
+              left={clickPosition.editorPosition.x}
               content={content}
               setContent={setContent}
               setHeight={setTextHeight}
