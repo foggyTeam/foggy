@@ -108,6 +108,7 @@ const BoardStage = observer(() => {
   };
 
   const handleTextEdit = (e) => {
+    if (!isEditingText) resetStage();
     handleEditText({
       stageRef,
       target: e.target,

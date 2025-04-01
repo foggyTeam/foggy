@@ -1,5 +1,6 @@
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement } from '@/app/lib/types/definitions';
+import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
@@ -20,6 +21,30 @@ export default function BoardLayer({
     element: any,
   ) => { x: number; y: number };
 }) {
+  const holdTextTransform = (e, element) => {
+    const node = e.target;
+
+    const scaleX = node.scaleX();
+    const scaleY = node.scaleY();
+
+    const width = Math.max(MIN_WIDTH, node.width() * scaleX);
+    const height = Math.max(MIN_HEIGHT, node.height() * scaleY);
+
+    const newSvg = HtmlToSvg(element.content, width, height);
+    const newImage = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'image',
+    ) as SVGImageElement;
+    newImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', newSvg);
+    newImage.setAttribute('width', width.toString());
+    newImage.setAttribute('height', height.toString());
+
+    node.setAttr('attrs', {
+      ...node.attrs,
+      image: newImage,
+    });
+  };
+
   const holdTransformEnd = (e, element) => {
     const node = e.target;
 
@@ -112,6 +137,7 @@ export default function BoardLayer({
                     y: e.target.y(),
                   })
                 }
+                onTransform={(e) => holdTextTransform(e, element)}
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
               />
             );
