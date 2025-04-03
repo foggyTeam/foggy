@@ -10,6 +10,7 @@ import { LoginUserDto } from './login-user.dto';
 import { GoogleUserDto } from './login-google.dto';
 import { getErrorMessages } from '../errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
+import { isURL } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -17,19 +18,6 @@ export class UsersService {
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
   ) {}
-
-  private async saveUser(newUser: User): Promise<Partial<User>> {
-    await this.checkUniqueFields({
-      email: newUser.email,
-      nickname: newUser.nickname,
-    });
-    try {
-      const user = await newUser.save();
-      return this.transformUserResponse(user);
-    } catch (error) {
-      this.handleSaveUserError(error);
-    }
-  }
 
   async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
     const [hashedPassword, nickname] = await Promise.all([
@@ -56,15 +44,98 @@ export class UsersService {
 
     if (!user) {
       const nickname = await this.generateGoogleNickname(userDto.nickname);
+      if (userDto.avatar && !isURL(userDto.avatar)) {
+        userDto.avatar = '';
+      }
       const newUser = new this.userModel({
         email: userDto.email,
         nickname,
         password: '',
+        avatar: userDto.avatar || '',
       });
       return this.saveUser(newUser);
     }
 
     return this.transformUserResponse(user as User);
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
+  async findUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new CustomException(
+        getErrorMessages({ id: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return user as User;
+  }
+
+  async deleteUserById(id: string): Promise<void> {
+    try {
+      await this.userModel.findByIdAndDelete(id);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
+  }
+
+  async deleteAllUsers(): Promise<void> {
+    await this.userModel.deleteMany({});
+    await this.counterModel.updateOne({}, { count: 0 });
+  }
+
+  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
+    const user = await this.findUserById(userId);
+
+    if (updateData.email) {
+      throw new CustomException(
+        getErrorMessages({ email: 'cannotChange' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (
+      updateData.nickname &&
+      !(await this.validateNickname(updateData.nickname))
+    ) {
+      throw new CustomException(
+        getErrorMessages({ nickname: 'invalid' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (updateData.password) {
+      updateData.password = await this.hashPassword(updateData.password);
+    }
+
+    if (updateData.settings) {
+      user.settings = {
+        ...user.settings,
+        ...updateData.settings,
+      };
+      delete updateData.settings;
+    }
+
+    Object.assign(user, updateData);
+    await user.save();
+
+    return user;
+  }
+
+  private async saveUser(newUser: User): Promise<Partial<User>> {
+    await this.checkUniqueFields({
+      email: newUser.email,
+      nickname: newUser.nickname,
+    });
+    try {
+      const user = await newUser.save();
+      return this.transformUserResponse(user);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
   }
 
   private async generateNickname(): Promise<string> {
@@ -104,19 +175,23 @@ export class UsersService {
       /\s+/g,
       '',
     );
-    const isValidNickname =
-      transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
-    const containsHoggyFoggy = transliteratedNickname.includes('hoggyFoggy');
 
-    if (
-      isValidNickname &&
-      !containsHoggyFoggy &&
-      !(await this.userModel.exists({ nickname: transliteratedNickname }))
-    ) {
+    if (await this.validateNickname(transliteratedNickname)) {
       return transliteratedNickname;
     }
 
     return this.generateNickname();
+  }
+
+  private async validateNickname(nickname: string): Promise<boolean> {
+    const isValidNickname = nickname.length >= 3 && nickname.length <= 20;
+    const containsHoggyFoggy = nickname.includes('hoggyFoggy');
+
+    return (
+      isValidNickname &&
+      !containsHoggyFoggy &&
+      !(await this.userModel.exists({ nickname }))
+    );
   }
 
   private async hashPassword(password: string): Promise<string> {
@@ -165,26 +240,6 @@ export class UsersService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
-  async findUserById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id);
-    if (!user) {
-      throw new CustomException(
-        getErrorMessages({ id: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return user as User;
-  }
-
-  async deleteAllUsers(): Promise<void> {
-    await this.userModel.deleteMany({});
-    await this.counterModel.updateOne({}, { count: 0 });
   }
 
   private transformUserResponse(user: User): Partial<User> {
