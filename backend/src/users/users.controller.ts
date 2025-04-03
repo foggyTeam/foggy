@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -84,6 +85,37 @@ export class UsersController {
     @Body() googleUserDto: GoogleUserDto,
   ): Promise<Partial<User>> {
     return this.usersService.handleGoogleYandexUser(googleUserDto);
+  }
+
+  @Patch('update/:id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update user information' })
+  @ApiResponse({ status: 200, description: 'User information updated' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBody({
+    description: 'Data to update user information',
+    examples: {
+      example1: {
+        value: {
+          password: 'newpassword123',
+          nickname: 'newnickname',
+          profileDescription: 'New description',
+          avatar:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/5221d54c-3507-42cc-bea4-2832cd1300d7-profile_image-70x70.png',
+          settings: {
+            emailNotifications: true,
+            projectNotifications: false,
+            favoriteProjectNotifications: true,
+          },
+        },
+      },
+    },
+  })
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateData: Partial<User>,
+  ): Promise<User> {
+    return this.usersService.updateUser(id, updateData);
   }
 
   @Get()

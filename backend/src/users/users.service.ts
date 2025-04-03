@@ -74,6 +74,44 @@ export class UsersService {
     await this.counterModel.updateOne({}, { count: 0 });
   }
 
+  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
+    const user = await this.findUserById(userId);
+
+    if (updateData.email) {
+      throw new CustomException(
+        getErrorMessages({ email: 'cannotChange' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (
+      updateData.nickname &&
+      !(await this.validateNickname(updateData.nickname))
+    ) {
+      throw new CustomException(
+        getErrorMessages({ nickname: 'invalid' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (updateData.password) {
+      updateData.password = await this.hashPassword(updateData.password);
+    }
+
+    if (updateData.settings) {
+      user.settings = {
+        ...user.settings,
+        ...updateData.settings,
+      };
+      delete updateData.settings;
+    }
+
+    Object.assign(user, updateData);
+    await user.save();
+
+    return user;
+  }
+
   private async saveUser(newUser: User): Promise<Partial<User>> {
     await this.checkUniqueFields({
       email: newUser.email,
@@ -124,19 +162,23 @@ export class UsersService {
       /\s+/g,
       '',
     );
-    const isValidNickname =
-      transliteratedNickname.length >= 3 && transliteratedNickname.length <= 20;
-    const containsHoggyFoggy = transliteratedNickname.includes('hoggyFoggy');
 
-    if (
-      isValidNickname &&
-      !containsHoggyFoggy &&
-      !(await this.userModel.exists({ nickname: transliteratedNickname }))
-    ) {
+    if (await this.validateNickname(transliteratedNickname)) {
       return transliteratedNickname;
     }
 
     return this.generateNickname();
+  }
+
+  private async validateNickname(nickname: string): Promise<boolean> {
+    const isValidNickname = nickname.length >= 3 && nickname.length <= 20;
+    const containsHoggyFoggy = nickname.includes('hoggyFoggy');
+
+    return (
+      isValidNickname &&
+      !containsHoggyFoggy &&
+      !(await this.userModel.exists({ nickname }))
+    );
   }
 
   private async hashPassword(password: string): Promise<string> {

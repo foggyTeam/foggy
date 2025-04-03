@@ -8,13 +8,9 @@ const errorMessages = {
       en: 'Nickname must be a string',
       ru: 'Никнейм должен быть строкой',
     },
-    minLength: {
-      en: 'Nickname must be at least 3 characters long',
-      ru: 'Никнейм должен содержать не менее 3 символов',
-    },
-    maxLength: {
-      en: 'Nickname can be at most 20 characters long',
-      ru: 'Никнейм не должен превышать 20 символов',
+    invalid: {
+      en: 'This nickname cannot be taken.',
+      ru: 'Данный никнейм не может быть взят.',
     },
     unique: {
       en: 'This nickname is already taken',
@@ -37,6 +33,10 @@ const errorMessages = {
     notFound: {
       en: 'User not found',
       ru: 'Пользователь не найден',
+    },
+    cannotChange: {
+      en: 'User cannot change',
+      ru: 'Нельзя менять электронную почту',
     },
   },
   id: {
