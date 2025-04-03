@@ -74,6 +74,14 @@ export class UsersService {
     return user as User;
   }
 
+  async deleteUserById(id: string): Promise<void> {
+    try {
+      await this.userModel.findByIdAndDelete(id);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
+  }
+
   async deleteAllUsers(): Promise<void> {
     await this.userModel.deleteMany({});
     await this.counterModel.updateOne({}, { count: 0 });

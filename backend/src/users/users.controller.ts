@@ -138,6 +138,15 @@ export class UsersController {
     return this.usersService.findUserById(id);
   }
 
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({ status: 204, description: 'User successfully deleted' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async deleteUserById(@Param('id') id: string): Promise<void> {
+    return this.usersService.deleteUserById(id);
+  }
+
   @Delete()
   @ApiOperation({ summary: 'Delete all users and reset counter' })
   @ApiResponse({
