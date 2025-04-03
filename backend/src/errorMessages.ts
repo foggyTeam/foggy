@@ -35,7 +35,7 @@ const errorMessages = {
       ru: 'Пользователь не найден',
     },
     cannotChange: {
-      en: 'User cannot change',
+      en: 'User cannot change email',
       ru: 'Нельзя менять электронную почту',
     },
   },
