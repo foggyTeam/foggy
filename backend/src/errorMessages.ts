@@ -75,6 +75,12 @@ const errorMessages = {
       ru: 'Неверный пароль',
     },
   },
+  avatar: {
+    invalidType: {
+      en: 'Invalid field for avatar',
+      ru: 'Неверное поле для аватара',
+    },
+  },
   general: {
     fieldNotRecognized: {
       en: 'This field is not recognized',

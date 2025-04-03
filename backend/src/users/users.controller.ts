@@ -77,6 +77,8 @@ export class UsersController {
         value: {
           email: 'user@gmail.com',
           nickname: 'Русское имя',
+          avatar:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/5221d54c-3507-42cc-bea4-2832cd1300d7-profile_image-70x70.png',
         },
       },
     },

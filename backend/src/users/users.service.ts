@@ -10,6 +10,7 @@ import { LoginUserDto } from './login-user.dto';
 import { GoogleUserDto } from './login-google.dto';
 import { getErrorMessages } from '../errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
+import { isURL } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -43,10 +44,14 @@ export class UsersService {
 
     if (!user) {
       const nickname = await this.generateGoogleNickname(userDto.nickname);
+      if (userDto.avatar && !isURL(userDto.avatar)) {
+        userDto.avatar = '';
+      }
       const newUser = new this.userModel({
         email: userDto.email,
         nickname,
         password: '',
+        avatar: userDto.avatar || '',
       });
       return this.saveUser(newUser);
     }

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsEmail } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { getErrorMessages } from '../errorMessages';
 
 export class GoogleUserDto {
@@ -9,4 +9,8 @@ export class GoogleUserDto {
   @IsNotEmpty({ message: getErrorMessages({ nickname: 'required' }).nickname })
   @IsString({ message: getErrorMessages({ nickname: 'invalidType' }).nickname })
   nickname: string;
+
+  @IsOptional()
+  @IsString({ message: getErrorMessages({ avatar: 'invalidType' }).avatar })
+  avatar?: string;
 }
