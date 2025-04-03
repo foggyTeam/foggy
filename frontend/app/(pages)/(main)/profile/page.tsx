@@ -1,0 +1,60 @@
+import clsx from 'clsx';
+import { bg_container } from '@/app/lib/types/style_definitions';
+import { Suspense } from 'react';
+import ProfileForm from '@/app/lib/components/profileForm';
+import { getRequest } from '@/app/lib/server/requests';
+import { cookies } from 'next/headers';
+import { decrypt } from '@/app/lib/session';
+
+export interface ProfileData {
+  nickname: string;
+  email: string;
+  password: string;
+  about: string;
+  teamInvitations: boolean;
+  projectNotifications: boolean;
+  emailNotifications: boolean;
+}
+
+async function getUserData() {
+  const cookie = (await cookies()).get('session' as any)?.value;
+  const session = await decrypt(cookie);
+
+  if (!session) {
+    return null;
+  }
+
+  const response = await getRequest('users/' + session.userId);
+
+  const userData = {
+    nickname: response.nickname,
+    email: response.email,
+    password: response.password,
+    about: response.profileDescription,
+    teamInvitations: response.settings.emailNotifications,
+    projectNotifications: response.settings.projectNotifications,
+    emailNotifications: response.settings.favoriteProjectNotifications,
+  } as ProfileData;
+
+  return userData ? userData : null;
+}
+
+export default async function Profile() {
+  const userData = await getUserData();
+
+  return (
+    <div className="flex h-screen w-screen items-center justify-center">
+      <div
+        className={clsx(
+          'flex h-fit w-auto flex-col items-center justify-center',
+          bg_container,
+          'rounded-bl-[64px] px-12',
+        )}
+      >
+        <Suspense>
+          <ProfileForm {...userData} />
+        </Suspense>
+      </div>
+    </div>
+  );
+}

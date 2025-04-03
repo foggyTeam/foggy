@@ -23,6 +23,19 @@
     }
   },
 
+  "profile": {
+    "signOutButton": "Sign out",
+    "deleteButton": "Delete account",
+    "saveButton": "Save",
+    "nickname": "Nickname",
+    "email": "Email",
+    "password": "Password",
+    "about": "About",
+    "teamInvitations": "Allow team invitations",
+    "projectNotifications": "Allow project notifications",
+    "emailNotifications": "Allow email notifications for favourite projects"
+  },
+
   "menu": {
     "tabs": {
       "projects": "PROJECTS",

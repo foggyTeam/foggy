@@ -23,6 +23,19 @@
     }
   },
 
+  "profile": {
+    "signOutButton": "Выйти",
+    "deleteButton": "Удалить аккаунт",
+    "saveButton": "Сохранить",
+    "nickname": "Никнейм",
+    "email": "Адрес эл. почты",
+    "password": "Пароль",
+    "about": "О себе",
+    "teamInvitations": "Разрешить приглашения в команды",
+    "projectNotifications": "Разрешить уведомления проектов",
+    "emailNotifications": "Разрешить уведомления на почту для избранных проектов"
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",
