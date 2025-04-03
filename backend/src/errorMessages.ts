@@ -9,8 +9,8 @@ const errorMessages = {
       ru: 'Никнейм должен быть строкой',
     },
     invalid: {
-      en: 'This nickname cannot be taken.',
-      ru: 'Данный никнейм не может быть взят.',
+      en: 'This nickname cannot be taken',
+      ru: 'Данный никнейм не может быть взят',
     },
     unique: {
       en: 'This nickname is already taken',
