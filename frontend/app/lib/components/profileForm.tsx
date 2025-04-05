@@ -15,6 +15,7 @@ import { Checkbox } from '@heroui/checkbox';
 import { profileFormSchema } from '@/app/lib/types/schemas';
 import z from 'zod';
 import { updateUserData } from '@/app/lib/server/actions/updateUserData';
+import { deleteUserById } from '@/app/lib/server/actions/deleteUserById';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -96,8 +97,10 @@ const ProfileForm = observer((userData: ProfileData) => {
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
             -1
-          )
+          ) {
+            setErrors(result.errors);
             console.error(result);
+          }
         })
         .finally(() => setIsSaving(false));
     }
@@ -107,8 +110,15 @@ const ProfileForm = observer((userData: ProfileData) => {
     console.log('sign out');
   };
 
-  const onDeleteAccount = () => {
-    console.log('delete');
+  const onDeleteAccount = async () => {
+    onSignOut();
+    await deleteUserById(userStore.user?.id).then((result) => {
+      if (
+        Object.keys(result).findIndex((element) => element === 'errors') !== -1
+      ) {
+        console.error(result);
+      }
+    });
   };
 
   return (
