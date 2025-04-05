@@ -30,6 +30,7 @@
     "nickname": "Nickname",
     "email": "Email",
     "password": "Password",
+    "passwordDescription": "Your account doesn't need password since you sign in via Google / Yandex.",
     "about": "About",
     "teamInvitations": "Allow team invitations",
     "projectNotifications": "Allow project notifications",

@@ -30,6 +30,7 @@
     "nickname": "Никнейм",
     "email": "Адрес эл. почты",
     "password": "Пароль",
+    "passwordDescription": "Вашему аккаунту не требуется пароль, так как вы вошли через Google / Yandex.",
     "about": "О себе",
     "teamInvitations": "Разрешить приглашения в команды",
     "projectNotifications": "Разрешить уведомления проектов",

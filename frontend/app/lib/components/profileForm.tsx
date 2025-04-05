@@ -8,16 +8,22 @@ import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
 import { Avatar } from '@heroui/avatar';
 import userStore from '@/app/stores/userStore';
-import { User2Icon } from 'lucide-react';
-import { Input } from '@heroui/input';
+import { Eye, EyeClosed, User2Icon } from 'lucide-react';
+import { Input, Textarea } from '@heroui/input';
 import { ProfileData } from '@/app/(pages)/(main)/profile/page';
+import { Checkbox } from '@heroui/checkbox';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordReadonly, setPasswordReadonly] = useState(false);
+  const [errors, setErrors] = useState({} as any);
+
   const [formData, changeFormData] = useState(userData);
 
   useEffect(() => {
     changeFormData(userData);
+    if (!userData.password) setPasswordReadonly(true);
   }, [userData]);
 
   const onSubmit = () => {
@@ -36,7 +42,10 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   return (
-    <Form className={'flex w-fit min-w-24 flex-col gap-2'} onSubmit={onSubmit}>
+    <Form
+      className={'flex w-[736px] min-w-24 flex-col gap-6'}
+      onSubmit={onSubmit}
+    >
       <div className="items-top flex w-full justify-between gap-2">
         <Avatar
           showFallback
@@ -57,10 +66,9 @@ const ProfileForm = observer((userData: ProfileData) => {
           {settingsStore.t.profile.signOutButton}
         </Button>
       </div>
-      <div className="flex w-full justify-between gap-2">
-        <div className="flex w-full flex-col gap-1">
+      <div className="flex w-full justify-between gap-6">
+        <div className="flex h-fit w-full flex-col gap-2">
           <Input
-            isRequired
             label={settingsStore.t.profile.nickname}
             labelPlacement="inside"
             name="nickname"
@@ -73,10 +81,111 @@ const ProfileForm = observer((userData: ProfileData) => {
             }
             classNames={{ inputWrapper: 'bg-white' }}
           />
+          <Input
+            label={settingsStore.t.profile.email}
+            labelPlacement="inside"
+            name="email"
+            type="email"
+            autoComplete="email"
+            size="md"
+            value={formData.email}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, email: value })
+            }
+            classNames={{ inputWrapper: 'bg-white' }}
+          />
+
+          <Input
+            isReadOnly={passwordReadonly}
+            errorMessage={errors.password}
+            description={
+              passwordReadonly
+                ? settingsStore.t.profile.passwordDescription
+                : false
+            }
+            label={settingsStore.t.profile.password}
+            labelPlacement="inside"
+            placeholder={settingsStore.t.login.passwordPlaceholder}
+            name="password"
+            value={formData.password}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, password: value })
+            }
+            type={passwordVisible ? 'text' : 'password'}
+            endContent={
+              <div className="flex items-center gap-2">
+                <button
+                  aria-label="clear field"
+                  className="h-fit w-fit"
+                  type="button"
+                  onClick={() => setPasswordVisible(!passwordVisible)}
+                >
+                  {passwordVisible ? (
+                    <Eye className="stroke-default-500" />
+                  ) : (
+                    <EyeClosed className="stroke-default-500" />
+                  )}
+                </button>
+              </div>
+            }
+            size="md"
+            autoComplete="current-password"
+            classNames={{ inputWrapper: 'bg-white' }}
+          />
         </div>
-        <div></div>
+        <div className="flex h-full w-full flex-col">
+          <Textarea
+            maxRows={7}
+            label={settingsStore.t.profile.about}
+            labelPlacement="inside"
+            name="about"
+            type="about"
+            autoComplete="about"
+            size="md"
+            value={formData.about}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, about: value })
+            }
+            classNames={{
+              inputWrapper: 'bg-white',
+            }}
+          />
+        </div>
       </div>
-      <div>checkboxes</div>
+      <div className="flex w-full justify-between gap-6">
+        <div className="flex w-full flex-col gap-2">
+          <Checkbox
+            isSelected={formData.teamInvitations}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, teamInvitations: value })
+            }
+            size="sm"
+          >
+            {settingsStore.t.profile.teamInvitations}
+          </Checkbox>
+          <Checkbox
+            isSelected={formData.projectNotifications}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, projectNotifications: value })
+            }
+            size="sm"
+          >
+            {settingsStore.t.profile.projectNotifications}
+          </Checkbox>
+        </div>
+        <div className="flex w-full flex-col">
+          <Checkbox
+            className="align-top"
+            isSelected={formData.emailNotifications}
+            onValueChange={(value) =>
+              changeFormData({ ...formData, emailNotifications: value })
+            }
+            size="sm"
+          >
+            {settingsStore.t.profile.emailNotifications}
+          </Checkbox>
+        </div>
+      </div>
       <div className="flex w-full items-center justify-between gap-2">
         <FButton
           onPress={onDeleteAccount}
