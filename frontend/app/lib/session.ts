@@ -38,3 +38,14 @@ export async function decrypt(session: string | undefined = '') {
     console.error('Failed to verify session');
   }
 }
+
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  cookieStore.set('session' as any, '', {
+    httpOnly: true,
+    secure: true,
+    expires: new Date(0) as any,
+    sameSite: 'lax',
+    path: '/',
+  } as any);
+}

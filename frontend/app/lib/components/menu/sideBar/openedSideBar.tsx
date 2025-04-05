@@ -16,8 +16,11 @@ import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import { Avatar } from '@heroui/avatar';
 import settingsStore from '@/app/stores/settingsStore';
+import { useRouter } from 'next/navigation';
 
 const OpenedSideBar = observer((props: { sideBarLayout: string }) => {
+  const router = useRouter();
+
   return (
     <Drawer
       isOpen={menuStore.isOpen}
@@ -41,14 +44,22 @@ const OpenedSideBar = observer((props: { sideBarLayout: string }) => {
 
         <DrawerHeader className="flex items-center justify-between gap-32">
           <div className="flex items-center justify-between gap-4">
-            <Avatar
-              showFallback
-              icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
-              name={userStore.user?.name as string}
-              src={userStore.user?.image as string}
-              size="lg"
-              color="default"
-            />
+            <Button
+              onPress={() => {
+                router.push('/profile');
+              }}
+              className="h-fit w-fit min-w-fit border-none p-0"
+              variant="bordered"
+            >
+              <Avatar
+                showFallback
+                icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
+                name={userStore.user?.name as string}
+                src={userStore.user?.image as string}
+                size="lg"
+                color="default"
+              />
+            </Button>
             <p className="text-small font-medium text-default-800">
               {userStore.user?.name}
             </p>
@@ -56,7 +67,7 @@ const OpenedSideBar = observer((props: { sideBarLayout: string }) => {
 
           <Button
             onPress={() => {
-              console.log('navigate to settings');
+              router.push('/profile');
             }}
             isIconOnly
             variant="light"
