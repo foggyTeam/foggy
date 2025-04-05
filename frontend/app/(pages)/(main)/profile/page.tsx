@@ -9,7 +9,7 @@ import { decrypt } from '@/app/lib/session';
 export interface ProfileData {
   nickname: string;
   email: string;
-  password: string;
+  avatar: string;
   about: string;
   teamInvitations: boolean;
   projectNotifications: boolean;
@@ -28,12 +28,12 @@ async function getUserData() {
 
   const userData = {
     nickname: response.nickname,
+    avatar: response.avatar,
     email: response.email,
-    password: response.password,
     about: response.profileDescription,
-    teamInvitations: response.settings.emailNotifications,
+    teamInvitations: response.settings.teamNotifications,
     projectNotifications: response.settings.projectNotifications,
-    emailNotifications: response.settings.favoriteProjectNotifications,
+    emailNotifications: response.settings.emailNotifications,
   } as ProfileData;
 
   return userData ? userData : null;

@@ -9,6 +9,10 @@
     "loginViaProviders": "Login with"
   },
   "validationErrors": {
+    "nickname": {
+      "maxLength": "Nickname must be no more than 14 characters long",
+      "invalidSymbols": "Nickname may contain only latin letters, digits and special symbols \".@_\""
+    },
     "email": {
       "required": "Email is required",
       "maxLength": "Email must be no more than 100 characters long",
@@ -20,6 +24,10 @@
       "minLength": "Password must be at least 8 characters long",
       "maxLength": "Password must be no more than 20 characters long",
       "invalidPassword": "Password must contain at least 1 letter and 1 number"
+    },
+    "about": {
+      "maxLength": "About must be no more than 140 characters long",
+      "invalidSymbols": "About may contain only latin letters, digits and special symbols"
     }
   },
 

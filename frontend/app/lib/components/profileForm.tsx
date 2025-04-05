@@ -8,29 +8,99 @@ import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
 import { Avatar } from '@heroui/avatar';
 import userStore from '@/app/stores/userStore';
-import { Eye, EyeClosed, User2Icon } from 'lucide-react';
+import { User2Icon } from 'lucide-react';
 import { Input, Textarea } from '@heroui/input';
 import { ProfileData } from '@/app/(pages)/(main)/profile/page';
 import { Checkbox } from '@heroui/checkbox';
+import { profileFormSchema } from '@/app/lib/types/schemas';
+import z from 'zod';
+import { updateUserData } from '@/app/lib/server/actions/updateUserData';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [passwordReadonly, setPasswordReadonly] = useState(false);
   const [errors, setErrors] = useState({} as any);
 
-  const [formData, changeFormData] = useState(userData);
+  const [nickname, setNickname] = useState(userData.nickname);
+  const [email, setEmail] = useState(userData.email);
+  const [about, setAbout] = useState(userData.about);
+  const [checkboxes, setCheckboxes] = useState({
+    team: userData.teamInvitations,
+    project: userData.projectNotifications,
+    email: userData.emailNotifications,
+  });
 
   useEffect(() => {
-    changeFormData(userData);
-    if (!userData.password) setPasswordReadonly(true);
+    setNickname(userData.nickname);
+    setEmail(userData.email);
+    setAbout(userData.about);
+    setCheckboxes({
+      team: userData.teamInvitations,
+      project: userData.projectNotifications,
+      email: userData.emailNotifications,
+    });
   }, [userData]);
 
-  const onSubmit = () => {
-    setIsSaving(!isSaving);
-    console.log('saving..');
-    // await blablabla
-    setIsSaving(!isSaving);
+  useEffect(() => {
+    isFormValid({ nickname, email, about });
+  }, [nickname, email, about]);
+
+  const isFormValid = (data: {
+    nickname: string;
+    email: string;
+    about: string;
+  }) => {
+    try {
+      profileFormSchema.parse(data);
+      setErrors({});
+      return true;
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        const newErrors: any = {};
+        e.errors.forEach((error) => {
+          if (error.path.length > 0) {
+            newErrors[error.path[0]] = error.message;
+          }
+        });
+        setErrors(newErrors);
+      }
+      return false;
+    }
+  };
+
+  const onSubmit = async () => {
+    if (!Object.keys(errors as any).length) {
+      setIsSaving(true);
+
+      const updatedData = {
+        ...(nickname !== userData.nickname && {
+          nickname: nickname,
+        }),
+        ...(about !== userData.about && {
+          profileDescription: about,
+        }),
+        settings: {
+          ...(checkboxes.email !== userData.emailNotifications && {
+            emailNotifications: checkboxes.email,
+          }),
+          ...(checkboxes.project !== userData.projectNotifications && {
+            projectNotifications: checkboxes.project,
+          }),
+          ...(checkboxes.team !== userData.teamInvitations && {
+            teamNotifications: checkboxes.team,
+          }),
+        },
+      };
+
+      await updateUserData(userStore.user?.id, updatedData)
+        .then((result) => {
+          if (
+            Object.keys(result).findIndex((element) => element === 'errors') !==
+            -1
+          )
+            console.error(result);
+        })
+        .finally(() => setIsSaving(false));
+    }
   };
 
   const onSignOut = () => {
@@ -42,10 +112,7 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   return (
-    <Form
-      className={'flex w-[736px] min-w-24 flex-col gap-6'}
-      onSubmit={onSubmit}
-    >
+    <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
       <div className="items-top flex w-full justify-between gap-2">
         <Avatar
           showFallback
@@ -69,83 +136,45 @@ const ProfileForm = observer((userData: ProfileData) => {
       <div className="flex w-full justify-between gap-6">
         <div className="flex h-fit w-full flex-col gap-2">
           <Input
+            isInvalid={errors.nickname}
+            errorMessage={errors.nickname}
             label={settingsStore.t.profile.nickname}
             labelPlacement="inside"
             name="nickname"
             type="nickname"
             autoComplete="nickname"
             size="md"
-            value={formData.nickname}
-            onValueChange={(value) =>
-              changeFormData({ ...formData, nickname: value })
-            }
+            value={nickname}
+            onValueChange={setNickname}
             classNames={{ inputWrapper: 'bg-white' }}
           />
           <Input
+            isReadOnly
+            isInvalid={errors.email}
+            errorMessage={errors.email}
             label={settingsStore.t.profile.email}
             labelPlacement="inside"
             name="email"
             type="email"
             autoComplete="email"
             size="md"
-            value={formData.email}
-            onValueChange={(value) =>
-              changeFormData({ ...formData, email: value })
-            }
-            classNames={{ inputWrapper: 'bg-white' }}
-          />
-
-          <Input
-            isReadOnly={passwordReadonly}
-            errorMessage={errors.password}
-            description={
-              passwordReadonly
-                ? settingsStore.t.profile.passwordDescription
-                : false
-            }
-            label={settingsStore.t.profile.password}
-            labelPlacement="inside"
-            placeholder={settingsStore.t.login.passwordPlaceholder}
-            name="password"
-            value={formData.password}
-            onValueChange={(value) =>
-              changeFormData({ ...formData, password: value })
-            }
-            type={passwordVisible ? 'text' : 'password'}
-            endContent={
-              <div className="flex items-center gap-2">
-                <button
-                  aria-label="clear field"
-                  className="h-fit w-fit"
-                  type="button"
-                  onClick={() => setPasswordVisible(!passwordVisible)}
-                >
-                  {passwordVisible ? (
-                    <Eye className="stroke-default-500" />
-                  ) : (
-                    <EyeClosed className="stroke-default-500" />
-                  )}
-                </button>
-              </div>
-            }
-            size="md"
-            autoComplete="current-password"
+            value={email}
             classNames={{ inputWrapper: 'bg-white' }}
           />
         </div>
         <div className="flex h-full w-full flex-col">
           <Textarea
-            maxRows={7}
+            isInvalid={errors.about}
+            errorMessage={errors.about}
+            maxRows={4}
             label={settingsStore.t.profile.about}
             labelPlacement="inside"
             name="about"
             type="about"
             autoComplete="about"
             size="md"
-            value={formData.about}
-            onValueChange={(value) =>
-              changeFormData({ ...formData, about: value })
-            }
+            value={about}
+            onValueChange={setAbout}
             classNames={{
               inputWrapper: 'bg-white',
             }}
@@ -155,18 +184,18 @@ const ProfileForm = observer((userData: ProfileData) => {
       <div className="flex w-full justify-between gap-6">
         <div className="flex w-full flex-col gap-2">
           <Checkbox
-            isSelected={formData.teamInvitations}
+            isSelected={checkboxes.team}
             onValueChange={(value) =>
-              changeFormData({ ...formData, teamInvitations: value })
+              setCheckboxes({ ...checkboxes, team: value })
             }
             size="sm"
           >
             {settingsStore.t.profile.teamInvitations}
           </Checkbox>
           <Checkbox
-            isSelected={formData.projectNotifications}
+            isSelected={checkboxes.project}
             onValueChange={(value) =>
-              changeFormData({ ...formData, projectNotifications: value })
+              setCheckboxes({ ...checkboxes, project: value })
             }
             size="sm"
           >
@@ -176,9 +205,9 @@ const ProfileForm = observer((userData: ProfileData) => {
         <div className="flex w-full flex-col">
           <Checkbox
             className="align-top"
-            isSelected={formData.emailNotifications}
+            isSelected={checkboxes.email}
             onValueChange={(value) =>
-              changeFormData({ ...formData, emailNotifications: value })
+              setCheckboxes({ ...checkboxes, email: value })
             }
             size="sm"
           >
@@ -199,7 +228,7 @@ const ProfileForm = observer((userData: ProfileData) => {
 
         <FButton
           isLoading={isSaving}
-          type="submit"
+          onPress={onSubmit}
           variant="solid"
           color="primary"
           size="md"
