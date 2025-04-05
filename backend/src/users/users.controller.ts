@@ -107,7 +107,7 @@ export class UsersController {
           settings: {
             emailNotifications: true,
             projectNotifications: false,
-            favoriteProjectNotifications: true,
+            teamNotifications: true,
           },
         },
       },
