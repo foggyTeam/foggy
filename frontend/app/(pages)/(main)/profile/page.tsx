@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/style_definitions';
-import { Suspense } from 'react';
+import React from 'react';
 import ProfileForm from '@/app/lib/components/profileForm';
 import { getRequest } from '@/app/lib/server/requests';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
+import ProfileFormSkeleton from '@/app/lib/components/skeletons/profileFormSkeleton';
 
 export interface ProfileData {
   nickname: string;
@@ -15,7 +16,6 @@ export interface ProfileData {
   projectNotifications: boolean;
   emailNotifications: boolean;
 }
-
 async function getUserData() {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
@@ -41,7 +41,6 @@ async function getUserData() {
 
 export default async function Profile() {
   const userData = await getUserData();
-
   return (
     <div className="flex h-screen w-screen items-center justify-center">
       <div
@@ -51,9 +50,7 @@ export default async function Profile() {
           'rounded-bl-[64px] px-12',
         )}
       >
-        <Suspense>
-          <ProfileForm {...userData} />
-        </Suspense>
+        {userData ? <ProfileForm {...userData} /> : <ProfileFormSkeleton />}
       </div>
     </div>
   );
