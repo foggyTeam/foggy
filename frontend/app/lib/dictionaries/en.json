@@ -35,6 +35,7 @@
     "signOutButton": "Sign out",
     "deleteButton": "Delete account",
     "saveButton": "Save",
+    "uploadAvatarHint": "Upload new avatar",
     "nickname": "Nickname",
     "email": "Email",
     "password": "Password",

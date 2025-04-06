@@ -23,6 +23,7 @@
     "@heroui/skeleton": "2.2.6",
     "@heroui/switch": "^2.2.9",
     "@heroui/tabs": "^2.2.8",
+    "@heroui/tooltip": "^2.2.13",
     "@next/env": "^15.1.4",
     "@types/react": "^19.0.4",
     "@types/react-dom": "^19.0.2",

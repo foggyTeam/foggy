@@ -35,6 +35,7 @@
     "signOutButton": "Выйти",
     "deleteButton": "Удалить аккаунт",
     "saveButton": "Сохранить",
+    "uploadAvatarHint": "Загрузить новое фото профиля",
     "nickname": "Имя пользователя",
     "email": "Адрес эл. почты",
     "password": "Пароль",

@@ -35,7 +35,7 @@ const ClosedSideBar = observer((props: { sideBarLayout: string }) => {
         onPress={() => {
           router.push('/profile');
         }}
-        className="h-fit w-fit min-w-fit border-none p-0"
+        className="h-fit w-fit min-w-fit rounded-full border-none p-0"
         variant="bordered"
       >
         <Avatar

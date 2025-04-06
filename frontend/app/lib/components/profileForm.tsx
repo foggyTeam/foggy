@@ -2,7 +2,7 @@
 
 import { observer } from 'mobx-react-lite';
 import { Form } from '@heroui/form';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
@@ -19,6 +19,8 @@ import { deleteUserById } from '@/app/lib/server/actions/deleteUserById';
 import { signUserOut } from '@/app/lib/server/actions/signUserOut';
 import AreYouSureModal from '@/app/lib/components/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
+import resizeImage from '@/app/lib/utils/resizeImage';
+import { Tooltip } from '@heroui/tooltip';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -33,6 +35,7 @@ const ProfileForm = observer((userData: ProfileData) => {
     project: userData.projectNotifications,
     email: userData.emailNotifications,
   });
+  const imageInputRef = useRef(null);
 
   useEffect(() => {
     setNickname(userData.nickname);
@@ -69,6 +72,33 @@ const ProfileForm = observer((userData: ProfileData) => {
         setErrors(newErrors);
       }
       return false;
+    }
+  };
+
+  const uploadImage = () => {
+    imageInputRef.current.click();
+  };
+
+  const handleImageChange = async (event) => {
+    const image = event.target.files[0];
+    if (image) {
+      if (!image.type.startsWith('image/')) {
+        console.error('File is not an image');
+        return;
+      }
+
+      const resizedImage = await resizeImage(image, 288).catch((error) =>
+        console.error(error),
+      );
+      if (!resizedImage) return;
+
+      const reader = new FileReader();
+      reader.readAsDataURL(resizedImage);
+      reader.onloadend = () => {
+        const resizedUrl = reader.result as string;
+        // await patch new image: resizedUrl
+        console.log('Successfully loaded: ');
+      };
     }
   };
 
@@ -129,15 +159,40 @@ const ProfileForm = observer((userData: ProfileData) => {
     <>
       <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
         <div className="items-top flex w-full justify-between gap-2">
-          <Avatar
-            showFallback
-            icon={<User2Icon className="h-72 w-72 stroke-default-200" />}
-            name={userStore.user?.name as string}
-            src={userStore.user?.image as string}
-            size="lg"
-            className="h-72 w-72"
-            color="default"
-          />
+          {/*TODO: replace with FTooltip after merge*/}
+          <Tooltip
+            content={settingsStore.t.profile.uploadAvatarHint}
+            classNames={{
+              base: 'before:shadow-container',
+              content: 'shadow-container',
+            }}
+            size="sm"
+            placement="right"
+            delay={600}
+          >
+            <Button
+              onPress={uploadImage}
+              variant="bordered"
+              className="h-fit w-fit min-w-fit rounded-full border-none p-0"
+            >
+              <Avatar
+                showFallback
+                icon={<User2Icon className="h-72 w-72 stroke-default-200" />}
+                name={userStore.user?.name as string}
+                src={userStore.user?.image as string}
+                size="lg"
+                className="h-72 w-72"
+                color="default"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                ref={imageInputRef as any}
+                onChange={handleImageChange}
+                style={{ display: 'none' }}
+              />
+            </Button>
+          </Tooltip>
           <Button
             onPress={onSignOut}
             type={'button'}
