@@ -17,6 +17,7 @@ async function getUser() {
 
   try {
     const userData: any = await getRequest(`users/${session.userId}`);
+
     return {
       id: userData['_id'],
       name: userData.nickname,

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { bg_container } from '@/app/lib/types/style_definitions';
+import { bg_container } from '@/app/lib/types/styles';
 import React from 'react';
 import ProfileForm from '@/app/lib/components/profileForm';
 import { getRequest } from '@/app/lib/server/requests';

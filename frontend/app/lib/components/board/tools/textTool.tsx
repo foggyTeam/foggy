@@ -1,7 +1,6 @@
 import { TypeIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import { ReactNode, useEffect, useState } from 'react';
-import { primary } from '@/tailwind.config';
 import { handlePlaceText } from '@/app/lib/components/board/tools/drawingHandlers';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import settingsStore from '@/app/stores/settingsStore';

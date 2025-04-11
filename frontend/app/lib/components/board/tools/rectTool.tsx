@@ -1,7 +1,6 @@
 import { SquareIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import { useEffect, useState } from 'react';
-import { primary } from '@/tailwind.config';
 import {
   handleMouseDown,
   handleMouseMove,
