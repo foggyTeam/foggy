@@ -11,6 +11,8 @@ import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
 import { bg_container } from '@/app/lib/types/styles';
 import clsx from 'clsx';
+import AllProjects from '@/app/lib/components/projects/allProjects';
+import AllTeams from '@/app/lib/components/teams/allTeams';
 
 const testMembers = [
   {
@@ -107,7 +109,6 @@ const testProjects = [
     lastChange: Date.now(),
   },
 ] as Project[];
-
 const testTeams = [
   {
     id: 'team1',
@@ -199,7 +200,7 @@ export default async function Main() {
           )}
         >
           {userProjects?.length !== undefined ? (
-            <p>Your projects</p>
+            <AllProjects projects={userProjects} />
           ) : (
             <p> Loading </p>
           )}
@@ -211,7 +212,11 @@ export default async function Main() {
             'rounded-tr-[64px] px-12',
           )}
         >
-          {userTeams !== undefined ? <p>Your teams</p> : <p> Loading </p>}
+          {userTeams?.length !== undefined ? (
+            <AllTeams teams={userTeams} />
+          ) : (
+            <p> Loading </p>
+          )}
         </div>
       </div>
     </>

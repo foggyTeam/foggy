@@ -52,6 +52,22 @@
     }
   },
 
+  "main": {
+    "myProjects": "МОИ ПРОЕКТЫ",
+    "myTeams": "МОИ КОМАНДЫ",
+    "teamProjects": "ПРОЕКТЫ _",
+    "participants": "УЧАСТНИКИ",
+    "andNMore": "И еще _...",
+    "you": "(вы)",
+    "roles": {
+      "owner": "владелец",
+      "admin": "админ",
+      "editor": "редактор",
+      "reader": "читатель",
+      "team": "команда"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",
