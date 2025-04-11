@@ -21,14 +21,71 @@ export enum BoardTypes {
   TREE,
 }
 
-export type Board = {
+export type BoardElement =
+  | RectElement
+  | EllipseElement
+  | LineElement
+  | TextElement
+  | MarkerElement;
+
+interface BaseElement {
+  id: string;
+  type: string;
+  draggable: boolean;
+  dragDistance: 4;
+  x: number;
+  y: number;
+  rotation: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
+
+export interface RectElement extends BaseElement {
+  type: 'rect';
+  cornerRadius: number;
+  width: number;
+  height: number;
+}
+
+export interface EllipseElement extends BaseElement {
+  type: 'ellipse';
+  width: number;
+  height: number;
+}
+
+export interface TextElement extends BaseElement {
+  // basically it is a Konva.image
+  type: 'text';
+  svg: string;
+  content: string;
+  cornerRadius: number;
+  width: number;
+  height: number;
+}
+
+export interface LineElement extends BaseElement {
+  type: 'line';
+  points: number[];
+  width: number;
+}
+
+export interface MarkerElement extends BaseElement {
+  type: 'marker';
+  points: number[];
+  width: number;
+  opacity: number;
+}
+
+export class Board {
   projectId: string;
   section: string;
   id: string;
   name: string;
-  type: BoardTypes;
+  type: BoardTypes = BoardTypes.SIMPLE;
+  layers: BoardElement[][] = [[], [], [], [], []];
   lastChange: string;
-};
+}
 
 export class Project {
   id: string = '';

@@ -14,9 +14,11 @@ export function to_rgb(hex: string): string {
       .join('');
   }
 
-  if (hex.length !== 6) {
-    throw new Error('Invalid hex color format');
+  if (hex.length > 6) {
+    hex = hex.slice(0, 6);
   }
+
+  while (hex.length < 6) hex += '0';
 
   const bigint = parseInt(hex, 16);
   r = (bigint >> 16) & 255;

@@ -60,6 +60,36 @@
     }
   },
 
+  "toolBar": {
+    "chooseColor": "Pick a color",
+    "strokeWidth": "Stroke width:",
+    "width": "Width",
+    "height": "Height",
+    "cornerRadius": "Corner radius",
+    "rotation": "Rotation",
+    "textToolPlaceholder": "Type something...",
+    "linkPlaceholder": "https://hoggyfoggy.com",
+    "linkLabel": "Link"
+  },
+
+  "toolTips": {
+    "tools": {
+      "textTool": "Text",
+      "rectTool": "Rectangle",
+      "ellipseTool": "Ellipse",
+      "fillTool": "Fill color",
+      "strokeTool": "Stroke width and color",
+      "sizeTool": "Size, rotation, corner radius",
+      "layerTool": "Layer",
+      "layerBottom": "Send to back",
+      "layerBack": "Move back",
+      "layerForward": "Move forward",
+      "layerTop": "Bring to front",
+      "deleteTool": "Delete"
+    },
+    "resetStage": "Reset position"
+  },
+
   "errors": {
     "invalidCredentials": "Invalid credentials"
   }

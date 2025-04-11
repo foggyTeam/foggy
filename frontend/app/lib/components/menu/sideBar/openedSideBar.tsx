@@ -9,7 +9,7 @@ import {
 import menuStore from '@/app/stores/menuStore';
 import { Tabs } from '@heroui/tabs';
 import { observer } from 'mobx-react-lite';
-import { bg_container } from '@/app/lib/types/style_definitions';
+import { bg_container } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { ChevronRight, User2Icon, UserCog2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';

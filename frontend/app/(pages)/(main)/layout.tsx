@@ -12,18 +12,22 @@ async function getUser() {
   const session = await decrypt(cookie);
 
   if (!session) {
-    return null;
+    return undefined;
   }
 
-  const userData = await getRequest('users/' + session.userId);
-  return userData
-    ? ({
-        id: userData['_id'],
-        name: userData.nickname,
-        email: userData.email,
-        image: userData.avatar ? userData.avatar : '/images/img.png',
-      } as User)
-    : null;
+  try {
+    const userData: any = await getRequest(`users/${session.userId}`);
+
+    return {
+      id: userData['_id'],
+      name: userData.nickname,
+      email: userData.email,
+      image: userData.avatar ? userData.avatar : '/images/img.png',
+    } as User;
+  } catch (e) {
+    console.error('User with this id does not exist.');
+    return { id: '' };
+  }
 }
 
 export default async function MainLayout({
@@ -31,7 +35,7 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user: User | null = await getUser();
+  const user: User | undefined = await getUser();
 
   return (
     <>

@@ -6,7 +6,7 @@ import userStore from '@/app/stores/userStore';
 import { BellIcon, ChevronLeft, User2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import menuStore from '@/app/stores/menuStore';
-import { bg_container } from '@/app/lib/types/style_definitions';
+import { bg_container } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 

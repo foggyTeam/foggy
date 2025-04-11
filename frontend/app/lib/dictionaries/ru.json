@@ -60,6 +60,36 @@
     }
   },
 
+  "toolBar": {
+    "chooseColor": "Выберите цвет",
+    "strokeWidth": "Толщина линии:",
+    "width": "Длина",
+    "height": "Высота",
+    "cornerRadius": "Скругление",
+    "rotation": "Поворот",
+    "textToolPlaceholder": "Напишите что-нибудь...",
+    "linkPlaceholder": "https://hoggyfoggy.com",
+    "linkLabel": "Ссылка"
+  },
+
+  "toolTips": {
+    "tools": {
+      "textTool": "Текст",
+      "rectTool": "Прямоугольник",
+      "ellipseTool": "Эллипс",
+      "fillTool": "Цвет заливки",
+      "strokeTool": "Цвет и толщина рамки",
+      "sizeTool": "Размеры, поворот, скругление",
+      "layerTool": "Слой",
+      "layerBottom": "На задний слой",
+      "layerBack": "Назад",
+      "layerForward": "Вперед",
+      "layerTop": "На передний слой",
+      "deleteTool": "Удалить"
+    },
+    "resetStage": "Сбросить смещение"
+  },
+
   "errors": {
     "invalidCredentials": "Указаны неверные данные"
   }
