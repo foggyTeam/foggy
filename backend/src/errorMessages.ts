@@ -111,11 +111,11 @@ const errorMessages = {
   },
   section: {
     required: {
-      en: 'Section is required',
+      en: 'SectionHeader is required',
       ru: 'Секция является обязательным',
     },
     invalidType: {
-      en: 'Section must be a string',
+      en: 'SectionHeader must be a string',
       ru: 'Раздел должен быть строкой',
     },
   },

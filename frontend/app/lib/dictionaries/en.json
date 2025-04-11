@@ -52,12 +52,33 @@
     }
   },
 
+  "main": {
+    "myProjects": "MY PROJECTS",
+    "myTeams": "MY TEAMS",
+    "teamProjects": "_ PROJECTS",
+    "participants": "PARTICIPANTS",
+    "andNMore": "And _ more...",
+    "you": "(you)",
+    "roles": {
+      "owner": "owner",
+      "admin": "admin",
+      "editor": "editor",
+      "reader": "reader",
+      "team": "team"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "PROJECTS",
       "teams": "TEAMS",
       "notifications": "NOTIFICATIONS"
     }
+  },
+
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
 
   "toolBar": {
