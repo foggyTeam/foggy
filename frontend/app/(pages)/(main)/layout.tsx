@@ -15,9 +15,7 @@ async function getUser() {
     return null;
   }
 
-  const response: any[] = await getRequest('users');
-
-  const userData: any = response.find((user) => user['_id'] == session.userId);
+  const userData = await getRequest('users/' + session.userId);
   return userData
     ? ({
         id: userData['_id'],
