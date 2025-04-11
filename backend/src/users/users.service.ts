@@ -17,8 +17,7 @@ export class UsersService {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
-  ) {
-  }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
     const [hashedPassword, nickname] = await Promise.all([
