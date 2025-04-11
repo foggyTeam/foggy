@@ -13,7 +13,30 @@ export enum AvailableProviders {
   YANDEX,
 }
 
+export type TeamRole = {
+  owner;
+  admin;
+  editor;
+  reader;
+};
+export type ProjectRole = TeamRole & {
+  team;
+};
+
 export type AvailableLocales = 'en' | 'ru';
+
+class Member {
+  id: string;
+  nickname: string;
+  avatar?: string;
+}
+export class ProjectMember extends Member {
+  role: ProjectRole;
+}
+
+export class TeamMember extends Member {
+  role: TeamRole;
+}
 
 export enum BoardTypes {
   SIMPLE,
@@ -90,6 +113,17 @@ export class Board {
 export class Project {
   id: string = '';
   name: string = 'unknown';
+  avatar: string = '';
+  description: string = '';
+  favourite: boolean = false;
+  members: ProjectMember[] = [];
   boards: Board[] = [];
   lastChange: string = '';
+}
+
+export class Team {
+  id: string = '';
+  name: string = 'unknown';
+  avatar: string = '';
+  members: TeamMember[] = [];
 }

@@ -1,9 +1,9 @@
 import RecentBar from '@/app/lib/components/menu/projectBar/recentBar';
 import BoardStage from '@/app/lib/components/board/boardStage';
 import Cursors from '@/app/lib/components/board/cursors';
-import BoardLoader from '@/app/lib/components/boardLoader';
+import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
 import { Board, BoardElement, BoardTypes } from '@/app/lib/types/definitions';
-import { info, primary, secondary, success } from '@/tailwind.config';
+import { info, primary, secondary } from '@/tailwind.config';
 
 const testBoardLayers = [
   [
