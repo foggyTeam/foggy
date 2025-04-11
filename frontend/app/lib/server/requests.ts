@@ -32,3 +32,33 @@ export const postRequest: any = async (url: string, data: any) => {
       return data.response.data;
     });
 };
+
+export const patchRequest: any = async (url: string, data: any) => {
+  return await axios
+    .patch(`${apiUri}/${url}`, data, {
+      headers: {
+        'x-api-key': `${verificationKey}`,
+      },
+    } as AxiosRequestConfig)
+    .then((data) => {
+      return data.data;
+    })
+    .catch((data) => {
+      return data.response.data;
+    });
+};
+
+export const deleteRequest: any = async (url: string) => {
+  return await axios
+    .delete(`${apiUri}/${url}`, {
+      headers: {
+        'x-api-key': `${verificationKey}`,
+      },
+    } as AxiosRequestConfig)
+    .then((data) => {
+      return data.data;
+    })
+    .catch((data) => {
+      return data.response.data;
+    });
+};

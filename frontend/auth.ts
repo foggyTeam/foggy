@@ -1,6 +1,6 @@
 import NextAuth, { Account, CredentialsSignin, Profile, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { createSession } from '@/app/lib/session';
+import { createSession, deleteSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/server/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
@@ -98,6 +98,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   events: {
+    async signOut() {
+      await deleteSession();
+    },
     async signIn({
       user,
       profile,

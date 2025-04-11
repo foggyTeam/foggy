@@ -16,6 +16,7 @@
     "@heroui/divider": "^2.2.10",
     "@heroui/drawer": "^2.2.12",
     "@heroui/dropdown": "^2.3.15",
+    "@heroui/checkbox": "^2.3.15",
     "@heroui/form": "2.1.9",
     "@heroui/input": "2.4.10",
     "@heroui/modal": "^2.2.12",

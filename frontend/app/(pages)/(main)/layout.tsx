@@ -1,5 +1,3 @@
-'use server';
-
 import React from 'react';
 import LogoBar from '@/app/lib/components/menu/logoBar';
 import SideBar from '@/app/lib/components/menu/sideBar/sideBar';
@@ -36,7 +34,7 @@ export default async function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user: undefined | User = await getUser();
+  const user: User | undefined = await getUser();
 
   return (
     <>
