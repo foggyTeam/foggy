@@ -15,8 +15,8 @@ export default function UseBoardNavigation(stageRef, scale) {
       };
       const handleMouseMove = (e) => {
         if (isDragging) {
-          let newX = stage.x() + e.evt.movementX;
-          let newY = stage.y() + e.evt.movementY;
+          const newX = stage.x() + e.evt.movementX;
+          const newY = stage.y() + e.evt.movementY;
 
           const fit = fitCoordinates(
             newX,

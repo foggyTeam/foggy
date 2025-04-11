@@ -9,6 +9,10 @@
     "loginViaProviders": "Login with"
   },
   "validationErrors": {
+    "nickname": {
+      "maxLength": "Nickname must be no more than 14 characters long",
+      "invalidSymbols": "Nickname may contain only latin letters, digits and special symbols \".@_\""
+    },
     "email": {
       "required": "Email is required",
       "maxLength": "Email must be no more than 100 characters long",
@@ -20,6 +24,31 @@
       "minLength": "Password must be at least 8 characters long",
       "maxLength": "Password must be no more than 20 characters long",
       "invalidPassword": "Password must contain at least 1 letter and 1 number"
+    },
+    "about": {
+      "maxLength": "About must be no more than 140 characters long",
+      "invalidSymbols": "About may contain only latin letters, digits and special symbols"
+    }
+  },
+
+  "profile": {
+    "signOutButton": "Sign out",
+    "deleteButton": "Delete account",
+    "saveButton": "Save",
+    "uploadAvatarHint": "Upload new avatar",
+    "nickname": "Nickname",
+    "email": "Email",
+    "password": "Password",
+    "passwordDescription": "Your account doesn't need password since you sign in via Google / Yandex.",
+    "about": "About",
+    "teamInvitations": "Allow team invitations",
+    "projectNotifications": "Allow project notifications",
+    "emailNotifications": "Allow email notifications for favourite projects",
+    "deleteAccount": {
+      "modalHeader": "Do you really want to delete account?",
+      "modalDescription": "Deleting your account will result in the irreversible loss of all your data, including projects, teams and personal information. After deletion data recovery will be impossible.",
+      "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
     }
   },
 
@@ -29,6 +58,36 @@
       "teams": "TEAMS",
       "notifications": "NOTIFICATIONS"
     }
+  },
+
+  "toolBar": {
+    "chooseColor": "Pick a color",
+    "strokeWidth": "Stroke width:",
+    "width": "Width",
+    "height": "Height",
+    "cornerRadius": "Corner radius",
+    "rotation": "Rotation",
+    "textToolPlaceholder": "Type something...",
+    "linkPlaceholder": "https://hoggyfoggy.com",
+    "linkLabel": "Link"
+  },
+
+  "toolTips": {
+    "tools": {
+      "textTool": "Text",
+      "rectTool": "Rectangle",
+      "ellipseTool": "Ellipse",
+      "fillTool": "Fill color",
+      "strokeTool": "Stroke width and color",
+      "sizeTool": "Size, rotation, corner radius",
+      "layerTool": "Layer",
+      "layerBottom": "Send to back",
+      "layerBack": "Move back",
+      "layerForward": "Move forward",
+      "layerTop": "Bring to front",
+      "deleteTool": "Delete"
+    },
+    "resetStage": "Reset position"
   },
 
   "errors": {

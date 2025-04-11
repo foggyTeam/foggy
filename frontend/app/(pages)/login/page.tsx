@@ -28,7 +28,7 @@ const Login = () => {
               alt={'bg-picture'}
               priority
               src={bg}
-            ></Image>
+            />
           </div>
 
           <div

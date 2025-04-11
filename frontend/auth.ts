@@ -1,6 +1,6 @@
 import NextAuth, { Account, CredentialsSignin, Profile, User } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { createSession } from '@/app/lib/session';
+import { createSession, deleteSession } from '@/app/lib/session';
 import { postRequest } from '@/app/lib/server/requests';
 import Google from 'next-auth/providers/google';
 import { Provider } from 'next-auth/providers';
@@ -75,6 +75,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return {
           name: profile.login,
           email: profile.default_email,
+          image: profile.picture,
         };
       },
     } as Provider,
@@ -97,6 +98,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
   },
   events: {
+    async signOut() {
+      await deleteSession();
+    },
     async signIn({
       user,
       profile,
@@ -113,6 +117,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           data: {
             nickname: user.name,
             email: user.email,
+            // avatar: user.image,
           },
         };
 
@@ -126,7 +131,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { ...user, id: result.id, name: result.nickname };
       }
     },
-
     async error(message: string) {
       console.error('Error event:', message);
     },

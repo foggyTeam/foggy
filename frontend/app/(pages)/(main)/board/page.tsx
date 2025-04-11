@@ -54,18 +54,8 @@ const testBoardLayers = [
       width: 100,
       height: 150,
     },
-    {
-      id: 'text1',
-      type: 'text',
-      draggable: true,
-      x: 200,
-      y: 300,
-      rotation: 0,
-      fill: success.DEFAULT,
-      text: 'Hello, world!',
-      fontSize: 24,
-    },
   ],
+  [],
 ];
 const testBoard = {
   projectId: 'kjgvkhb11',

@@ -4,13 +4,13 @@ import { Document } from 'mongoose';
 interface UserSettings {
   emailNotifications: boolean;
   projectNotifications: boolean;
-  favoriteProjectNotifications: boolean;
+  teamNotifications: boolean;
 }
 
 const defaultSettings: UserSettings = {
   emailNotifications: false,
   projectNotifications: false,
-  favoriteProjectNotifications: true,
+  teamNotifications: true,
 };
 
 @Schema()
