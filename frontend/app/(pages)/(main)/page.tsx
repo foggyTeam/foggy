@@ -73,7 +73,7 @@ const testProjects = [
       ' ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero' +
       ' eos et accusam et justo duo dolores et ea rebum. Stet clita kasd' +
       ' gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-    favourite: false,
+    favorite: false,
     members: testMembers.slice(2, 5) as ProjectMember[],
     boards: [],
     lastChange: Date.now(),
@@ -88,7 +88,7 @@ const testProjects = [
       ' aliquyam erat, sed diam voluptua. At vero eos et accusam et justo' +
       ' duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata' +
       ' sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,',
-    favourite: true,
+    favorite: true,
     members: testMembers as ProjectMember[],
     boards: [],
     lastChange: Date.now(),
@@ -103,7 +103,7 @@ const testProjects = [
       ' aliquyam erat, sed diam voluptua. At vero eos et accusam et justo' +
       ' duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata' +
       ' sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,',
-    favourite: true,
+    favorite: true,
     members: testMembers.slice(0, 3) as ProjectMember[],
     boards: [],
     lastChange: Date.now(),

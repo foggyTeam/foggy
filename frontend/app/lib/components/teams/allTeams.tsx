@@ -5,7 +5,7 @@ export default function AllTeams({ teams }: { teams: Team[] }) {
   return (
     <div>
       {teams.map((team) => (
-        <p>{team.name}</p>
+        <p key={team.id}>{team.name}</p>
       ))}
     </div>
   );

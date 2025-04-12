@@ -115,7 +115,7 @@ export class Project {
   name: string = 'unknown';
   avatar: string = '';
   description: string = '';
-  favourite: boolean = false;
+  favorite: boolean = false;
   members: ProjectMember[] = [];
   boards: Board[] = [];
   lastChange: string = '';
@@ -125,5 +125,6 @@ export class Team {
   id: string = '';
   name: string = 'unknown';
   avatar: string = '';
+  favorite: boolean = false;
   members: TeamMember[] = [];
 }
