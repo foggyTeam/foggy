@@ -28,6 +28,7 @@ class ProjectsStore {
       setAllProjects: action,
       addBoard: action,
       addProject: action,
+      updateProject: action,
     });
   }
 
@@ -152,6 +153,15 @@ class ProjectsStore {
   };
   addProject = (newProject: Project) => {
     this.allProjects.push(newProject);
+  };
+  updateProject = (id: string, newAttrs: Partial<Project>) => {
+    const projectIndex = this.allProjects.findIndex(
+      (project) => project.id === id,
+    );
+    this.allProjects[projectIndex] = {
+      ...this.allProjects[projectIndex],
+      ...newAttrs,
+    };
   };
 }
 

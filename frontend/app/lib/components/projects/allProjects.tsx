@@ -4,6 +4,7 @@ import ContentSection from '@/app/lib/components/contentSection';
 import settingsStore from '@/app/stores/settingsStore';
 import projectsStore from '@/app/stores/projectsStore';
 import { observer } from 'mobx-react-lite';
+import ProjectCard from '@/app/lib/components/projects/projectCard';
 
 const AllProjects = observer(() => {
   const addNewProject = () => {
@@ -14,7 +15,7 @@ const AllProjects = observer(() => {
     <ContentSection
       sectionTitle={settingsStore.t.main.myProjects}
       data={projectsStore.allProjects.slice()}
-      DataCard={() => <span>I am data</span>}
+      DataCard={ProjectCard}
       filter
       onlyFavorite
       onlyWithNotification

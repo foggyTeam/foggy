@@ -3,3 +3,6 @@ export const bg_container_no_padding: string =
   ' bg-opacity-50 backdrop-blur-3xl rounded-2xl shadow-container';
 
 export const bg_container: string = bg_container_no_padding + ' px-1 py-12';
+
+export const el_animation: string =
+  'transform transition-all hover:-translate-y-0.5';
