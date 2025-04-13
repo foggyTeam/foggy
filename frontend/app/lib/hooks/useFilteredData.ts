@@ -10,16 +10,18 @@ const useFilteredData = (
 ) => {
   return useMemo(() => {
     return data.filter((value) => {
-      const searchValueIn: boolean =
-        value.name?.includes(searchValue) ||
-        value.nickname?.includes(searchValue);
+      // TODO: fix that
+      const searchValueIn: boolean = searchValue.length
+        ? value.name?.includes(searchValue.toLowerCase()) ||
+          value.nickname?.includes(searchValue.toLowerCase())
+        : true;
 
       const hasUnreadNotifications: boolean = !!value.unreadNotifications;
 
       return (
         searchValueIn &&
         checkFilters(filters) &&
-        value.favorite === favorite &&
+        (favorite ? (value.favorite as boolean) : true) &&
         hasUnreadNotifications === withNotification
       );
     });

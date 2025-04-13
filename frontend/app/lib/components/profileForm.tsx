@@ -20,7 +20,7 @@ import { signUserOut } from '@/app/lib/server/actions/signUserOut';
 import AreYouSureModal from '@/app/lib/components/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
 import resizeImage from '@/app/lib/utils/resizeImage';
-import { Tooltip } from '@heroui/tooltip';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -159,8 +159,7 @@ const ProfileForm = observer((userData: ProfileData) => {
     <>
       <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
         <div className="items-top flex w-full justify-between gap-2">
-          {/*TODO: replace with FTooltip after merge*/}
-          <Tooltip
+          <FTooltip
             content={settingsStore.t.profile.uploadAvatarHint}
             classNames={{
               base: 'before:shadow-container',
@@ -192,7 +191,7 @@ const ProfileForm = observer((userData: ProfileData) => {
                 style={{ display: 'none' }}
               />
             </Button>
-          </Tooltip>
+          </FTooltip>
           <Button
             onPress={onSignOut}
             type={'button'}
