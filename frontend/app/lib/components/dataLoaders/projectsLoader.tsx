@@ -11,7 +11,7 @@ const ProjectsLoader = ({
   projectsData: Project[] | undefined;
 }) => {
   useEffect(() => {
-    if (projectsData && !userStore.isAuthenticated) {
+    if (projectsData && userStore.isAuthenticated) {
       projectsStore.setAllProjects(projectsData);
     }
   }, [projectsData]);

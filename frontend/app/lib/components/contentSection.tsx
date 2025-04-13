@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  FilterObject,
   Project,
   ProjectMember,
   Team,
@@ -39,7 +40,7 @@ export default function ContentSection({
   openSettings,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState([] as FilterObject[]);
   const [favorite, setFavorite] = useState(false);
   const [withNotification, setWithNotification] = useState(false);
 
@@ -78,7 +79,7 @@ export default function ContentSection({
     }
 
     return props;
-  }, [favorite, withNotification]);
+  }, [favorite, filters, withNotification]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4 text-sm">

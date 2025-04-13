@@ -40,7 +40,7 @@ export default function ContentActionBar({
   openSettings,
 }: ActionBarProps) {
   return (
-    <div className="flex h-fit w-full flex-col gap-1">
+    <div className="flex h-fit w-full flex-col gap-2">
       <div className="flex h-fit w-full items-center justify-between gap-2">
         <div className="flex gap-1">
           <Input
@@ -61,16 +61,14 @@ export default function ContentActionBar({
             <Button
               onPress={openFilters}
               isIconOnly
-              variant={Object.keys(filters).length ? 'flat' : 'light'}
-              color={Object.keys(filters).length ? 'primary' : 'default'}
+              variant={filters.length ? 'flat' : 'light'}
+              color={filters.length ? 'primary' : 'default'}
               size="sm"
               radius="lg"
             >
               <FunnelIcon
                 className={
-                  Object.keys(filters).length
-                    ? 'stroke-primary-500'
-                    : 'stroke-default-300'
+                  filters.length ? 'stroke-primary-500' : 'stroke-default-300'
                 }
               />
             </Button>
@@ -108,7 +106,7 @@ export default function ContentActionBar({
             </Button>
           )}
         </div>
-        <div className="gap1 flex">
+        <div className="flex gap-1">
           {addNew !== undefined && (
             <Button
               onPress={addNew}
@@ -144,7 +142,7 @@ export default function ContentActionBar({
           )}
         </div>
       </div>
-      {openFilters !== undefined && Object.keys(filters).length > 0 && (
+      {openFilters !== undefined && filters.length > 0 && (
         <AllFilters filters={filters} setFilters={setFilters} />
       )}
     </div>

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { checkFilters } from '@/app/lib/components/menu/filterMenu';
+import { checkFilters } from '@/app/lib/components/filters/filterMenu';
 
 const useFilteredData = (
   data: any[],
