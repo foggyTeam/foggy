@@ -77,6 +77,11 @@
     }
   },
 
+  "time": {
+    "today": "Сегодня",
+    "yesterday": "Вчера"
+  },
+
   "toolBar": {
     "chooseColor": "Выберите цвет",
     "strokeWidth": "Толщина линии:",

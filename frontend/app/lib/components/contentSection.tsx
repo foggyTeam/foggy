@@ -7,7 +7,7 @@ import {
   Team,
   TeamMember,
 } from '@/app/lib/types/definitions';
-import { useMemo, useState } from 'react';
+import { ComponentType, useMemo, useState } from 'react';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { Avatar } from '@heroui/avatar';
 import ContentActionBar, {
@@ -18,7 +18,7 @@ interface ContentSectionProps {
   sectionTitle: string;
   sectionAvatar?: string;
   data: Project[] | Team[] | TeamMember[] | ProjectMember[]; // | Notification[];
-  DataCard: any;
+  DataCard: ComponentType<any>;
   filter?: boolean;
   onlyFavorite?: boolean;
   onlyWithNotification?: boolean;
@@ -91,11 +91,9 @@ export default function ContentSection({
 
         <ContentActionBar {...actionBarProps} />
       </div>
-      <div className="flex flex-wrap">
+      <div>
         {filteredData.map((element) => (
-          <p key={element.id}>
-            {element.name} <DataCard />
-          </p>
+          <DataCard key={element.id} {...element} />
         ))}
       </div>
     </div>

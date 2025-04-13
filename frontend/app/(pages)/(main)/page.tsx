@@ -74,9 +74,9 @@ const testProjects = [
       ' eos et accusam et justo duo dolores et ea rebum. Stet clita kasd' +
       ' gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
     favorite: false,
-    members: testMembers.slice(2, 5) as ProjectMember[],
+    members: testMembers as ProjectMember[],
     boards: [],
-    lastChange: Date.now(),
+    lastChange: new Date().toISOString(),
   },
   {
     id: 'project2',
@@ -89,9 +89,9 @@ const testProjects = [
       ' duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata' +
       ' sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,',
     favorite: true,
-    members: testMembers as ProjectMember[],
+    members: testMembers.slice(2, 5) as ProjectMember[],
     boards: [],
-    lastChange: Date.now(),
+    lastChange: new Date().toISOString(),
   },
   {
     id: 'project3',
@@ -106,7 +106,7 @@ const testProjects = [
     favorite: true,
     members: testMembers.slice(0, 3) as ProjectMember[],
     boards: [],
-    lastChange: Date.now(),
+    lastChange: new Date().toISOString(),
   },
 ] as Project[];
 const testTeams = [
