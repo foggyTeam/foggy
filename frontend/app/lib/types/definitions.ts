@@ -128,3 +128,8 @@ export class Team {
   favorite: boolean = false;
   members: TeamMember[] = [];
 }
+
+export class FilterObject {
+  field: 'nickname' | 'name' | 'team' | 'role' | 'lastChange';
+  referenceValue: string;
+}

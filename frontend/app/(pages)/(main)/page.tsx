@@ -200,7 +200,7 @@ export default async function Main() {
           )}
         >
           {userProjects?.length !== undefined ? (
-            <AllProjects projects={userProjects} />
+            <AllProjects />
           ) : (
             <p> Loading </p>
           )}

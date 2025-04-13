@@ -1,10 +1,11 @@
 'use client';
 
-import { Project } from '@/app/lib/types/definitions';
 import ContentSection from '@/app/lib/components/contentSection';
 import settingsStore from '@/app/stores/settingsStore';
+import projectsStore from '@/app/stores/projectsStore';
+import { observer } from 'mobx-react-lite';
 
-export default function AllProjects({ projects }: { projects: Project[] }) {
+const AllProjects = observer(() => {
   const addNewProject = () => {
     console.log('New project');
   };
@@ -12,7 +13,7 @@ export default function AllProjects({ projects }: { projects: Project[] }) {
   return (
     <ContentSection
       sectionTitle={settingsStore.t.main.myProjects}
-      data={projects}
+      data={projectsStore.allProjects.slice()}
       DataCard={() => <span>I am data</span>}
       filter
       onlyFavorite
@@ -20,4 +21,6 @@ export default function AllProjects({ projects }: { projects: Project[] }) {
       addNew={addNewProject}
     />
   );
-}
+});
+
+export default AllProjects;

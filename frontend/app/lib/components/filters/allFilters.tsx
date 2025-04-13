@@ -1,15 +1,29 @@
+import FilterCard from '@/app/lib/components/filters/filterCard';
+import { FilterObject } from '@/app/lib/types/definitions';
+
 export default function AllFilters({
   filters,
   setFilters,
 }: {
-  filters: any[];
+  filters: FilterObject[];
   setFilters: any;
 }) {
+  const removeFilter = (referenceValue) => {
+    setFilters(
+      filters.filter((filter) => filter.referenceValue !== referenceValue),
+    );
+  };
+
   return (
     <div className="flex w-full flex-wrap gap-2">
-      {Object.keys(filters).map((filterKey) => {
-        const filter = filters[filterKey];
-        return <p key={filterKey}>{filterKey}</p>;
+      {filters.map((filter) => {
+        return (
+          <FilterCard
+            key={filter.referenceValue}
+            filter={filter}
+            removeFilter={removeFilter}
+          />
+        );
       })}
     </div>
   );
