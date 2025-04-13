@@ -9,7 +9,7 @@ import {
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
-import { bg_container } from '@/app/lib/types/styles';
+import { bg_container_no_padding } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import AllProjects from '@/app/lib/components/projects/allProjects';
 import AllTeams from '@/app/lib/components/teams/allTeams';
@@ -195,8 +195,8 @@ export default async function Main() {
         <div
           className={clsx(
             'flex h-full min-h-0.5 w-full flex-col items-center justify-center',
-            bg_container,
-            'rounded-bl-[64px] px-12',
+            bg_container_no_padding,
+            'rounded-bl-[64px] px-8 pt-8',
           )}
         >
           {userProjects?.length !== undefined ? (
@@ -208,8 +208,8 @@ export default async function Main() {
         <div
           className={clsx(
             'flex h-96 w-full flex-col items-center justify-center',
-            bg_container,
-            'rounded-tr-[64px] px-12',
+            bg_container_no_padding,
+            'rounded-tr-[64px] px-8 pt-8',
           )}
         >
           {userTeams?.length !== undefined ? (

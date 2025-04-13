@@ -6,10 +6,12 @@ import {
   Team,
   TeamMember,
 } from '@/app/lib/types/definitions';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { Avatar } from '@heroui/avatar';
-import ContentActionBar from '@/app/lib/components/contentActionBar';
+import ContentActionBar, {
+  ActionBarProps,
+} from '@/app/lib/components/contentActionBar';
 
 interface ContentSectionProps {
   sectionTitle: string;
@@ -49,19 +51,49 @@ export default function ContentSection({
     withNotification,
   );
 
+  const openProjectFilters = () => {
+    console.log('Project filters');
+  };
+
+  const actionBarProps = useMemo(() => {
+    const props: ActionBarProps = {
+      setSearchValue,
+      addNew,
+      addMember,
+      openSettings,
+    };
+
+    if (filter) {
+      props.openFilters = openProjectFilters;
+      props.filters = filters;
+      props.setFilters = setFilters;
+    }
+    if (onlyFavorite) {
+      props.favorite = favorite;
+      props.setFavorite = setFavorite;
+    }
+    if (onlyWithNotification) {
+      props.withNotification = withNotification;
+      props.setWithNotification = setWithNotification;
+    }
+
+    return props;
+  }, [favorite, withNotification]);
+
   return (
-    <div className="h-full w-full gap-4">
-      <div className="flex h-10 items-center justify-start gap-2">
-        {sectionAvatar?.length && <Avatar size="md" src={sectionAvatar} />}
-        <h1 className="text-sm font-medium">{sectionTitle}</h1>
+    <div className="flex h-full w-full flex-col gap-4 text-sm">
+      <div className="flex flex-col gap-1">
+        <div className="flex h-10 items-center justify-start gap-2">
+          {sectionAvatar?.length && <Avatar size="md" src={sectionAvatar} />}
+          <h1 className="font-medium">{sectionTitle}</h1>
+        </div>
+
+        <ContentActionBar {...actionBarProps} />
       </div>
-
-      <ContentActionBar />
-
       <div className="flex flex-wrap">
         {filteredData.map((element) => (
           <p key={element.id}>
-            {element.id} <DataCard />
+            {element.name} <DataCard />
           </p>
         ))}
       </div>

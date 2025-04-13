@@ -59,6 +59,7 @@
     "participants": "УЧАСТНИКИ",
     "andNMore": "И еще _...",
     "you": "(вы)",
+    "searchPlaceholder": "Найти...",
     "roles": {
       "owner": "владелец",
       "admin": "админ",

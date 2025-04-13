@@ -59,6 +59,7 @@
     "participants": "PARTICIPANTS",
     "andNMore": "And _ more...",
     "you": "(you)",
+    "searchPlaceholder": "Find...",
     "roles": {
       "owner": "owner",
       "admin": "admin",
