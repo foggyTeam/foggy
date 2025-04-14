@@ -1,0 +1,125 @@
+[
+  {
+    "id": "67f18c3ece58d18c7ebaae02",
+    "nickname": "iciicifur",
+    "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+    "profileDescription": "A junior Next.js developer who loves creativity.",
+    "emailNotifications": false,
+    "projectNotifications": true,
+    "teamNotifications": true
+  },
+  {
+    "id": "user-2",
+    "nickname": "creative_guru",
+    "avatar": "http://postimg.su/image/JOr147ko/b2.png",
+    "profileDescription": "Creative thinker, always ready to brainstorm!"
+  },
+  {
+    "id": "user-3",
+    "nickname": "team_player",
+    "avatar": "http://postimg.su/image/8n2MgFcT/b3.png",
+    "profileDescription": "Teamwork makes the dream work."
+  },
+  {
+    "id": "user-4",
+    "nickname": "coach_master",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "profileDescription": "Helping others achieve their goals."
+  },
+  {
+    "id": "user-5",
+    "nickname": "design_wizard",
+    "avatar": "http://postimg.su/image/klibtc2Q/b5.png",
+    "profileDescription": "A wizard in UX/UI design, making things beautiful."
+  },
+  {
+    "id": "user-6",
+    "nickname": "strategy_pro",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "profileDescription": "Strategist who loves solving complex problems."
+  },
+  {
+    "id": "user-7",
+    "nickname": "tech_guru",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "profileDescription": "Tech enthusiast and problem solver."
+  },
+  {
+    "id": "user-8",
+    "nickname": "mentor_guide",
+    "avatar": "http://postimg.su/image/dXE0TkS7/b6.png",
+    "profileDescription": "Guiding the next generation of innovators."
+  },
+  {
+    "id": "user-9",
+    "nickname": "brainstormer",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "profileDescription": "Loves coming up with new ideas."
+  },
+  {
+    "id": "user-10",
+    "nickname": "project_leader",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "profileDescription": "Leading teams to success with clear vision."
+  },
+  {
+    "id": "user-11",
+    "nickname": "student_helper",
+    "avatar": "http://postimg.su/image/e6Lj8LCf/b7.png",
+    "profileDescription": "Helping students achieve their academic goals."
+  },
+  {
+    "id": "user-12",
+    "nickname": "visionary",
+    "avatar": "http://postimg.su/image/UFdiymvN/b15.png",
+    "profileDescription": "Visionary thinker with big ideas."
+  },
+  {
+    "id": "user-13",
+    "nickname": "collaborator",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "profileDescription": "Enjoys working closely with teams."
+  },
+  {
+    "id": "user-14",
+    "nickname": "content_creator",
+    "avatar": "http://postimg.su/image/oRpYCdHd/s11.png",
+    "profileDescription": "Creating engaging content for any audience."
+  },
+  {
+    "id": "user-15",
+    "nickname": "goal_achiever",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "profileDescription": "Focused on achieving every goal."
+  },
+  {
+    "id": "user-16",
+    "nickname": "dynamic_leader",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "profileDescription": "Dynamic and inspiring leader."
+  },
+  {
+    "id": "user-17",
+    "nickname": "coding_expert",
+    "avatar": "http://postimg.su/image/IMUjhjbJ/cyan6.png",
+    "profileDescription": "Expert in coding and software development."
+  },
+  {
+    "id": "user-18",
+    "nickname": "organizer",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "profileDescription": "Organizing chaos into structure."
+  },
+  {
+    "id": "user-19",
+    "nickname": "problem_solver",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "profileDescription": "Passionate about solving tough problems."
+  },
+  {
+    "id": "user-20",
+    "nickname": "innovator",
+    "avatar": "http://postimg.su/image/3KgFkHL4/white15.jpg",
+    "profileDescription": "Always thinking outside the box."
+  }
+]

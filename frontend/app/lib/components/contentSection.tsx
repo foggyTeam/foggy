@@ -96,8 +96,8 @@ export default function ContentSection({
       <div
         className={clsx(
           'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
-          'scrollbar-thin scrollbar-thumb-default-300 scrollbar-track-white/20',
-          'scrollbar-thumb-rounded-full scrollbar-track-rounded-full',
+          'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+          'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
         )}
       >
         <div

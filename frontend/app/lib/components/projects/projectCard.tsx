@@ -62,14 +62,14 @@ export default function ProjectCard(project: Project) {
       )}
     >
       <div className="flex h-fit w-full items-center justify-between gap-2">
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center justify-start gap-2 overflow-hidden">
           <Avatar
             size="md"
             color="primary"
             name={project.name.toUpperCase()}
             src={project.avatar}
           />
-          <h1 className="font-medium transition-colors duration-300 hover:text-f_accent">
+          <h1 className="max-w-40 truncate text-nowrap font-medium transition-colors duration-300 hover:text-f_accent">
             <a /*TODO: link to this project page*/ href={'/'}>{project.name}</a>
           </h1>
         </div>
@@ -139,7 +139,6 @@ export default function ProjectCard(project: Project) {
                 classNames={{
                   base: 'h-7 w-7 border-white border-1.5',
                 }}
-                color="primary"
                 key={member.id}
                 name={member.nickname}
                 src={member.avatar}
