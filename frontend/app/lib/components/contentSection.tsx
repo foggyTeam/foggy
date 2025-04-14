@@ -42,28 +42,7 @@ export default function ContentSection({
   openSettings,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [filters, setFilters] = useState([
-    {
-      field: 'nickname',
-      referenceValue: 'creative_guru',
-    },
-    {
-      field: 'name',
-      referenceValue: 'Design Sprint',
-    },
-    {
-      field: 'team',
-      referenceValue: 'design_wizard',
-    },
-    {
-      field: 'role',
-      referenceValue: 'owner',
-    },
-    {
-      field: 'lastChange',
-      referenceValue: '2025-04-14T12:00:00Z',
-    },
-  ] as FilterObject[]);
+  const [filters, setFilters] = useState([] as FilterObject[]);
   const [favorite, setFavorite] = useState(false);
   const [withNotification, setWithNotification] = useState(false);
 
@@ -126,7 +105,7 @@ export default function ContentSection({
         <div
           className="grid-rows-auto grid content-between gap-y-2 pb-16"
           style={{
-            gridTemplateColumns: 'repeat(auto-fit, 146px)',
+            gridTemplateColumns: 'repeat(auto-fill, 97px)',
           }}
         >
           {filteredData.map((element) => (

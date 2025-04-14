@@ -2,6 +2,8 @@
 subsequent requests, such as the user's ID, role, etc. It should not contain
 personally identifiable information like phone number, email address, credit card
 information, etc, or sensitive data like passwords.*/
+
+// GENERAL
 export type SessionPayload = {
   userId: string;
   expiresAt: Date;
@@ -13,31 +15,9 @@ export enum AvailableProviders {
   YANDEX,
 }
 
-export type TeamRole = {
-  owner;
-  admin;
-  editor;
-  reader;
-};
-export type ProjectRole = TeamRole & {
-  team;
-};
-
 export type AvailableLocales = 'en' | 'ru';
 
-class Member {
-  id: string;
-  nickname: string;
-  avatar?: string;
-}
-export class ProjectMember extends Member {
-  role: ProjectRole;
-}
-
-export class TeamMember extends Member {
-  role: TeamRole;
-}
-
+// BOARD
 export enum BoardTypes {
   SIMPLE,
   GRAPH,
@@ -110,6 +90,7 @@ export class Board {
   lastChange: string;
 }
 
+// PROJECT
 export class Project {
   id: string = '';
   name: string = 'unknown';
@@ -121,14 +102,37 @@ export class Project {
   lastChange: string = '';
 }
 
+export type ProjectRole = TeamRole & {
+  team;
+};
+class Member {
+  id: string;
+  nickname: string;
+  avatar?: string;
+}
+export class ProjectMember extends Member {
+  role: ProjectRole;
+}
+
+// TEAM
 export class Team {
   id: string = '';
   name: string = 'unknown';
   avatar: string = '';
-  favorite: boolean = false;
   members: TeamMember[] = [];
+  projects: Project[] = [];
+}
+export type TeamRole = {
+  owner;
+  admin;
+  editor;
+  reader;
+};
+export class TeamMember extends Member {
+  role: TeamRole;
 }
 
+// FILTERS
 export class FilterObject {
   field: 'nickname' | 'name' | 'team' | 'role' | 'lastChange';
   referenceValue: string;

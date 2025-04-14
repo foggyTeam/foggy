@@ -139,7 +139,7 @@ class ProjectsStore {
   };
 
   setActiveBoard = (board: Board) => {
-    if (this.activeBoard) this.activeBoard = { ...this.activeBoard, board };
+    if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
   };
   setActiveProject = (id: string) => {
