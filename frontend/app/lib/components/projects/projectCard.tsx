@@ -149,7 +149,7 @@ export default function ProjectCard(project: Project) {
                 src={member.avatar}
               />
             ))}
-            {project.members.length - 3 && (
+            {project.members.length - 3 > 0 && (
               <Avatar
                 classNames={{
                   base: 'h-7 w-7 border-white border-2',

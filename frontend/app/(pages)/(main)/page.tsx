@@ -17,6 +17,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import AllProjects from '@/app/lib/components/projects/allProjects';
 import AllTeams from '@/app/lib/components/teams/allTeams';
+import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 
 async function getUserProjects() {
   const cookie = (await cookies()).get('session' as any)?.value;
@@ -61,7 +62,6 @@ async function getUserProjects() {
     return undefined;
   }
 }
-
 async function getUserTeams() {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
@@ -113,6 +113,7 @@ export default async function Main() {
   return (
     <>
       <ProjectsLoader projectsData={userProjects} />
+      <TeamsLoader teamsData={userTeams} />
       <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-24 py-8">
         <div
           className={clsx(
@@ -129,16 +130,12 @@ export default async function Main() {
         </div>
         <div
           className={clsx(
-            'flex h-96 w-full flex-col items-center justify-center',
+            'flex h-80 w-full flex-col items-center justify-center',
             bg_container_no_padding,
             'rounded-tr-[64px] px-8 pt-8',
           )}
         >
-          {userTeams?.length !== undefined ? (
-            <AllTeams teams={userTeams} />
-          ) : (
-            <p> Loading </p>
-          )}
+          {userTeams?.length !== undefined ? <AllTeams /> : <p> Loading </p>}
         </div>
       </div>
     </>

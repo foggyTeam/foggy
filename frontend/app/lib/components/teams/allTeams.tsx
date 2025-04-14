@@ -1,12 +1,24 @@
 'use client';
-import { Team } from '@/app/lib/types/definitions';
+import teamsStore from '@/app/stores/teamsStore';
+import { observer } from 'mobx-react-lite';
+import settingsStore from '@/app/stores/settingsStore';
+import ContentSection from '@/app/lib/components/contentSection';
+import TeamCard from '@/app/lib/components/teams/teamCard';
 
-export default function AllTeams({ teams }: { teams: Team[] }) {
+const AllTeams = observer(() => {
+  const addNewTeam = () => {
+    console.log('new teams!');
+  };
   return (
-    <div>
-      {teams.map((team) => (
-        <p key={team.id}>{team.name}</p>
-      ))}
-    </div>
+    <ContentSection
+      sectionTitle={settingsStore.t.main.myTeams}
+      data={teamsStore.allTeams.slice()}
+      DataCard={TeamCard}
+      filter
+      onlyWithNotification
+      addNew={addNewTeam}
+    />
   );
-}
+});
+
+export default AllTeams;
