@@ -60,6 +60,7 @@
     "andNMore": "And _ more...",
     "you": "(you)",
     "searchPlaceholder": "Find...",
+    "noProjectDescription": "This project doesn't have any description yet...",
     "roles": {
       "owner": "owner",
       "admin": "admin",

@@ -141,6 +141,8 @@ const foggy_accent_rgb = {
   DEFAULT: to_rgb(foggy_accent.DEFAULT),
 };
 
+const scrollbarPlugin = require('tailwind-scrollbar');
+
 export default {
   content: [
     './(pages)/**/*.{js,ts,jsx,tsx,mdx}',
@@ -204,6 +206,7 @@ export default {
         },
       },
     }),
+    scrollbarPlugin({ nocompatible: true }),
     function ({ addUtilities }: any) {
       const avatars = {
         '.accent-avatar': {

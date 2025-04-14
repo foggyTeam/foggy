@@ -4,15 +4,22 @@ import { Project } from '@/app/lib/types/definitions';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import { StarIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
 import clsx from 'clsx';
 import ProjectMemberCard from '@/app/lib/components/projects/projectMemberCard';
-import { el_animation } from '@/app/lib/types/styles';
+import {
+  el_animation,
+  project_tile,
+  project_tile_exp,
+} from '@/app/lib/types/styles';
 import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
+import userStore from '@/app/stores/userStore';
 
 function byRole(a, b) {
+  const thisUserId = userStore.user?.id;
+
   const rolePriority = {
     owner: 5,
     admin: 4,
@@ -21,19 +28,37 @@ function byRole(a, b) {
     reader: 1,
   };
 
+  if (a.id === thisUserId) return -1;
+  if (b.id === thisUserId) return 1;
+
   return rolePriority[b.role] - rolePriority[a.role];
 }
 
 export default function ProjectCard(project: Project) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (cardRef.current && !cardRef.current.contains(event.target as Node))
+        setIsExpanded(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div
-      onClick={() => setIsExpanded(!isExpanded)}
+      ref={cardRef}
+      onClick={() => setIsExpanded(true)}
       className={clsx(
-        'flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+        'box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
         el_animation,
-        isExpanded ? 'h-fit w-[600px]' : 'h-24 w-72',
+        isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px] cursor-pointer',
+        isExpanded ? project_tile_exp : project_tile,
       )}
     >
       <div className="flex h-fit w-full items-center justify-between gap-2">
@@ -68,21 +93,26 @@ export default function ProjectCard(project: Project) {
       <div
         className={clsx(
           'flex h-full w-full',
-          isExpanded ? 'flex-col gap-2' : 'items-end justify-between gap-1',
+          isExpanded ? 'flex-col gap-1' : 'items-end justify-between gap-1',
         )}
       >
         <div className="h-fit w-full">
           <p
             className={clsx(
-              'pr-0.5 italic text-default-700',
+              'pr-0.5 text-start italic',
               isExpanded ? 'line-clamp-4' : 'line-clamp-2',
+              project.description.length
+                ? 'text-default-700'
+                : 'text-default-400',
             )}
           >
-            {project.description}
+            {project.description.length
+              ? project.description
+              : settingsStore.t.main.noProjectDescription}
           </p>
         </div>
         {isExpanded ? (
-          <div className="mt-1 grid max-h-full w-full grid-cols-2 gap-2">
+          <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
             {project.members
               .sort(byRole)
               .slice(0, 7)
@@ -115,18 +145,19 @@ export default function ProjectCard(project: Project) {
                 src={member.avatar}
               />
             ))}
-            <Avatar
-              classNames={{
-                base: 'h-7 w-7 border-white border-2',
-              }}
-              name={`+${project.members.length - 3}`}
-            />
+            {project.members.length - 3 && (
+              <Avatar
+                classNames={{
+                  base: 'h-7 w-7 border-white border-2',
+                }}
+                name={`+${project.members.length - 3}`}
+              />
+            )}
           </AvatarGroup>
         )}
       </div>
-
       {isExpanded && (
-        <p className="w-full py-0.5 text-end text-xs text-default-700">
+        <p className="w-full text-end text-xs text-default-700">
           {GetDateTime(project.lastChange)}
         </p>
       )}

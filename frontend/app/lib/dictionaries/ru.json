@@ -60,6 +60,7 @@
     "andNMore": "И еще _...",
     "you": "(вы)",
     "searchPlaceholder": "Найти...",
+    "noProjectDescription": "У этого проекта пока нет описания...",
     "roles": {
       "owner": "владелец",
       "admin": "админ",
