@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@heroui/button';
 import { info, primary, secondary, success, warning } from '@/tailwind.config';
+import GetDateTime from '@/app/lib/utils/getDateTime';
 
 export default function FilterCard({
   filter,
@@ -39,7 +40,9 @@ export default function FilterCard({
         <KeyRoundIcon stroke={cardColor} className="h-4" />
       )}
       <p style={{ color: cardColor }} className="text-xs">
-        {filter.referenceValue}
+        {filter.field === 'lastChange'
+          ? GetDateTime(filter.referenceValue)
+          : filter.referenceValue}
       </p>
 
       <Button

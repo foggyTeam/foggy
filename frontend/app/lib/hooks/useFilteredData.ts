@@ -7,20 +7,24 @@ const useFilteredData = (
   filters,
   favorite: boolean,
   withNotification: boolean,
+  userId: string,
 ) => {
   return useMemo(() => {
     return data.filter((value) => {
-      // TODO: fix that
-      const searchValueIn: boolean = searchValue.length
-        ? value.name?.includes(searchValue.toLowerCase()) ||
-          value.nickname?.includes(searchValue.toLowerCase())
+      const lowerCaseSearchValue: string = searchValue.toLowerCase();
+      const lowerCaseDataValue: string =
+        value.name?.toLowerCase() ||
+        value.nickname?.toLowerCase() ||
+        value.header?.toLowerCase();
+      const searchValueIn: boolean = lowerCaseSearchValue.length
+        ? lowerCaseDataValue.includes(lowerCaseSearchValue)
         : true;
 
       const hasUnreadNotifications: boolean = !!value.unreadNotifications;
 
       return (
         searchValueIn &&
-        checkFilters(filters) &&
+        checkFilters(filters, value, userId) &&
         (favorite ? (value.favorite as boolean) : true) &&
         hasUnreadNotifications === withNotification
       );
