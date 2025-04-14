@@ -14,7 +14,6 @@ export default function ProjectMemberCard(member: ProjectMember) {
     >
       <div className="flex items-center justify-start gap-1">
         <Avatar
-          color="primary"
           size="sm"
           classNames={{
             base: 'border-white border-1.5',

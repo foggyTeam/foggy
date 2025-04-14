@@ -1,0 +1,313 @@
+[
+  {
+    "id": "project-1",
+    "name": "Design Sprint",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "description": "A collaborative design project for rapid prototyping.",
+    "favorite": true,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "editor" },
+      { "id": "user-2", "role": "owner" },
+      { "id": "user-3", "role": "reader" },
+      { "id": "user-5", "role": "editor" },
+      { "id": "user-6", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-14T12:00:00Z"
+  },
+  {
+    "id": "project-2",
+    "name": "Marketing Campaign",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "description": "Developing strategies for a new product launch.",
+    "favorite": false,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-3", "role": "owner" },
+      { "id": "user-7", "role": "team" },
+      { "id": "user-9", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-13T10:30:00Z"
+  },
+  {
+    "id": "project-3",
+    "name": "App Development",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "description": "Creating a cross-platform mobile application.",
+    "favorite": true,
+    "members": [
+      { "id": "user-4", "role": "admin" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "admin" },
+      { "id": "user-5", "role": "owner" },
+      { "id": "user-8", "role": "reader" },
+      { "id": "user-10", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-12T14:20:00Z"
+  },
+  {
+    "id": "project-4",
+    "name": "E-Learning Platform",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "description": "Developing an engaging e-learning platform for students.",
+    "favorite": false,
+    "members": [
+      { "id": "user-6", "role": "editor" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "owner" },
+      { "id": "user-10", "role": "team" },
+      { "id": "user-11", "role": "reader" },
+      { "id": "user-12", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-11T09:45:00Z"
+  },
+  {
+    "id": "project-5",
+    "name": "Social Media Strategy",
+    "avatar": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+    "description": "Crafting a long-term strategy for social media presence.",
+    "favorite": true,
+    "members": [
+      { "id": "user-13", "role": "owner" },
+      { "id": "user-14", "role": "team" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-16", "role": "editor" },
+      { "id": "user-17", "role": "admin" },
+      { "id": "user-18", "role": "team" },
+      { "id": "user-19", "role": "reader" },
+      { "id": "user-20", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-10T16:00:00Z"
+  },
+  {
+    "id": "project-6",
+    "name": "Gaming Platform",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "description": "Building an interactive gaming platform.",
+    "favorite": false,
+    "members": [
+      { "id": "user-2", "role": "reader" },
+      { "id": "user-3", "role": "editor" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "owner" },
+      { "id": "user-6", "role": "team" },
+      { "id": "user-8", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-09T15:00:00Z"
+  },
+  {
+    "id": "project-7",
+    "name": "AI Research",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "description": "Conducting AI and machine learning research.",
+    "favorite": true,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "editor" },
+      { "id": "user-5", "role": "owner" },
+      { "id": "user-6", "role": "reader" },
+      { "id": "user-9", "role": "admin" },
+      { "id": "user-10", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-08T11:45:00Z"
+  },
+  {
+    "id": "project-8",
+    "name": "Event Planner",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "description": "Developing a tool for event organization.",
+    "favorite": false,
+    "members": [
+      { "id": "user-2", "role": "owner" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-4", "role": "admin" },
+      { "id": "user-7", "role": "editor" },
+      { "id": "user-9", "role": "team" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-07T14:30:00Z"
+  },
+  {
+    "id": "project-9",
+    "name": "Fitness Tracker",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "description": "Creating an app for tracking fitness activities.",
+    "favorite": true,
+    "members": [
+      { "id": "user-8", "role": "owner" },
+      { "id": "user-10", "role": "reader" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "admin" },
+      { "id": "user-13", "role": "team" },
+      { "id": "user-14", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-06T12:15:00Z"
+  },
+  {
+    "id": "project-10",
+    "name": "Budget Tracker",
+    "avatar": "https://images.unsplash.com/photo-1487014679447-9f8336841d58",
+    "description": "Developing a budgeting tool for personal finance.",
+    "favorite": false,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-11", "role": "owner" },
+      { "id": "user-12", "role": "team" },
+      { "id": "user-15", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-05T16:10:00Z"
+  },
+  {
+    "id": "project-11",
+    "name": "Virtual Art Gallery",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "description": "A platform to showcase and explore digital art collections.",
+    "favorite": true,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "owner" },
+      { "id": "user-2", "role": "editor" },
+      { "id": "user-3", "role": "team" },
+      { "id": "user-4", "role": "reader" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-14T08:00:00Z"
+  },
+  {
+    "id": "project-12",
+    "name": "Music Collaboration Hub",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "description": "A tool for musicians to create and collaborate on music tracks.",
+    "favorite": false,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-5", "role": "owner" },
+      { "id": "user-6", "role": "admin" },
+      { "id": "user-7", "role": "team" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-13T14:30:00Z"
+  },
+  {
+    "id": "project-13",
+    "name": "Online Book Club",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "description": "A platform for book lovers to discuss and recommend books.",
+    "favorite": true,
+    "members": [
+      { "id": "user-8", "role": "owner" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
+      { "id": "user-9", "role": "editor" },
+      { "id": "user-10", "role": "reader" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-12T10:15:00Z"
+  },
+  {
+    "id": "project-14",
+    "name": "Eco-Friendly Living",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "description": "A project to promote sustainable and eco-friendly lifestyles.",
+    "favorite": false,
+    "members": [
+      { "id": "user-11", "role": "owner" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-12", "role": "admin" },
+      { "id": "user-13", "role": "team" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-11T16:45:00Z"
+  },
+  {
+    "id": "project-15",
+    "name": "Health and Wellness Tracker",
+    "avatar": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
+    "description": "An app to monitor health goals and track wellness progress.",
+    "favorite": true,
+    "members": [
+      { "id": "user-14", "role": "owner" },
+      { "id": "user-15", "role": "team" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "admin" },
+      { "id": "user-16", "role": "reader" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-10T08:30:00Z"
+  },
+  {
+    "id": "project-16",
+    "name": "Language Learning Platform",
+    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+    "description": "An interactive platform for learning new languages with peers.",
+    "favorite": false,
+    "members": [
+      { "id": "user-17", "role": "owner" },
+      { "id": "user-18", "role": "team" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-19", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-09T09:00:00Z"
+  },
+  {
+    "id": "project-17",
+    "name": "Photography Portfolio",
+    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+    "description": "A web-based tool for photographers to showcase their work.",
+    "favorite": true,
+    "members": [
+      { "id": "user-20", "role": "owner" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
+      { "id": "user-2", "role": "reader" },
+      { "id": "user-3", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-08T12:00:00Z"
+  },
+  {
+    "id": "project-18",
+    "name": "Game Development Kit",
+    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+    "description": "A toolkit for indie developers to create and publish games.",
+    "favorite": false,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "owner" },
+      { "id": "user-5", "role": "team" },
+      { "id": "user-6", "role": "reader" },
+      { "id": "user-7", "role": "admin" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-07T11:45:00Z"
+  },
+  {
+    "id": "project-19",
+    "name": "Educational Video Series",
+    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+    "description": "A platform for creating and sharing educational video lessons.",
+    "favorite": true,
+    "members": [
+      { "id": "user-8", "role": "owner" },
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
+      { "id": "user-9", "role": "team" },
+      { "id": "user-10", "role": "editor" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-06T15:30:00Z"
+  },
+  {
+    "id": "project-20",
+    "name": "Remote Work Toolkit",
+    "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    "description": "A comprehensive toolkit for managing remote teams effectively.",
+    "favorite": false,
+    "members": [
+      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
+      { "id": "user-11", "role": "owner" },
+      { "id": "user-12", "role": "admin" },
+      { "id": "user-13", "role": "reader" }
+    ],
+    "boards": [],
+    "lastChange": "2025-04-05T18:00:00Z"
+  }
+]
