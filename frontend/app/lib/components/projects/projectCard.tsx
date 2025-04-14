@@ -69,7 +69,12 @@ export default function ProjectCard(project: Project) {
             name={project.name.toUpperCase()}
             src={project.avatar}
           />
-          <h1 className="max-w-40 truncate text-nowrap font-medium transition-colors duration-300 hover:text-f_accent">
+          <h1
+            className={clsx(
+              'truncate text-nowrap font-medium transition-colors duration-300 hover:text-f_accent',
+              !isExpanded && 'max-w-40',
+            )}
+          >
             <a /*TODO: link to this project page*/ href={'/'}>{project.name}</a>
           </h1>
         </div>

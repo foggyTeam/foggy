@@ -14,6 +14,7 @@ import ContentActionBar, {
   ActionBarProps,
 } from '@/app/lib/components/contentActionBar';
 import clsx from 'clsx';
+import userStore from '@/app/stores/userStore';
 
 interface ContentSectionProps {
   sectionTitle: string;
@@ -41,7 +42,28 @@ export default function ContentSection({
   openSettings,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [filters, setFilters] = useState([] as FilterObject[]);
+  const [filters, setFilters] = useState([
+    {
+      field: 'nickname',
+      referenceValue: 'creative_guru',
+    },
+    {
+      field: 'name',
+      referenceValue: 'Design Sprint',
+    },
+    {
+      field: 'team',
+      referenceValue: 'design_wizard',
+    },
+    {
+      field: 'role',
+      referenceValue: 'owner',
+    },
+    {
+      field: 'lastChange',
+      referenceValue: '2025-04-14T12:00:00Z',
+    },
+  ] as FilterObject[]);
   const [favorite, setFavorite] = useState(false);
   const [withNotification, setWithNotification] = useState(false);
 
@@ -51,6 +73,7 @@ export default function ContentSection({
     filters,
     favorite,
     withNotification,
+    userStore.user?.id as string,
   );
 
   const openProjectFilters = () => {
