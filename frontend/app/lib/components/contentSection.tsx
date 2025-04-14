@@ -13,6 +13,7 @@ import { Avatar } from '@heroui/avatar';
 import ContentActionBar, {
   ActionBarProps,
 } from '@/app/lib/components/contentActionBar';
+import clsx from 'clsx';
 
 interface ContentSectionProps {
   sectionTitle: string;
@@ -82,7 +83,7 @@ export default function ContentSection({
   }, [favorite, filters, withNotification]);
 
   return (
-    <div className="flex h-full w-full flex-col gap-4 text-sm">
+    <div className="flex h-full w-full flex-col gap-4 overflow-clip text-sm">
       <div className="flex flex-col gap-1">
         <div className="flex h-10 items-center justify-start gap-2">
           {sectionAvatar?.length && <Avatar size="md" src={sectionAvatar} />}
@@ -91,11 +92,27 @@ export default function ContentSection({
 
         <ContentActionBar {...actionBarProps} />
       </div>
-      <div>
-        {filteredData.map((element) => (
-          <DataCard key={element.id} {...element} />
-        ))}
+
+      <div
+        className={clsx(
+          'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
+          'scrollbar-thin scrollbar-thumb-default-300 scrollbar-track-white/20',
+          'scrollbar-thumb-rounded-full scrollbar-track-rounded-full',
+        )}
+      >
+        <div
+          className="grid-rows-auto grid content-between gap-y-2 pb-16"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, 146px)',
+          }}
+        >
+          {filteredData.map((element) => (
+            <DataCard key={element.id} {...element} />
+          ))}
+        </div>
       </div>
+
+      <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
     </div>
   );
 }
