@@ -57,7 +57,7 @@ export default function ContentActionBar({
             }}
             endContent={<SearchIcon className="stroke-default-500" />}
           />
-          {openFilters !== undefined && (
+          {setFilters !== undefined && (
             <Button
               onPress={openFilters}
               isIconOnly
@@ -142,7 +142,7 @@ export default function ContentActionBar({
           )}
         </div>
       </div>
-      {openFilters !== undefined && filters.length > 0 && (
+      {setFilters !== undefined && (
         <AllFilters filters={filters} setFilters={setFilters} />
       )}
     </div>

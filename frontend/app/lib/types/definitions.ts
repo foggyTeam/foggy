@@ -102,9 +102,8 @@ export class Project {
   lastChange: string = '';
 }
 
-export type ProjectRole = TeamRole & {
-  team;
-};
+export type ProjectRole = TeamRole & 'team';
+
 class Member {
   id: string;
   nickname: string;
@@ -122,18 +121,16 @@ export class Team {
   members: TeamMember[] = [];
   projects: Project[] = [];
 }
-export type TeamRole = {
-  owner;
-  admin;
-  editor;
-  reader;
-};
+export type TeamRole = 'owner' | 'admin' | 'editor' | 'reader';
+
 export class TeamMember extends Member {
   role: TeamRole;
 }
 
 // FILTERS
-export class FilterObject {
-  field: 'nickname' | 'name' | 'team' | 'role' | 'lastChange';
-  referenceValue: string;
+export class FilterSet {
+  nickname: Set<string> = new Set();
+  team: Set<string> = new Set();
+  role: Set<ProjectRole> = new Set();
+  lastChange: string = '';
 }

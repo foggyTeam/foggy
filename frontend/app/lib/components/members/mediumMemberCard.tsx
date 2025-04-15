@@ -1,12 +1,12 @@
 import { Avatar } from '@heroui/avatar';
 import React from 'react';
-import { ProjectMember } from '@/app/lib/types/definitions';
+import { ProjectMember, TeamMember } from '@/app/lib/types/definitions';
 import RoleCard from '@/app/lib/components/roleCard';
 import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
 
-export default function ProjectMemberCard(member: ProjectMember) {
+export default function MediumMemberCard(member: ProjectMember | TeamMember) {
   return (
     <Button
       onPress={() => console.log('navigate to member')}

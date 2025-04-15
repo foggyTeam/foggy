@@ -1,7 +1,7 @@
 import settingsStore from '@/app/stores/settingsStore';
 
 export default function GetDateTime(date: string) {
-  const inputDate = new Date(date); // Преобразуем строку в объект Date
+  const inputDate = new Date(date);
   const now = new Date();
 
   const startOfToday = new Date(

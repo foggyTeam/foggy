@@ -70,6 +70,22 @@
     }
   },
 
+  "filters": {
+    "menuHeader": "Фильтры",
+    "byMember": {
+      "label": "Имя пользователя участника",
+      "placeholder": "Где участвует..."
+    },
+    "byTeam": {
+      "label": "Название команды участника",
+      "placeholder": "Где участвует команда..."
+    },
+    "byRole": {
+      "label": "Моя роль",
+      "placeholder": "Где я..."
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",

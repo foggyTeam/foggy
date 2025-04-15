@@ -1,4 +1,3 @@
-import { FilterObject } from '@/app/lib/types/definitions';
 import {
   CalendarDaysIcon,
   KeyRoundIcon,
@@ -10,10 +9,12 @@ import { info, primary, secondary, success, warning } from '@/tailwind.config';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 
 export default function FilterCard({
-  filter,
+  filterKey,
+  filterValue,
   removeFilter,
 }: {
-  filter: FilterObject;
+  filterKey: string;
+  filterValue: string;
   removeFilter: any;
 }) {
   const colorMap = {
@@ -23,30 +24,33 @@ export default function FilterCard({
     role: warning.DEFAULT,
     default: success.DEFAULT,
   };
-  const cardColor = colorMap[filter.field] || colorMap.default;
+  const cardColor = colorMap[filterKey] || colorMap.default;
 
   return (
     <div
       style={{ borderColor: cardColor }}
       className="flex h-7 w-fit items-center justify-between gap-1 rounded-full border-1.5 px-2"
     >
-      {filter.field === 'lastChange' && (
+      {filterKey === 'lastChange' && (
         <CalendarDaysIcon stroke={cardColor} className="h-4" />
       )}
-      {filter.field === 'nickname' && (
+      {filterKey === 'nickname' && (
         <UserRoundIcon stroke={cardColor} className="h-4" />
       )}
-      {filter.field === 'role' && (
+      {filterKey === 'role' && (
         <KeyRoundIcon stroke={cardColor} className="h-4" />
       )}
       <p style={{ color: cardColor }} className="text-xs">
-        {filter.field === 'lastChange'
-          ? GetDateTime(filter.referenceValue)
-          : filter.referenceValue}
+        {filterKey === 'lastChange'
+          ? filterValue
+              .split('_')
+              .map((date) => GetDateTime(date))
+              .join(' - ')
+          : filterValue}
       </p>
 
       <Button
-        onPress={() => removeFilter(filter.referenceValue)}
+        onPress={() => removeFilter(filterKey, filterValue)}
         isIconOnly
         className="h-6 w-6 min-w-6"
         variant="light"
