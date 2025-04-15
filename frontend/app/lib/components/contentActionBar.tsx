@@ -11,10 +11,11 @@ import {
 import { Button } from '@heroui/button';
 import FunnelIcon from '@/app/lib/components/svg/funnelIcon';
 import AllFilters from '@/app/lib/components/filters/allFilters';
+import { FilterSet } from '@/app/lib/types/definitions';
 
 export interface ActionBarProps {
   setSearchValue: any;
-  filters?: any;
+  filters?: FilterSet;
   setFilters?: any;
   openFilters?: any;
   favorite?: any;
@@ -39,6 +40,14 @@ export default function ContentActionBar({
   addMember,
   openSettings,
 }: ActionBarProps) {
+  const hasFilters = () => {
+    return [
+      filters?.role?.size,
+      filters?.team?.size,
+      filters?.nickname?.size,
+      filters?.lastChange?.length,
+    ].some((size) => size as boolean);
+  };
   return (
     <div className="flex h-fit w-full flex-col gap-2">
       <div className="flex h-fit w-full items-center justify-between gap-2">
@@ -61,14 +70,14 @@ export default function ContentActionBar({
             <Button
               onPress={openFilters}
               isIconOnly
-              variant={filters.length ? 'flat' : 'light'}
-              color={filters.length ? 'primary' : 'default'}
+              variant={hasFilters() ? 'flat' : 'light'}
+              color={hasFilters() ? 'primary' : 'default'}
               size="sm"
               radius="lg"
             >
               <FunnelIcon
                 className={
-                  filters.length ? 'stroke-primary-500' : 'stroke-default-300'
+                  hasFilters() ? 'stroke-primary-500' : 'stroke-default-300'
                 }
               />
             </Button>
