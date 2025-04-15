@@ -7,7 +7,7 @@ import { Button } from '@heroui/button';
 import React, { useEffect, useRef, useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
 import clsx from 'clsx';
-import ProjectMemberCard from '@/app/lib/components/projects/projectMemberCard';
+import MediumMemberCard from '@/app/lib/components/members/mediumMemberCard';
 import {
   el_animation,
   project_tile,
@@ -122,7 +122,7 @@ export default function ProjectCard(project: Project) {
               .sort(byRole)
               .slice(0, 7)
               .map((member) => (
-                <ProjectMemberCard key={member.id} {...member} />
+                <MediumMemberCard key={member.id} {...member} />
               ))}
             {project.members.length > 7 && (
               <Button

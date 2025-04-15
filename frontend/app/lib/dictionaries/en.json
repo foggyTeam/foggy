@@ -70,6 +70,22 @@
     }
   },
 
+  "filters": {
+    "menuHeader": "Filters",
+    "byMember": {
+      "label": "Member nickname",
+      "placeholder": "Has member..."
+    },
+    "byTeam": {
+      "label": "Team name",
+      "placeholder": "Has team..."
+    },
+    "byRole": {
+      "label": "My role",
+      "placeholder": "Where I am..."
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "PROJECTS",

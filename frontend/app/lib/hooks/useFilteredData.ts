@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { checkFilters } from '@/app/lib/components/filters/filterMenu';
+import CheckFilters from '@/app/lib/utils/checkFilters';
 
 const useFilteredData = (
   data: any[],
@@ -24,12 +24,12 @@ const useFilteredData = (
 
       return (
         searchValueIn &&
-        checkFilters(filters, value, userId) &&
+        CheckFilters(filters, value, userId) &&
         (favorite ? (value.favorite as boolean) : true) &&
         hasUnreadNotifications === withNotification
       );
     });
-  }, [data, searchValue, filters, favorite, withNotification]);
+  }, [data, searchValue, JSON.stringify(filters), favorite, withNotification]);
 };
 
 export default useFilteredData;
