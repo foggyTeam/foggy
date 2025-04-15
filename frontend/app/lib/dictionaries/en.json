@@ -83,6 +83,10 @@
     "byRole": {
       "label": "My role",
       "placeholder": "Where I am a..."
+    },
+    "byLastChange": {
+      "label": "Last change",
+      "placeholder": "Updated at..."
     }
   },
 

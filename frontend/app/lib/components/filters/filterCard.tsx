@@ -29,7 +29,7 @@ export default function FilterCard({
   return (
     <div
       style={{ borderColor: cardColor }}
-      className="flex h-7 w-fit items-center justify-between gap-1 rounded-full border-1.5 px-2"
+      className="flex h-7 w-fit items-center justify-between gap-1 rounded-full border-1.5 px-2 transition-background hover:bg-primary/10"
     >
       {filterKey === 'lastChange' && (
         <CalendarDaysIcon stroke={cardColor} className="h-4" />
@@ -40,11 +40,11 @@ export default function FilterCard({
       {filterKey === 'role' && (
         <KeyRoundIcon stroke={cardColor} className="h-4" />
       )}
-      <p style={{ color: cardColor }} className="text-xs">
+      <p style={{ color: cardColor }} className="cursor-default text-xs">
         {filterKey === 'lastChange'
           ? filterValue
               .split('_')
-              .map((date) => GetDateTime(date))
+              .map((date) => GetDateTime(date).split(',')[0])
               .join(' - ')
           : filterValue}
       </p>

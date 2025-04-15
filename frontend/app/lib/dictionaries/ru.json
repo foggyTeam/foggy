@@ -83,6 +83,10 @@
     "byRole": {
       "label": "Моя роль",
       "placeholder": "Где я..."
+    },
+    "byLastChange": {
+      "label": "Последнее изменение",
+      "placeholder": "Изменено..."
     }
   },
 

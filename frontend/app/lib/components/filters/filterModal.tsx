@@ -7,7 +7,7 @@ import {
   TeamRole,
 } from '@/app/lib/types/definitions';
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/modal';
-import { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import { Select, SelectItem } from '@heroui/select';
@@ -15,6 +15,16 @@ import { useDebouncedCallback } from 'use-debounce';
 import RoleCard from '@/app/lib/components/roleCard';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import { DateRangePicker } from '@heroui/date-picker';
+import {
+  CalendarDate,
+  getLocalTimeZone,
+  parseAbsoluteToLocal,
+  today,
+  ZonedDateTime,
+} from '@internationalized/date';
+import { Button } from '@heroui/react';
+import { X } from 'lucide-react';
 
 export default function FilterModal({
   data,
@@ -38,9 +48,11 @@ export default function FilterModal({
   const [membersList, setMembersList] = useState<Array<ProjectMember>>();
   const [teamsList, setTeamsList] = useState<Array<Team>>();
   const [rolesList, setRolesList] = useState<Array<TeamRole>>();
+  const [maxDate, setMaxDate] = useState<CalendarDate>();
+
   const [lastUpdated, setLastUpdated] = useState<{
-    start: string;
-    end: string;
+    start: ZonedDateTime;
+    end: ZonedDateTime;
   }>();
 
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -82,12 +94,13 @@ export default function FilterModal({
     }
     // lastChange
     if (data[0].lastChange) {
+      setMaxDate(today(getLocalTimeZone()));
       if (filters.lastChange) {
         const [periodStart, periodEnd] = filters.lastChange.split('_');
-        setLastUpdated({ start: periodStart, end: periodEnd });
-      } else {
-        const today = new Date().toISOString();
-        setLastUpdated({ start: today, end: today });
+        setLastUpdated({
+          start: parseAbsoluteToLocal(periodStart),
+          end: parseAbsoluteToLocal(periodEnd),
+        });
       }
     }
   }, [data]);
@@ -105,9 +118,19 @@ export default function FilterModal({
     debouncedUpdateFilters(newFilters);
   }, [selectedMembers, selectedTeams, selectedRoles]);
 
+  useEffect(() => {
+    const newFilters: FilterSet = { ...filters };
+    const newPeriod = [lastUpdated?.start, lastUpdated?.end].map((date) =>
+      date?.toDate().toISOString(),
+    );
+    newFilters.lastChange = newPeriod[0] ? newPeriod.join('_') : '';
+
+    debouncedUpdateFilters(newFilters);
+  }, [lastUpdated]);
+
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-      <ModalContent className="flex w-fit gap-2 p-6">
+      <ModalContent className="flex w-fit max-w-2xl gap-2 p-6">
         {(onClose) =>
           (
             <>
@@ -115,91 +138,128 @@ export default function FilterModal({
                 {settingsStore.t.filters.menuHeader}
               </ModalHeader>
 
-              <ModalBody className="flex h-fit w-fit flex-row gap-4 p-0">
-                <div className="flex w-fit flex-col gap-2">
-                  {membersList?.length > 0 && (
-                    <Select
-                      radius="md"
-                      className="w-72"
-                      classNames={{
-                        popoverContent: clsx(
-                          bg_container_no_padding,
-                          'p-2 sm:p-3 bg-opacity-100',
-                        ),
-                      }}
-                      selectedKeys={selectedMembers}
-                      onSelectionChange={setSelectedMembers}
-                      selectionMode="multiple"
-                      label={settingsStore.t.filters.byMember.label}
-                      placeholder={settingsStore.t.filters.byMember.placeholder}
-                    >
-                      {membersList.map(
-                        (member) =>
-                          (
-                            <SelectItem
-                              key={member.nickname}
-                              textValue={member.nickname}
-                            >
-                              <SmallMemberCard {...member} />
-                            </SelectItem>
-                          ) as any,
-                      )}
-                    </Select>
-                  )}
-                  {teamsList?.length > 0 && (
-                    <Select
-                      radius="md"
-                      className="w-72"
-                      classNames={{
-                        popoverContent: clsx(
-                          bg_container_no_padding,
-                          'p-2 sm:p-3 bg-opacity-100',
-                        ),
-                      }}
-                      selectedKeys={selectedTeams}
-                      onSelectionChange={setSelectedTeams}
-                      selectionMode="multiple"
-                      label={settingsStore.t.filters.byTeam.label}
-                      placeholder={settingsStore.t.filters.byTeam.placeholder}
-                    >
-                      {teamsList.map(
-                        (team) =>
-                          (
-                            <SelectItem key={team.name} textValue={team.name}>
-                              <SmallMemberCard {...team} />
-                            </SelectItem>
-                          ) as any,
-                      )}
-                    </Select>
-                  )}
-                  {rolesList?.length > 0 && (
-                    <Select
-                      radius="md"
-                      className="w-72"
-                      classNames={{
-                        popoverContent: clsx(
-                          bg_container_no_padding,
-                          'p-2 sm:p-3 bg-opacity-100',
-                        ),
-                      }}
-                      selectedKeys={selectedRoles}
-                      onSelectionChange={setSelectedRoles}
-                      selectionMode="multiple"
-                      label={settingsStore.t.filters.byRole.label}
-                      placeholder={settingsStore.t.filters.byRole.placeholder}
-                    >
-                      {rolesList.map(
-                        (role) =>
-                          (
-                            <SelectItem key={role} textValue={role}>
-                              <RoleCard role={role} />
-                            </SelectItem>
-                          ) as any,
-                      )}
-                    </Select>
-                  )}
-                </div>
-                {lastUpdated && <div>Dates</div>}
+              <ModalBody className="flex h-fit max-h-40 w-fit max-w-2xl flex-col flex-wrap gap-2 p-0">
+                {membersList?.length > 0 && (
+                  <Select
+                    radius="md"
+                    className="w-72"
+                    classNames={{
+                      popoverContent: clsx(
+                        bg_container_no_padding,
+                        'p-2 sm:p-3 bg-opacity-100',
+                      ),
+                    }}
+                    selectedKeys={selectedMembers}
+                    onSelectionChange={setSelectedMembers}
+                    selectionMode="multiple"
+                    label={settingsStore.t.filters.byMember.label}
+                    placeholder={settingsStore.t.filters.byMember.placeholder}
+                  >
+                    {membersList.map(
+                      (member) =>
+                        (
+                          <SelectItem
+                            key={member.nickname}
+                            textValue={member.nickname}
+                          >
+                            <SmallMemberCard {...member} />
+                          </SelectItem>
+                        ) as any,
+                    )}
+                  </Select>
+                )}
+                {teamsList?.length > 0 && (
+                  <Select
+                    radius="md"
+                    className="w-72"
+                    classNames={{
+                      popoverContent: clsx(
+                        bg_container_no_padding,
+                        'p-2 sm:p-3 bg-opacity-100',
+                      ),
+                    }}
+                    selectedKeys={selectedTeams}
+                    onSelectionChange={setSelectedTeams}
+                    selectionMode="multiple"
+                    label={settingsStore.t.filters.byTeam.label}
+                    placeholder={settingsStore.t.filters.byTeam.placeholder}
+                  >
+                    {teamsList.map(
+                      (team) =>
+                        (
+                          <SelectItem key={team.name} textValue={team.name}>
+                            <SmallMemberCard {...team} />
+                          </SelectItem>
+                        ) as any,
+                    )}
+                  </Select>
+                )}
+                {rolesList?.length > 0 && (
+                  <Select
+                    radius="md"
+                    className="w-72"
+                    classNames={{
+                      popoverContent: clsx(
+                        bg_container_no_padding,
+                        'p-2 sm:p-3 bg-opacity-100',
+                      ),
+                    }}
+                    selectedKeys={selectedRoles}
+                    onSelectionChange={setSelectedRoles}
+                    selectionMode="multiple"
+                    label={settingsStore.t.filters.byRole.label}
+                    placeholder={settingsStore.t.filters.byRole.placeholder}
+                    renderValue={(items) => {
+                      return (
+                        <div className="flex gap-1 overflow-hidden">
+                          {items.map((item) => (
+                            <RoleCard key={item.key} role={item.key} />
+                          ))}
+                        </div>
+                      );
+                    }}
+                  >
+                    {rolesList.map(
+                      (role) =>
+                        (
+                          <SelectItem key={role} textValue={role}>
+                            <RoleCard role={role} />
+                          </SelectItem>
+                        ) as any,
+                    )}
+                  </Select>
+                )}
+
+                {maxDate && (
+                  <DateRangePicker
+                    value={lastUpdated}
+                    onChange={setLastUpdated}
+                    maxValue={maxDate}
+                    label={settingsStore.t.filters.byLastChange.label}
+                    selectorButtonPlacement="start"
+                    endContent={
+                      lastUpdated?.start && (
+                        <Button
+                          isIconOnly
+                          variant="light"
+                          className="h-fit w-fit min-w-fit"
+                          onClick={() =>
+                            setLastUpdated({ start: undefined, end: undefined })
+                          }
+                        >
+                          <X className="stroke-default-400" />
+                        </Button>
+                      )
+                    }
+                    className="w-72"
+                    classNames={{
+                      label: 'text-xs',
+                    }}
+                    hideTimeZone
+                    granularity="day"
+                    aria-label="Last change"
+                  />
+                )}
               </ModalBody>
             </>
           ) as ReactNode
