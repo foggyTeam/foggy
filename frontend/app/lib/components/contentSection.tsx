@@ -16,7 +16,7 @@ import ContentActionBar, {
 import clsx from 'clsx';
 import userStore from '@/app/stores/userStore';
 import { useDisclosure } from '@heroui/modal';
-import FilterMenu from '@/app/lib/components/filters/filterMenu';
+import FilterModal from '@/app/lib/components/filters/filterModal';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
 
 interface ContentSectionProps {
@@ -128,7 +128,7 @@ export default function ContentSection({
         <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
       </div>
       {isFiltersOpen && (
-        <FilterMenu
+        <FilterModal
           data={data}
           filters={filters}
           setFilters={setFilters}

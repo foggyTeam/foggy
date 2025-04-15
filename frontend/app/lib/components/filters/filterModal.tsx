@@ -12,8 +12,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import { Select, SelectItem } from '@heroui/select';
 import { useDebouncedCallback } from 'use-debounce';
+import RoleCard from '@/app/lib/components/roleCard';
+import clsx from 'clsx';
+import { bg_container_no_padding } from '@/app/lib/types/styles';
 
-export default function FilterMenu({
+export default function FilterModal({
   data,
   filters,
   setFilters,
@@ -104,19 +107,26 @@ export default function FilterMenu({
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-      <ModalContent className="flex w-fit gap-2 p-2 sm:p-3">
+      <ModalContent className="flex w-fit gap-2 p-6">
         {(onClose) =>
           (
             <>
-              <ModalHeader className="flex">
+              <ModalHeader className="flex p-0">
                 {settingsStore.t.filters.menuHeader}
               </ModalHeader>
 
-              <ModalBody className="flex h-fit w-fit flex-row gap-4">
-                <div className="flex w-fit flex-col gap-1">
+              <ModalBody className="flex h-fit w-fit flex-row gap-4 p-0">
+                <div className="flex w-fit flex-col gap-2">
                   {membersList?.length > 0 && (
                     <Select
+                      radius="md"
                       className="w-72"
+                      classNames={{
+                        popoverContent: clsx(
+                          bg_container_no_padding,
+                          'p-2 sm:p-3 bg-opacity-100',
+                        ),
+                      }}
                       selectedKeys={selectedMembers}
                       onSelectionChange={setSelectedMembers}
                       selectionMode="multiple"
@@ -136,8 +146,58 @@ export default function FilterMenu({
                       )}
                     </Select>
                   )}
-                  {teamsList?.length > 0 && <p>Teams</p>}
-                  {rolesList?.length > 0 && <p>Roles</p>}
+                  {teamsList?.length > 0 && (
+                    <Select
+                      radius="md"
+                      className="w-72"
+                      classNames={{
+                        popoverContent: clsx(
+                          bg_container_no_padding,
+                          'p-2 sm:p-3 bg-opacity-100',
+                        ),
+                      }}
+                      selectedKeys={selectedTeams}
+                      onSelectionChange={setSelectedTeams}
+                      selectionMode="multiple"
+                      label={settingsStore.t.filters.byTeam.label}
+                      placeholder={settingsStore.t.filters.byTeam.placeholder}
+                    >
+                      {teamsList.map(
+                        (team) =>
+                          (
+                            <SelectItem key={team.name} textValue={team.name}>
+                              <SmallMemberCard {...team} />
+                            </SelectItem>
+                          ) as any,
+                      )}
+                    </Select>
+                  )}
+                  {rolesList?.length > 0 && (
+                    <Select
+                      radius="md"
+                      className="w-72"
+                      classNames={{
+                        popoverContent: clsx(
+                          bg_container_no_padding,
+                          'p-2 sm:p-3 bg-opacity-100',
+                        ),
+                      }}
+                      selectedKeys={selectedRoles}
+                      onSelectionChange={setSelectedRoles}
+                      selectionMode="multiple"
+                      label={settingsStore.t.filters.byRole.label}
+                      placeholder={settingsStore.t.filters.byRole.placeholder}
+                    >
+                      {rolesList.map(
+                        (role) =>
+                          (
+                            <SelectItem key={role} textValue={role}>
+                              <RoleCard role={role} />
+                            </SelectItem>
+                          ) as any,
+                      )}
+                    </Select>
+                  )}
                 </div>
                 {lastUpdated && <div>Dates</div>}
               </ModalBody>
