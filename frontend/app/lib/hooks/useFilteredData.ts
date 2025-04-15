@@ -29,7 +29,7 @@ const useFilteredData = (
         hasUnreadNotifications === withNotification
       );
     });
-  }, [data, searchValue, JSON.stringify(filters), favorite, withNotification]);
+  }, [data, searchValue, filters, favorite, withNotification]);
 };
 
 export default useFilteredData;
