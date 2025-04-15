@@ -17,13 +17,12 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { DateRangePicker } from '@heroui/date-picker';
 import {
-  CalendarDate,
   getLocalTimeZone,
   parseAbsoluteToLocal,
   today,
   ZonedDateTime,
 } from '@internationalized/date';
-import { Button } from '@heroui/react';
+import { Button } from '@heroui/button';
 import { X } from 'lucide-react';
 
 export default function FilterModal({
@@ -48,7 +47,7 @@ export default function FilterModal({
   const [membersList, setMembersList] = useState<Array<ProjectMember>>();
   const [teamsList, setTeamsList] = useState<Array<Team>>();
   const [rolesList, setRolesList] = useState<Array<TeamRole>>();
-  const [maxDate, setMaxDate] = useState<CalendarDate>();
+  const [maxDate, setMaxDate] = useState<ZonedDateTime>();
 
   const [lastUpdated, setLastUpdated] = useState<{
     start: ZonedDateTime;
