@@ -59,47 +59,49 @@ export default function FilterModal({
   const [selectedRoles, setSelectedRoles] = useState([]);
 
   useEffect(() => {
-    // nickname || team
-    if (data[0].members) {
-      const allMembers: Map<string, ProjectMember> = new Map();
-      const allTeams: Map<string, Team> = new Map();
-      const alreadySelectedMembers: Map<string, string> = new Map();
-      const alreadySelectedTeams: Map<string, string> = new Map();
+    if (data.length) {
+      // nickname || team
+      if (data[0]?.members) {
+        const allMembers: Map<string, ProjectMember> = new Map();
+        const allTeams: Map<string, Team> = new Map();
+        const alreadySelectedMembers: Map<string, string> = new Map();
+        const alreadySelectedTeams: Map<string, string> = new Map();
 
-      data.map((element) => {
-        element.members.map((member) => {
-          if (member.nickname) {
-            allMembers.set(member.id, member);
-            if (filters.nickname.has(member.nickname))
-              alreadySelectedMembers.set(member.id, member.nickname);
-          }
-          if (member.name) {
-            allTeams.set(member.id, member);
-            if (filters.team.has(member.name))
-              alreadySelectedTeams.set(member.id, member.name);
-          }
+        data.map((element) => {
+          element.members?.map((member) => {
+            if (member.nickname) {
+              allMembers.set(member.id, member);
+              if (filters.nickname.has(member.nickname))
+                alreadySelectedMembers.set(member.id, member.nickname);
+            }
+            if (member.name) {
+              allTeams.set(member.id, member);
+              if (filters.team.has(member.name))
+                alreadySelectedTeams.set(member.id, member.name);
+            }
+          });
         });
-      });
 
-      setMembersList(Array.from(allMembers.values()));
-      setTeamsList(Array.from(allTeams.values()));
-      setSelectedMembers(Array.from(alreadySelectedMembers.values()));
-      setSelectedTeams(Array.from(alreadySelectedTeams.values()));
-    }
-    // role
-    if (data[0].members || data[0].nickname) {
-      setRolesList(Array.from(teamRoles));
-      setSelectedRoles(Array.from(filters.role));
-    }
-    // lastChange
-    if (data[0].lastChange) {
-      setMaxDate(today(getLocalTimeZone()));
-      if (filters.lastChange) {
-        const [periodStart, periodEnd] = filters.lastChange.split('_');
-        setLastUpdated({
-          start: parseAbsoluteToLocal(periodStart),
-          end: parseAbsoluteToLocal(periodEnd),
-        });
+        setMembersList(Array.from(allMembers.values()));
+        setTeamsList(Array.from(allTeams.values()));
+        setSelectedMembers(Array.from(alreadySelectedMembers.values()));
+        setSelectedTeams(Array.from(alreadySelectedTeams.values()));
+      }
+      // role
+      if (data[0]?.members || data[0]?.nickname) {
+        setRolesList(Array.from(teamRoles));
+        setSelectedRoles(Array.from(filters.role));
+      }
+      // lastChange
+      if (data[0]?.lastChange) {
+        setMaxDate(today(getLocalTimeZone()));
+        if (filters.lastChange) {
+          const [periodStart, periodEnd] = filters.lastChange.split('_');
+          setLastUpdated({
+            start: parseAbsoluteToLocal(periodStart),
+            end: parseAbsoluteToLocal(periodEnd),
+          });
+        }
       }
     }
   }, [data]);

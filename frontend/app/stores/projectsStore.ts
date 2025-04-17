@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import {
-  Board,
+  BoardType,
   BoardElement,
   Project,
   TextElement,
@@ -10,8 +10,8 @@ import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 const MAX_LAYER = 2;
 
 class ProjectsStore {
-  activeBoard: Board | undefined = undefined;
-  activeProject: Project | undefined = new Project();
+  activeBoard: BoardType | undefined = undefined;
+  activeProject: Project | undefined = undefined;
   allProjects: Project[] = [];
 
   constructor() {
@@ -138,7 +138,7 @@ class ProjectsStore {
     return currentIndex;
   };
 
-  setActiveBoard = (board: Board) => {
+  setActiveBoard = (board: BoardType) => {
     if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
   };
@@ -148,10 +148,11 @@ class ProjectsStore {
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
   };
-  addBoard = (newBoard: Board) => {
+  addBoard = (newBoard: BoardType) => {
     this.activeProject?.boards.push(newBoard);
   };
   addProject = (newProject: Project) => {
+    // TODO: make a post request and receive a project id
     this.allProjects.push(newProject);
   };
   updateProject = (id: string, newAttrs: Partial<Project>) => {

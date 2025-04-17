@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
+import { BoardType, BoardTypes, Project } from '@/app/lib/types/definitions';
 import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
 
 const RecentBar = observer(() => {
@@ -110,7 +110,7 @@ const RecentBar = observer(() => {
                 },
               ],
               lastChange: Date.now().toString(),
-            } as Board);
+            } as BoardType);
             projectsStore.addBoard({
               projectId: 'lufglglyg1',
               section: 'test section',
@@ -118,7 +118,7 @@ const RecentBar = observer(() => {
               name: `file ${i}`,
               type: BoardTypes.GRAPH,
               lastChange: Date.now().toString(),
-            } as Board);
+            } as BoardType);
             projectsStore.addBoard({
               projectId: 'lufglglyg1',
               section: 'test section',
@@ -126,7 +126,7 @@ const RecentBar = observer(() => {
               name: `file ${i}`,
               type: BoardTypes.TREE,
               lastChange: Date.now().toString(),
-            } as Board);
+            } as BoardType);
           }
         }}
         isIconOnly
