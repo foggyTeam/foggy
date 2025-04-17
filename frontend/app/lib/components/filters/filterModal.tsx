@@ -24,26 +24,28 @@ import {
 } from '@internationalized/date';
 import { Button } from '@heroui/button';
 import { X } from 'lucide-react';
+import { FilterReducerActionPayload } from '@/app/lib/components/contentSection';
+
+const teamRoles: Set<TeamRole> = new Set([
+  'owner',
+  'admin',
+  'editor',
+  'reader',
+]);
 
 export default function FilterModal({
   data,
   filters,
-  setFilters,
+  dispatchFilters,
   isOpen,
   onOpenChange,
 }: {
   data: Project[] | Team[] | TeamMember[] | ProjectMember[]; // | Notification[];
   filters: FilterSet;
-  setFilters: any;
+  dispatchFilters: any;
   isOpen: any;
   onOpenChange: any;
 }) {
-  const teamRoles: Set<TeamRole> = new Set([
-    'owner',
-    'admin',
-    'editor',
-    'reader',
-  ]);
   const [membersList, setMembersList] = useState<Array<ProjectMember>>();
   const [teamsList, setTeamsList] = useState<Array<Team>>();
   const [rolesList, setRolesList] = useState<Array<TeamRole>>();
@@ -52,7 +54,7 @@ export default function FilterModal({
   const [lastUpdated, setLastUpdated] = useState<{
     start: ZonedDateTime;
     end: ZonedDateTime;
-  }>();
+  }>({ start: undefined, end: undefined });
 
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([]);
@@ -104,30 +106,39 @@ export default function FilterModal({
         }
       }
     }
-  }, [data]);
+  }, [data, filters]);
 
   const debouncedUpdateFilters = useDebouncedCallback(
-    (newFilters: FilterSet) => setFilters(newFilters),
+    (payload: FilterReducerActionPayload[]) =>
+      dispatchFilters({
+        type: 'SET',
+        payload: payload,
+      }),
     300,
   );
-  useEffect(() => {
-    const newFilters: FilterSet = { ...filters };
-    newFilters.nickname = new Set(selectedMembers);
-    newFilters.team = new Set(selectedTeams);
-    newFilters.role = new Set(selectedRoles);
-
-    debouncedUpdateFilters(newFilters);
-  }, [selectedMembers, selectedTeams, selectedRoles]);
 
   useEffect(() => {
-    const newFilters: FilterSet = { ...filters };
     const newPeriod = [lastUpdated?.start, lastUpdated?.end].map((date) =>
       date?.toDate().toISOString(),
     );
-    newFilters.lastChange = newPeriod[0] ? newPeriod.join('_') : '';
+    const filtersToUpdate: FilterReducerActionPayload[] = [
+      { key: 'nickname', value: new Set(selectedMembers) },
+      { key: 'team', value: new Set(selectedTeams) },
+      { key: 'role', value: new Set(selectedRoles) },
+      {
+        key: 'lastChange',
+        value: newPeriod[0] ? newPeriod.join('_') : '',
+      },
+    ];
 
-    debouncedUpdateFilters(newFilters);
-  }, [lastUpdated]);
+    debouncedUpdateFilters(filtersToUpdate);
+  }, [
+    selectedMembers,
+    selectedTeams,
+    selectedRoles,
+    lastUpdated,
+    debouncedUpdateFilters,
+  ]);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>

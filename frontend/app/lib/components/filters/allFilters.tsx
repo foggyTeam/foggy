@@ -24,16 +24,17 @@ const renderLastChangeCard = (filters, removeFilter) => {
   );
 };
 
-export default function AllFilters({ filters, setFilters }) {
+export default function AllFilters({ filters, dispatchFilters }) {
   const removeFilter = (key, value) => {
-    const newFilters = { ...filters };
-    if (key !== 'lastChange') {
-      newFilters[key] = new Set(newFilters[key]);
-      newFilters[key].delete(value);
-    } else {
-      newFilters.lastChange = '';
-    }
-    setFilters(newFilters);
+    dispatchFilters({
+      type: 'DELETE',
+      payload: [
+        {
+          key: key,
+          value: key === 'lastChange' ? value : new Set([value]),
+        },
+      ],
+    });
   };
 
   return (
