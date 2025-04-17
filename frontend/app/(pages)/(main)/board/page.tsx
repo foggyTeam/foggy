@@ -2,7 +2,11 @@ import RecentBar from '@/app/lib/components/menu/projectBar/recentBar';
 import BoardStage from '@/app/lib/components/board/boardStage';
 import Cursors from '@/app/lib/components/board/cursors';
 import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
-import { Board, BoardElement, BoardTypes } from '@/app/lib/types/definitions';
+import {
+  BoardElement,
+  BoardType,
+  BoardTypes,
+} from '@/app/lib/types/definitions';
 import { info, primary, secondary } from '@/tailwind.config';
 
 const testBoardLayers = [
@@ -41,7 +45,7 @@ const testBoardLayers = [
       strokeWidth: 8,
       opacity: 0.5,
     },
-  ],
+  ] as BoardElement[],
   [
     {
       id: 'ellipse1',
@@ -53,19 +57,19 @@ const testBoardLayers = [
       fill: info.DEFAULT,
       width: 100,
       height: 150,
-    },
-  ],
-  [],
+    } as BoardElement,
+  ] as BoardElement[],
+  [] as BoardElement[],
 ];
-const testBoard = {
+const testBoard: BoardType = {
   projectId: 'kjgvkhb11',
   section: 'test section',
   id: 'ljkhgblkjb11',
   name: 'test board',
   type: BoardTypes.SIMPLE,
   layers: testBoardLayers as BoardElement[][],
-  lastChange: Date.now(),
-} as Board;
+  lastChange: new Date().toISOString(),
+};
 
 export default function Board() {
   // по-хорошему тут запросить данные доски с бэка

@@ -80,26 +80,59 @@ export interface MarkerElement extends BaseElement {
   opacity: number;
 }
 
-export class Board {
+export class BoardType {
   projectId: string;
   section: string;
   id: string;
   name: string;
   type: BoardTypes = BoardTypes.SIMPLE;
-  layers: BoardElement[][] = [[], [], [], [], []];
+  layers: BoardElement[][] = [[], [], []];
   lastChange: string;
 }
 
 // PROJECT
 export class Project {
+  constructor(params: {
+    id: string;
+    name?: string;
+    creator: Partial<ProjectMember>;
+    avatar?: string;
+    description?: string;
+    settings?: ProjectSettings;
+    lastChange?: string;
+  }) {
+    if (params?.id) this.id = params.id;
+    if (params?.creator)
+      this.members = [
+        {
+          role: 'owner',
+          id: params.creator.id,
+          nickname: params.creator.nickname,
+          avatar: params.creator.avatar,
+        } as ProjectMember,
+      ];
+    if (params?.name) this.name = params.name;
+    if (params?.avatar) this.avatar = params.avatar;
+    if (params?.description) this.description = params.description;
+    if (params?.settings) this.settings = params.settings;
+    if (params?.lastChange) this.lastChange = params.lastChange;
+  }
+
   id: string = '';
   name: string = 'unknown';
   avatar: string = '';
   description: string = '';
+  settings: ProjectSettings = new ProjectSettings();
   favorite: boolean = false;
   members: ProjectMember[] = [];
-  boards: Board[] = [];
-  lastChange: string = '';
+  boards: BoardType[] = [];
+  lastChange: string = new Date().toISOString();
+}
+
+export class ProjectSettings {
+  allowRequests: boolean = true;
+  isPublic: boolean = false;
+  memberListIsPublic: boolean = true;
 }
 
 export type ProjectRole = TeamRole & 'team';

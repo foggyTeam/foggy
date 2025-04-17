@@ -27,7 +27,16 @@
     },
     "about": {
       "maxLength": "About must be no more than 140 characters long",
-      "invalidSymbols": "About may contain only latin letters, digits and special symbols"
+      "invalidSymbols": "About may contain only letters, digits and special symbols"
+    },
+    "projectName": {
+      "required": "Project name is required",
+      "maxLength": "Project name must be no more than 20 characters long",
+      "invalidSymbols": "Project name may contain only letters, digits and special symbols"
+    },
+    "projectDescription": {
+      "maxLength": "Description must be no more than 300 characters long",
+      "invalidSymbols": "Description may contain only letters, digits and special symbols"
     }
   },
 
@@ -68,6 +77,30 @@
       "reader": "reader",
       "team": "team"
     }
+  },
+
+  "projects": {
+    "projectSettings": {
+      "name": "Project name",
+      "description": "Project description",
+      "uploadAvatarHint": "Upload new project avatar",
+      "allowRequests": "Allow requests to the project",
+      "isPublic": "Project is public",
+      "memberListIsPublic": "Member list is public",
+      "leaveButton": "Leave the project",
+      "deleteButton": "Delete project",
+      "saveButton": "Save",
+      "createButton": "Create project"
+    },
+    "deleteProject": {
+      "modalHeader": "Do you really want to delete your project?",
+      "modalDescription": "Deleting your project will result in the irreversible loss of all project data, including sections and boards. After deletion data recovery will be impossible.",
+      "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
+    },
+    "projectMembers": "PARTICIPANTS",
+    "projectSections": "SECTIONS",
+    "addSection": "ADD SECTION"
   },
 
   "filters": {
