@@ -16,7 +16,7 @@ import { FilterSet } from '@/app/lib/types/definitions';
 export interface ActionBarProps {
   setSearchValue: any;
   filters?: FilterSet;
-  setFilters?: any;
+  dispatchFilters?: any;
   openFilters?: any;
   favorite?: any;
   setFavorite?: any;
@@ -30,7 +30,7 @@ export interface ActionBarProps {
 export default function ContentActionBar({
   setSearchValue,
   filters,
-  setFilters,
+  dispatchFilters,
   openFilters,
   favorite,
   setFavorite,
@@ -66,7 +66,7 @@ export default function ContentActionBar({
             }}
             endContent={<SearchIcon className="stroke-default-500" />}
           />
-          {setFilters !== undefined && (
+          {dispatchFilters !== undefined && (
             <Button
               onPress={openFilters}
               isIconOnly
@@ -151,8 +151,8 @@ export default function ContentActionBar({
           )}
         </div>
       </div>
-      {setFilters !== undefined && (
-        <AllFilters filters={filters} setFilters={setFilters} />
+      {dispatchFilters !== undefined && (
+        <AllFilters filters={filters} dispatchFilters={dispatchFilters} />
       )}
     </div>
   );

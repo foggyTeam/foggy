@@ -4,10 +4,11 @@ import {
   FilterSet,
   Project,
   ProjectMember,
+  ProjectRole,
   Team,
   TeamMember,
 } from '@/app/lib/types/definitions';
-import { ComponentType, useMemo, useState } from 'react';
+import { ComponentType, useMemo, useReducer, useState } from 'react';
 
 import { Avatar } from '@heroui/avatar';
 import ContentActionBar, {
@@ -32,6 +33,40 @@ interface ContentSectionProps {
   openSettings?: any;
 }
 
+export type FilterReducerActionPayload = {
+  key: 'nickname' | 'team' | 'role' | 'lastChange';
+  value: Set<string & ProjectRole> | string;
+};
+type FilterReducerAction =
+  | { type: 'SET'; payload: FilterReducerActionPayload[] }
+  | { type: 'DELETE'; payload: FilterReducerActionPayload[] }
+  | { type: 'RESET' };
+
+function filtersReducer(state, action: FilterReducerAction) {
+  const newFilters: FilterSet = { ...state };
+  switch (action.type) {
+    case 'SET':
+      action.payload.forEach((payload) => {
+        newFilters[payload.key] = payload.value;
+      });
+      return newFilters;
+    case 'DELETE':
+      action.payload.forEach((payload) => {
+        if (payload.key !== 'lastChange')
+          payload.value.forEach((value) =>
+            newFilters[payload.key].delete(value),
+          );
+        else newFilters[payload.key] = '';
+      });
+      return newFilters;
+    case 'RESET':
+      return new FilterSet();
+    default:
+      console.error('An error while setting filters. Resetting');
+      return new FilterSet();
+  }
+}
+
 export default function ContentSection({
   sectionTitle,
   sectionAvatar,
@@ -45,7 +80,10 @@ export default function ContentSection({
   openSettings,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
-  const [filters, setFilters] = useState(new FilterSet());
+  const [filters, dispatchFilters] = useReducer(
+    filtersReducer,
+    new FilterSet(),
+  );
   const [favorite, setFavorite] = useState(false);
   const [withNotification, setWithNotification] = useState(false);
   const {
@@ -73,7 +111,7 @@ export default function ContentSection({
 
     if (filter) {
       props.openFilters = onFiltersOpen;
-      props.setFilters = setFilters;
+      props.dispatchFilters = dispatchFilters;
     }
     if (onlyFavorite) props.setFavorite = setFavorite;
 
@@ -81,8 +119,13 @@ export default function ContentSection({
 
     return props;
   }, [
+    setSearchValue,
+    addNew,
+    addMember,
+    openSettings,
+    filter,
     onFiltersOpen,
-    setFilters,
+    dispatchFilters,
     onlyFavorite,
     setFavorite,
     onlyWithNotification,
@@ -128,13 +171,15 @@ export default function ContentSection({
         <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
       </div>
 
-      <FilterModal
-        data={data}
-        filters={filters}
-        setFilters={setFilters}
-        isOpen={isFiltersOpen}
-        onOpenChange={onFiltersOpenChange}
-      />
+      {isFiltersOpen && (
+        <FilterModal
+          data={data}
+          filters={filters}
+          dispatchFilters={dispatchFilters}
+          isOpen={isFiltersOpen}
+          onOpenChange={onFiltersOpenChange}
+        />
+      )}
     </>
   );
 }

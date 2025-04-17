@@ -50,9 +50,8 @@ const ProjectSettingsModal = observer(
         setCheckboxes(projectsStore.activeProject.settings);
       } else if (!isNewProject) {
         console.error('No active project!');
-        onOpenChange(false);
       }
-    }, []);
+    }, [isNewProject]);
 
     useEffect(() => {
       IsFormValid({ name, description }, projectFormSchema, setErrors);
