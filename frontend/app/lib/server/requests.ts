@@ -5,12 +5,17 @@ const apiUri = process.env.NEXT_PUBLIC_API_URI;
 const verificationKey = process.env.VERIFICATION_KEY;
 
 // fetcher accepts relative request's url.
-export const getRequest: any = async (url: string) =>
+export const getRequest: any = async (
+  url: string,
+  options: AxiosRequestConfig = {},
+) =>
   axios
     .get(`${apiUri}/${url}`, {
       headers: {
         'x-api-key': `${verificationKey}`,
+        ...options.headers,
       },
+      ...options,
     } as AxiosRequestConfig)
     .then((response) => {
       return response.data;
