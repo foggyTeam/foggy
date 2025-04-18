@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FoggyLarge from '@/app/lib/components/svg/foggyLarge';
 
-const Login = () => {
+const LoginPage = () => {
   return (
     <>
       <div className="flex h-screen w-screen items-center justify-center">
@@ -54,4 +54,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;

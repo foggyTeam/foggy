@@ -7,7 +7,19 @@ import userStore from '@/app/stores/userStore';
 
 export default function Cursors() {
   const [cursors, setCursors] = useState<{
-    [key: string]: { x: number; y: number; nickname: string; color: string };
+    [key: string]: {
+      x: number;
+      y: number;
+      nickname: string;
+      color:
+        | 'default'
+        | 'danger'
+        | 'primary'
+        | 'secondary'
+        | 'success'
+        | 'warning'
+        | undefined;
+    };
   }>({});
   const colors = ['primary', 'secondary', 'warning', 'success', 'danger'];
   const userColor = colors[Math.floor(Math.random() * colors.length)];
@@ -48,7 +60,14 @@ export default function Cursors() {
         nickname: string;
         x: number;
         y: number;
-        color: string;
+        color:
+          | 'default'
+          | 'danger'
+          | 'primary'
+          | 'secondary'
+          | 'success'
+          | 'warning'
+          | undefined;
       }) => {
         setCursors((prev) => ({
           ...prev,

@@ -1,6 +1,14 @@
 import { Tooltip } from '@heroui/tooltip';
 
-export default function FTooltip({ content, children }) {
+export default function FTooltip({
+  content,
+  children,
+  placement,
+}: {
+  content: string;
+  children: any;
+  placement?: any;
+}) {
   return (
     <Tooltip
       showArrow
@@ -11,6 +19,7 @@ export default function FTooltip({ content, children }) {
       size="sm"
       content={content}
       delay={600}
+      placement={placement}
     >
       {children}
     </Tooltip>

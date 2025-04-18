@@ -9,6 +9,7 @@ import {
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
 
 export default function RectTool({
   activeTool,
@@ -16,7 +17,7 @@ export default function RectTool({
   stageRef,
   addElement,
   updateElement,
-}) {
+}: ToolProps) {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 

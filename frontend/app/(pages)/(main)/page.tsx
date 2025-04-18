@@ -19,7 +19,7 @@ import AllProjects from '@/app/lib/components/projects/allProjects';
 import AllTeams from '@/app/lib/components/teams/allTeams';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 
-async function getUserProjects() {
+async function getUserProjects(): Promise<Project[] | undefined> {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
 
@@ -29,27 +29,19 @@ async function getUserProjects() {
 
   try {
     return new Promise((resolve) => {
-      const allUsers: ProjectMember[] = users;
+      const allUsers: any[] = users;
       setTimeout(
         () =>
           resolve(
-            (projects as Project[]).map((project) => {
+            projects.map((project) => {
               return {
                 ...project,
-                members: allUsers
-                  .filter(
-                    (user) =>
-                      project.members.findIndex(
-                        (member) => member.id === user.id,
-                      ) > -1,
-                  )
-                  .map((member) => {
-                    return {
-                      ...member,
-                      role: project.members.find((m) => m.id === member.id)
-                        .role,
-                    };
-                  }),
+                members: project.members.map((member) => {
+                  return {
+                    ...member,
+                    ...allUsers.find((user) => user.id === member.id),
+                  } as ProjectMember;
+                }),
               } as Project;
             }),
           ),
@@ -62,7 +54,7 @@ async function getUserProjects() {
     return undefined;
   }
 }
-async function getUserTeams() {
+async function getUserTeams(): Promise<Team[] | undefined> {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
 
@@ -71,28 +63,21 @@ async function getUserTeams() {
   }
 
   try {
-    const allUsers: TeamMember[] = users;
+    const allUsers: any[] = users;
 
     return new Promise((resolve) => {
       setTimeout(
         () =>
           resolve(
-            (teams as Team[]).map((team) => {
+            teams.map((team) => {
               return {
                 ...team,
-                members: allUsers
-                  .filter(
-                    (user) =>
-                      team.members.findIndex(
-                        (member) => member.id === user.id,
-                      ) > -1,
-                  )
-                  .map((member) => {
-                    return {
-                      ...member,
-                      role: team.members.find((m) => m.id === member.id).role,
-                    };
-                  }),
+                members: team.members.map((member) => {
+                  return {
+                    ...member,
+                    ...allUsers.find((user) => user.id === member.id),
+                  } as TeamMember;
+                }),
               } as Team;
             }),
           ),
@@ -106,7 +91,7 @@ async function getUserTeams() {
   }
 }
 
-export default async function Main() {
+export default async function MainPage() {
   const userProjects = await getUserProjects();
   const userTeams = await getUserTeams();
 

@@ -17,14 +17,14 @@ export default function FilterCard({
   filterValue: string;
   removeFilter: any;
 }) {
-  const colorMap = {
+  const colorMap: any = {
     lastChange: secondary.DEFAULT,
     nickname: info.DEFAULT,
     name: primary.DEFAULT,
     role: warning.DEFAULT,
     default: success.DEFAULT,
   };
-  const cardColor = colorMap[filterKey] || colorMap.default;
+  const cardColor: any = colorMap[filterKey] || colorMap.default;
 
   return (
     <div

@@ -1,7 +1,7 @@
 import { Layer } from 'react-konva';
 import { useEffect, useState } from 'react';
 
-const createGridPattern = (gridSize) => {
+const createGridPattern = (gridSize: number) => {
   const size = gridSize;
   return `
     <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
@@ -10,7 +10,15 @@ const createGridPattern = (gridSize) => {
   `;
 };
 
-export default function GridLayer({ stageRef, scale, gridSize }) {
+export default function GridLayer({
+  stageRef,
+  scale,
+  gridSize,
+}: {
+  stageRef: any;
+  scale: number;
+  gridSize: number;
+}) {
   const [pattern, setPattern] = useState(null);
 
   useEffect(() => {

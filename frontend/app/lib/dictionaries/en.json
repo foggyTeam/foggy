@@ -10,6 +10,7 @@
   },
   "validationErrors": {
     "nickname": {
+      "required": "Nickname is required",
       "maxLength": "Nickname must be no more than 14 characters long",
       "invalidSymbols": "Nickname may contain only latin letters, digits and special symbols \".@_\""
     },

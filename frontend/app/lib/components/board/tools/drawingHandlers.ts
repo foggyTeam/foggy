@@ -8,6 +8,7 @@ interface DrawingHandlersProps {
   setActiveTool: (tool: string) => void;
   addElement: (element: BoardElement) => void;
   updateElement: (id: string, newAttrs: Partial<BoardElement>) => void;
+  drawing?: boolean;
   setDrawing: (drawing: boolean) => void;
   setNewElement: (element: BoardElement | null) => void;
   newElement: BoardElement | null;
@@ -26,7 +27,7 @@ export interface TextEdit {
 const DEFAULT_FILL = primary['200'];
 const DEFAULT_STROKE = primary['300'];
 
-const getRelativePointerPosition = (stage) => {
+const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
   transform.invert();
   const pos = transform.point(stage.getPointerPosition());
@@ -38,7 +39,7 @@ const getRelativePointerPosition = (stage) => {
   };
 };
 
-const getRelativeElementPosition = (stage, element) => {
+const getRelativeElementPosition = (stage: any, element: any) => {
   const stagePosition = stage.getPosition();
   const x = element.x + stagePosition.x;
   const y = element.y + stagePosition.y;
@@ -131,7 +132,7 @@ export const handlePlaceText =
     setClickPosition,
     textHeight,
     setTextHeight,
-  }) =>
+  }: any) =>
   async (e: any) => {
     if (isEditing) {
       const { x, y } = clickPosition.stagePosition;
@@ -180,7 +181,7 @@ export const handleEditText = ({
   setContent,
   textEditing,
   setTextEditing,
-}) => {
+}: any) => {
   if (target.parent) {
     const stage = stageRef.current.getStage();
     const element: TextElement = target.attrs;
@@ -221,7 +222,7 @@ const hideTextElement = (
   id: string,
   width: number,
   height: number,
-  updateElement,
+  updateElement: any,
 ) => {
   const svg = HtmlToSvg('', width, height);
 

@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { BoardType } from '@/app/lib/types/definitions';
+import { Board } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 
-const BoardLoader = ({ boardData }: { boardData: BoardType }) => {
+const BoardLoader = ({ boardData }: { boardData: Board | undefined }) => {
   useEffect(() => {
     if (boardData) {
       projectsStore.setActiveBoard(boardData);

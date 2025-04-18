@@ -4,7 +4,6 @@ import {
   FilterSet,
   Project,
   ProjectMember,
-  ProjectRole,
   Team,
   TeamMember,
 } from '@/app/lib/types/definitions';
@@ -34,35 +33,40 @@ interface ContentSectionProps {
 }
 
 export type FilterReducerActionPayload = {
-  key: 'nickname' | 'team' | 'role' | 'lastChange';
-  value: Set<string & ProjectRole> | string;
+  key: keyof FilterSet;
+  value: FilterSet[keyof FilterSet];
 };
 type FilterReducerAction =
   | { type: 'SET'; payload: FilterReducerActionPayload[] }
   | { type: 'DELETE'; payload: FilterReducerActionPayload[] }
   | { type: 'RESET' };
 
-function filtersReducer(state, action: FilterReducerAction) {
+function filtersReducer(state: FilterSet, action: FilterReducerAction) {
   const newFilters: FilterSet = { ...state };
+
   switch (action.type) {
     case 'SET':
       action.payload.forEach((payload) => {
-        newFilters[payload.key] = payload.value;
+        if (payload.key === 'lastChange') {
+          newFilters.lastChange = payload.value as any;
+        } else newFilters[payload.key] = payload.value as any;
       });
       return newFilters;
+
     case 'DELETE':
       action.payload.forEach((payload) => {
-        if (payload.key !== 'lastChange')
-          payload.value.forEach((value) =>
-            newFilters[payload.key].delete(value),
+        if (payload.key !== 'lastChange') {
+          const valuesToDelete = payload.value as Set<any>;
+          valuesToDelete.forEach((value) =>
+            (newFilters[payload.key] as Set<any>).delete(value),
           );
-        else newFilters[payload.key] = '';
+        } else newFilters.lastChange = '';
       });
       return newFilters;
     case 'RESET':
       return new FilterSet();
     default:
-      console.error('An error while setting filters. Resetting');
+      console.error('An error occurred while setting filters. Resetting...');
       return new FilterSet();
   }
 }

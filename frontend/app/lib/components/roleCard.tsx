@@ -6,14 +6,14 @@ export default function RoleCard({
 }: {
   role: ProjectRole | TeamRole | string;
 }) {
-  const colorMap = {
+  const colorMap: any = {
     owner: info.DEFAULT,
     admin: danger.DEFAULT,
     editor: success.DEFAULT,
     reader: warning.DEFAULT,
     default: secondary.DEFAULT,
   };
-  const cardColor = colorMap[role] || colorMap.default;
+  const cardColor: string = colorMap[role] || colorMap.default;
 
   return (
     <div

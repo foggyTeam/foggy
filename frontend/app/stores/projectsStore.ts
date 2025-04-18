@@ -1,6 +1,6 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import {
-  BoardType,
+  Board,
   BoardElement,
   Project,
   TextElement,
@@ -10,7 +10,7 @@ import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 const MAX_LAYER = 2;
 
 class ProjectsStore {
-  activeBoard: BoardType | undefined = undefined;
+  activeBoard: Board | undefined = undefined;
   activeProject: Project | undefined = undefined;
   allProjects: Project[] = [];
 
@@ -33,13 +33,13 @@ class ProjectsStore {
   }
 
   addElement = (newElement: BoardElement) => {
-    if (this.activeBoard)
+    if (this.activeBoard?.layers)
       this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
         newElement,
       );
   };
   updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
-    if (this.activeBoard) {
+    if (this.activeBoard?.layers) {
       this.activeBoard.layers = this.activeBoard.layers.map(
         (layer: BoardElement[]) =>
           layer.map((element) => {
@@ -55,7 +55,7 @@ class ProjectsStore {
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
   ): { layer: number; index: number } => {
-    if (this.activeBoard) {
+    if (this.activeBoard?.layers) {
       let elementToMove: BoardElement | null = null;
       let currentLayerIndex: number = -1;
 
@@ -115,11 +115,11 @@ class ProjectsStore {
             };
         }
       }
-      return { layer: -1, index: -1 };
     }
+    return { layer: -1, index: -1 };
   };
   removeElement = (id: string) => {
-    if (this.activeBoard)
+    if (this.activeBoard?.layers)
       this.activeBoard.layers = this.activeBoard.layers.map((layer) =>
         layer.filter((element) => element.id !== id),
       );
@@ -127,29 +127,33 @@ class ProjectsStore {
   getElementLayer = (id: string): { layer: number; index: number } => {
     const currentIndex = { layer: -1, index: -1 };
 
-    this.activeBoard?.layers.map((layer, layerIndex) => {
-      const index = layer.findIndex((element) => element.id === id);
-      if (index !== -1) {
-        currentIndex.layer = layerIndex;
-        currentIndex.index = index;
-      }
-    });
+    if (this.activeBoard?.layers)
+      this.activeBoard?.layers.map((layer, layerIndex) => {
+        const index = layer.findIndex((element) => element.id === id);
+        if (index !== -1) {
+          currentIndex.layer = layerIndex;
+          currentIndex.index = index;
+        }
+      });
 
     return currentIndex;
   };
 
-  setActiveBoard = (board: BoardType) => {
+  setActiveBoard = (board: Board) => {
     if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
   };
   setActiveProject = (id: string) => {
-    this.activeProject = this.allProjects.find((project) => project.id == id);
+    this.activeProject = this.allProjects?.find((project) => project.id == id);
   };
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
   };
-  addBoard = (newBoard: BoardType) => {
-    this.activeProject?.boards.push(newBoard);
+  addBoard = (newBoard: Board) => {
+    if (this.activeProject) {
+      if (!this.activeProject.boards) this.activeProject.boards = [];
+      this.activeProject.boards.push(newBoard);
+    }
   };
   addProject = (newProject: Project) => {
     // TODO: make a post request and receive a project id

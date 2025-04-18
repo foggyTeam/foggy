@@ -10,11 +10,17 @@ export default function SmallMemberCard(
       <Avatar
         size="sm"
         className="p-0"
-        name={member.nickname || member.name}
+        name={
+          ('nickname' in member && member.nickname) ||
+          ('name' in member && member.name) ||
+          ''
+        }
         src={member.avatar}
       />
       <p className="text-small font-bold text-default-700">
-        {member.nickname || member.name}
+        {('nickname' in member && member.nickname) ||
+          ('name' in member && member.name) ||
+          ''}
       </p>
     </div>
   );

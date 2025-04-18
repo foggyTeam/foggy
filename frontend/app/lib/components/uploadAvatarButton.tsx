@@ -21,23 +21,14 @@ export default function UploadAvatarButton({
     avatar?: string;
   };
 }) {
-  const imageInputRef = useRef(null);
+  const imageInputRef = useRef<any>(null);
 
   const handleClick = () => {
-    imageInputRef.current.click();
+    imageInputRef.current?.click();
   };
 
   return (
-    <FTooltip
-      content={tooltipContent}
-      classNames={{
-        base: 'before:shadow-container',
-        content: 'shadow-container',
-      }}
-      size="sm"
-      placement="right"
-      delay={600}
-    >
+    <FTooltip content={tooltipContent} placement="right">
       <Button
         onPress={handleClick}
         variant="bordered"
@@ -59,7 +50,7 @@ export default function UploadAvatarButton({
         <input
           type="file"
           accept="image/*"
-          ref={imageInputRef as any}
+          ref={imageInputRef}
           onChange={handleImageUpload}
           style={{ display: 'none' }}
         />

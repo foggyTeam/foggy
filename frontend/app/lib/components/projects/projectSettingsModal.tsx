@@ -46,8 +46,10 @@ const ProjectSettingsModal = observer(
     useEffect(() => {
       if (!isNewProject && projectsStore.activeProject) {
         setName(projectsStore.activeProject.name);
-        setDescription(projectsStore.activeProject.description);
-        setCheckboxes(projectsStore.activeProject.settings);
+        setDescription(projectsStore.activeProject.description || '');
+        setCheckboxes(
+          projectsStore.activeProject.settings || new ProjectSettings(),
+        );
       } else if (!isNewProject) {
         console.error('No active project!');
       }
@@ -57,9 +59,9 @@ const ProjectSettingsModal = observer(
       IsFormValid({ name, description }, projectFormSchema, setErrors);
     }, [name, description, setErrors]);
 
-    const handleImageUpload = async (event) => {
+    const handleImageUpload = async (event: any) => {
       const resizedImageURL = await HandleImageUpload(event);
-      setAvatar(resizedImageURL);
+      if (resizedImageURL) setAvatar(resizedImageURL);
     };
 
     const deleteProject = () => {

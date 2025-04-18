@@ -1,0 +1,66 @@
+{
+  "projectId": "project-1",
+  "section": "test section",
+  "id": "ljkhgblkjb11",
+  "name": "test board",
+  "type": "SIMPLE",
+  "layers": [
+    [
+      {
+        "id": "rect1",
+        "type": "rect",
+        "draggable": true,
+        "dragDistance": 4,
+        "x": 100,
+        "y": 100,
+        "rotation": 0,
+        "fill": "#C2B7CE",
+        "width": 200,
+        "height": 100,
+        "cornerRadius": 0
+      },
+      {
+        "id": "line1",
+        "type": "line",
+        "draggable": true,
+        "dragDistance": 4,
+        "x": 50,
+        "y": 50,
+        "rotation": 0,
+        "stroke": "#AA99B9",
+        "points": [0, 0, 100, 100],
+        "strokeWidth": 2,
+        "width": 2
+      },
+      {
+        "id": "marker1",
+        "type": "marker",
+        "draggable": true,
+        "dragDistance": 4,
+        "x": 150,
+        "y": 150,
+        "rotation": 0,
+        "stroke": "#9781A6",
+        "points": [0, 0, 50, 50, 100, 0],
+        "strokeWidth": 8,
+        "opacity": 0.5
+      }
+    ],
+    [
+      {
+        "id": "ellipse1",
+        "type": "ellipse",
+        "draggable": true,
+        "dragDistance": 4,
+        "x": 400,
+        "y": 150,
+        "rotation": 0,
+        "fill": "#8EA3C2",
+        "width": 100,
+        "height": 150
+      }
+    ],
+    []
+  ],
+  "lastChange": "2025-04-17T16:36:24.000Z"
+}

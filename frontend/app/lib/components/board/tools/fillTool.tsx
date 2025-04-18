@@ -10,8 +10,9 @@ import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
 
-export default function FillTool({ element, updateElement }) {
+export default function FillTool({ element, updateElement }: ElementToolProps) {
   const [fillColor, changeColor] = useState(primary.DEFAULT);
 
   useEffect(() => {

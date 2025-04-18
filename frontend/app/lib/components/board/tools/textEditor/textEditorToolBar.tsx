@@ -1,4 +1,4 @@
-import React, { JSX } from 'react';
+import React from 'react';
 import {
   AlignCenterIcon,
   AlignJustifyIcon,
@@ -31,15 +31,15 @@ import { to_rgb } from '@/tailwind.config';
 import EditorToolDropdown from '@/app/lib/components/board/tools/textEditor/editorToolDropdown';
 
 interface EditorTool {
-  id?: string;
+  id: string;
   value: string | boolean | number;
-  ToolIcon: JSX.Element;
+  ToolIcon: React.ComponentType<any>;
 }
 
 interface EditorDropdown {
   id: string;
-  options: EditorTool[];
-  defaultIcon: JSX.Element;
+  options: Omit<EditorTool, 'id'>[];
+  defaultIcon: React.ComponentType<any>;
 }
 
 export default function TextEditorToolBar({
@@ -48,7 +48,7 @@ export default function TextEditorToolBar({
   quillRef,
   saveSelection,
   restoreSelection,
-}) {
+}: any) {
   const defaultLink = '/';
   const defaultColor = `rgba(${to_rgb('#171717')}, 1)`;
   const defaultBackground = '';
@@ -102,10 +102,13 @@ export default function TextEditorToolBar({
         defaultIcon: AlignCenterIcon,
       },
     ] as EditorDropdown[],
-    clear: { id: 'clear', ToolIcon: RemoveFormattingIcon as JSX.Element },
+    clear: {
+      id: 'clear',
+      ToolIcon: RemoveFormattingIcon as React.ComponentType<any>,
+    },
   };
 
-  function handleClick(clickType, value) {
+  function handleClick(clickType: string, value: string) {
     if (quillRef.current) {
       // получим и обновим данные о выделенном фрагменте из Quill
       const quill = quillRef.current as Quill;
@@ -133,7 +136,7 @@ export default function TextEditorToolBar({
     <div
       className={clsx(
         bg_container_no_padding,
-        'flex h-14 w-fit justify-start gap-1 p-2 sm:p-3',
+        'flex h-14 w-fit max-w-[27rem] justify-start gap-1 p-2 sm:p-3',
       )}
     >
       {tools.base.map((tool, index) => {
@@ -144,7 +147,6 @@ export default function TextEditorToolBar({
             handleClick={handleClick}
             Icon={tool.ToolIcon}
             isAccent={selectionFormat[tool.id] === tool.value}
-            index={index}
             key={`${tool.id}${index}`}
           />
         );
