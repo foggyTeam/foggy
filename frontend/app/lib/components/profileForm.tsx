@@ -49,7 +49,7 @@ const ProfileForm = observer((userData: ProfileData) => {
     IsFormValid({ nickname, email, about }, profileFormSchema, setErrors);
   }, [nickname, email, about]);
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = (event: any) => {
     const resizedImageURL = HandleImageUpload(event);
   };
 
@@ -77,7 +77,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         },
       };
 
-      await updateUserData(userStore.user?.id, updatedData)
+      await updateUserData(userStore.user?.id as string, updatedData)
         .then((result) => {
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
@@ -96,7 +96,7 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   const deleteAccount = async () => {
-    await deleteUserById(userStore.user?.id).then((result) => {
+    await deleteUserById(userStore.user?.id as string).then((result) => {
       if (
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
       ) {

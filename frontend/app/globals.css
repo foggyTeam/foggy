@@ -3,19 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: rgba(255, 255, 255, 0);
-  --foreground: #171717;
+  --background: #fafafa;
+  --foreground: #18181b;
 }
 
-@media {
-  :root {
-    --background: rgba(10, 10, 10, 0);
-    --foreground: #ededed;
-  }
+html.dark {
+  --background: #18181b;
+  --foreground: #fafafa;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
   font-family: Montserrat, sans-serif;
 }

@@ -2,7 +2,7 @@ import z, { ZodObject } from 'zod';
 
 export default function IsFormValid(
   data: any,
-  schema: ZodObject<object>,
+  schema: ZodObject<any>,
   setErrors: any,
 ) {
   try {

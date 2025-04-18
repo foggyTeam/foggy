@@ -3,11 +3,15 @@ import { useEffect } from 'react';
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
 
-export default function UseBoardZoom(stageRef, scale, setScale) {
+export default function UseBoardZoom(
+  stageRef: any,
+  scale: number,
+  setScale: any,
+) {
   useEffect(() => {
     const stage = stageRef.current;
     if (stage) {
-      const handleWheel = (e) => {
+      const handleWheel = (e: any) => {
         e.evt.preventDefault();
 
         if (Math.floor(e.evt.deltaY as number) !== (e.evt.deltaY as number)) {

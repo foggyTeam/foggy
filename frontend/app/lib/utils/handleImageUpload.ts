@@ -46,7 +46,7 @@ function handleImageUpload(image: File, minSize: number): Promise<Blob> {
   });
 }
 
-export default async function HandleImageUpload(event, minSize = 288) {
+export default async function HandleImageUpload(event: any, minSize = 288) {
   const image = event.target.files[0];
   if (image) {
     if (!image.type.startsWith('image/')) {

@@ -14,8 +14,9 @@ import { NumberInput } from '@heroui/number-input';
 import settingsStore from '@/app/stores/settingsStore';
 import { BoardElement } from '@/app/lib/types/definitions';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
 
-export default function SizeTool({ element, updateElement }) {
+export default function SizeTool({ element, updateElement }: ElementToolProps) {
   const [width, setWidth] = useState(undefined as any);
   const [height, setHeight] = useState(undefined as any);
   const [cornerRadius, setCornerRadius] = useState(0);

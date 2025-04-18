@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import CheckFilters from '@/app/lib/utils/checkFilters';
+import { FilterSet } from '@/app/lib/types/definitions';
 
 const useFilteredData = (
   data: any[],
   searchValue: string,
-  filters,
+  filters: FilterSet,
   favorite: boolean,
   withNotification: boolean,
   userId: string,

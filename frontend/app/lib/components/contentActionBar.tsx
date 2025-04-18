@@ -46,7 +46,7 @@ export default function ContentActionBar({
       filters?.team?.size,
       filters?.nickname?.size,
       filters?.lastChange?.length,
-    ].some((size) => size as boolean);
+    ].some((size) => !!size);
   };
   return (
     <div className="flex h-fit w-full flex-col gap-2">

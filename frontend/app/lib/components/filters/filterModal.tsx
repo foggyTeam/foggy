@@ -18,8 +18,8 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { DateRangePicker } from '@heroui/date-picker';
 import {
   getLocalTimeZone,
+  now,
   parseAbsoluteToLocal,
-  today,
   ZonedDateTime,
 } from '@internationalized/date';
 import { Button } from '@heroui/button';
@@ -54,34 +54,38 @@ export default function FilterModal({
   const [lastUpdated, setLastUpdated] = useState<{
     start: ZonedDateTime;
     end: ZonedDateTime;
-  }>({ start: undefined, end: undefined });
+  } | null>(null);
 
-  const [selectedMembers, setSelectedMembers] = useState([]);
-  const [selectedTeams, setSelectedTeams] = useState([]);
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<TeamRole[]>([]);
 
   useEffect(() => {
     if (data.length) {
       // nickname || team
-      if (data[0]?.members) {
+      if ('members' in data[0]) {
         const allMembers: Map<string, ProjectMember> = new Map();
         const allTeams: Map<string, Team> = new Map();
         const alreadySelectedMembers: Map<string, string> = new Map();
         const alreadySelectedTeams: Map<string, string> = new Map();
 
-        data.map((element) => {
-          element.members?.map((member) => {
-            if (member.nickname) {
-              allMembers.set(member.id, member);
-              if (filters.nickname.has(member.nickname))
-                alreadySelectedMembers.set(member.id, member.nickname);
-            }
-            if (member.name) {
-              allTeams.set(member.id, member);
-              if (filters.team.has(member.name))
-                alreadySelectedTeams.set(member.id, member.name);
-            }
-          });
+        data.forEach((element) => {
+          if ('members' in element && element.members)
+            element.members?.forEach((member) => {
+              if (member.nickname) {
+                allMembers.set(member.id, member as ProjectMember);
+                if (filters.nickname.has(member.nickname))
+                  alreadySelectedMembers.set(
+                    member.id as string,
+                    member.nickname,
+                  );
+              }
+              if ('name' in member) {
+                allTeams.set(member.id, member as Team);
+                if (filters.team.has(member.name as string))
+                  alreadySelectedTeams.set(member.id, member.name as string);
+              }
+            });
         });
 
         setMembersList(Array.from(allMembers.values()));
@@ -90,13 +94,13 @@ export default function FilterModal({
         setSelectedTeams(Array.from(alreadySelectedTeams.values()));
       }
       // role
-      if (data[0]?.members || data[0]?.nickname) {
+      if ('members' in data[0] || 'nickname' in data[0]) {
         setRolesList(Array.from(teamRoles));
         setSelectedRoles(Array.from(filters.role));
       }
       // lastChange
-      if (data[0]?.lastChange) {
-        setMaxDate(today(getLocalTimeZone()));
+      if ('lastChange' in data[0]) {
+        setMaxDate(now(getLocalTimeZone()));
         if (filters.lastChange) {
           const [periodStart, periodEnd] = filters.lastChange.split('_');
           setLastUpdated({
@@ -151,7 +155,7 @@ export default function FilterModal({
               </ModalHeader>
 
               <ModalBody className="flex h-fit max-h-40 w-fit max-w-2xl flex-col flex-wrap gap-2 p-0">
-                {membersList?.length > 0 && (
+                {membersList && membersList.length > 0 && (
                   <Select
                     radius="md"
                     className="w-72"
@@ -162,7 +166,9 @@ export default function FilterModal({
                       ),
                     }}
                     selectedKeys={selectedMembers}
-                    onSelectionChange={setSelectedMembers}
+                    onSelectionChange={(keys) =>
+                      setSelectedMembers(Array.from(keys) as string[])
+                    }
                     selectionMode="multiple"
                     label={settingsStore.t.filters.byMember.label}
                     placeholder={settingsStore.t.filters.byMember.placeholder}
@@ -180,7 +186,7 @@ export default function FilterModal({
                     )}
                   </Select>
                 )}
-                {teamsList?.length > 0 && (
+                {teamsList && teamsList.length > 0 && (
                   <Select
                     radius="md"
                     className="w-72"
@@ -191,7 +197,9 @@ export default function FilterModal({
                       ),
                     }}
                     selectedKeys={selectedTeams}
-                    onSelectionChange={setSelectedTeams}
+                    onSelectionChange={(keys) =>
+                      setSelectedTeams(Array.from(keys) as string[])
+                    }
                     selectionMode="multiple"
                     label={settingsStore.t.filters.byTeam.label}
                     placeholder={settingsStore.t.filters.byTeam.placeholder}
@@ -206,7 +214,7 @@ export default function FilterModal({
                     )}
                   </Select>
                 )}
-                {rolesList?.length > 0 && (
+                {rolesList && rolesList.length > 0 && (
                   <Select
                     radius="md"
                     className="w-72"
@@ -217,7 +225,9 @@ export default function FilterModal({
                       ),
                     }}
                     selectedKeys={selectedRoles}
-                    onSelectionChange={setSelectedRoles}
+                    onSelectionChange={(keys) =>
+                      setSelectedRoles(Array.from(keys) as TeamRole[])
+                    }
                     selectionMode="multiple"
                     label={settingsStore.t.filters.byRole.label}
                     placeholder={settingsStore.t.filters.byRole.placeholder}
@@ -225,7 +235,10 @@ export default function FilterModal({
                       return (
                         <div className="flex gap-1 overflow-hidden">
                           {items.map((item) => (
-                            <RoleCard key={item.key} role={item.key} />
+                            <RoleCard
+                              key={item.key}
+                              role={item.key as string}
+                            />
                           ))}
                         </div>
                       );
@@ -255,9 +268,7 @@ export default function FilterModal({
                           isIconOnly
                           variant="light"
                           className="h-fit w-fit min-w-fit"
-                          onClick={() =>
-                            setLastUpdated({ start: undefined, end: undefined })
-                          }
+                          onClick={() => setLastUpdated(null)}
                         >
                           <X className="stroke-default-400" />
                         </Button>

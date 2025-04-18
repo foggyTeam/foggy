@@ -59,7 +59,8 @@ const BoardStage = observer(() => {
   UseBoardNavigation(stageRef, scale);
   UseBoardZoom(stageRef, scale, setScale);
 
-  const resetStage = (onlyZoom: boolean = false) => {
+  const resetStage = (e: any = undefined) => {
+    const onlyZoom = !!e;
     const stage = stageRef.current;
     if (stage) {
       if (onlyZoom === true) {
@@ -75,13 +76,13 @@ const BoardStage = observer(() => {
     }
   };
 
-  const [selectedElements, changeSelection] = useState([]);
+  const [selectedElements, changeSelection] = useState<any[]>([]);
   const selectionRef: any = useRef(null);
 
-  const [isEditingText, setIsEditingText] = useState(null as TextEdit);
+  const [isEditingText, setIsEditingText] = useState<TextEdit>();
   const [textContent, setTextContent] = useState('');
 
-  const handleSelect = (e) => {
+  const handleSelect = (e: any) => {
     const element: BoardElement = e.target;
 
     changeSelection((prevState) => {
@@ -89,15 +90,14 @@ const BoardStage = observer(() => {
         return prevState.findIndex((el) => el._id === e.target._id) === -1
           ? [...prevState, element]
           : prevState.filter((v) => v._id !== e.target._id);
-      } else {
-        return prevState.findIndex((el) => el._id === e.target._id) === -1
-          ? [element]
-          : [];
       }
+      return prevState.findIndex((el) => el._id === e.target._id) === -1
+        ? [element]
+        : [];
     });
   };
 
-  const handleDeselect = (e) => {
+  const handleDeselect = (e: any) => {
     if (e.target.parent == null) {
       changeSelection([]);
       if (isEditingText)
@@ -113,7 +113,7 @@ const BoardStage = observer(() => {
     }
   };
 
-  const handleTextEdit = (e) => {
+  const handleTextEdit = (e: any) => {
     if (!isEditingText) resetStage(true);
     handleEditText({
       stageRef,
@@ -164,8 +164,6 @@ const BoardStage = observer(() => {
         height={window?.innerHeight}
         ref={stageRef}
         onClick={handleDeselect}
-        onDragMove={null}
-        onDragEnd={null}
       >
         <GridLayer stageRef={stageRef} scale={scale} gridSize={GRID_SIZE} />
 
@@ -173,7 +171,6 @@ const BoardStage = observer(() => {
           <BoardLayer
             key={index}
             layer={layer}
-            selectedElements={selectedElements}
             handleSelect={handleSelect}
             fitCoordinates={(pos, element) =>
               fitCoordinates(pos.x, pos.y, element.width, element.height, scale)
@@ -228,7 +225,7 @@ const BoardStage = observer(() => {
               content={textContent}
               setContent={setTextContent}
               height={isEditingText.textHeight}
-              setHeight={(newHeight) =>
+              setHeight={(newHeight: number) =>
                 setIsEditingText({ ...isEditingText, textHeight: newHeight })
               }
               width={isEditingText.textWidth}

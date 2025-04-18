@@ -18,11 +18,7 @@ export enum AvailableProviders {
 export type AvailableLocales = 'en' | 'ru';
 
 // BOARD
-export enum BoardTypes {
-  SIMPLE,
-  GRAPH,
-  TREE,
-}
+export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'TREE';
 
 export type BoardElement =
   | RectElement
@@ -80,14 +76,14 @@ export interface MarkerElement extends BaseElement {
   opacity: number;
 }
 
-export class BoardType {
-  projectId: string;
-  section: string;
-  id: string;
-  name: string;
-  type: BoardTypes = BoardTypes.SIMPLE;
-  layers: BoardElement[][] = [[], [], []];
-  lastChange: string;
+export class Board {
+  projectId: string = '';
+  section: string = '';
+  id: string = '';
+  name: string = 'unknown';
+  type: BoardTypes = 'SIMPLE';
+  layers?: BoardElement[][] = [[], [], []];
+  lastChange: string = '';
 }
 
 // PROJECT
@@ -120,12 +116,12 @@ export class Project {
 
   id: string = '';
   name: string = 'unknown';
-  avatar: string = '';
-  description: string = '';
-  settings: ProjectSettings = new ProjectSettings();
-  favorite: boolean = false;
+  avatar?: string = '';
+  description?: string = '';
+  settings?: ProjectSettings = new ProjectSettings();
+  favorite?: boolean = false;
   members: ProjectMember[] = [];
-  boards: BoardType[] = [];
+  boards?: Board[] = [];
   lastChange: string = new Date().toISOString();
 }
 
@@ -135,35 +131,36 @@ export class ProjectSettings {
   memberListIsPublic: boolean = true;
 }
 
-export type ProjectRole = TeamRole & 'team';
+export type ProjectRole = TeamRole | 'team';
 
 class Member {
-  id: string;
-  nickname: string;
+  id: string = '';
+  nickname?: string;
   avatar?: string;
 }
 export class ProjectMember extends Member {
-  role: ProjectRole;
+  role: ProjectRole = 'reader';
+  name?: string;
 }
 
 // TEAM
 export class Team {
   id: string = '';
   name: string = 'unknown';
-  avatar: string = '';
-  members: TeamMember[] = [];
-  projects: Project[] = [];
+  avatar?: string = '';
+  members?: TeamMember[] = [];
+  projects?: Project[] = [];
 }
 export type TeamRole = 'owner' | 'admin' | 'editor' | 'reader';
 
 export class TeamMember extends Member {
-  role: TeamRole;
+  role: TeamRole = 'reader';
 }
 
 // FILTERS
 export class FilterSet {
   nickname: Set<string> = new Set();
   team: Set<string> = new Set();
-  role: Set<ProjectRole> = new Set();
+  role: Set<TeamRole> = new Set();
   lastChange: string = '';
 }

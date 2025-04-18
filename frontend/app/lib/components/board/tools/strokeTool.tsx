@@ -11,10 +11,14 @@ import settingsStore from '@/app/stores/settingsStore';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
 
-export default function StrokeTool({ element, updateElement }) {
+export default function StrokeTool({
+  element,
+  updateElement,
+}: ElementToolProps) {
   const [strokeColor, changeColor] = useState(primary.DEFAULT);
-  const [strokeWidth, changeWidth] = useState(0);
+  const [strokeWidth, changeWidth] = useState<number>(0);
 
   useEffect(() => {
     changeColor(
@@ -60,12 +64,12 @@ export default function StrokeTool({ element, updateElement }) {
             (strokeColor.length === 7 || strokeColor.length === 9)
               ? strokeColor
               : primary.DEFAULT,
-        } as BoardElement);
+        } as Partial<BoardElement>);
       } else {
         updateElement(element.attrs.id, {
           strokeWidth: undefined,
           stroke: undefined,
-        } as BoardElement);
+        } as Partial<BoardElement>);
       }
     }
   }, [strokeColor, strokeWidth]);
@@ -89,7 +93,9 @@ export default function StrokeTool({ element, updateElement }) {
       >
         <Slider
           value={strokeWidth}
-          onChange={changeWidth}
+          onChange={(value: number | number[]) =>
+            changeWidth(Array.isArray(value) ? value[0] : value)
+          }
           label={settingsStore.t.toolBar.strokeWidth}
           className="w-[89.2%]"
           size="md"

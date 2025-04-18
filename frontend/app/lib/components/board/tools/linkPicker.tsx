@@ -1,7 +1,13 @@
 import { Input } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 
-export default function LinkPicker({ value, changeValue }) {
+export default function LinkPicker({
+  value,
+  changeValue,
+}: {
+  value: string;
+  changeValue: any;
+}) {
   return (
     <Input
       placeholder={settingsStore.t.toolBar.linkPlaceholder}

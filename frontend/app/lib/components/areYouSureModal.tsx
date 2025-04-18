@@ -16,6 +16,14 @@ export default function AreYouSureModal({
   description,
   sure,
   dismiss,
+}: {
+  isOpen: boolean;
+  onOpenChange: any;
+  action: any;
+  header: string;
+  description?: string;
+  sure: string;
+  dismiss: string;
 }) {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>

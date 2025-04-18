@@ -2,9 +2,9 @@ import {
   FilterSet,
   Project,
   ProjectMember,
-  ProjectRole,
   Team,
   TeamMember,
+  TeamRole,
 } from '@/app/lib/types/definitions';
 
 export default function CheckFilters(
@@ -13,28 +13,32 @@ export default function CheckFilters(
   userId: string,
 ): boolean {
   if (filters) {
-    if (filters.nickname?.size > 0 && value.members) {
-      const nicknameMatches = value.members?.some((member) =>
-        filters.nickname.has(member.nickname),
+    if (filters.nickname?.size > 0 && 'members' in value) {
+      const nicknameMatches = value.members?.some(
+        (member) => member.nickname && filters.nickname.has(member.nickname),
       );
       if (!nicknameMatches) return false;
     }
 
-    if (filters.team?.size > 0 && value.members) {
+    if (filters.team?.size > 0 && 'members' in value) {
       const teamMatches = value.members?.some(
         (member) =>
-          member.role === ('team' as ProjectRole) &&
+          member.role === 'team' &&
+          member.name &&
           filters.team.has(member.name),
       );
       if (!teamMatches) return false;
     }
 
-    if (filters.role?.size > 0 && (value.role || value.members)) {
-      const roleMatches =
-        filters.role.has(
+    if (filters.role?.size > 0) {
+      let roleMatches = true;
+      if ('role' in value)
+        roleMatches = filters.role.has(value.role as TeamRole);
+      else if ('members' in value)
+        roleMatches = filters.role.has(
           value.members?.find((member) => member.id === userId)
-            ?.role as ProjectRole,
-        ) || filters.role.has(value.role);
+            ?.role as TeamRole,
+        );
       if (!roleMatches) return false;
     }
 
@@ -42,7 +46,8 @@ export default function CheckFilters(
       const [periodStart, periodEnd] = filters.lastChange
         .split('_')
         .map((date) => new Date(date));
-      const targetDate = new Date(value.lastChange);
+      const targetDate =
+        'lastChange' in value ? new Date(value.lastChange) : false;
 
       if (!(periodStart <= targetDate && targetDate <= periodEnd)) return false;
     }

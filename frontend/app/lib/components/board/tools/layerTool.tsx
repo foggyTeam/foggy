@@ -13,8 +13,9 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
+import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
 
-export default function LayerTool({ element }) {
+export default function LayerTool({ element }: ElementToolProps) {
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {

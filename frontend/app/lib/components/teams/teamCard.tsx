@@ -30,8 +30,8 @@ export default function TeamCard(team: Team) {
           </h1>
           <RoleCard
             role={
-              team.members.find((member) => member.id === userStore.user?.id)
-                .role
+              team.members?.find((member) => member.id === userStore.user?.id)
+                ?.role || 'reader'
             }
           />
         </div>
@@ -39,7 +39,7 @@ export default function TeamCard(team: Team) {
 
       <div className="flex h-full w-fit items-center justify-end">
         <AvatarGroup className="-space-x-4">
-          {team.members.slice(0, 5).map((member) => (
+          {team.members?.slice(0, 5).map((member) => (
             <Avatar
               size="md"
               classNames={{
@@ -50,7 +50,7 @@ export default function TeamCard(team: Team) {
               src={member.avatar}
             />
           ))}
-          {team.members.length - 5 > 0 && (
+          {team.members && team.members.length - 5 > 0 && (
             <Avatar
               size="md"
               classNames={{

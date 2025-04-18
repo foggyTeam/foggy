@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { fitCoordinates } from '@/app/lib/components/board/boardStage';
 
-export default function UseBoardNavigation(stageRef, scale) {
+export default function UseBoardNavigation(stageRef: any, scale: number) {
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     const stage: any = stageRef.current;
     if (stage) {
       // handling mouse navigation
-      const handleMouseDown = (e) => {
+      const handleMouseDown = (e: any) => {
         if (e.evt.button === 2) {
           setIsDragging(true);
         }
       };
-      const handleMouseMove = (e) => {
+      const handleMouseMove = (e: any) => {
         if (isDragging) {
           const newX = stage.x() + e.evt.movementX;
           const newY = stage.y() + e.evt.movementY;
@@ -39,7 +39,7 @@ export default function UseBoardNavigation(stageRef, scale) {
       stage.on('mouseup', handleMouseUp);
 
       // handling wheel navigation
-      const handleWheel = (e) => {
+      const handleWheel = (e: any) => {
         e.evt.preventDefault();
         if (Math.abs(e.evt.deltaY as number) < 100) {
           const newX = stage.x() - e.evt.deltaX;
@@ -61,12 +61,12 @@ export default function UseBoardNavigation(stageRef, scale) {
       stage.on('wheel', handleWheel);
 
       // handling navigation with touch
-      const handleTouchStart = (e) => {
+      const handleTouchStart = (e: any) => {
         if (e.evt.touches.length === 2) {
           setIsDragging(true);
         }
       };
-      const handleTouchMove = (e) => {
+      const handleTouchMove = (e: any) => {
         if (isDragging && e.evt.touches.length === 2) {
           const touch1 = e.evt.touches[0];
           const touch2 = e.evt.touches[1];
@@ -96,7 +96,7 @@ export default function UseBoardNavigation(stageRef, scale) {
       stage.on('touchmove', handleTouchMove);
       stage.on('touchend', handleTouchEnd);
 
-      stage.container().addEventListener('contextmenu', (e) => {
+      stage.container().addEventListener('contextmenu', (e: any) => {
         e.preventDefault();
       });
 
@@ -112,7 +112,7 @@ export default function UseBoardNavigation(stageRef, scale) {
         stage.off('touchend', handleTouchEnd);
         stage
           .container()
-          .removeEventListener('contextmenu', (e) => e.preventDefault());
+          .removeEventListener('contextmenu', (e: any) => e.preventDefault());
       };
     }
   }, [isDragging, scale]);

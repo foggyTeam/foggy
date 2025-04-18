@@ -1,6 +1,11 @@
 import FilterCard from '@/app/lib/components/filters/filterCard';
+import { FilterSet } from '@/app/lib/types/definitions';
 
-const renderFilterCards = (filterKey, filters, removeFilter) => {
+const renderFilterCards = (
+  filterKey: keyof FilterSet,
+  filters: FilterSet,
+  removeFilter: any,
+) => {
   return Array.from(filters[filterKey]).map((filterValue: string, index) => (
     <FilterCard
       key={`${filterKey}-${index}`}
@@ -11,7 +16,7 @@ const renderFilterCards = (filterKey, filters, removeFilter) => {
   ));
 };
 
-const renderLastChangeCard = (filters, removeFilter) => {
+const renderLastChangeCard = (filters: FilterSet, removeFilter: any) => {
   return (
     filters.lastChange && (
       <FilterCard
@@ -24,8 +29,17 @@ const renderLastChangeCard = (filters, removeFilter) => {
   );
 };
 
-export default function AllFilters({ filters, dispatchFilters }) {
-  const removeFilter = (key, value) => {
+export default function AllFilters({
+  filters,
+  dispatchFilters,
+}: {
+  filters?: FilterSet;
+  dispatchFilters: any;
+}) {
+  const removeFilter = (
+    key: keyof FilterSet,
+    value: FilterSet[keyof FilterSet],
+  ) => {
     dispatchFilters({
       type: 'DELETE',
       payload: [
@@ -39,11 +53,13 @@ export default function AllFilters({ filters, dispatchFilters }) {
 
   return (
     <div className="flex w-full flex-wrap gap-2">
-      {Object.keys(filters).map((filterKey) =>
-        filterKey === 'lastChange'
-          ? renderLastChangeCard(filters, removeFilter)
-          : renderFilterCards(filterKey, filters, removeFilter),
-      )}
+      {filters &&
+        (Object.keys(filters) as (keyof FilterSet)[]).map(
+          (filterKey: keyof FilterSet) =>
+            filterKey === 'lastChange'
+              ? renderLastChangeCard(filters, removeFilter)
+              : renderFilterCards(filterKey, filters, removeFilter),
+        )}
     </div>
   );
 }

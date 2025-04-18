@@ -3,11 +3,11 @@ import { CableIcon, LayoutDashboardIcon, NetworkIcon } from 'lucide-react';
 
 export default function BoardIcon({ boardType }: { boardType: BoardTypes }) {
   switch (boardType) {
-    case BoardTypes.SIMPLE:
+    case 'SIMPLE':
       return <LayoutDashboardIcon className="stroke-success-400" />;
-    case BoardTypes.GRAPH:
+    case 'GRAPH':
       return <CableIcon className="stroke-primary-400" />;
-    case BoardTypes.TREE:
+    case 'TREE':
       return <NetworkIcon className="stroke-secondary-400" />;
   }
 }

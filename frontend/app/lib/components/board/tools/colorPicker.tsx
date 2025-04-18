@@ -3,7 +3,13 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
 
-export default function ColorPicker({ value, changeValue }) {
+export default function ColorPicker({
+  value,
+  changeValue,
+}: {
+  value: string;
+  changeValue: any;
+}) {
   return (
     <>
       <HexAlphaColorPicker

@@ -17,10 +17,10 @@ import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 import userStore from '@/app/stores/userStore';
 
-function byRole(a, b) {
+function byRole(a: any, b: any) {
   const thisUserId = userStore.user?.id;
 
-  const rolePriority = {
+  const rolePriority: any = {
     owner: 5,
     admin: 4,
     team: 3,
@@ -106,12 +106,10 @@ export default function ProjectCard(project: Project) {
             className={clsx(
               'pr-0.5 text-start italic',
               isExpanded ? 'line-clamp-4' : 'line-clamp-2',
-              project.description.length
-                ? 'text-default-700'
-                : 'text-default-400',
+              !!project.description ? 'text-default-700' : 'text-default-400',
             )}
           >
-            {project.description.length
+            {!!project.description
               ? project.description
               : settingsStore.t.main.noProjectDescription}
           </p>
@@ -132,7 +130,7 @@ export default function ProjectCard(project: Project) {
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
-                  project.members.length - 7,
+                  (project.members.length - 7).toString(),
                 )}
               </Button>
             )}
