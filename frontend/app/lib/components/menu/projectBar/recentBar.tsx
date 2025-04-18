@@ -5,9 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import { Board, Project } from '@/app/lib/types/definitions';
 import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
-import userStore from '@/app/stores/userStore';
 
 const RecentBar = observer(() => {
   return (
@@ -34,48 +32,7 @@ const RecentBar = observer(() => {
       <Button
         onPress={() => {
           // TODO: REDO
-          projectsStore.addProject(
-            new Project({
-              id: 'lufglglyg1',
-              name: 'First project',
-              creator: {
-                id: userStore.user?.id || 'hi',
-                nickname: userStore.user?.name || 'hi',
-                avatar: userStore.user?.image || undefined,
-              },
-            }),
-          );
-          projectsStore.setActiveProject('lufglglyg1');
-
-          for (let i = 0; i < 5; i++) {
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygs${i}`,
-              name: `file ${i}`,
-              type: 'SIMPLE',
-              layers: [[], [], []],
-              lastChange: new Date().toISOString(),
-            } as Board);
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygg${i}`,
-              name: `file ${i}`,
-              type: 'GRAPH',
-              layers: [[], [], []],
-              lastChange: new Date().toISOString(),
-            } as Board);
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygt${i}`,
-              name: `file ${i}`,
-              type: 'TREE',
-              layers: [[], [], []],
-              lastChange: new Date().toISOString(),
-            } as Board);
-          }
+          console.log('you click me');
         }}
         isIconOnly
         variant="light"

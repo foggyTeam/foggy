@@ -121,8 +121,19 @@ export class Project {
   settings?: ProjectSettings = new ProjectSettings();
   favorite?: boolean = false;
   members: ProjectMember[] = [];
+  sections?: ProjectSection[] = [];
   boards?: Board[] = [];
   lastChange: string = new Date().toISOString();
+}
+
+export interface ProjectSection {
+  id: string;
+  name: string;
+  childrenNumber: number;
+  children: (
+    | ProjectSection
+    | Pick<Board, 'id' | 'name' | 'type' | 'lastChange'>
+  )[];
 }
 
 export class ProjectSettings {

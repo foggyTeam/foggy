@@ -143,8 +143,8 @@ class ProjectsStore {
     if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
   };
-  setActiveProject = (id: string) => {
-    this.activeProject = this.allProjects?.find((project) => project.id == id);
+  setActiveProject = (project: Project) => {
+    this.activeProject = project;
   };
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
