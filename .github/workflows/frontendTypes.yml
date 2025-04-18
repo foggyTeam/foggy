@@ -13,6 +13,6 @@ jobs:
         working-directory: frontend
 
       - name: Type check
-        run: pnpm tsc --noEmit
+        run: pnpm check
         working-directory: frontend
       - run: echo "Frontend / ${{ job.status }}."
