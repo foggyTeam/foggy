@@ -12,6 +12,9 @@ jobs:
         run: pnpm install
         working-directory: frontend
 
+      - name: List public folder
+        run: ls -R frontend/public
+
       - name: Type check
         run: pnpm check
         working-directory: frontend
