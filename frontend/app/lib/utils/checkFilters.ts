@@ -4,7 +4,7 @@ import {
   ProjectMember,
   Team,
   TeamMember,
-  TeamRole,
+  Role,
 } from '@/app/lib/types/definitions';
 
 export default function CheckFilters(
@@ -22,22 +22,17 @@ export default function CheckFilters(
 
     if (filters.team?.size > 0 && 'members' in value) {
       const teamMatches = value.members?.some(
-        (member) =>
-          member.role === 'team' &&
-          member.name &&
-          filters.team.has(member.name),
+        (member) => 'team' in member && filters.team.has(member.team as string),
       );
       if (!teamMatches) return false;
     }
 
     if (filters.role?.size > 0) {
       let roleMatches = true;
-      if ('role' in value)
-        roleMatches = filters.role.has(value.role as TeamRole);
+      if ('role' in value) roleMatches = filters.role.has(value.role as Role);
       else if ('members' in value)
         roleMatches = filters.role.has(
-          value.members?.find((member) => member.id === userId)
-            ?.role as TeamRole,
+          value.members?.find((member) => member.id === userId)?.role as Role,
         );
       if (!roleMatches) return false;
     }

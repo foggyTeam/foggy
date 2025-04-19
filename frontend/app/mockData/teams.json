@@ -5,14 +5,38 @@
     "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
     "favorite": true,
     "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "admin" },
-      { "id": "user-4", "role": "owner" },
-      { "id": "user-7", "role": "editor" },
-      { "id": "user-8", "role": "reader" },
-      { "id": "user-9", "role": "editor" },
-      { "id": "user-10", "role": "reader" },
-      { "id": "user-11", "role": "reader" }
-    ]
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-4",
+        "nickname": "COACH_MASTER_1",
+        "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TECH_GURU",
+        "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-8",
+        "nickname": "MENTOR_8",
+        "avatar": "http://postimg.su/image/dXE0TkS7/b6.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "BRAINSTORMER_9",
+        "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
   },
   {
     "id": "team-2",
@@ -20,12 +44,38 @@
     "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
     "favorite": false,
     "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
-      { "id": "user-3", "role": "owner" },
-      { "id": "user-5", "role": "editor" },
-      { "id": "user-6", "role": "admin" },
-      { "id": "user-8", "role": "reader" }
-    ]
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-3",
+        "nickname": "TEAM_PLAYER",
+        "avatar": "http://postimg.su/image/8n2MgFcT/b3.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-5",
+        "nickname": "DESIGN_WIZARD5",
+        "avatar": "http://postimg.su/image/klibtc2Q/b5.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-6",
+        "nickname": "STRATEGY_PRO_6",
+        "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-8",
+        "nickname": "MENTOR_8",
+        "avatar": "http://postimg.su/image/dXE0TkS7/b6.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
   },
   {
     "id": "team-3",
@@ -33,13 +83,38 @@
     "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
     "favorite": true,
     "members": [
-      { "id": "user-6", "role": "reader" },
-      { "id": "user-7", "role": "owner" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "editor" },
-      { "id": "user-9", "role": "admin" },
-      { "id": "user-10", "role": "reader" },
-      { "id": "user-11", "role": "editor" }
-    ]
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TECH_GURU",
+        "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-6",
+        "nickname": "STRATEGY_PRO_6",
+        "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "BRAINSTORMER_9",
+        "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-10",
+        "nickname": "PROJECT_LEADER_10",
+        "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
   },
   {
     "id": "team-4",
@@ -47,13 +122,38 @@
     "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
     "favorite": false,
     "members": [
-      { "id": "user-11", "role": "admin" },
-      { "id": "user-12", "role": "owner" },
-      { "id": "user-13", "role": "reader" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "editor" },
-      { "id": "user-15", "role": "admin" },
-      { "id": "user-16", "role": "reader" }
-    ]
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-12",
+        "nickname": "VISIONARY_12",
+        "avatar": "http://postimg.su/image/UFdiymvN/b15.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-13",
+        "nickname": "COLLABORATOR_13",
+        "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-15",
+        "nickname": "GOAL_ACHIEVER_15",
+        "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-16",
+        "nickname": "DYNAMIC_LEADER_16",
+        "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
   },
   {
     "id": "team-5",
@@ -61,99 +161,37 @@
     "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
     "favorite": true,
     "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
-      { "id": "user-14", "role": "owner" },
-      { "id": "user-17", "role": "reader" },
-      { "id": "user-18", "role": "admin" },
-      { "id": "user-19", "role": "editor" }
-    ]
-  },
-  {
-    "id": "team-9",
-    "name": "Visionaries United",
-    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
-    "favorite": true,
-    "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "admin" },
-      { "id": "user-5", "role": "owner" },
-      { "id": "user-6", "role": "reader" },
-      { "id": "user-7", "role": "editor" },
-      { "id": "user-8", "role": "team" }
-    ]
-  },
-  {
-    "id": "team-10",
-    "name": "NextGen Developers",
-    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
-    "favorite": false,
-    "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
-      { "id": "user-9", "role": "owner" },
-      { "id": "user-10", "role": "reader" },
-      { "id": "user-11", "role": "editor" }
-    ]
-  },
-  {
-    "id": "team-11",
-    "name": "Sustainability Heroes",
-    "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
-    "favorite": true,
-    "members": [
-      { "id": "user-12", "role": "owner" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
-      { "id": "user-13", "role": "editor" },
-      { "id": "user-14", "role": "team" },
-      { "id": "user-15", "role": "admin" }
-    ]
-  },
-  {
-    "id": "team-12",
-    "name": "Tech Pioneers",
-    "avatar": "http://postimg.su/image/HS94hp0y/b8.png",
-    "favorite": false,
-    "members": [
-      { "id": "user-16", "role": "owner" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
-      { "id": "user-17", "role": "reader" },
-      { "id": "user-18", "role": "editor" }
-    ]
-  },
-  {
-    "id": "team-13",
-    "name": "Creative Coders",
-    "avatar": "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0",
-    "favorite": true,
-    "members": [
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "editor" },
-      { "id": "user-19", "role": "owner" },
-      { "id": "user-20", "role": "team" },
-      { "id": "user-2", "role": "reader" }
-    ]
-  },
-  {
-    "id": "team-14",
-    "name": "Global Innovators",
-    "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
-    "favorite": true,
-    "members": [
-      { "id": "user-3", "role": "owner" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "team" },
-      { "id": "user-4", "role": "editor" },
-      { "id": "user-5", "role": "reader" },
-      { "id": "user-6", "role": "admin" }
-    ]
-  },
-  {
-    "id": "team-15",
-    "name": "Bright Minds",
-    "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
-    "favorite": false,
-    "members": [
-      { "id": "user-7", "role": "owner" },
-      { "id": "67f18c3ece58d18c7ebaae02", "role": "reader" },
-      { "id": "user-8", "role": "team" },
-      { "id": "user-9", "role": "editor" },
-      { "id": "user-10", "role": "admin" }
-    ]
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-14",
+        "nickname": "CONTENT_CREATOR_14",
+        "avatar": "http://postimg.su/image/oRpYCdHd/s11.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-17",
+        "nickname": "CODING_EXPERT_17",
+        "avatar": "http://postimg.su/image/IMUjhjbJ/cyan6.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-18",
+        "nickname": "ORGANIZER_18",
+        "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-19",
+        "nickname": "PROBLEM_SOLVER_19",
+        "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
   }
 ]

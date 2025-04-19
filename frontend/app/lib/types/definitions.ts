@@ -76,54 +76,26 @@ export interface MarkerElement extends BaseElement {
   opacity: number;
 }
 
-export class Board {
-  projectId: string = '';
-  section: string = '';
-  id: string = '';
-  name: string = 'unknown';
-  type: BoardTypes = 'SIMPLE';
-  layers?: BoardElement[][] = [[], [], []];
-  lastChange: string = '';
+export interface Board {
+  id: string;
+  name: string;
+  type: BoardTypes;
+  layers: BoardElement[][];
+  sectionId: string;
+  lastChange: string;
 }
 
 // PROJECT
-export class Project {
-  constructor(params: {
-    id: string;
-    name?: string;
-    creator: Partial<ProjectMember>;
-    avatar?: string;
-    description?: string;
-    settings?: ProjectSettings;
-    lastChange?: string;
-  }) {
-    if (params?.id) this.id = params.id;
-    if (params?.creator)
-      this.members = [
-        {
-          role: 'owner',
-          id: params.creator.id,
-          nickname: params.creator.nickname,
-          avatar: params.creator.avatar,
-        } as ProjectMember,
-      ];
-    if (params?.name) this.name = params.name;
-    if (params?.avatar) this.avatar = params.avatar;
-    if (params?.description) this.description = params.description;
-    if (params?.settings) this.settings = params.settings;
-    if (params?.lastChange) this.lastChange = params.lastChange;
-  }
-
-  id: string = '';
-  name: string = 'unknown';
-  avatar?: string = '';
-  description?: string = '';
-  settings?: ProjectSettings = new ProjectSettings();
-  favorite?: boolean = false;
-  members: ProjectMember[] = [];
-  sections?: ProjectSection[] = [];
-  boards?: Board[] = [];
-  lastChange: string = new Date().toISOString();
+export interface Project {
+  id: string;
+  name: string;
+  avatar?: string;
+  description?: string;
+  favorite?: boolean;
+  members: ProjectMember[];
+  sections: ProjectSection[];
+  settings: ProjectSettings;
+  lastChange: string;
 }
 
 export interface ProjectSection {
@@ -132,7 +104,7 @@ export interface ProjectSection {
   childrenNumber: number;
   children: (
     | ProjectSection
-    | Pick<Board, 'id' | 'name' | 'type' | 'lastChange'>
+    | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
   )[];
 }
 
@@ -142,36 +114,33 @@ export class ProjectSettings {
   memberListIsPublic: boolean = true;
 }
 
-export type ProjectRole = TeamRole | 'team';
-
-class Member {
-  id: string = '';
-  nickname?: string;
-  avatar?: string;
-}
-export class ProjectMember extends Member {
-  role: ProjectRole = 'reader';
-  name?: string;
+export interface ProjectMember extends TeamMember {
+  team?: string;
+  teamId?: string;
 }
 
 // TEAM
-export class Team {
-  id: string = '';
-  name: string = 'unknown';
-  avatar?: string = '';
-  members?: TeamMember[] = [];
-  projects?: Project[] = [];
+export interface Team {
+  id: string;
+  name: string;
+  avatar?: string;
+  members: TeamMember[];
+  projects: Project[];
 }
-export type TeamRole = 'owner' | 'admin' | 'editor' | 'reader';
 
-export class TeamMember extends Member {
-  role: TeamRole = 'reader';
+export type Role = 'owner' | 'admin' | 'editor' | 'reader';
+
+export interface TeamMember {
+  id: string;
+  nickname: string;
+  avatar?: string;
+  role: Role;
 }
 
 // FILTERS
 export class FilterSet {
   nickname: Set<string> = new Set();
   team: Set<string> = new Set();
-  role: Set<TeamRole> = new Set();
+  role: Set<Role> = new Set();
   lastChange: string = '';
 }

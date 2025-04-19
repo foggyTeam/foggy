@@ -16,19 +16,18 @@ const RecentBar = observer(() => {
         bg_container,
       )}
     >
-      {projectsStore.activeProject
-        ? projectsStore.activeProject.boards?.slice(-4).map((board) => (
-            <Button
-              onPress={() => console.log(board.name)}
-              key={board.id}
-              isIconOnly
-              variant="light"
-              size="md"
-            >
-              <BoardIcon boardType={board.type} />
-            </Button>
-          ))
-        : null}
+      {projectsStore.activeBoard && (
+        <Button
+          onPress={() => console.log(projectsStore.activeBoard?.name)}
+          key={projectsStore.activeBoard?.id}
+          isIconOnly
+          variant="light"
+          size="md"
+        >
+          <BoardIcon boardType={projectsStore.activeBoard?.type || 'SIMPLE'} />
+        </Button>
+      )}
+
       <Button
         onPress={() => {
           // TODO: REDO
