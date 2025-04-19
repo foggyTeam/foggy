@@ -93,19 +93,21 @@ export interface Project {
   description?: string;
   favorite?: boolean;
   members: ProjectMember[];
-  sections: ProjectSection[];
+  sections: Map<string, ProjectSection>;
   settings: ProjectSettings;
   lastChange: string;
 }
 
 export interface ProjectSection {
   id: string;
+  parentId?: string;
   name: string;
   childrenNumber: number;
-  children: (
+  children: Map<
+    string,
     | ProjectSection
     | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
-  )[];
+  >;
 }
 
 export class ProjectSettings {

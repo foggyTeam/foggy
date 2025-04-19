@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 
 export default function BackgroundCircle({ params }: { params: circleParams }) {
   const [isBoardPage, setIsBoardPage] = useState(false);
+  const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
   const path = usePathname();
 
   const position = (initial: number) => {
@@ -15,7 +16,7 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
   };
 
   useEffect(() => {
-    setIsBoardPage(path === '/board');
+    setIsBoardPage(!!path.match(boardPageRegex));
   }, [path]);
 
   return (

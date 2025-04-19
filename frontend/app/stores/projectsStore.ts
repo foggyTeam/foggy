@@ -3,6 +3,7 @@ import {
   Board,
   BoardElement,
   Project,
+  ProjectSection,
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
@@ -26,9 +27,10 @@ class ProjectsStore {
       setActiveBoard: action,
       setActiveProject: action,
       setAllProjects: action,
-      addBoard: action,
+      addProjectChild: action,
       addProject: action,
       updateProject: action,
+      updateProjectChild: action,
     });
   }
 
@@ -149,19 +151,6 @@ class ProjectsStore {
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
   };
-  addBoard = (sectionId, newBoard: Partial<Board>) => {
-    const sectionIndex = this.activeProject?.sections?.findIndex(
-      (section) => section.id === sectionId,
-    );
-    if (sectionIndex > -1) {
-      if (!this.activeProject.boards) this.activeProject.boards = [];
-      this.activeProject.boards.push(newBoard);
-    }
-  };
-  addProject = (newProject: Project) => {
-    // TODO: make a post request and receive a project id
-    this.allProjects.push(newProject);
-  };
   updateProject = (id: string, newAttrs: Partial<Project>) => {
     const projectIndex = this.allProjects.findIndex(
       (project) => project.id === id,
@@ -170,6 +159,93 @@ class ProjectsStore {
       ...this.allProjects[projectIndex],
       ...newAttrs,
     };
+  };
+
+  addProject = (newProject: Project) => {
+    // TODO: make a post request and receive a project id
+    this.allProjects.push(newProject);
+  };
+  addProjectChild = (
+    parentSections: string[],
+    child: ProjectSection | Board,
+    isSection: boolean,
+  ) => {
+    if (!this.activeProject) return;
+
+    let currentSection: Map<
+      string,
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    > = this.activeProject.sections;
+
+    for (let i = 0; i < parentSections.length; i++) {
+      const sectionId = parentSections[i];
+      const nextSection = currentSection.get(sectionId);
+
+      // если секция не найдена или структура некорректна
+      if (!nextSection || !('children' in nextSection)) {
+        console.error('Не удалось добавить элемент');
+        return;
+      }
+
+      if (i === parentSections.length - 1) {
+        if (!nextSection.children) nextSection.children = new Map();
+
+        nextSection.children.set(child.id, child);
+        if (isSection && 'parentId' in child)
+          child.parentId = parentSections[parentSections.length - 1];
+      } else currentSection = nextSection.children;
+    }
+
+    // добавление на верхний уровень
+    if (parentSections.length === 0 && isSection && 'parentId' in child) {
+      this.activeProject.sections.set(child.id, child);
+      child.parentId = undefined;
+    }
+  };
+  updateProjectChild = (
+    parentSections: string[],
+    id: string,
+    newAttrs: Partial<ProjectSection | Board>,
+  ): void => {
+    if (!this.activeProject) return;
+
+    let currentSection: Map<
+      string,
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    > = this.activeProject.sections;
+
+    for (let i = 0; i < parentSections.length; i++) {
+      const sectionId = parentSections[i];
+      const nextSection = currentSection.get(sectionId);
+
+      // если секция не найдена или структура некорректна
+      if (!nextSection || !('children' in nextSection)) {
+        console.error('Не удалось обновить элемент');
+        return;
+      }
+
+      if (i === parentSections.length - 1) {
+        const targetItem = nextSection.children.get(id);
+        if (!targetItem) {
+          console.error('Элемент не найден');
+          return;
+        }
+
+        Object.assign(targetItem, newAttrs);
+      } else currentSection = nextSection.children;
+    }
+
+    if (parentSections.length === 0) {
+      const targetItem = this.activeProject.sections.get(id);
+      if (!targetItem) {
+        console.error('Элемент не найден');
+        return;
+      }
+
+      Object.assign(targetItem, newAttrs);
+    }
   };
 }
 

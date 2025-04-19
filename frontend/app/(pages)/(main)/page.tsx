@@ -1,9 +1,7 @@
 import React from 'react';
-import projects from '@/app/mockData/projects.json';
-import users from '@/app/mockData/users.json';
 
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
-import { Project, ProjectMember, Team } from '@/app/lib/types/definitions';
+import { Project, Team } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
@@ -12,6 +10,8 @@ import clsx from 'clsx';
 import AllProjects from '@/app/lib/components/projects/allProjects';
 import AllTeams from '@/app/lib/components/teams/allTeams';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
+import allProjects from '@/app/mockData/projects.json';
+import allTeams from '@/app/mockData/teams.json';
 
 async function getUserProjects(): Promise<Project[] | undefined> {
   const cookie = (await cookies()).get('session' as any)?.value;
@@ -23,24 +23,7 @@ async function getUserProjects(): Promise<Project[] | undefined> {
 
   try {
     return new Promise((resolve) => {
-      const allUsers: any[] = users;
-      setTimeout(
-        () =>
-          resolve(
-            projects.map((project) => {
-              return {
-                ...project,
-                members: project.members.map((member) => {
-                  return {
-                    ...member,
-                    ...allUsers.find((user) => user.id === member.id),
-                  } as ProjectMember;
-                }),
-              } as Project;
-            }),
-          ),
-        300,
-      );
+      setTimeout(() => resolve(allProjects), 300);
     });
   } catch (e) {
     console.error('User with this id does not exist.');
@@ -57,8 +40,9 @@ async function getUserTeams(): Promise<Team[] | undefined> {
   }
 
   try {
-    const response = await fetch('@/app/mockData/teams.json');
-    return await response.json();
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(allTeams), 300);
+    });
   } catch (e) {
     console.error('User with this id does not exist.');
     await signOut();
