@@ -3,7 +3,7 @@ import { decrypt } from '@/app/lib/session';
 import { cookies } from 'next/headers';
 
 const publicRoutes = ['/login'];
-const protectedRoutesRegex = /^\/(project|team|board)\/([^/]+)$/;
+const protectedRoutesRegex = /^\/(project|team)\/([^/]+)$/;
 
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;

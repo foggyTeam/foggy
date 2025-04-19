@@ -6,6 +6,7 @@ import { Board } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
+import board from '@/app/mockData/board.json';
 
 interface BoardPageProps {
   project_id: string;
@@ -26,8 +27,9 @@ async function getBoard(
   }
 
   try {
-    const response = await fetch('@/app/mockData/board.json');
-    return await response.json();
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(board), 300);
+    });
   } catch (e) {
     console.error('User with this id does not exist.');
     await signOut();
