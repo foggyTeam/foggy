@@ -15,7 +15,7 @@ export default async function middleware(req: NextRequest) {
   if (!isPublicRoute && !session?.userId)
     return NextResponse.redirect(new URL('/login', req.nextUrl));
 
-  // Маршрут вида project/[id], team/[id], или board/[id]
+  // Маршрут вида project/[project_id], team/[project_id], или board/[project_id]
   const match = path.match(protectedRoutesRegex);
 
   if (match) {

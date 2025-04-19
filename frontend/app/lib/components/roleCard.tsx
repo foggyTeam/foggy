@@ -1,11 +1,7 @@
 import { danger, info, secondary, success, warning } from '@/tailwind.config';
-import { ProjectRole, TeamRole } from '@/app/lib/types/definitions';
+import { Role } from '@/app/lib/types/definitions';
 
-export default function RoleCard({
-  role,
-}: {
-  role: ProjectRole | TeamRole | string;
-}) {
+export default function RoleCard({ role }: { role: Role | string }) {
   const colorMap: any = {
     owner: info.DEFAULT,
     admin: danger.DEFAULT,

@@ -5,10 +5,19 @@ import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
 import { Board } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
-import board from '@/app/mockData/board.json';
 import { signOut } from '@/auth';
 
-async function getBoard(): Promise<Board | undefined> {
+interface BoardPageProps {
+  project_id: string;
+  section_id: string;
+  board_id: string;
+}
+
+async function getBoard(
+  project_id: string,
+  section_id: string,
+  board_id: string,
+): Promise<Board | undefined> {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
 
@@ -17,9 +26,8 @@ async function getBoard(): Promise<Board | undefined> {
   }
 
   try {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(board as Board), 300);
-    });
+    const response = await fetch('@/app/mockData/board.json');
+    return await response.json();
   } catch (e) {
     console.error('User with this id does not exist.');
     await signOut();
@@ -27,8 +35,9 @@ async function getBoard(): Promise<Board | undefined> {
   }
 }
 
-export default async function BoardPage() {
-  const boardData = await getBoard();
+export default async function BoardPage(params: BoardPageProps) {
+  const { project_id, section_id, board_id } = await params;
+  const boardData = await getBoard(project_id, section_id, board_id);
 
   return (
     <>

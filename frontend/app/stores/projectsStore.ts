@@ -149,8 +149,11 @@ class ProjectsStore {
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
   };
-  addBoard = (newBoard: Board) => {
-    if (this.activeProject) {
+  addBoard = (sectionId, newBoard: Partial<Board>) => {
+    const sectionIndex = this.activeProject?.sections?.findIndex(
+      (section) => section.id === sectionId,
+    );
+    if (sectionIndex > -1) {
       if (!this.activeProject.boards) this.activeProject.boards = [];
       this.activeProject.boards.push(newBoard);
     }

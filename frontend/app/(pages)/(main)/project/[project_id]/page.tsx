@@ -1,12 +1,9 @@
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
 import { Project } from '@/app/lib/types/definitions';
 import { getRequest } from '@/app/lib/server/requests';
-import { undefined } from 'zod';
 
 interface ProjectPageProps {
-  params: {
-    id: string;
-  };
+  project_id: string;
 }
 
 async function getProject(id: string): Promise<Project | undefined> {
@@ -31,8 +28,8 @@ async function getProject(id: string): Promise<Project | undefined> {
 export default async function ProjectPage({
   params,
 }: Promise<ProjectPageProps>) {
-  const { id } = await params;
-  const projectData = await getProject(id);
+  const { project_id } = await params;
+  const projectData = await getProject(project_id);
 
   return (
     <>

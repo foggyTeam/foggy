@@ -1,15 +1,9 @@
 import React from 'react';
-import teams from '@/app/mockData/teams.json';
 import projects from '@/app/mockData/projects.json';
 import users from '@/app/mockData/users.json';
 
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
-import {
-  Project,
-  ProjectMember,
-  Team,
-  TeamMember,
-} from '@/app/lib/types/definitions';
+import { Project, ProjectMember, Team } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
@@ -63,27 +57,8 @@ async function getUserTeams(): Promise<Team[] | undefined> {
   }
 
   try {
-    const allUsers: any[] = users;
-
-    return new Promise((resolve) => {
-      setTimeout(
-        () =>
-          resolve(
-            teams.map((team) => {
-              return {
-                ...team,
-                members: team.members.map((member) => {
-                  return {
-                    ...member,
-                    ...allUsers.find((user) => user.id === member.id),
-                  } as TeamMember;
-                }),
-              } as Team;
-            }),
-          ),
-        300,
-      );
-    });
+    const response = await fetch('@/app/mockData/teams.json');
+    return await response.json();
   } catch (e) {
     console.error('User with this id does not exist.');
     await signOut();

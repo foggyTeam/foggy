@@ -2,9 +2,9 @@ import {
   FilterSet,
   Project,
   ProjectMember,
+  Role,
   Team,
   TeamMember,
-  TeamRole,
 } from '@/app/lib/types/definitions';
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/modal';
 import React, { ReactNode, useEffect, useState } from 'react';
@@ -26,12 +26,7 @@ import { Button } from '@heroui/button';
 import { X } from 'lucide-react';
 import { FilterReducerActionPayload } from '@/app/lib/components/contentSection';
 
-const teamRoles: Set<TeamRole> = new Set([
-  'owner',
-  'admin',
-  'editor',
-  'reader',
-]);
+const teamRoles: Set<Role> = new Set(['owner', 'admin', 'editor', 'reader']);
 
 export default function FilterModal({
   data,
@@ -47,8 +42,8 @@ export default function FilterModal({
   onOpenChange: any;
 }) {
   const [membersList, setMembersList] = useState<Array<ProjectMember>>();
-  const [teamsList, setTeamsList] = useState<Array<Team>>();
-  const [rolesList, setRolesList] = useState<Array<TeamRole>>();
+  const [teamsList, setTeamsList] = useState<Array<string>>();
+  const [rolesList, setRolesList] = useState<Array<Role>>();
   const [maxDate, setMaxDate] = useState<ZonedDateTime>();
 
   const [lastUpdated, setLastUpdated] = useState<{
@@ -58,16 +53,16 @@ export default function FilterModal({
 
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
-  const [selectedRoles, setSelectedRoles] = useState<TeamRole[]>([]);
+  const [selectedRoles, setSelectedRoles] = useState<Role[]>([]);
 
   useEffect(() => {
     if (data.length) {
       // nickname || team
       if ('members' in data[0]) {
         const allMembers: Map<string, ProjectMember> = new Map();
-        const allTeams: Map<string, Team> = new Map();
+        const allTeams: Set<string> = new Set([]);
         const alreadySelectedMembers: Map<string, string> = new Map();
-        const alreadySelectedTeams: Map<string, string> = new Map();
+        const alreadySelectedTeams: Set<string> = new Set([]);
 
         data.forEach((element) => {
           if ('members' in element && element.members)
@@ -75,15 +70,12 @@ export default function FilterModal({
               if (member.nickname) {
                 allMembers.set(member.id, member as ProjectMember);
                 if (filters.nickname.has(member.nickname))
-                  alreadySelectedMembers.set(
-                    member.id as string,
-                    member.nickname,
-                  );
+                  alreadySelectedMembers.set(member.id, member.nickname);
               }
-              if ('name' in member) {
-                allTeams.set(member.id, member as Team);
-                if (filters.team.has(member.name as string))
-                  alreadySelectedTeams.set(member.id, member.name as string);
+              if ('team' in member && typeof member.team === 'string') {
+                allTeams.add(member.team);
+                if (filters.team.has(member.team))
+                  alreadySelectedTeams.add(member.team);
               }
             });
         });
@@ -129,10 +121,7 @@ export default function FilterModal({
       { key: 'nickname', value: new Set(selectedMembers) },
       { key: 'team', value: new Set(selectedTeams) },
       { key: 'role', value: new Set(selectedRoles) },
-      {
-        key: 'lastChange',
-        value: newPeriod[0] ? newPeriod.join('_') : '',
-      },
+      { key: 'lastChange', value: newPeriod[0] ? newPeriod.join('_') : '' },
     ];
 
     debouncedUpdateFilters(filtersToUpdate);
@@ -207,8 +196,12 @@ export default function FilterModal({
                     {teamsList.map(
                       (team) =>
                         (
-                          <SelectItem key={team.name} textValue={team.name}>
-                            <SmallMemberCard {...team} />
+                          <SelectItem
+                            key={team}
+                            textValue={team}
+                            className="text-small font-bold text-default-700"
+                          >
+                            {team}
                           </SelectItem>
                         ) as any,
                     )}
@@ -226,7 +219,7 @@ export default function FilterModal({
                     }}
                     selectedKeys={selectedRoles}
                     onSelectionChange={(keys) =>
-                      setSelectedRoles(Array.from(keys) as TeamRole[])
+                      setSelectedRoles(Array.from(keys) as Role[])
                     }
                     selectionMode="multiple"
                     label={settingsStore.t.filters.byRole.label}

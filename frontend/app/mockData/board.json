@@ -1,8 +1,7 @@
 {
-  "projectId": "project-1",
-  "section": "test section",
-  "id": "ljkhgblkjb11",
-  "name": "test board",
+  "sectionId": "section-0",
+  "id": "board-0",
+  "name": "Test board",
   "type": "SIMPLE",
   "layers": [
     [
