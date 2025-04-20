@@ -8,6 +8,7 @@ import {
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
+import ConvertRawProject from '@/app/lib/utils/convertRawProject';
 
 const MAX_LAYER = 2;
 
@@ -147,10 +148,7 @@ class ProjectsStore {
     else this.activeBoard = board;
   };
   setActiveProject = (project: RawProject) => {
-    this.activeProject = {
-      ...project,
-      sections: observable.map(project.sections),
-    };
+    this.activeProject = ConvertRawProject(project);
   };
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;
