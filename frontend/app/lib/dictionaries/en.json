@@ -1,13 +1,4 @@
 {
-  "login": {
-    "email": "Email",
-    "password": "Password",
-    "emailPlaceholder": "hoggyfoggy@example.com",
-    "passwordPlaceholder": "qwerty123",
-    "signInButton": "Log in",
-    "signUpButton": "Sign up",
-    "loginViaProviders": "Login with"
-  },
   "validationErrors": {
     "nickname": {
       "required": "Nickname is required",
@@ -39,6 +30,16 @@
       "maxLength": "Description must be no more than 300 characters long",
       "invalidSymbols": "Description may contain only letters, digits and special symbols"
     }
+  },
+
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "hoggyfoggy@example.com",
+    "passwordPlaceholder": "qwerty123",
+    "signInButton": "Log in",
+    "signUpButton": "Sign up",
+    "loginViaProviders": "Login with"
   },
 
   "profile": {

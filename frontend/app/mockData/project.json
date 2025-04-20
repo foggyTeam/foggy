@@ -1,0 +1,142 @@
+{
+  "id": "project-3",
+  "name": "App Development",
+  "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+  "description": "Creating a cross-platform mobile application.",
+  "favorite": true,
+  "members": [
+    {
+      "id": "user-4",
+      "nickname": "COACH_MASTER_1",
+      "avatar": "http://postimg.su/image/jS9F0TS1/b4.png",
+      "role": "admin",
+      "team": "Creative Minds",
+      "teamId": "team-1"
+    },
+    {
+      "id": "67f18c3ece58d18c7ebaae02",
+      "nickname": "iciicifur",
+      "avatar": "http://postimg.su/image/jnDPchRV/s10.png",
+      "role": "reader"
+    },
+    {
+      "id": "user-5",
+      "nickname": "DESIGN_WIZARD5",
+      "avatar": "http://postimg.su/image/klibtc2Q/b5.png",
+      "role": "owner",
+      "team": "Visionaries United",
+      "teamId": "team-9"
+    },
+    {
+      "id": "user-10",
+      "nickname": "PROJECT_LEADER_10",
+      "avatar": "http://postimg.su/image/adq7HUIB/s15.png",
+      "role": "editor",
+      "team": "Tech Innovators",
+      "teamId": "team-3"
+    },
+    {
+      "id": "user-15",
+      "nickname": "GOAL_ACHIEVER_15",
+      "avatar": "http://postimg.su/image/Qe7bRQeD/b3.png",
+      "role": "reader"
+    },
+    {
+      "id": "user-14",
+      "nickname": "CONTENT_CREATOR_14",
+      "avatar": "http://postimg.su/image/oRpYCdHd/s11.png",
+      "role": "editor"
+    },
+    {
+      "id": "user-20",
+      "nickname": "INNOVATOR_20",
+      "avatar": "http://postimg.su/image/3KgFkHL4/white15.jpg",
+      "role": "admin"
+    }
+  ],
+  "sections": {
+    "section-1": {
+      "id": "section-1",
+      "name": "UI Design",
+      "parentId": null,
+      "childrenNumber": 2,
+      "children": {
+        "section-1-1": {
+          "id": "section-1-1",
+          "name": "Wireframes",
+          "parentId": "section-1",
+          "childrenNumber": 0,
+          "children": {}
+        },
+        "section-1-2": {
+          "id": "section-1-2",
+          "name": "Mockups",
+          "parentId": "section-1",
+          "childrenNumber": 0,
+          "children": {}
+        }
+      }
+    },
+    "section-2": {
+      "id": "section-2",
+      "name": "Backend Development",
+      "parentId": null,
+      "childrenNumber": 1,
+      "children": {
+        "board-1": {
+          "id": "board-1",
+          "name": "API Endpoints",
+          "sectionId": "section-2",
+          "type": "GRAPH",
+          "lastChange": "2025-04-15T10:00:00Z",
+          "layers": []
+        }
+      }
+    },
+    "section-3": {
+      "id": "section-3",
+      "name": "Project Management",
+      "parentId": null,
+      "childrenNumber": 2,
+      "children": {
+        "section-3-1": {
+          "id": "section-3-1",
+          "name": "Sprint Planning",
+          "parentId": "section-3",
+          "childrenNumber": 0,
+          "children": {}
+        },
+        "board-2": {
+          "id": "board-2",
+          "name": "Task Tracker",
+          "sectionId": "section-3",
+          "type": "TREE",
+          "lastChange": "2025-04-18T09:30:00Z",
+          "layers": []
+        }
+      }
+    },
+    "section-4": {
+      "id": "section-4",
+      "name": "Testing",
+      "parentId": null,
+      "childrenNumber": 1,
+      "children": {
+        "board-3": {
+          "id": "board-3",
+          "name": "Bug Reports",
+          "sectionId": "section-4",
+          "type": "SIMPLE",
+          "lastChange": "2025-04-19T12:45:00Z",
+          "layers": []
+        }
+      }
+    }
+  },
+  "settings": {
+    "allowRequests": true,
+    "isPublic": false,
+    "memberListIsPublic": true
+  },
+  "lastChange": "2025-04-12T14:20:00Z"
+}

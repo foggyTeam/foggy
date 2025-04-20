@@ -15,24 +15,7 @@ import {
 } from '@/app/lib/types/styles';
 import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
-import userStore from '@/app/stores/userStore';
-
-function byRole(a: any, b: any) {
-  const thisUserId = userStore.user?.id;
-
-  const rolePriority: any = {
-    owner: 5,
-    admin: 4,
-    team: 3,
-    editor: 2,
-    reader: 1,
-  };
-
-  if (a.id === thisUserId) return -1;
-  if (b.id === thisUserId) return 1;
-
-  return rolePriority[b.role] - rolePriority[a.role];
-}
+import CompareByRole from '@/app/lib/utils/compareByRole';
 
 export default function ProjectCard(project: Project) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -117,7 +100,7 @@ export default function ProjectCard(project: Project) {
         {isExpanded ? (
           <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
             {project.members
-              .sort(byRole)
+              .sort(CompareByRole)
               .slice(0, 7)
               .map((member) => (
                 <MediumMemberCard key={member.id} {...member} />

@@ -4,6 +4,7 @@ import {
   BoardElement,
   Project,
   ProjectSection,
+  RawProject,
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
@@ -145,8 +146,11 @@ class ProjectsStore {
     if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
   };
-  setActiveProject = (project: Project) => {
-    this.activeProject = project;
+  setActiveProject = (project: RawProject) => {
+    this.activeProject = {
+      ...project,
+      sections: observable.map(project.sections),
+    };
   };
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;

@@ -12,7 +12,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import { Select, SelectItem } from '@heroui/select';
 import { useDebouncedCallback } from 'use-debounce';
-import RoleCard from '@/app/lib/components/roleCard';
+import RoleCard from '@/app/lib/components/members/roleCard';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { DateRangePicker } from '@heroui/date-picker';
