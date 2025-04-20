@@ -1,7 +1,7 @@
 import { Avatar } from '@heroui/avatar';
 import React from 'react';
 import { ProjectMember, TeamMember } from '@/app/lib/types/definitions';
-import RoleCard from '@/app/lib/components/roleCard';
+import RoleCard from '@/app/lib/components/members/roleCard';
 import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';

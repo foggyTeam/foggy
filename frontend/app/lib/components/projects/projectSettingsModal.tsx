@@ -25,7 +25,7 @@ const ProjectSettingsModal = observer(
   }: {
     isOpen: boolean;
     onOpenChange: any;
-    isNewProject: boolean;
+    isNewProject?: boolean;
   }) => {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);

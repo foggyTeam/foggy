@@ -50,7 +50,7 @@ export default function ContentActionBar({
   };
   return (
     <div className="flex h-fit w-full flex-col gap-2">
-      <div className="flex h-fit w-full items-center justify-between gap-2">
+      <div className="flex h-fit w-full items-center justify-between gap-1">
         <div className="flex gap-1">
           <Input
             onValueChange={setSearchValue}
@@ -73,7 +73,6 @@ export default function ContentActionBar({
               variant={hasFilters() ? 'flat' : 'light'}
               color={hasFilters() ? 'primary' : 'default'}
               size="sm"
-              radius="lg"
             >
               <FunnelIcon
                 className={
@@ -89,7 +88,6 @@ export default function ContentActionBar({
               variant={favorite ? 'flat' : 'light'}
               color={favorite ? 'primary' : 'default'}
               size="sm"
-              radius="lg"
             >
               <StarIcon
                 className={
@@ -105,7 +103,6 @@ export default function ContentActionBar({
               variant={withNotification ? 'flat' : 'light'}
               color={withNotification ? 'primary' : 'default'}
               size="sm"
-              radius="lg"
             >
               <BellIcon
                 className={
@@ -117,35 +114,17 @@ export default function ContentActionBar({
         </div>
         <div className="flex gap-1">
           {addNew !== undefined && (
-            <Button
-              onPress={addNew}
-              isIconOnly
-              variant="light"
-              size="sm"
-              radius="lg"
-            >
+            <Button onPress={addNew} isIconOnly variant="light" size="sm">
               <PlusIcon className="stroke-default-500" />
             </Button>
           )}
           {addMember !== undefined && (
-            <Button
-              onPress={addMember}
-              isIconOnly
-              variant="light"
-              size="sm"
-              radius="lg"
-            >
+            <Button onPress={addMember} isIconOnly variant="light" size="sm">
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
           {openSettings !== undefined && (
-            <Button
-              onPress={openSettings}
-              isIconOnly
-              variant="light"
-              size="sm"
-              radius="lg"
-            >
+            <Button onPress={openSettings} isIconOnly variant="light" size="sm">
               <SettingsIcon className="stroke-default-500" />
             </Button>
           )}

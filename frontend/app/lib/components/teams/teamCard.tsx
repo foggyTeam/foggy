@@ -3,12 +3,13 @@ import { el_animation, team_tile } from '@/app/lib/types/styles';
 import { Avatar, AvatarGroup } from '@heroui/avatar';
 import React from 'react';
 import clsx from 'clsx';
-import RoleCard from '@/app/lib/components/roleCard';
+import RoleCard from '@/app/lib/components/members/roleCard';
 import userStore from '@/app/stores/userStore';
 
 export default function TeamCard(team: Team) {
   return (
     <div
+      // TODO: navigate to team
       onClick={() => console.log('hi')}
       className={clsx(
         'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
