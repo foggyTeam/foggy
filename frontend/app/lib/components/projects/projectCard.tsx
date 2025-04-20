@@ -71,11 +71,11 @@ export default function ProjectCard(project: Project) {
           />
           <h1
             className={clsx(
-              'truncate text-nowrap font-medium transition-colors duration-300 hover:text-f_accent',
+              'accent-link truncate text-nowrap font-medium',
               !isExpanded && 'max-w-40',
             )}
           >
-            <a /*TODO: link to this project page*/ href={'/'}>{project.name}</a>
+            <a href={`project/${project.id}`}>{project.name}</a>
           </h1>
         </div>
         <Button
@@ -123,16 +123,15 @@ export default function ProjectCard(project: Project) {
                 <MediumMemberCard key={member.id} {...member} />
               ))}
             {project.members.length > 7 && (
-              <Button
-                // TODO: link to this project page
-                variant="bordered"
-                className="h-8 items-center justify-start border-none px-4 italic"
+              <a
+                href={`project/${project.id}`}
+                className="accent-link h-8 content-center justify-start px-4 italic"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
                   (project.members.length - 7).toString(),
                 )}
-              </Button>
+              </a>
             )}
           </div>
         ) : (
