@@ -72,8 +72,24 @@
           "id": "section-1-2",
           "name": "Mockups",
           "parentId": "section-1",
-          "childrenNumber": 0,
-          "children": {}
+          "childrenNumber": 2,
+          "children": {
+            "section-1-2-1": {
+              "id": "section-1-2-1",
+              "name": "Child section",
+              "parentId": "section-1-2",
+              "childrenNumber": 0,
+              "children": {}
+            },
+            "board-32": {
+              "id": "board-32",
+              "name": "Board 32 hey",
+              "sectionId": "section-1-2",
+              "type": "SIMPLE",
+              "lastChange": "2025-04-15T10:00:00Z",
+              "layers": []
+            }
+          }
         }
       }
     },

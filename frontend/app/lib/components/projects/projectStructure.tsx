@@ -10,7 +10,7 @@ import { Button } from '@heroui/button';
 import { SettingsIcon } from 'lucide-react';
 import settingsStore from '@/app/stores/settingsStore';
 import React from 'react';
-import SectionCard from '@/app/lib/components/projects/sectionCard';
+import ProjectTree from '@/app/lib/components/projects/projectTree/projectTree';
 
 const ProjectStructure = observer(() => {
   const {
@@ -53,7 +53,7 @@ const ProjectStructure = observer(() => {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex h-full min-h-96 flex-col gap-4">
           <h1 className="font-medium">
             {settingsStore.t.projects.projectSections}
           </h1>
@@ -64,14 +64,7 @@ const ProjectStructure = observer(() => {
               'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
             )}
           >
-            <div className="flex flex-col gap-2">
-              {projectsStore.activeProject?.sections &&
-                Array.from(projectsStore.activeProject?.sections?.values()).map(
-                  (section) => (
-                    <SectionCard key={section.id} section={section} />
-                  ),
-                )}
-            </div>
+            <ProjectTree />
           </div>
         </div>
 
