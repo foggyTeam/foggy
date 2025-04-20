@@ -54,7 +54,7 @@ export default function ProjectCard(project: Project) {
           />
           <h1
             className={clsx(
-              'accent-link truncate text-nowrap font-medium',
+              'truncate text-nowrap font-medium accent-link',
               !isExpanded && 'max-w-40',
             )}
           >
@@ -108,7 +108,7 @@ export default function ProjectCard(project: Project) {
             {project.members.length > 7 && (
               <a
                 href={`project/${project.id}`}
-                className="accent-link h-8 content-center justify-start px-4 italic"
+                className="h-8 content-center justify-start px-4 italic accent-link"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
