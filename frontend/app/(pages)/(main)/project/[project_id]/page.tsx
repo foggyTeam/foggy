@@ -25,14 +25,13 @@ async function getProject(id: string): Promise<Project | undefined> {
   return undefined;
 }
 
-export default async function ProjectPage({
-  params,
-}: Promise<ProjectPageProps>) {
+export default async function ProjectPage(params: Promise<ProjectPageProps>) {
   const { project_id } = await params;
   const projectData = await getProject(project_id);
 
   return (
     <>
+      <p>{project_id}</p>
       <ProjectLoader projectData={projectData} />
     </>
   );

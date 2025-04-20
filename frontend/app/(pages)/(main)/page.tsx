@@ -23,7 +23,7 @@ async function getUserProjects(): Promise<Project[] | undefined> {
 
   try {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(allProjects), 300);
+      setTimeout(() => resolve(allProjects as Project[]), 300);
     });
   } catch (e) {
     console.error('User with this id does not exist.');
@@ -41,7 +41,7 @@ async function getUserTeams(): Promise<Team[] | undefined> {
 
   try {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(allTeams), 300);
+      setTimeout(() => resolve(allTeams as Team[]), 300);
     });
   } catch (e) {
     console.error('User with this id does not exist.');

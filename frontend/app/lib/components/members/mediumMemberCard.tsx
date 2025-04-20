@@ -9,8 +9,8 @@ import { Button } from '@heroui/button';
 export default function MediumMemberCard(member: ProjectMember | TeamMember) {
   return (
     <Button
-      onPress={() => console.log('navigate to member')}
-      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pl-0 pr-1 transition-colors duration-200 shadow-container hover:bg-primary-100"
+      // TODO: navigate to member
+      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pl-0 pr-1 transition-colors duration-300 shadow-container hover:bg-primary-100"
     >
       <div className="flex items-center justify-start gap-1">
         <Avatar

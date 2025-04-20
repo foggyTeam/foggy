@@ -293,6 +293,14 @@ export default {
         '.shadow-container': {
           boxShadow: `2px 4px 10px 0 rgba(${to_rgb(primary.DEFAULT)}, 0.04)`,
         },
+        '.accent-link': {
+          transitionProperty: 'color, text-decoration-color, fill, stroke',
+          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          transitionDuration: '200ms',
+        },
+        '.accent-link:hover': {
+          color: `rgb(${to_rgb(foggy_accent.DEFAULT)})`,
+        },
       };
 
       addUtilities({ ...avatars, ...badges, ...buttons, ...theme_styles }, [
