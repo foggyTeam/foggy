@@ -12,6 +12,8 @@ interface ActiveNodeContextType {
     id: string;
     parentList: string[];
   }) => void;
+  removeNode: (id: string, parentList: string[]) => void;
+  addNode: (parentList: string[]) => void;
 }
 const ActiveNodeContext = createContext<ActiveNodeContextType | null>(null);
 export const useActiveSectionContext = () => {
@@ -24,12 +26,21 @@ export const useActiveSectionContext = () => {
 const ProjectTree = observer(() => {
   const [activeNode, setActiveNode] = useState(null);
 
-  const handleClick = (event) => console.log(event);
+  const removeNode = (id: string, parentList: string[]) => {
+    console.log('removing', id);
+  };
+
+  const addNode = (parentList: string[]) => {
+    console.log('adding', parentList);
+  };
+
   return (
     <ActiveNodeContext.Provider
       value={{
         activeNode: activeNode,
         setActiveNode: setActiveNode,
+        removeNode: removeNode,
+        addNode: addNode,
       }}
     >
       <div className="flex h-fit w-full flex-col gap-2 pb-16 pr-2">
