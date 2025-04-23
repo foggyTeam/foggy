@@ -8,12 +8,14 @@ import { Button } from '@heroui/button';
 import { ChevronRightIcon } from 'lucide-react';
 import SubSectionCard from '@/app/lib/components/projects/projectTree/subSectionCard';
 import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
+import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 
 export default function RootSectionCard({
   section,
 }: {
   section: ProjectSection;
 }) {
+  const { activeNode, setActiveNode } = useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [sectionName, setSectionName] = useState(section.name);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -28,6 +30,8 @@ export default function RootSectionCard({
 
   return (
     <div
+      tabIndex={0}
+      onBlur={() => setActiveNode(null)}
       className={clsx(
         'box-border flex flex-col items-start justify-start rounded-2xl',
         'w-full bg-white px-3 py-2 shadow-container hover:bg-default-50',
@@ -37,8 +41,13 @@ export default function RootSectionCard({
       )}
     >
       <div
-        onDoubleClick={() => setIsReadonly(false)}
-        className="flex h-12 w-full items-center justify-start gap-0"
+        onClick={() => setActiveNode({ id: section.id, parentList: [] })}
+        className={clsx(
+          'flex h-12 w-full cursor-pointer items-center justify-start gap-0 rounded-xl hover:bg-default-100',
+          activeNode &&
+            section.id === activeNode.id &&
+            'bg-primary-100 hover:bg-primary-100',
+        )}
       >
         <Button
           isIconOnly
@@ -54,14 +63,22 @@ export default function RootSectionCard({
           />
         </Button>
         <Input
-          isReadOnly={isReadonly}
           value={sectionName.toUpperCase()}
           onValueChange={setSectionName}
+          isReadOnly={isReadonly}
+          autoFocus={!isReadonly}
+          onClick={(e) => e.stopPropagation()}
+          onFocus={() => setIsReadonly(false)}
           onBlur={updateSectionName}
           variant="bordered"
-          size="sm"
+          className={clsx(
+            'h-6 w-full max-w-56 content-center rounded-md border-1.5 border-default/0',
+            !isReadonly && 'border-default-200',
+          )}
           classNames={{
-            inputWrapper: 'border-none shadow-none max-w-sm',
+            main: 'h-6',
+            mainWrapper: 'flex justify-center',
+            inputWrapper: 'shadow-none max-w-lg transition-all border-none',
             input: 'truncate text-nowrap',
           }}
         />
