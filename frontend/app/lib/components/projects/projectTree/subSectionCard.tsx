@@ -6,6 +6,7 @@ import { Button } from '@heroui/button';
 import { ChevronRightIcon } from 'lucide-react';
 import { Input } from '@heroui/input';
 import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
+import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 
 export default function SubSectionCard({
   parentList,
@@ -14,6 +15,7 @@ export default function SubSectionCard({
   parentList: string[];
   subSection: ProjectSection;
 }) {
+  const { activeNode, setActiveNode } = useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [subSectionName, setSubSectionName] = useState(subSection.name);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -35,8 +37,13 @@ export default function SubSectionCard({
       )}
     >
       <div
-        onDoubleClick={() => setIsReadonly(false)}
-        className="flex w-full items-center justify-start gap-0"
+        onClick={() => setActiveNode({ id: subSection.id, parentList })}
+        className={clsx(
+          'flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 hover:bg-default-100',
+          activeNode &&
+            subSection.id === activeNode.id &&
+            'bg-primary-100 hover:bg-primary-100',
+        )}
       >
         <Button
           isIconOnly
@@ -53,13 +60,22 @@ export default function SubSectionCard({
         </Button>
         <Input
           isReadOnly={isReadonly}
+          autoFocus={!isReadonly}
+          onClick={(e) => e.stopPropagation()}
+          onFocus={() => setIsReadonly(false)}
+          onBlur={updateSectionName}
           value={subSectionName}
           onValueChange={setSubSectionName}
-          onBlur={updateSectionName}
           variant="bordered"
           size="sm"
+          className={clsx(
+            'h-6 w-fit content-center rounded-md border-1.5 border-default/0',
+            !isReadonly && 'border-default-200',
+          )}
           classNames={{
-            inputWrapper: 'border-none shadow-none max-w-sm',
+            main: 'h-6',
+            mainWrapper: 'flex justify-center',
+            inputWrapper: 'shadow-none max-w-sm transition-all border-none',
             input: 'truncate text-nowrap',
           }}
         />
