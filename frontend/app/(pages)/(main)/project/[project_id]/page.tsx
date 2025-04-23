@@ -17,7 +17,11 @@ async function getProject(id: string): Promise<RawProject | undefined> {
   });
 }
 
-export default async function ProjectPage(params: Promise<ProjectPageProps>) {
+export default async function ProjectPage({
+  params,
+}: {
+  params: Promise<ProjectPageProps>;
+}) {
   const { project_id } = await params;
   const projectData = await getProject(project_id);
 

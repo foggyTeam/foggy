@@ -37,7 +37,11 @@ async function getBoard(
   }
 }
 
-export default async function BoardPage(params: BoardPageProps) {
+export default async function BoardPage({
+  params,
+}: {
+  params: Promise<BoardPageProps>;
+}) {
   const { project_id, section_id, board_id } = await params;
   const boardData = await getBoard(project_id, section_id, board_id);
 

@@ -8,6 +8,7 @@ import { IdCardIcon, LogOutIcon, UserRoundXIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
+import Link from 'next/link';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
   return (
@@ -31,9 +32,9 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
           <div className="flex items-center gap-1">
             <h1 className="max-w-32 truncate text-nowrap font-medium">
               {/* TODO: navigate to member page */}
-              <a href="/" className="accent-link">
+              <Link href="/" className="accent-link">
                 {member.nickname}
-              </a>
+              </Link>
             </h1>
             {userStore.user?.id === member.id && (
               <p className="text-xs text-default-700">
