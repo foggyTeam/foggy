@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
+import ElementIcon from '@/app/lib/components/menu/projectBar/elementIcon';
 
 const RecentBar = observer(() => {
   return (
@@ -24,7 +24,9 @@ const RecentBar = observer(() => {
           variant="light"
           size="md"
         >
-          <BoardIcon boardType={projectsStore.activeBoard?.type || 'SIMPLE'} />
+          <ElementIcon
+            elementType={projectsStore.activeBoard?.type || 'SIMPLE'}
+          />
         </Button>
       )}
 

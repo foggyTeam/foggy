@@ -68,3 +68,14 @@ export const projectFormSchema = z.object({
       settingsStore.t.validationErrors.projectDescription.invalidSymbols,
     ),
 });
+
+export const projectElementNameSchema = z.object({
+  name: z
+    .string()
+    .nonempty(settingsStore.t.validationErrors.projectElementName.required)
+    .max(20, settingsStore.t.validationErrors.projectElementName.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.projectElementName.invalidSymbols,
+    ),
+});

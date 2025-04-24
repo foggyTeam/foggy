@@ -1,7 +1,7 @@
 import { Board } from '@/app/lib/types/definitions';
 import { useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
-import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
+import ElementIcon from '@/app/lib/components/menu/projectBar/elementIcon';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
@@ -56,7 +56,7 @@ export default function BoardCard({
       >
         <div className="flex h-full w-full items-center">
           <div className="flex h-8 w-8 items-center justify-center">
-            <BoardIcon boardType={board.type} />
+            <ElementIcon elementType={board.type} />
           </div>
           <NameInput
             isReadonly={isReadonly}

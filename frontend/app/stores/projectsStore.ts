@@ -201,7 +201,7 @@ class ProjectsStore {
     }
 
     // добавление на верхний уровень
-    if (parentSections.length === 0 && isSection && 'parentId' in child) {
+    if (parentSections.length === 0 && isSection && 'children' in child) {
       this.activeProject.sections.set(child.id, child);
       child.parentId = undefined;
     }

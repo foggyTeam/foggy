@@ -125,6 +125,8 @@ export interface ProjectMember extends TeamMember {
   teamId?: string;
 }
 
+export type ProjectElementTypes = BoardTypes | 'SECTION';
+
 // TEAM
 export interface Team {
   id: string;
