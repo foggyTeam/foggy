@@ -2,20 +2,20 @@ import { ProjectSection } from '@/app/lib/types/definitions';
 import clsx from 'clsx';
 import { el_animation } from '@/app/lib/types/styles';
 import { useState } from 'react';
-import { Input } from '@heroui/input';
 import projectsStore from '@/app/stores/projectsStore';
 import { Button } from '@heroui/button';
 import { ChevronRightIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import SubSectionCard from '@/app/lib/components/projects/projectTree/subSectionCard';
 import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
+import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 
 export default function RootSectionCard({
   section,
 }: {
   section: ProjectSection;
 }) {
-  const { activeNode, setActiveNode, removeNode, addNode } =
+  const { activeNodes, setActiveNodes, removeNode, addNode } =
     useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [sectionName, setSectionName] = useState(section.name);
@@ -32,7 +32,7 @@ export default function RootSectionCard({
   return (
     <div
       tabIndex={0}
-      onBlur={() => setActiveNode(null)}
+      onBlur={() => setActiveNodes([])}
       className={clsx(
         'flex flex-col items-start justify-start rounded-2xl',
         'w-full bg-white px-3 py-2 shadow-container hover:bg-default-50',
@@ -42,11 +42,17 @@ export default function RootSectionCard({
       )}
     >
       <div
-        onClick={() => setActiveNode({ id: section.id, parentList: [] })}
+        onClick={(event) =>
+          setActiveNodes(
+            event.ctrlKey
+              ? [...activeNodes, { id: section.id, parentList: [] }]
+              : [{ id: section.id, parentList: [] }],
+          )
+        }
         className={clsx(
-          'group flex h-12 w-full cursor-pointer items-center justify-between gap-0 rounded-xl hover:bg-default-100',
-          activeNode &&
-            section.id === activeNode.id &&
+          'group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-1 hover:bg-default-100',
+          activeNodes.length &&
+            activeNodes.findIndex((node) => node.id == section.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
         )}
       >
@@ -64,25 +70,14 @@ export default function RootSectionCard({
               )}
             />
           </Button>
-          <Input
+          <NameInput
+            isReadonly={isReadonly}
+            setIsReadonly={setIsReadonly}
+            onBlur={updateSectionName}
             value={sectionName.toUpperCase()}
             onValueChange={setSectionName}
-            isReadOnly={isReadonly}
-            autoFocus={!isReadonly}
-            onClick={(e) => e.stopPropagation()}
-            onFocus={() => setIsReadonly(false)}
-            onBlur={updateSectionName}
-            variant="bordered"
-            className={clsx(
-              'h-6 w-full max-w-56 content-center rounded-md border-1.5 border-default/0',
-              !isReadonly && 'border-default-200',
-            )}
-            classNames={{
-              main: 'h-6',
-              mainWrapper: 'flex justify-center',
-              inputWrapper: 'shadow-none max-w-lg transition-all border-none',
-              input: 'truncate text-nowrap',
-            }}
+            size="md"
+            maxW="lg"
           />
         </div>
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
