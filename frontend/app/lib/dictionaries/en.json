@@ -29,6 +29,11 @@
     "projectDescription": {
       "maxLength": "Description must be no more than 300 characters long",
       "invalidSymbols": "Description may contain only letters, digits and special symbols"
+    },
+    "projectElementName": {
+      "required": "Name is required",
+      "maxLength": "Name must be no more than 20 characters long",
+      "invalidSymbols": "Name may contain only letters, digits and special symbols"
     }
   },
 
@@ -104,6 +109,25 @@
       "modalHeader": "Do you really want to delete this element?",
       "modalSure": "Delete anyway",
       "modalDismiss": "Dismiss"
+    },
+    "addElement": {
+      "section": {
+        "new": "New section",
+        "placeholder": "Section name"
+      },
+      "simple": {
+        "new": "New board",
+        "placeholder": "Board name"
+      },
+      "graph": {
+        "new": "New graph",
+        "placeholder": "Graph name"
+      },
+      "tree": {
+        "new": "New tree",
+        "placeholder": "Tree name"
+      },
+      "create": "Create"
     },
     "projectMembers": "PARTICIPANTS",
     "projectSections": "SECTIONS",

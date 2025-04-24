@@ -6,6 +6,12 @@ import AddRootSectionButton from '@/app/lib/components/projects/projectTree/addR
 import settingsStore from '@/app/stores/settingsStore';
 import AreYouSureModal from '@/app/lib/components/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
+import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
+import {
+  Board,
+  ProjectElementTypes,
+  ProjectSection,
+} from '@/app/lib/types/definitions';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
@@ -37,14 +43,42 @@ const ProjectTree = observer(() => {
     id: string;
     parentList: string[];
   }>(null);
+  const [newNodeParentList, setNewNodeParentList] = useState<string[]>(null);
 
   const removeNode = (id: string, parentList: string[]) => {
     setNodeToRemove({ id: id, parentList: parentList });
     onDeleteChildOpen(true);
   };
 
-  const addNode = (parentList: string[]) => {
-    console.log('adding', parentList);
+  const openAddNodeModal = (parentList: string[]) => {
+    setNewNodeParentList(parentList);
+    onAddChildOpen(true);
+  };
+
+  const addNode = (nodeName: string, nodeType: ProjectElementTypes) => {
+    // TODO: await for id
+    switch (nodeType) {
+      case 'SECTION':
+        const newSection: ProjectSection = {
+          children: new Map(),
+          childrenNumber: 0,
+          id: nodeName,
+          name: nodeName,
+        };
+        projectsStore.addProjectChild(newNodeParentList, newSection, true);
+        break;
+      default:
+        const newBoard: Board = {
+          id: nodeName,
+          name: nodeName,
+          type: nodeType,
+          layers: [[], [], []],
+          sectionId: newNodeParentList[newNodeParentList.length - 1],
+          lastChange: new Date().toISOString(),
+        };
+        projectsStore.addProjectChild(newNodeParentList, newBoard, false);
+    }
+    onAddChildOpenChange();
   };
 
   return (
@@ -54,13 +88,13 @@ const ProjectTree = observer(() => {
           activeNodes: activeNodes,
           setActiveNodes: setActiveNodes,
           removeNode: removeNode,
-          addNode: addNode,
+          addNode: openAddNodeModal,
         }}
       >
         <div className="flex h-fit w-full flex-col gap-2 pb-16 pr-2">
           <AddRootSectionButton
             title={settingsStore.t.projects.addSection}
-            onPress={addNode}
+            onPress={openAddNodeModal}
           />
           {projectsStore.activeProject?.sections &&
             Array.from(projectsStore.activeProject?.sections?.values()).map(
@@ -85,6 +119,14 @@ const ProjectTree = observer(() => {
           header={settingsStore.t.projects.deleteProjectChild.modalHeader}
           sure={settingsStore.t.projects.deleteProjectChild.modalSure}
           dismiss={settingsStore.t.projects.deleteProjectChild.modalDismiss}
+        />
+      )}
+      {isAddChildOpen && (
+        <AddProjectElementModal
+          isOpen={isAddChildOpen}
+          onOpenChange={onAddChildOpenChange}
+          sectionOnly={newNodeParentList.length === 0}
+          action={addNode}
         />
       )}
     </>
