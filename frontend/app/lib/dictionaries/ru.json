@@ -99,6 +99,11 @@
       "modalSure": "Удалить",
       "modalDismiss": "Отмена"
     },
+    "deleteProjectChild": {
+      "modalHeader": "Вы действительно хотите удалить этот элемент?",
+      "modalSure": "Удалить",
+      "modalDismiss": "Отмена"
+    },
     "projectMembers": "УЧАСТНИКИ",
     "projectSections": "РАЗДЕЛЫ",
     "addSection": "ДОБАВИТЬ РАЗДЕЛ"

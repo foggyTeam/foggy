@@ -4,9 +4,9 @@ import projectsStore from '@/app/stores/projectsStore';
 import clsx from 'clsx';
 import { Button } from '@heroui/button';
 import { ChevronRightIcon, PlusIcon, TrashIcon } from 'lucide-react';
-import { Input } from '@heroui/input';
 import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
+import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 
 export default function SubSectionCard({
   parentList,
@@ -15,7 +15,7 @@ export default function SubSectionCard({
   parentList: string[];
   subSection: ProjectSection;
 }) {
-  const { activeNode, setActiveNode, addNode, removeNode } =
+  const { activeNodes, setActiveNodes, addNode, removeNode } =
     useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [subSectionName, setSubSectionName] = useState(subSection.name);
@@ -38,11 +38,17 @@ export default function SubSectionCard({
       )}
     >
       <div
-        onClick={() => setActiveNode({ id: subSection.id, parentList })}
+        onClick={(event) =>
+          setActiveNodes(
+            event.ctrlKey
+              ? [...activeNodes, { id: subSection.id, parentList }]
+              : [{ id: subSection.id, parentList }],
+          )
+        }
         className={clsx(
           'group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 hover:bg-default-100',
-          activeNode &&
-            subSection.id === activeNode.id &&
+          activeNodes.length &&
+            activeNodes.findIndex((node) => node.id == subSection.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
         )}
       >
@@ -60,26 +66,12 @@ export default function SubSectionCard({
               )}
             />
           </Button>
-          <Input
-            isReadOnly={isReadonly}
-            autoFocus={!isReadonly}
-            onClick={(e) => e.stopPropagation()}
-            onFocus={() => setIsReadonly(false)}
+          <NameInput
+            isReadonly={isReadonly}
+            setIsReadonly={setIsReadonly}
             onBlur={updateSectionName}
             value={subSectionName}
             onValueChange={setSubSectionName}
-            variant="bordered"
-            size="sm"
-            className={clsx(
-              'h-6 w-fit content-center rounded-md border-1.5 border-default/0',
-              !isReadonly && 'border-default-200',
-            )}
-            classNames={{
-              main: 'h-6',
-              mainWrapper: 'flex justify-center',
-              inputWrapper: 'shadow-none max-w-sm transition-all border-none',
-              input: 'truncate text-nowrap',
-            }}
           />
         </div>
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">

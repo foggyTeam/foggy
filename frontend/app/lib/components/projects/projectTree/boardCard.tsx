@@ -1,13 +1,13 @@
 import { Board } from '@/app/lib/types/definitions';
 import { useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
-import { Input } from '@heroui/input';
 import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 import { Button } from '@heroui/button';
 import { TrashIcon } from 'lucide-react';
+import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 
 export default function BoardCard({
   parentList,
@@ -16,7 +16,7 @@ export default function BoardCard({
   parentList: string[];
   board: Pick<Board, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
 }) {
-  const { activeNode, setActiveNode, removeNode } = useActiveSectionContext();
+  const { activeNodes, setActiveNodes, removeNode } = useActiveSectionContext();
   const router = useRouter();
   const [isReadonly, setIsReadonly] = useState(true);
   const [boardName, setBoardName] = useState(board.name);
@@ -40,11 +40,17 @@ export default function BoardCard({
       className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0"
     >
       <div
-        onClick={() => setActiveNode({ id: board.id, parentList })}
+        onClick={(event) =>
+          setActiveNodes(
+            event.ctrlKey
+              ? [...activeNodes, { id: board.id, parentList }]
+              : [{ id: board.id, parentList }],
+          )
+        }
         className={clsx(
           'group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors hover:bg-default-100',
-          activeNode &&
-            board.id === activeNode.id &&
+          activeNodes.length &&
+            activeNodes.findIndex((node) => node.id == board.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
         )}
       >
@@ -52,26 +58,12 @@ export default function BoardCard({
           <div className="flex h-8 w-8 items-center justify-center">
             <BoardIcon boardType={board.type} />
           </div>
-          <Input
-            isReadOnly={isReadonly}
-            autoFocus={!isReadonly}
-            onClick={(e) => e.stopPropagation()}
-            onFocus={() => setIsReadonly(false)}
+          <NameInput
+            isReadonly={isReadonly}
+            setIsReadonly={setIsReadonly}
             onBlur={updateBoardName}
             value={boardName}
             onValueChange={setBoardName}
-            variant="bordered"
-            size="sm"
-            className={clsx(
-              'h-6 w-fit content-center rounded-md border-1.5 border-default/0',
-              !isReadonly && 'border-default-200',
-            )}
-            classNames={{
-              main: 'h-6',
-              mainWrapper: 'flex justify-center',
-              inputWrapper: 'shadow-none max-w-sm transition-all border-none',
-              input: 'truncate text-nowrap',
-            }}
           />
         </div>
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">

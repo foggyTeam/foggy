@@ -33,6 +33,7 @@ class ProjectsStore {
       addProject: action,
       updateProject: action,
       updateProjectChild: action,
+      deleteProjectChild: action,
     });
   }
 
@@ -248,6 +249,36 @@ class ProjectsStore {
 
       Object.assign(targetItem, newAttrs);
     }
+  };
+  deleteProjectChild = (childId: string, parentSections: string[]) => {
+    if (!this.activeProject) return;
+
+    let currentSection: Map<
+      string,
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    > = this.activeProject.sections;
+
+    for (let i = 0; i < parentSections.length; i++) {
+      const sectionId = parentSections[i];
+      const nextSection = currentSection.get(sectionId);
+
+      // если секция не найдена или структура некорректна
+      if (!nextSection || !('children' in nextSection)) {
+        console.error('Не удалось добавить элемент');
+        return;
+      }
+
+      if (i === parentSections.length - 1) {
+        if (!nextSection.children) nextSection.children = new Map();
+
+        nextSection.children.delete(childId);
+      } else currentSection = nextSection.children;
+    }
+
+    // удаление с верхнего уровеня
+    if (parentSections.length === 0)
+      this.activeProject.sections.delete(childId);
   };
 }
 
