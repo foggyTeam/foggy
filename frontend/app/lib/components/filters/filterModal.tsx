@@ -58,7 +58,7 @@ export default function FilterModal({
   useEffect(() => {
     if (data.length) {
       // nickname || team
-      if ('members' in data[0]) {
+      if ('members' in data[0] || 'role' in data[0]) {
         const allMembers: Map<string, ProjectMember> = new Map();
         const allTeams: Set<string> = new Set([]);
         const alreadySelectedMembers: Map<string, string> = new Map();
@@ -78,6 +78,12 @@ export default function FilterModal({
                   alreadySelectedTeams.add(member.team);
               }
             });
+
+          if ('team' in element && element.team) {
+            allTeams.add(element.team);
+            if (filters.team.has(element.team))
+              alreadySelectedTeams.add(element.team);
+          }
         });
 
         setMembersList(Array.from(allMembers.values()));
@@ -102,7 +108,7 @@ export default function FilterModal({
         }
       }
     }
-  }, [data, filters]);
+  }, []);
 
   const debouncedUpdateFilters = useDebouncedCallback(
     (payload: FilterReducerActionPayload[]) =>

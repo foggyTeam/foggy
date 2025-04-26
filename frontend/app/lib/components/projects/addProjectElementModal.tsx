@@ -13,11 +13,13 @@ export default function AddProjectElementModal({
   isOpen,
   onOpenChange,
   action,
+  boardOnly = false,
   sectionOnly = false,
 }: {
   isOpen: boolean;
   onOpenChange: any;
   action: (nodeName: string, nodeType: ProjectElementTypes) => void;
+  boardOnly?: boolean;
   sectionOnly?: boolean;
 }) {
   const [name, setName] = useState<string>('');
@@ -25,6 +27,11 @@ export default function AddProjectElementModal({
   const [filetype, setFiletype] = useState<ProjectElementTypes>(
     sectionOnly ? 'SECTION' : 'SIMPLE',
   );
+  const disabledKeys: ProjectElementTypes[] = boardOnly
+    ? ['SECTION']
+    : sectionOnly
+      ? ['SIMPLE', 'GRAPH', 'TREE']
+      : [];
   const filetypeTabs: ProjectElementTypes[] = [
     'SECTION',
     'SIMPLE',
@@ -45,9 +52,11 @@ export default function AddProjectElementModal({
               <ModalHeader className="-mt-16 pb-0 pl-0">
                 <Tabs
                   selectedKey={filetype}
-                  onSelectionChange={setFiletype}
+                  onSelectionChange={(key) =>
+                    setFiletype(key as ProjectElementTypes)
+                  }
                   variant="light"
-                  disabledKeys={sectionOnly ? ['SIMPLE', 'GRAPH', 'TREE'] : []}
+                  disabledKeys={disabledKeys}
                   aria-label="Filtypes"
                   size="lg"
                 >
@@ -62,8 +71,13 @@ export default function AddProjectElementModal({
               <ModalBody className="flex h-fit w-fit max-w-xl flex-col gap-4 pt-6">
                 <h1 className="font-medium">
                   {
-                    settingsStore.t.projects.addElement[filetype.toLowerCase()]
-                      .new
+                    settingsStore.t.projects.addElement[
+                      filetype.toLowerCase() as
+                        | 'section'
+                        | 'simple'
+                        | 'graph'
+                        | 'tree'
+                    ].new
                   }
                 </h1>
                 <Input
@@ -80,8 +94,13 @@ export default function AddProjectElementModal({
                     input: 'text-sm',
                   }}
                   placeholder={
-                    settingsStore.t.projects.addElement[filetype.toLowerCase()]
-                      .placeholder
+                    settingsStore.t.projects.addElement[
+                      filetype.toLowerCase() as
+                        | 'section'
+                        | 'simple'
+                        | 'graph'
+                        | 'tree'
+                    ].placeholder
                   }
                 />
                 {/* Maybe some presets here*/}

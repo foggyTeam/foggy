@@ -31,9 +31,8 @@ export default function SubSectionCard({
 
   return (
     <div
-      style={{ paddingLeft: `${parentList.length * 16}px` }}
       className={clsx(
-        'flex max-h-16 w-full flex-col items-start justify-start p-1 pr-0 transition-all duration-500',
+        'flex max-h-16 w-full flex-col items-start justify-start p-1 pl-10 pr-0 transition-all duration-500',
         isExpanded && 'max-h-[1000px]',
       )}
     >

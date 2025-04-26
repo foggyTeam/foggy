@@ -2,9 +2,9 @@ import {
   FilterSet,
   Project,
   ProjectMember,
+  Role,
   Team,
   TeamMember,
-  Role,
 } from '@/app/lib/types/definitions';
 
 export default function CheckFilters(
@@ -20,11 +20,19 @@ export default function CheckFilters(
       if (!nicknameMatches) return false;
     }
 
-    if (filters.team?.size > 0 && 'members' in value) {
-      const teamMatches = value.members?.some(
-        (member) => 'team' in member && filters.team.has(member.team as string),
-      );
-      if (!teamMatches) return false;
+    if (filters.team?.size > 0) {
+      if ('members' in value) {
+        const teamMatches = value.members?.some(
+          (member) =>
+            'team' in member && filters.team.has(member.team as string),
+        );
+        if (!teamMatches) return false;
+      }
+      if ('role' in value) {
+        const teamMatches =
+          'team' in value ? filters.team.has(value.team as string) : false;
+        if (!teamMatches) return false;
+      }
     }
 
     if (filters.role?.size > 0) {
