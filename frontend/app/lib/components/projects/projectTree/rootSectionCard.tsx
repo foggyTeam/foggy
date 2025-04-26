@@ -76,6 +76,7 @@ export default function RootSectionCard({
             onBlur={updateSectionName}
             value={sectionName.toUpperCase()}
             onValueChange={setSectionName}
+            upperCase
             size="md"
             maxW="lg"
           />

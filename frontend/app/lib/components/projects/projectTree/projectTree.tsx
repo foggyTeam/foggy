@@ -38,21 +38,23 @@ const ProjectTree = observer(() => {
     onOpen: onAddChildOpen,
     onOpenChange: onAddChildOpenChange,
   } = useDisclosure();
-  const [activeNodes, setActiveNodes] = useState([]);
+  const [activeNodes, setActiveNodes] = useState<
+    { id: string; parentList: string[] }[]
+  >([]);
   const [nodeToRemove, setNodeToRemove] = useState<{
     id: string;
     parentList: string[];
-  }>(null);
-  const [newNodeParentList, setNewNodeParentList] = useState<string[]>(null);
+  } | null>(null);
+  const [newNodeParentList, setNewNodeParentList] = useState<string[]>([]);
 
   const removeNode = (id: string, parentList: string[]) => {
     setNodeToRemove({ id: id, parentList: parentList });
-    onDeleteChildOpen(true);
+    onDeleteChildOpen();
   };
 
   const openAddNodeModal = (parentList: string[]) => {
     setNewNodeParentList(parentList);
-    onAddChildOpen(true);
+    onAddChildOpen();
   };
 
   const addNode = (nodeName: string, nodeType: ProjectElementTypes) => {
@@ -109,10 +111,12 @@ const ProjectTree = observer(() => {
           isOpen={isDeleteChildOpen}
           onOpenChange={onDeleteChildOpenChange}
           action={() => {
-            projectsStore.deleteProjectChild(
-              nodeToRemove.id,
-              nodeToRemove.parentList,
-            );
+            if (nodeToRemove) {
+              projectsStore.deleteProjectChild(
+                nodeToRemove.id,
+                nodeToRemove.parentList,
+              );
+            }
             setNodeToRemove(null);
             onDeleteChildOpenChange();
           }}
@@ -125,6 +129,7 @@ const ProjectTree = observer(() => {
         <AddProjectElementModal
           isOpen={isAddChildOpen}
           onOpenChange={onAddChildOpenChange}
+          boardOnly={newNodeParentList.length >= 7}
           sectionOnly={newNodeParentList.length === 0}
           action={addNode}
         />
