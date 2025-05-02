@@ -8,8 +8,10 @@ import { Button } from '@heroui/button';
 import menuStore from '@/app/stores/menuStore';
 import { bg_container } from '@/app/lib/types/styles';
 import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
 
 const ClosedSideBar = observer((props: { sideBarLayout: string }) => {
+  const router = useRouter();
   return (
     <div
       className={clsx(
@@ -29,14 +31,22 @@ const ClosedSideBar = observer((props: { sideBarLayout: string }) => {
         <ChevronLeft className="stroke-default-400" />
       </Button>
 
-      <Avatar
-        showFallback
-        icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
-        name={userStore.user?.name as string}
-        src={userStore.user?.image as string}
-        size="lg"
-        color="default"
-      />
+      <Button
+        onPress={() => {
+          router.push('/profile');
+        }}
+        className="h-fit w-fit min-w-fit rounded-full border-none p-0"
+        variant="bordered"
+      >
+        <Avatar
+          showFallback
+          icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
+          name={userStore.user?.name as string}
+          src={userStore.user?.image as string}
+          size="lg"
+          color="default"
+        />
+      </Button>
       <Badge color="success" content={15} variant="flat">
         <Button
           onPress={() => {

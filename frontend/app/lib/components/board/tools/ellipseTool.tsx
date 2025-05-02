@@ -1,13 +1,14 @@
 import { CircleIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import { useEffect, useState } from 'react';
-import { primary } from '@/tailwind.config';
 import {
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
 } from '@/app/lib/components/board/tools/drawingHandlers';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
+import settingsStore from '@/app/stores/settingsStore';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export default function EllipseTool({
   activeTool,
@@ -70,18 +71,25 @@ export default function EllipseTool({
   ]);
 
   return (
-    <Button
-      onPress={() => setActiveTool('ellipse')}
-      variant={activeTool === 'ellipse' ? 'flat' : 'light'}
-      color={activeTool === 'ellipse' ? 'primary' : 'default'}
-      isIconOnly
-      size="md"
-    >
-      <CircleIcon
-        className={
-          activeTool === 'ellipse' ? 'stroke-primary-500' : 'stroke-default-500'
-        }
-      />
-    </Button>
+    <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
+      <Button
+        onPress={() => {
+          if (activeTool === 'ellipse') setActiveTool('');
+          else setActiveTool('ellipse');
+        }}
+        variant={activeTool === 'ellipse' ? 'flat' : 'light'}
+        color={activeTool === 'ellipse' ? 'primary' : 'default'}
+        isIconOnly
+        size="md"
+      >
+        <CircleIcon
+          className={
+            activeTool === 'ellipse'
+              ? 'stroke-primary-500'
+              : 'stroke-default-500'
+          }
+        />
+      </Button>
+    </FTooltip>
   );
 }

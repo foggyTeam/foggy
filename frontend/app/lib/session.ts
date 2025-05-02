@@ -20,6 +20,12 @@ export async function createSession(userId: string) {
   } as any);
 }
 
+export async function clearSession() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete('session' as any);
+}
+
 export async function encrypt(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
@@ -37,4 +43,15 @@ export async function decrypt(session: string | undefined = '') {
   } catch (error) {
     console.error('Failed to verify session');
   }
+}
+
+export async function deleteSession() {
+  const cookieStore = await cookies();
+  cookieStore.set('session' as any, '', {
+    httpOnly: true,
+    secure: true,
+    expires: new Date(0) as any,
+    sameSite: 'lax',
+    path: '/',
+  } as any);
 }
