@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
-@Schema()
-export class Board extends Document {
+@Schema({ timestamps: true })
+export class Board {
   @Prop({ required: true })
-  projectId: string;
+  projectId: Types.ObjectId;
 
   @Prop({ required: true })
-  section: string;
+  sectionId: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -15,11 +15,10 @@ export class Board extends Document {
   @Prop({ required: true })
   type: string;
 
-  @Prop({ required: true, type: [String] })
-  layers: string[];
-
-  @Prop({ required: true, default: Date.now })
-  lastChange: Date;
+  @Prop({ required: true, ref: 'Layer' })
+  layers: Types.ObjectId[];
 }
+
+export type BoardDocument = HydratedDocument<Board>;
 
 export const BoardSchema = SchemaFactory.createForClass(Board);

@@ -1,50 +1,50 @@
 import {
   BadRequestException,
-  ConflictException,
+  HttpStatus,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Board } from './schemas/board.schema';
-import { Layer } from './schemas/layer.schema';
+import { Model, Types } from 'mongoose';
+import { Board, BoardDocument } from './schemas/board.schema';
+import { Layer, LayerDocument } from './schemas/layer.schema';
 import { BaseElement, BaseElementModel } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { CustomException } from '../exceptions/custom-exception';
+import { getErrorMessages } from '../errorMessages';
 
 @Injectable()
 export class BoardService {
   constructor(
-    @InjectModel(Board.name) private boardModel: Model<Board>,
-    @InjectModel(Layer.name) private layerModel: Model<Layer>,
+    @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
+    @InjectModel(Layer.name) private layerModel: Model<LayerDocument>,
   ) {}
 
-  async createBoard(createBoardDto: CreateBoardDto): Promise<Board> {
+  async createBoard(createBoardDto: CreateBoardDto): Promise<BoardDocument> {
+    await this.validateBoardData(createBoardDto);
     try {
-      await this.validateBoardData(createBoardDto);
+      const createdBoard = await this.boardModel.create(createBoardDto);
 
-      const createdBoard = new this.boardModel(createBoardDto);
-      await createdBoard.save();
-
-      const layers = await this.createLayers(createdBoard._id.toString());
-      createdBoard.layers = layers.map((layer) => layer._id.toString());
+      const layers = await this.createLayers(createdBoard._id);
+      createdBoard.layers = layers.map((layer) => layer._id);
       await createdBoard.save();
 
       return createdBoard;
-    } catch (error) {
-      throw new InternalServerErrorException(
-        `Failed to create board: ${error.message}`,
+    } catch {
+      throw new CustomException(
+        getErrorMessages({ board: 'creationFailed' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  async findAll(): Promise<Board[]> {
+  async findAll(): Promise<BoardDocument[]> {
     return this.boardModel.find().exec();
   }
 
-  async findById(boardId: string): Promise<Board> {
+  async findById(boardId: Types.ObjectId): Promise<BoardDocument> {
     const board = await this.boardModel.findById(boardId).exec();
     if (!board) {
       throw new NotFoundException(`Board with ID "${boardId}" not found`);
@@ -52,7 +52,7 @@ export class BoardService {
     return board;
   }
 
-  async deleteById(boardId: string): Promise<void> {
+  async deleteById(boardId: Types.ObjectId): Promise<void> {
     const board = await this.findById(boardId);
 
     await this.layerModel.deleteMany({ boardId: board._id }).exec();
@@ -64,8 +64,8 @@ export class BoardService {
   }
 
   async addElement(
-    boardId: string,
-    layerNumber: number,
+    boardId: Types.ObjectId,
+    layerNumber: number = 2,
     elementDto: any,
   ): Promise<any> {
     const board = await this.findById(boardId);
@@ -128,7 +128,7 @@ export class BoardService {
 
     layer.elements.splice(elementIndex, 1);
     await layer.save();
-    await this.updateLastChange(layer.boardId);
+    await this.updateAtBoard(layer.boardId);
     return { message: 'Element successfully deleted' };
   }
 
@@ -144,12 +144,12 @@ export class BoardService {
 
     Object.assign(element, updateDto);
     await layer.save();
-    await this.updateLastChange(layer.boardId);
+    await this.updateAtBoard(layer.boardId);
     return element;
   }
 
   async moveElementToLayer(
-    boardId: string,
+    boardId: Types.ObjectId,
     elementId: string,
     direction: 'up' | 'down',
   ): Promise<BaseElement> {
@@ -191,7 +191,7 @@ export class BoardService {
 
     await currentLayer.save();
     await targetLayer.save();
-    await this.updateLastChange(boardId);
+    await this.updateAtBoard(boardId);
     return element;
   }
 
@@ -220,12 +220,12 @@ export class BoardService {
     }
 
     await layer.save();
-    await this.updateLastChange(layer.boardId);
+    await this.updateAtBoard(layer.boardId);
     return layer.elements[elementIndex];
   }
 
   async getElementLayerIndex(
-    layerIds: string[],
+    layerIds: Types.ObjectId[],
     elementId: string,
   ): Promise<number> {
     for (let i = 0; i < layerIds.length; i++) {
@@ -240,9 +240,9 @@ export class BoardService {
   }
 
   async updateBoardTitle(
-    boardId: string,
+    boardId: Types.ObjectId,
     updateBoardTitleDto: UpdateBoardDto,
-  ): Promise<Board> {
+  ): Promise<BoardDocument> {
     const board = await this.boardModel.findById(boardId).exec();
     if (!board) {
       throw new NotFoundException(`Board with ID "${boardId}" not found`);
@@ -250,11 +250,13 @@ export class BoardService {
 
     board.name = updateBoardTitleDto.name;
     await board.save();
-    await this.updateLastChange(boardId);
+    await this.updateAtBoard(boardId);
     return board;
   }
 
-  private async createLayers(boardId: string): Promise<Layer[]> {
+  private async createLayers(
+    boardId: Types.ObjectId,
+  ): Promise<LayerDocument[]> {
     return Promise.all(
       Array.from({ length: 3 }, (_, index) => {
         const layer = new this.layerModel({ boardId, layerNumber: index });
@@ -266,20 +268,22 @@ export class BoardService {
   private async validateBoardData(
     createBoardDto: CreateBoardDto,
   ): Promise<void> {
-    const { projectId, name } = createBoardDto;
+    const { sectionId, name } = createBoardDto;
 
     const existingBoard = await this.boardModel
-      .findOne({ projectId, name })
+      .findOne({ sectionId, name })
       .exec();
+
     if (existingBoard) {
-      throw new ConflictException(
-        'Board with the same name already exists in the project',
+      throw new CustomException(
+        getErrorMessages({ board: 'unique' }),
+        HttpStatus.CONFLICT,
       );
     }
   }
 
   private async isElementIdUnique(
-    boardId: string,
+    boardId: Types.ObjectId,
     elementId: string,
   ): Promise<boolean> {
     const board = await this.findById(boardId);
@@ -294,7 +298,7 @@ export class BoardService {
 
   private async findLayerAndElementById(
     elementId: string,
-  ): Promise<{ layer: Layer; element: BaseElement }> {
+  ): Promise<{ layer: LayerDocument; element: BaseElement }> {
     const layers = await this.layerModel.find().exec();
     for (const layer of layers) {
       const element = layer.elements.find(
@@ -309,7 +313,7 @@ export class BoardService {
 
   private async findLayerAndElementIndexById(
     elementId: string,
-  ): Promise<{ layer: Layer; elementIndex: number }> {
+  ): Promise<{ layer: LayerDocument; elementIndex: number }> {
     const layers = await this.layerModel.find().exec();
     for (const layer of layers) {
       const elementIndex = layer.elements.findIndex(
@@ -322,11 +326,9 @@ export class BoardService {
     throw new NotFoundException(`Element with ID "${elementId}" not found`);
   }
 
-  private async updateLastChange(boardId: string): Promise<void> {
-    const board = await this.boardModel.findById(boardId).exec();
-    if (board) {
-      board.lastChange = new Date();
-      await board.save();
-    }
+  private async updateAtBoard(boardId: Types.ObjectId): Promise<void> {
+    await this.boardModel
+      .updateOne({ _id: boardId }, { $currentDate: { updatedAt: true } })
+      .exec();
   }
 }

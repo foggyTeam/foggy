@@ -20,10 +20,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BoardService } from './board.service';
-import { Board } from './schemas/board.schema';
+import { Board, BoardDocument } from './schemas/board.schema';
 import { BaseElement } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
+import { Types } from 'mongoose';
+import { CreateBoardDto } from './dto/create-board.dto';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -49,15 +51,15 @@ export class BoardController {
       example1: {
         summary: 'Simple board example',
         value: {
-          projectId: 'project1',
-          section: 'section1',
+          projectId: '680f9ca1d1c94a1d0f76e23c',
+          sectionId: '680f9ca1d1c94a1d0f76e23e',
           name: 'Test Board',
           type: 'simple',
         },
       },
     },
   })
-  async create(@Body() createBoardDto: any): Promise<Board> {
+  async create(@Body() createBoardDto: CreateBoardDto): Promise<BoardDocument> {
     return this.boardService.createBoard(createBoardDto);
   }
 
@@ -69,7 +71,7 @@ export class BoardController {
     description: 'Returns an array of boards.',
     type: [Board],
   })
-  async findAll(): Promise<Board[]> {
+  async findAll(): Promise<BoardDocument[]> {
     return this.boardService.findAll();
   }
 
@@ -87,7 +89,7 @@ export class BoardController {
     type: Board,
   })
   @ApiResponse({ status: 404, description: 'Board not found.' })
-  async findById(@Param('id') id: string): Promise<Board> {
+  async findById(@Param('id') id: Types.ObjectId): Promise<BoardDocument> {
     const board = await this.boardService.findById(id);
     if (!board) {
       throw new NotFoundException(`Board with ID "${id}" not found`);
@@ -121,9 +123,9 @@ export class BoardController {
     },
   })
   async updateBoardTitle(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Body() updateBoardDto: UpdateBoardDto,
-  ): Promise<Board> {
+  ): Promise<BoardDocument> {
     return this.boardService.updateBoardTitle(id, updateBoardDto);
   }
 
@@ -140,7 +142,7 @@ export class BoardController {
     description: 'The board has been successfully deleted.',
   })
   @ApiResponse({ status: 404, description: 'Board not found.' })
-  async deleteById(@Param('id') id: string): Promise<void> {
+  async deleteById(@Param('id') id: Types.ObjectId): Promise<void> {
     return this.boardService.deleteById(id);
   }
 
@@ -259,7 +261,7 @@ export class BoardController {
     },
   })
   async addElement(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Query('layerNumber') layerNumber: number,
     @Body() elementDto: any,
   ): Promise<BaseElement> {
@@ -344,7 +346,7 @@ export class BoardController {
     },
   })
   async updateElement(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Param('elementId') elementId: string,
     @Body() updateDto: UpdateElementDto,
   ): Promise<BaseElement> {
@@ -379,7 +381,7 @@ export class BoardController {
     description: 'Board, layer, or element not found.',
   })
   async moveElementWithinLayer(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Param('elementId') elementId: string,
     @Query('direction') direction: 'up' | 'down',
   ): Promise<BaseElement> {
@@ -415,7 +417,7 @@ export class BoardController {
     description: 'Board, layer, or element not found.',
   })
   async moveElementToLayer(
-    @Param('id') id: string,
+    @Param('id') id: Types.ObjectId,
     @Param('elementId') elementId: string,
     @Query('direction') direction: 'up' | 'down',
   ): Promise<BaseElement> {

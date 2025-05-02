@@ -75,6 +75,20 @@ const errorMessages = {
       ru: 'Неверный пароль',
     },
   },
+  board: {
+    required: {
+      en: 'Board data is required',
+      ru: 'Данные доски являются обязательными',
+    },
+    unique: {
+      en: 'Board with this name already exists',
+      ru: 'Доска с таким названием уже существует',
+    },
+    creationFailed: {
+      en: 'Failed to create board',
+      ru: 'Не удалось создать доску',
+    },
+  },
   general: {
     fieldNotRecognized: {
       en: 'This field is not recognized',
@@ -99,18 +113,18 @@ const errorMessages = {
       ru: 'ID проекта является обязательным',
     },
     invalidType: {
-      en: 'Project ID must be a string',
-      ru: 'ID проекта должен быть строкой',
+      en: 'Project ID must be supported by MongoDB',
+      ru: 'ID проекта должен поддерживаться MongoDB',
     },
   },
   section: {
     required: {
       en: 'Section is required',
-      ru: 'Секция является обязательным',
+      ru: 'Раздел является обязательным',
     },
     invalidType: {
-      en: 'Section must be a string',
-      ru: 'Раздел должен быть строкой',
+      en: 'Section ID must be supported by MongoDB',
+      ru: 'ID раздела должен поддерживаться MongoDB',
     },
   },
   name: {
