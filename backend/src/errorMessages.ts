@@ -112,6 +112,10 @@ const errorMessages = {
       en: 'Invalid API Key',
       ru: 'Неверный API ключ',
     },
+    devOnly: {
+      en: 'This endpoint is available only in development environment',
+      ru: 'Эта точка доступа доступна только в среде разработки',
+    },
   },
   projectId: {
     required: {

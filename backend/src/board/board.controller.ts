@@ -26,6 +26,8 @@ import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { CustomException } from '../exceptions/custom-exception';
+import { getErrorMessages } from '../errorMessages';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -63,15 +65,26 @@ export class BoardController {
     return this.boardService.createBoard(createBoardDto);
   }
 
-  @Get()
+  @Get('dev-only')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all boards' })
+  @ApiOperation({
+    summary: '[DEV ONLY] Get all boards',
+    description:
+      'This endpoint is available only in development environment for debugging purposes',
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns an array of boards.',
     type: [Board],
   })
-  async findAll(): Promise<BoardDocument[]> {
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden in production environment',
+  })
+  async findAll(): Promise<Partial<BoardDocument>[]> {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new CustomException(getErrorMessages({ general: 'devOnly' }));
+    }
     return this.boardService.findAll();
   }
 

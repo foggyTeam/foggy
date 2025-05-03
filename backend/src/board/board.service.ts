@@ -40,8 +40,14 @@ export class BoardService {
     }
   }
 
-  async findAll(): Promise<BoardDocument[]> {
-    return this.boardModel.find().exec();
+  async findAll(): Promise<Partial<BoardDocument>[]> {
+    return this.boardModel
+      .find()
+      .select('-__v')
+      .limit(100)
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
   }
 
   async findById(boardId: Types.ObjectId): Promise<BoardDocument> {
