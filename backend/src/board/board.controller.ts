@@ -119,10 +119,10 @@ export class BoardController {
   })
   @ApiResponse({
     status: 200,
-    description: 'The board title has been successfully updated.',
+    description: 'The board title has been successfully updated',
     type: Board,
   })
-  @ApiResponse({ status: 404, description: 'Board not found.' })
+  @ApiResponse({ status: 404, description: 'Board not found' })
   @ApiBody({
     description: 'Data for updating the board title',
     examples: {
@@ -142,18 +142,34 @@ export class BoardController {
   }
 
   @Delete(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Delete a board by ID' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Delete a board by ID',
+    description: 'Deletes the board and all its associated layers',
+  })
   @ApiParam({
     name: 'id',
-    description: 'ID of the board to delete',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
     type: String,
+    example: '68155ef10664ac3e46713d63',
   })
   @ApiResponse({
-    status: 200,
-    description: 'The board has been successfully deleted.',
+    status: HttpStatus.NO_CONTENT,
+    description: 'The board and its layers were successfully deleted',
   })
-  @ApiResponse({ status: 404, description: 'Board not found.' })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid board ID format',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Board not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to delete board',
+  })
   async deleteById(@Param('id') id: Types.ObjectId): Promise<void> {
     return this.boardService.deleteById(id);
   }

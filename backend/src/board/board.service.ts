@@ -81,8 +81,12 @@ export class BoardService {
     await this.layerModel.deleteMany({ boardId: board._id }).exec();
 
     const result = await this.boardModel.deleteOne({ _id: boardId }).exec();
+
     if (result.deletedCount === 0) {
-      throw new NotFoundException(`Board with ID "${boardId}" not found`);
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
