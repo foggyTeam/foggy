@@ -92,7 +92,7 @@ export default function RemoveTeamMemberModal({
                 </Select>
 
                 <Alert
-                  variant="bordered"
+                  color="danger"
                   description={
                     removeType[0] === 'entire'
                       ? settingsStore.t.members.removeTeamMember.entire.hint
