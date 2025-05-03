@@ -41,6 +41,12 @@ export class BoardService {
   }
 
   async findAll(): Promise<Partial<BoardDocument>[]> {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new CustomException(
+        getErrorMessages({ general: 'devOnly' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
     return this.boardModel
       .find()
       .select('-__v')
