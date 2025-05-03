@@ -15,10 +15,31 @@ import { useMembersContext } from '@/app/lib/components/projects/allProjectMembe
 import RemoveTeamMemberModal from '@/app/lib/components/members/removeTeamMemberModal';
 import SelectOwnerModal from '@/app/lib/components/members/selectOwnerModal';
 import { useMemberModals } from '@/app/lib/hooks/useMemberModals';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
   const { currentStep, nextStep, resetSequence } = useMemberModals();
   const { myRole, updateMemberRole, removeMember } = useMembersContext();
+
+  const areYouSureModalText = {
+    newOwner: {
+      header: settingsStore.t.members.areYouSure.newOwner.modalHeader,
+      sure: settingsStore.t.members.areYouSure.newOwner.modalSure,
+    },
+    leave: {
+      header: settingsStore.t.members.areYouSure.leave.modalHeader,
+      sure: settingsStore.t.members.areYouSure.leave.modalSure,
+    },
+    removeMember: {
+      header:
+        settingsStore.t.members.areYouSure.removeMember.modalHeader.replace(
+          '_',
+          member.nickname,
+        ),
+      sure: settingsStore.t.members.areYouSure.removeMember.modalSure,
+    },
+    dismiss: settingsStore.t.members.areYouSure.modalDismiss,
+  };
 
   const [removeTeamMemberType, setRemoveTeamMemberType] = useState<
     'breakup' | 'entire' | null
@@ -30,7 +51,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
   const [newOwnerId, setNewOwnerId] = useState<string | null>(null);
 
   const handleChangeRole = () => {
-    if (myRole === 'owner') nextStep('selectOwner');
+    if (myRole === 'owner' && member.role === 'owner') nextStep('selectOwner');
     else handleSubmit();
   };
 
@@ -46,7 +67,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
   };
 
   const handleSubmit = () => {
-    if (currentStep === 'changeRole' && newRole && newRoleType)
+    if (currentStep === 'changeRole' && newRole)
       updateMemberRole(member.id, newRole, newRoleType);
     else if (currentStep !== 'changeRole')
       removeMember(member.id, newOwnerId, removeTeamMemberType);
@@ -104,15 +125,20 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
 
         <div className="flex h-full w-fit items-center justify-start gap-2">
           <>
-            <Button
-              isDisabled={member.role === 'owner' && myRole !== 'owner'}
-              onPress={() => nextStep('changeRole')}
-              isIconOnly
-              variant="light"
-              size="sm"
-            >
-              <IdCardIcon className="stroke-default-300" />
-            </Button>
+            {CheckAccess(['admin', 'owner']) && (
+              <Button
+                isDisabled={
+                  (member.role === 'owner' && myRole !== 'owner') ||
+                  !(myRole === 'owner' || myRole === 'admin')
+                }
+                onPress={() => nextStep('changeRole')}
+                isIconOnly
+                variant="light"
+                size="sm"
+              >
+                <IdCardIcon className="stroke-default-300" />
+              </Button>
+            )}
             {userStore.user?.id === member.id ? (
               <Button
                 isDisabled={
@@ -129,16 +155,21 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 <LogOutIcon className="stroke-danger" />
               </Button>
             ) : (
-              <Button
-                isDisabled={member.role === 'owner'}
-                onPress={handleRemoveMember}
-                isIconOnly
-                color="danger"
-                variant="light"
-                size="sm"
-              >
-                <UserRoundXIcon className="stroke-danger" />
-              </Button>
+              CheckAccess(['admin', 'owner']) && (
+                <Button
+                  isDisabled={
+                    member.role === 'owner' ||
+                    !(myRole === 'owner' || myRole === 'admin')
+                  }
+                  onPress={handleRemoveMember}
+                  isIconOnly
+                  color="danger"
+                  variant="light"
+                  size="sm"
+                >
+                  <UserRoundXIcon className="stroke-danger" />
+                </Button>
+              )
             )}
           </>
         </div>
@@ -157,6 +188,12 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
       {currentStep === 'selectOwner' && (
         <SelectOwnerModal
           member={member}
+          teamFilter={
+            (removeTeamMemberType === 'entire' &&
+              'team' in member &&
+              member.team) ||
+            undefined
+          }
           isOpen={true}
           onOpenChange={closeModal}
           action={() => nextStep('areYouSure')}
@@ -179,9 +216,19 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
           isOpen={true}
           onOpenChange={closeModal}
           action={handleSubmit}
-          dismiss={'dismiss'}
-          header={'are you sure'}
-          sure={'sure'}
+          dismiss={areYouSureModalText.dismiss}
+          header={
+            (newOwnerId && areYouSureModalText.newOwner.header) ||
+            (member.id === userStore.user?.id &&
+              areYouSureModalText.leave.header) ||
+            areYouSureModalText.removeMember.header
+          }
+          sure={
+            (newOwnerId && areYouSureModalText.newOwner.sure) ||
+            (member.id === userStore.user?.id &&
+              areYouSureModalText.leave.sure) ||
+            areYouSureModalText.removeMember.sure
+          }
         />
       )}
     </>

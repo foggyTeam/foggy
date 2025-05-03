@@ -8,6 +8,7 @@ import { useActiveSectionContext } from '@/app/lib/components/projects/projectTr
 import { Button } from '@heroui/button';
 import { TrashIcon } from 'lucide-react';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 export default function BoardCard({
   parentList,
@@ -58,7 +59,9 @@ export default function BoardCard({
             <ElementIcon elementType={board.type} />
           </div>
           <NameInput
-            isReadonly={isReadonly}
+            isReadonly={
+              isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+            }
             setIsReadonly={setIsReadonly}
             onBlur={updateBoardName}
             value={boardName}
@@ -66,15 +69,17 @@ export default function BoardCard({
           />
         </div>
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
-          <Button
-            isIconOnly
-            onPress={() => removeNode(board.id, parentList)}
-            variant="light"
-            color="danger"
-            size="sm"
-          >
-            <TrashIcon className="stroke-danger-500" />
-          </Button>
+          {CheckAccess(['admin', 'owner', 'editor']) && (
+            <Button
+              isIconOnly
+              onPress={() => removeNode(board.id, parentList)}
+              variant="light"
+              color="danger"
+              size="sm"
+            >
+              <TrashIcon className="stroke-danger-500" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { SettingsIcon } from 'lucide-react';
 import settingsStore from '@/app/stores/settingsStore';
 import React from 'react';
 import ProjectTree from '@/app/lib/components/projects/projectTree/projectTree';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 const ProjectStructure = observer(() => {
   const {
@@ -35,9 +36,11 @@ const ProjectStructure = observer(() => {
                 {projectsStore.activeProject?.name}
               </h1>
             </div>
-            <Button onPress={onSettingsOpen} isIconOnly variant="light">
-              <SettingsIcon className="stroke-default-500" />
-            </Button>
+            {CheckAccess(['admin', 'owner']) && (
+              <Button onPress={onSettingsOpen} isIconOnly variant="light">
+                <SettingsIcon className="stroke-default-500" />
+              </Button>
+            )}
           </div>
           <p
             className={clsx(

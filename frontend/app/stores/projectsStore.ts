@@ -6,14 +6,17 @@ import {
   ProjectMember,
   ProjectSection,
   RawProject,
+  Role,
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 import ConvertRawProject from '@/app/lib/utils/convertRawProject';
+import userStore from '@/app/stores/userStore';
 
 const MAX_LAYER = 2;
 
 class ProjectsStore {
+  myRole: Role | undefined = undefined;
   activeBoard: Board | undefined = undefined;
   activeProject: Project | undefined = undefined;
   allProjects: Project[] = [];
@@ -153,6 +156,9 @@ class ProjectsStore {
   };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);
+    this.myRole = this.activeProject.members.find(
+      (member) => member.id === userStore.user?.id,
+    ).role;
   };
   setAllProjects = (projects: Project[]) => {
     this.allProjects = projects;

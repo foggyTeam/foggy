@@ -9,6 +9,7 @@ import SubSectionCard from '@/app/lib/components/projects/projectTree/subSection
 import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 export default function RootSectionCard({
   section,
@@ -71,7 +72,9 @@ export default function RootSectionCard({
             />
           </Button>
           <NameInput
-            isReadonly={isReadonly}
+            isReadonly={
+              isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+            }
             setIsReadonly={setIsReadonly}
             onBlur={updateSectionName}
             value={sectionName.toUpperCase()}
@@ -81,25 +84,29 @@ export default function RootSectionCard({
             maxW="lg"
           />
         </div>
-        <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
-          <Button
-            isIconOnly
-            onPress={() => addNode([section.id])}
-            variant="light"
-            size="sm"
-          >
-            <PlusIcon className="stroke-default-500" />
-          </Button>
-          <Button
-            isIconOnly
-            onPress={() => removeNode(section.id, [])}
-            variant="light"
-            color="danger"
-            size="sm"
-          >
-            <TrashIcon className="stroke-danger-500" />
-          </Button>
-        </div>
+        {CheckAccess(['admin', 'owner', 'editor']) && (
+          <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
+            <>
+              <Button
+                isIconOnly
+                onPress={() => addNode([section.id])}
+                variant="light"
+                size="sm"
+              >
+                <PlusIcon className="stroke-default-500" />
+              </Button>
+              <Button
+                isIconOnly
+                onPress={() => removeNode(section.id, [])}
+                variant="light"
+                color="danger"
+                size="sm"
+              >
+                <TrashIcon className="stroke-danger-500" />
+              </Button>
+            </>
+          </div>
+        )}
       </div>
       {isExpanded &&
         Array.from(section.children.values()).map((child) => {

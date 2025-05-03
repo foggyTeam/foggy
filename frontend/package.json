@@ -10,6 +10,7 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@heroui/alert": "^2.2.19",
     "@heroui/autocomplete": "^2.3.18",
     "@heroui/avatar": "^2.2.13",
     "@heroui/badge": "^2.2.10",

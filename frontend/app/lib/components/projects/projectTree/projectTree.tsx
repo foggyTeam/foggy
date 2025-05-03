@@ -12,6 +12,7 @@ import {
   ProjectElementTypes,
   ProjectSection,
 } from '@/app/lib/types/definitions';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
@@ -94,10 +95,12 @@ const ProjectTree = observer(() => {
         }}
       >
         <div className="flex h-fit w-full flex-col gap-2 pb-16 pr-2">
-          <AddRootSectionButton
-            title={settingsStore.t.projects.addSection}
-            onPress={openAddNodeModal}
-          />
+          {CheckAccess(['admin', 'owner', 'editor']) && (
+            <AddRootSectionButton
+              title={settingsStore.t.projects.addSection}
+              onPress={openAddNodeModal}
+            />
+          )}
           {projectsStore.activeProject?.sections &&
             Array.from(projectsStore.activeProject?.sections?.values()).map(
               (section) => (

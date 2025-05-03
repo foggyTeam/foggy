@@ -17,13 +17,13 @@
       "id": "67f18c3ece58d18c7ebaae02",
       "nickname": "iciicifur",
       "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
-      "role": "reader"
+      "role": "owner"
     },
     {
       "id": "user-5",
       "nickname": "DesignWiz",
       "avatar": "https://i.postimg.cc/FHCJ5qkx/b5.png",
-      "role": "owner",
+      "role": "editor",
       "team": "Visionaries United",
       "teamId": "team-9"
     },

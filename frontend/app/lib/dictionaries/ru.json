@@ -154,22 +154,46 @@
   },
 
   "members": {
-    "areYouSure": {
-      "modalHeader": "Вы действительно хотите выйти?",
-      "modalSure": "Выйти",
-      "modalDismiss": "Отмена"
-    },
-    "removeMember": {
-      "modalHeader": "Вы действительно хотите удалить _?",
-      "modalSure": "Удалить",
+    "removeTeamMember": {
+      "modalHeader": "Удалить участника команды _",
+      "breakup": {
+        "option": "Отвязать участников команды",
+        "hint": "Участник будет удален из проекта, а остальные члены команды потеряют свою привязку к команде в этом проекте."
+      },
+      "entire": {
+        "option": "Удалить команду полностью",
+        "hint": "Все участники команды будут удалены из проекта. Вы можете снова пригласить команду, чтобы отменить это действие."
+      },
+      "modalSure": "Продолжить",
       "modalDismiss": "Отмена"
     },
     "changeRole": {
       "modalHeader": "Изменить роль _",
       "modalDismiss": "Отмена",
       "modalSave": "Сохранить",
-      "modalUpgradeTeam": "Обновить макс. роль команды",
-      "modalUpgradeMember": "Переопределить командную роль _"
+      "upgradeTeam": "Обновить макс. роль команды",
+      "upgradeMember": "Переопределить командную роль _"
+    },
+    "selectOwner": {
+      "modalHeader": "Выберите нового владельца",
+      "label": "Новый владелец",
+      "modalDismiss": "Отмена",
+      "modalSave": "Сохранить"
+    },
+    "areYouSure": {
+      "newOwner": {
+        "modalHeader": "Вы действительно хотите назначить нового владельца?",
+        "modalSure": "Назначить"
+      },
+      "leave": {
+        "modalHeader": "Вы действительно хотите выйти?",
+        "modalSure": "Выйти"
+      },
+      "removeMember": {
+        "modalHeader": "Вы действительно хотите удалить _?",
+        "modalSure": "Удалить"
+      },
+      "modalDismiss": "Отмена"
     }
   },
 
