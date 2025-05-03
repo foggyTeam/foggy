@@ -4,7 +4,7 @@ import RootSectionCard from '@/app/lib/components/projects/projectTree/rootSecti
 import React, { createContext, useContext, useState } from 'react';
 import AddRootSectionButton from '@/app/lib/components/projects/projectTree/addRootSectionButton';
 import settingsStore from '@/app/stores/settingsStore';
-import AreYouSureModal from '@/app/lib/components/areYouSureModal';
+import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {

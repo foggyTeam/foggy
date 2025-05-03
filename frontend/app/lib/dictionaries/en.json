@@ -154,6 +154,26 @@
     }
   },
 
+  "members": {
+    "areYouSure": {
+      "modalHeader": "Do you really want to leave?",
+      "modalSure": "Leave",
+      "modalDismiss": "Dismiss"
+    },
+    "removeMember": {
+      "modalHeader": "Do you really want to remove _?",
+      "modalSure": "Remove",
+      "modalDismiss": "Dismiss"
+    },
+    "changeRole": {
+      "modalHeader": "Change _'s role",
+      "modalDismiss": "Dismiss",
+      "modalSave": "Save",
+      "modalUpgradeTeam": "Update maximum team role",
+      "modalUpgradeMember": "Override _'s team role"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "PROJECTS",

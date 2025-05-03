@@ -11,7 +11,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
 import { Input, Textarea } from '@heroui/input';
 import { Checkbox } from '@heroui/checkbox';
-import AreYouSureModal from '@/app/lib/components/areYouSureModal';
+import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
 import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import clsx from 'clsx';

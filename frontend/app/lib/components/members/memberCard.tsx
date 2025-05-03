@@ -1,6 +1,6 @@
 import { Avatar } from '@heroui/avatar';
-import React from 'react';
-import { ProjectMember, TeamMember } from '@/app/lib/types/definitions';
+import React, { useState } from 'react';
+import { ProjectMember, Role, TeamMember } from '@/app/lib/types/definitions';
 import RoleCard from '@/app/lib/components/members/roleCard';
 import clsx from 'clsx';
 import { el_animation, team_tile } from '@/app/lib/types/styles';
@@ -9,79 +9,181 @@ import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import Link from 'next/link';
+import ChangeRoleModal from '@/app/lib/components/members/changeRoleModal';
+import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
+import { useMembersContext } from '@/app/lib/components/projects/allProjectMembers';
+import RemoveTeamMemberModal from '@/app/lib/components/members/removeTeamMemberModal';
+import SelectOwnerModal from '@/app/lib/components/members/selectOwnerModal';
+import { useMemberModals } from '@/app/lib/hooks/useMemberModals';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
+  const { currentStep, nextStep, resetSequence } = useMemberModals();
+  const { myRole, updateMemberRole, removeMember } = useMembersContext();
+
+  const [removeTeamMemberType, setRemoveTeamMemberType] = useState<
+    'breakup' | 'entire' | null
+  >(null);
+  const [newRole, setNewRole] = useState<Role | null>(null);
+  const [newRoleType, setNewRoleType] = useState<
+    'override' | 'updateMax' | null
+  >(null);
+  const [newOwnerId, setNewOwnerId] = useState<string | null>(null);
+
+  const handleChangeRole = () => {
+    if (myRole === 'owner') nextStep('selectOwner');
+    else handleSubmit();
+  };
+
+  const handleRemoveMember = () => {
+    if ('team' in member && member.team) nextStep('removeTeamMember');
+    else nextStep('areYouSure');
+  };
+
+  const handleLeave = () => {
+    if ('team' in member && member.team) nextStep('removeTeamMember');
+    else if (myRole === 'owner') nextStep('selectOwner');
+    else nextStep('areYouSure');
+  };
+
+  const handleSubmit = () => {
+    if (currentStep === 'changeRole' && newRole && newRoleType)
+      updateMemberRole(member.id, newRole, newRoleType);
+    else if (currentStep !== 'changeRole')
+      removeMember(member.id, newOwnerId, removeTeamMemberType);
+    closeModal();
+  };
+
+  const closeModal = () => {
+    setNewOwnerId(null);
+    setNewRole(null);
+    setNewRoleType(null);
+    setRemoveTeamMemberType(null);
+    resetSequence();
+  };
+
   return (
-    <div
-      className={clsx(
-        'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
-        el_animation,
-        'h-16 w-[98%] max-w-[379px]',
-        team_tile,
-      )}
-    >
-      <div className="flex h-full w-full items-center justify-start gap-2">
-        <Avatar
-          size="md"
-          color="primary"
-          className="min-h-10 min-w-10"
-          name={member.nickname.toUpperCase()}
-          src={member.avatar}
-        />
-        <div className="flex h-full w-full flex-col items-start justify-between">
-          <div className="flex items-center gap-1">
-            <h1 className="max-w-32 truncate text-nowrap font-medium">
-              {/* TODO: navigate to member page */}
-              <Link href="/" className="accent-link">
-                {member.nickname}
-              </Link>
-            </h1>
-            {userStore.user?.id === member.id && (
-              <p className="text-xs text-default-700">
-                {settingsStore.t.main.you}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center justify-start gap-2">
-            <RoleCard role={member.role} />
-            {'team' in member && member.team && <RoleCard role={member.team} />}
+    <>
+      <div
+        className={clsx(
+          'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+          el_animation,
+          'h-16 w-[98%] max-w-[379px]',
+          team_tile,
+        )}
+      >
+        <div className="flex h-full w-full items-center justify-start gap-2">
+          <Avatar
+            size="md"
+            color="primary"
+            className="min-h-10 min-w-10"
+            name={member.nickname.toUpperCase()}
+            src={member.avatar}
+          />
+          <div className="flex h-full w-full flex-col items-start justify-between">
+            <div className="flex items-center gap-1">
+              <h1 className="max-w-32 truncate text-nowrap font-medium">
+                {/* TODO: navigate to member page */}
+                <Link href="/" className="accent-link">
+                  {member.nickname}
+                </Link>
+              </h1>
+              {userStore.user?.id === member.id && (
+                <p className="text-xs text-default-700">
+                  {settingsStore.t.main.you}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center justify-start gap-2">
+              <RoleCard role={member.role} />
+              {'team' in member && member.team && (
+                <RoleCard role={member.team} />
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex h-full w-fit items-center justify-start gap-2">
-        {userStore.user?.id === member.id ? (
-          <Button
-            onPress={() => console.log('leave project')}
-            isIconOnly
-            color="danger"
-            variant="light"
-            size="sm"
-          >
-            <LogOutIcon className="stroke-danger" />
-          </Button>
-        ) : (
+        <div className="flex h-full w-fit items-center justify-start gap-2">
           <>
             <Button
-              onPress={() => console.log('edit role')}
+              isDisabled={member.role === 'owner' && myRole !== 'owner'}
+              onPress={() => nextStep('changeRole')}
               isIconOnly
               variant="light"
               size="sm"
             >
               <IdCardIcon className="stroke-default-300" />
             </Button>
-            <Button
-              onPress={() => console.log('delete member')}
-              isIconOnly
-              color="danger"
-              variant="light"
-              size="sm"
-            >
-              <UserRoundXIcon className="stroke-danger" />
-            </Button>
+            {userStore.user?.id === member.id ? (
+              <Button
+                isDisabled={
+                  'team' in member &&
+                  member.team &&
+                  member.role in ['reader', 'editor']
+                }
+                onPress={handleLeave}
+                isIconOnly
+                color="danger"
+                variant="light"
+                size="sm"
+              >
+                <LogOutIcon className="stroke-danger" />
+              </Button>
+            ) : (
+              <Button
+                isDisabled={member.role === 'owner'}
+                onPress={handleRemoveMember}
+                isIconOnly
+                color="danger"
+                variant="light"
+                size="sm"
+              >
+                <UserRoundXIcon className="stroke-danger" />
+              </Button>
+            )}
           </>
-        )}
+        </div>
       </div>
-    </div>
+      {currentStep === 'changeRole' && (
+        <ChangeRoleModal
+          member={member}
+          submitRole={setNewRole}
+          submitRoleType={setNewRoleType}
+          isOpen={true}
+          onOpenChange={closeModal}
+          action={handleChangeRole}
+        />
+      )}
+
+      {currentStep === 'selectOwner' && (
+        <SelectOwnerModal
+          member={member}
+          isOpen={true}
+          onOpenChange={closeModal}
+          action={() => nextStep('areYouSure')}
+          submitOwnerId={setNewOwnerId}
+        />
+      )}
+
+      {currentStep === 'removeTeamMember' && (
+        <RemoveTeamMemberModal
+          member={member}
+          isOpen={true}
+          onOpenChange={closeModal}
+          action={() => nextStep('areYouSure')}
+          submitRemoveType={setRemoveTeamMemberType}
+        />
+      )}
+
+      {currentStep === 'areYouSure' && (
+        <AreYouSureModal
+          isOpen={true}
+          onOpenChange={closeModal}
+          action={handleSubmit}
+          dismiss={'dismiss'}
+          header={'are you sure'}
+          sure={'sure'}
+        />
+      )}
+    </>
   );
 }
