@@ -1,5 +1,5 @@
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 
 const MIN_WIDTH = 4;
@@ -14,14 +14,14 @@ export default function BoardLayer({
 }: {
   layer: BoardElement[];
   updateElement: (id: string, newAttrs: Partial<any>) => void;
-  handleSelect: (event) => void;
-  handleTextEdit: (event) => void;
+  handleSelect: (event: any) => void;
+  handleTextEdit: (event: any) => void;
   fitCoordinates: (
     pos: { x: number; y: number },
     element: any,
   ) => { x: number; y: number };
 }) {
-  const holdTextTransform = (e, element) => {
+  const holdTextTransform = (e: any, element: TextElement) => {
     const node = e.target;
 
     const scaleX = node.scaleX();
@@ -45,7 +45,7 @@ export default function BoardLayer({
     });
   };
 
-  const holdTransformEnd = (e, element) => {
+  const holdTransformEnd = (e: any, element: BoardElement) => {
     const node = e.target;
 
     const scaleX = node.scaleX();
@@ -95,6 +95,8 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
+                radiusX={element.width / 2}
+                radiusY={element.height / 2}
               />
             );
           case 'line':
@@ -137,7 +139,9 @@ export default function BoardLayer({
                     y: e.target.y(),
                   })
                 }
-                onTransform={(e) => holdTextTransform(e, element)}
+                onTransform={(e) =>
+                  holdTextTransform(e, element as TextElement)
+                }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
               />

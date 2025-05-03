@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { Board } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 
-const BoardLoader = ({ boardData }: { boardData: Board }) => {
+const BoardLoader = ({ boardData }: { boardData: Board | undefined }) => {
   useEffect(() => {
     if (boardData) {
       projectsStore.setActiveBoard(boardData);

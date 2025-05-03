@@ -1,5 +1,5 @@
 import { Button } from '@heroui/button';
-import React, { JSX, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -57,10 +57,13 @@ export default function EditorToolButton({
 }: {
   id?: string;
   value: string | number | boolean;
-  Icon: JSX.Element;
+  Icon: any;
+  handleClick?: any;
   isAccent: boolean;
+  saveSelection?: any;
+  restoreSelection?: any;
   popover?: boolean;
-  PopoverInnerContent?;
+  PopoverInnerContent?: any;
 }) {
   const [localValue, setLocalValue] = useState(value);
 

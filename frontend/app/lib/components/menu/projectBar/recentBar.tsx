@@ -5,8 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
-import BoardIcon from '@/app/lib/components/menu/projectBar/boardIcon';
+import ElementIcon from '@/app/lib/components/menu/projectBar/elementIcon';
 
 const RecentBar = observer(() => {
   return (
@@ -17,117 +16,24 @@ const RecentBar = observer(() => {
         bg_container,
       )}
     >
-      {projectsStore.activeProject
-        ? projectsStore.activeProject.boards.slice(-4).map((board) => (
-            <Button
-              onPress={() => console.log(board.name)}
-              key={board.id}
-              isIconOnly
-              variant="light"
-              size="md"
-            >
-              <BoardIcon boardType={board.type} />
-            </Button>
-          ))
-        : null}
+      {projectsStore.activeBoard && (
+        <Button
+          onPress={() => console.log(projectsStore.activeBoard?.name)}
+          key={projectsStore.activeBoard?.id}
+          isIconOnly
+          variant="light"
+          size="md"
+        >
+          <ElementIcon
+            elementType={projectsStore.activeBoard?.type || 'SIMPLE'}
+          />
+        </Button>
+      )}
+
       <Button
         onPress={() => {
-          projectsStore.addProject({
-            id: 'lufglglyg1',
-            name: 'First project',
-            boards: [],
-            lastChange: Date.now().toString(),
-          } as Project);
-          projectsStore.setActiveProject('lufglglyg1');
-
-          for (let i = 0; i < 5; i++) {
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygs${i}`,
-              name: `file ${i}`,
-              type: BoardTypes.SIMPLE,
-              layers: [
-                {
-                  elements: [
-                    {
-                      id: 'rect1',
-                      type: 'rect',
-                      draggable: true,
-                      x: 100,
-                      y: 100,
-                      rotation: 0,
-                      color: 'red',
-                      width: 200,
-                      height: 100,
-                    },
-                    {
-                      id: 'ellipse1',
-                      type: 'ellipse',
-                      draggable: true,
-                      x: 400,
-                      y: 150,
-                      rotation: 0,
-                      color: 'blue',
-                      width: 150,
-                      height: 150,
-                    },
-                    {
-                      id: 'text1',
-                      type: 'text',
-                      draggable: true,
-                      x: 200,
-                      y: 300,
-                      rotation: 0,
-                      color: 'green',
-                      text: 'Hello, world!',
-                      fontSize: 24,
-                    },
-                    {
-                      id: 'line1',
-                      type: 'line',
-                      draggable: true,
-                      x: 50,
-                      y: 50,
-                      rotation: 0,
-                      color: 'black',
-                      points: [0, 0, 100, 100],
-                      width: 2,
-                    },
-                    {
-                      id: 'marker1',
-                      type: 'marker',
-                      draggable: true,
-                      x: 150,
-                      y: 150,
-                      rotation: 0,
-                      color: 'purple',
-                      points: [0, 0, 50, 50, 100, 0],
-                      width: 3,
-                      opacity: 0.5,
-                    },
-                  ],
-                },
-              ],
-              lastChange: Date.now().toString(),
-            } as Board);
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygg${i}`,
-              name: `file ${i}`,
-              type: BoardTypes.GRAPH,
-              lastChange: Date.now().toString(),
-            } as Board);
-            projectsStore.addBoard({
-              projectId: 'lufglglyg1',
-              section: 'test section',
-              id: `jhgluygt${i}`,
-              name: `file ${i}`,
-              type: BoardTypes.TREE,
-              lastChange: Date.now().toString(),
-            } as Board);
-          }
+          // TODO: REDO
+          console.log('you click me');
         }}
         isIconOnly
         variant="light"

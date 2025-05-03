@@ -50,3 +50,32 @@ export const profileFormSchema = z.object({
     .max(140, settingsStore.t.validationErrors.about.maxLength)
     .regex(aboutRegex, settingsStore.t.validationErrors.about.invalidSymbols),
 });
+
+export const projectFormSchema = z.object({
+  name: z
+    .string()
+    .nonempty(settingsStore.t.validationErrors.projectName.required)
+    .max(20, settingsStore.t.validationErrors.projectName.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.projectName.invalidSymbols,
+    ),
+  description: z
+    .string()
+    .max(300, settingsStore.t.validationErrors.projectDescription.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.projectDescription.invalidSymbols,
+    ),
+});
+
+export const projectElementNameSchema = z.object({
+  name: z
+    .string()
+    .nonempty(settingsStore.t.validationErrors.projectElementName.required)
+    .max(20, settingsStore.t.validationErrors.projectElementName.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.projectElementName.invalidSymbols,
+    ),
+});

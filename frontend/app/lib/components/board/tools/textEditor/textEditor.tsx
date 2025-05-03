@@ -13,12 +13,20 @@ export default function CustomTextEditor({
   height,
   setHeight,
   width,
+}: {
+  top?: number;
+  left?: number;
+  content: string;
+  setContent: any;
+  height?: number;
+  setHeight: any;
+  width?: number;
 }) {
   const quillRef = useRef<Quill | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
 
   const [selectionFormat, setSelectionFormat] = useState({} as any);
-  const [savedSelection, setSavedSelection] = useState(null as Range);
+  const [savedSelection, setSavedSelection] = useState<Range | null>(null);
 
   useEffect(() => {
     if (editorContainerRef.current) {
@@ -68,8 +76,8 @@ export default function CustomTextEditor({
     <div
       style={{
         position: 'fixed',
-        top: top - 56,
-        left: left,
+        top: top ? top - 56 : 0,
+        left: left ? left : 0,
       }}
     >
       <TextEditorToolBar
@@ -78,7 +86,6 @@ export default function CustomTextEditor({
         quillRef={quillRef}
         saveSelection={saveSelection}
         restoreSelection={restoreSelection}
-        className="max-w-[27rem]"
       />
       <div
         style={{

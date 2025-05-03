@@ -7,17 +7,28 @@ import LayerTool from '@/app/lib/components/board/tools/layerTool';
 import DeleteTool from '@/app/lib/components/board/tools/deleteTool';
 import { Divider } from '@heroui/divider';
 import React from 'react';
+import { BoardElement } from '@/app/lib/types/definitions';
+
+export type ElementToolProps = {
+  element: any;
+  updateElement?: any;
+  removeElement?: any;
+};
 
 export default function ElementToolBar({
   updateElement,
   removeElement,
   element,
+}: {
+  updateElement: any;
+  removeElement: any;
+  element: BoardElement;
 }) {
   const tools = [FillTool, StrokeTool, SizeTool, LayerTool];
 
   return (
     <div className="flex justify-center gap-1">
-      {tools.map((Tool, index) => (
+      {tools.map((Tool: any, index) => (
         <Tool
           key={index}
           element={element}

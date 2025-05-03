@@ -8,6 +8,7 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { createPortal } from 'react-dom';
 import 'react-quill-new/dist/quill.snow.css';
 import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
+import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
 
 export default function TextTool({
   activeTool,
@@ -15,7 +16,7 @@ export default function TextTool({
   stageRef,
   addElement,
   resetStage,
-}) {
+}: ToolProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [clickPosition, setClickPosition] = useState({
     stagePosition: { x: undefined, y: undefined },

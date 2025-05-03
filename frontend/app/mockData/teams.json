@@ -1,0 +1,197 @@
+[
+  {
+    "id": "team-1",
+    "name": "Creative Minds",
+    "avatar": "https://i.postimg.cc/fb3C6YyJ/ruruc1.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-4",
+        "nickname": "CoachMaster",
+        "avatar": "https://i.postimg.cc/6qVGkpC7/b4.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TechGuru",
+        "avatar": "https://i.postimg.cc/DmVBg0n8/b3.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-8",
+        "nickname": "Mentor8",
+        "avatar": "https://i.postimg.cc/hvR28hSh/b6.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "Brainstorm9",
+        "avatar": "https://i.postimg.cc/c4wSN8Kk/s9.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-2",
+    "name": "Marketing Wizards",
+    "avatar": "https://i.postimg.cc/L8SM46L9/s12.png",
+    "favorite": false,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-3",
+        "nickname": "TeamPlayer",
+        "avatar": "https://i.postimg.cc/sDchK1Vq/b3.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-5",
+        "nickname": "DesignWiz",
+        "avatar": "https://i.postimg.cc/FHCJ5qkx/b5.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-6",
+        "nickname": "StratPro6",
+        "avatar": "https://i.postimg.cc/x1BTPSbB/b6.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-8",
+        "nickname": "Mentor8",
+        "avatar": "https://i.postimg.cc/hvR28hSh/b6.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-3",
+    "name": "Tech Innovators",
+    "avatar": "https://i.postimg.cc/SNqZJXTv/b7.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TechGuru",
+        "avatar": "https://i.postimg.cc/DmVBg0n8/b3.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-6",
+        "nickname": "StratPro6",
+        "avatar": "https://i.postimg.cc/x1BTPSbB/b6.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "Brainstorm9",
+        "avatar": "https://i.postimg.cc/c4wSN8Kk/s9.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-10",
+        "nickname": "ProjLead10",
+        "avatar": "https://i.postimg.cc/L8SM46L9/s12.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-4",
+    "name": "Student Helpers",
+    "avatar": "https://i.postimg.cc/yxTyFPQr/b15.png",
+    "favorite": false,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-12",
+        "nickname": "Visionary",
+        "avatar": "https://i.postimg.cc/yxTyFPQr/b15.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-13",
+        "nickname": "Collabor13",
+        "avatar": "https://i.postimg.cc/9f2s283r/s9.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-15",
+        "nickname": "GoalAchiev",
+        "avatar": "https://i.postimg.cc/7ZwNYp68/b3.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-16",
+        "nickname": "DynLeader",
+        "avatar": "https://i.postimg.cc/rwHCCzjc/b1.jpg",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-5",
+    "name": "Event Coordinators",
+    "avatar": "https://i.postimg.cc/tRmTgP4X/mixkit-fresh-juicy-oranges-392-original.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://i.postimg.cc/BQ8rBPcQ/s10.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-14",
+        "nickname": "ContentCrt",
+        "avatar": "https://i.postimg.cc/X7yPCS4r/s13.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-17",
+        "nickname": "CodeExpert",
+        "avatar": "https://i.postimg.cc/Vs9gQffB/b17.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-18",
+        "nickname": "Organizer",
+        "avatar": "https://i.postimg.cc/SR4G25rM/b14.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-19",
+        "nickname": "ProbSolver",
+        "avatar": "https://i.postimg.cc/fb3C6YyJ/ruruc1.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
+  }
+]

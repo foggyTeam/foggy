@@ -1,7 +1,4 @@
-export default function resizeImage(
-  image: File,
-  minSize: number,
-): Promise<Blob> {
+function handleImageUpload(image: File, minSize: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.src = URL.createObjectURL(image);
@@ -47,4 +44,23 @@ export default function resizeImage(
     };
     img.onerror = reject;
   });
+}
+
+export default async function HandleImageUpload(event: any, minSize = 288) {
+  const image = event.target.files[0];
+  if (image) {
+    if (!image.type.startsWith('image/')) {
+      console.error('File is not an image');
+      return null;
+    }
+
+    const resizedImage = await handleImageUpload(image, minSize).catch(
+      (error) => console.error(error),
+    );
+    if (!resizedImage) return null;
+
+    const reader = new FileReader();
+    reader.readAsDataURL(resizedImage);
+    return reader.result;
+  }
 }

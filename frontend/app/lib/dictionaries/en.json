@@ -1,15 +1,7 @@
 {
-  "login": {
-    "email": "Email",
-    "password": "Password",
-    "emailPlaceholder": "hoggyfoggy@example.com",
-    "passwordPlaceholder": "qwerty123",
-    "signInButton": "Log in",
-    "signUpButton": "Sign up",
-    "loginViaProviders": "Login with"
-  },
   "validationErrors": {
     "nickname": {
+      "required": "Nickname is required",
       "maxLength": "Nickname must be no more than 14 characters long",
       "invalidSymbols": "Nickname may contain only latin letters, digits and special symbols \".@_\""
     },
@@ -27,8 +19,32 @@
     },
     "about": {
       "maxLength": "About must be no more than 140 characters long",
-      "invalidSymbols": "About may contain only latin letters, digits and special symbols"
+      "invalidSymbols": "About may contain only letters, digits and special symbols"
+    },
+    "projectName": {
+      "required": "Project name is required",
+      "maxLength": "Project name must be no more than 20 characters long",
+      "invalidSymbols": "Project name may contain only letters, digits and special symbols"
+    },
+    "projectDescription": {
+      "maxLength": "Description must be no more than 300 characters long",
+      "invalidSymbols": "Description may contain only letters, digits and special symbols"
+    },
+    "projectElementName": {
+      "required": "Name is required",
+      "maxLength": "Name must be no more than 20 characters long",
+      "invalidSymbols": "Name may contain only letters, digits and special symbols"
     }
+  },
+
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "hoggyfoggy@example.com",
+    "passwordPlaceholder": "qwerty123",
+    "signInButton": "Log in",
+    "signUpButton": "Sign up",
+    "loginViaProviders": "Login with"
   },
 
   "profile": {
@@ -43,11 +59,141 @@
     "about": "About",
     "teamInvitations": "Allow team invitations",
     "projectNotifications": "Allow project notifications",
-    "emailNotifications": "Allow email notifications for favourite projects",
+    "emailNotifications": "Allow email notifications for favorite projects",
     "deleteAccount": {
       "modalHeader": "Do you really want to delete account?",
       "modalDescription": "Deleting your account will result in the irreversible loss of all your data, including projects, teams and personal information. After deletion data recovery will be impossible.",
       "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
+    }
+  },
+
+  "main": {
+    "myProjects": "MY PROJECTS",
+    "myTeams": "MY TEAMS",
+    "teamProjects": "_ PROJECTS",
+    "participants": "PARTICIPANTS",
+    "andNMore": "And _ more...",
+    "you": "(you)",
+    "searchPlaceholder": "Find...",
+    "noProjectDescription": "This project doesn't have any description yet...",
+    "roles": {
+      "owner": "owner",
+      "admin": "admin",
+      "editor": "editor",
+      "reader": "reader",
+      "team": "team"
+    }
+  },
+
+  "projects": {
+    "projectSettings": {
+      "name": "Project name",
+      "description": "Project description",
+      "uploadAvatarHint": "Upload new project avatar",
+      "allowRequests": "Allow requests to the project",
+      "isPublic": "Project is public",
+      "memberListIsPublic": "Member list is public",
+      "leaveButton": "Leave the project",
+      "deleteButton": "Delete project",
+      "saveButton": "Save",
+      "createButton": "Create project"
+    },
+    "deleteProject": {
+      "modalHeader": "Do you really want to delete your project?",
+      "modalDescription": "Deleting your project will result in the irreversible loss of all project data, including sections and boards. After deletion data recovery will be impossible.",
+      "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
+    },
+    "deleteProjectChild": {
+      "modalHeader": "Do you really want to delete this element?",
+      "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
+    },
+    "addElement": {
+      "section": {
+        "new": "New section",
+        "placeholder": "Section name"
+      },
+      "simple": {
+        "new": "New board",
+        "placeholder": "Board name"
+      },
+      "graph": {
+        "new": "New graph",
+        "placeholder": "Graph name"
+      },
+      "tree": {
+        "new": "New tree",
+        "placeholder": "Tree name"
+      },
+      "create": "Create"
+    },
+    "projectMembers": "PARTICIPANTS",
+    "projectSections": "SECTIONS",
+    "addSection": "ADD SECTION"
+  },
+
+  "filters": {
+    "menuHeader": "Filters",
+    "byMember": {
+      "label": "Member nickname",
+      "placeholder": "Has member..."
+    },
+    "byTeam": {
+      "label": "Team name",
+      "placeholder": "Has team..."
+    },
+    "byRole": {
+      "label": "My role",
+      "placeholder": "Where I am a..."
+    },
+    "byLastChange": {
+      "label": "Last change",
+      "placeholder": "Updated at..."
+    }
+  },
+
+  "members": {
+    "removeTeamMember": {
+      "modalHeader": "Remove team _ member",
+      "breakup": {
+        "option": "Detach team members",
+        "hint": "The member will be removed from project and other team members will lose their team membership in this project."
+      },
+      "entire": {
+        "option": "Remove the entire team",
+        "hint": "All team members will be removed from the project. You can invite a team again to rollback this action."
+      },
+      "modalSure": "Continue",
+      "modalDismiss": "Dismiss"
+    },
+    "changeRole": {
+      "modalHeader": "Change _'s role",
+      "modalDismiss": "Dismiss",
+      "modalSave": "Save",
+      "upgradeTeam": "Update maximum team role",
+      "upgradeMember": "Override _'s team role"
+    },
+    "selectOwner": {
+      "modalHeader": "Select a new owner",
+      "label": "New owner",
+      "modalDismiss": "Dismiss",
+      "modalSave": "Save"
+    },
+    "areYouSure": {
+      "newOwner": {
+        "modalHeader": "Are you sure you want to appoint a new owner?",
+        "modalSure": "Appoint"
+      },
+      "leave": {
+        "modalHeader": "Do you really want to leave?",
+        "modalSure": "Leave"
+      },
+      "removeMember": {
+        "modalHeader": "Do you really want to remove _?",
+        "modalSure": "Remove"
+      },
       "modalDismiss": "Dismiss"
     }
   },
@@ -58,6 +204,11 @@
       "teams": "TEAMS",
       "notifications": "NOTIFICATIONS"
     }
+  },
+
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
 
   "toolBar": {

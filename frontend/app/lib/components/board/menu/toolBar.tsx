@@ -8,6 +8,16 @@ import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 import { Divider } from '@heroui/divider';
 import TextTool from '@/app/lib/components/board/tools/textTool';
+import { BoardElement } from '@/app/lib/types/definitions';
+
+export type ToolProps = {
+  activeTool: string;
+  setActiveTool: any;
+  addElement: any;
+  updateElement: any;
+  stageRef: any;
+  resetStage: any;
+};
 
 export default function ToolBar({
   stageRef,
@@ -16,6 +26,13 @@ export default function ToolBar({
   removeElement,
   element,
   resetStage,
+}: {
+  stageRef: any;
+  updateElement: any;
+  addElement: any;
+  removeElement: any;
+  element: BoardElement;
+  resetStage: any;
 }) {
   const [activeTool, setActiveTool] = useState('');
   const tools = [TextTool, RectTool, EllipseTool];

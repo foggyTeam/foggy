@@ -2,8 +2,12 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
 import { TrashIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
+import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
 
-export default function DeleteTool({ element, removeElement }) {
+export default function DeleteTool({
+  element,
+  removeElement,
+}: ElementToolProps) {
   return (
     <Button
       onPress={() => removeElement(element.attrs.id)}
