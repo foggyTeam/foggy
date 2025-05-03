@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BoardService } from './board.service';
 import { BoardController } from './board.controller';
+import { BoardElementsGateway } from '../websocket/board-element.gateway';
 import { Board, BoardSchema } from './schemas/board.schema';
 import { Layer, LayerSchema } from './schemas/layer.schema';
 
@@ -13,6 +14,6 @@ import { Layer, LayerSchema } from './schemas/layer.schema';
     ]),
   ],
   controllers: [BoardController],
-  providers: [BoardService],
+  providers: [BoardService, BoardElementsGateway],
 })
 export class BoardModule {}

@@ -320,7 +320,7 @@ export class BoardService {
     return !duplicateExists;
   }
 
-  private async findLayerAndElementById(
+  public async findLayerAndElementById(
     elementId: string,
   ): Promise<{ layer: LayerDocument; element: BaseElement }> {
     const layers = await this.layerModel.find().exec();
