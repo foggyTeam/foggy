@@ -153,6 +153,26 @@
     }
   },
 
+  "members": {
+    "areYouSure": {
+      "modalHeader": "Вы действительно хотите выйти?",
+      "modalSure": "Выйти",
+      "modalDismiss": "Отмена"
+    },
+    "removeMember": {
+      "modalHeader": "Вы действительно хотите удалить _?",
+      "modalSure": "Удалить",
+      "modalDismiss": "Отмена"
+    },
+    "changeRole": {
+      "modalHeader": "Изменить роль _",
+      "modalDismiss": "Отмена",
+      "modalSave": "Сохранить",
+      "modalUpgradeTeam": "Обновить макс. роль команды",
+      "modalUpgradeMember": "Переопределить командную роль _"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",

@@ -8,25 +8,79 @@ import { useDisclosure } from '@heroui/modal';
 import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
 import MemberCard from '@/app/lib/components/members/memberCard';
 import CompareByRole from '@/app/lib/utils/compareByRole';
+import { createContext, useContext } from 'react';
+import { Role } from '@/app/lib/types/definitions';
+
+interface MembersContextType {
+  memberType: 'team' | 'project';
+  myRole: Role | null;
+  removeMember: (
+    id: string,
+    newOwnerId?: string | null,
+    removeType?: 'breakup' | 'entire' | null,
+  ) => void;
+  updateMemberRole: (
+    id: string,
+    newRole: Role,
+    changeType?: 'override' | 'updateMax',
+  ) => void;
+}
+
+const MembersContext = createContext<MembersContextType | null>(null);
+export const useMembersContext = () => {
+  const context = useContext(MembersContext);
+  if (!context)
+    throw new Error('useContext must be used within a ContextProvider');
+  return context;
+};
 
 const AllProjectMembers = observer(() => {
+  const myRole: Role | null =
+    projectsStore.activeProject?.members.toSorted(CompareByRole)[0].role ||
+    null;
   const {
     isOpen: isAddMemberOpen,
     onOpen: onAddMemberOpen,
     onOpenChange: onAddMemberOpenChange,
   } = useDisclosure();
 
+  const handleRemoveMember = (
+    id: string,
+    newOwnerId?: string | null,
+    removeType?: 'breakup' | 'entire' | null,
+  ) => {
+    console.log('remove member', id, newOwnerId, removeType);
+    projectsStore.removeProjectMember(id);
+  };
+  const handleUpdateMemberRole = (
+    id: string,
+    newRole: Role,
+    changeType?: 'override' | 'updateMax',
+  ) => {
+    console.log('new role', id, newRole, changeType);
+    projectsStore.updateProjectMember(id, { role: newRole });
+  };
+
   return (
     <>
-      <ContentSection
-        sectionTitle={settingsStore.t.projects.projectMembers}
-        data={
-          projectsStore.activeProject?.members.toSorted(CompareByRole) || []
-        }
-        DataCard={MemberCard}
-        filter
-        addMember={onAddMemberOpen}
-      />
+      <MembersContext.Provider
+        value={{
+          memberType: 'project',
+          myRole: myRole,
+          removeMember: handleRemoveMember,
+          updateMemberRole: handleUpdateMemberRole,
+        }}
+      >
+        <ContentSection
+          sectionTitle={settingsStore.t.projects.projectMembers}
+          data={
+            projectsStore.activeProject?.members.toSorted(CompareByRole) || []
+          }
+          DataCard={MemberCard}
+          filter
+          addMember={onAddMemberOpen}
+        />
+      </MembersContext.Provider>
       {isAddMemberOpen && (
         <ProjectSettingsModal
           isOpen={isAddMemberOpen}

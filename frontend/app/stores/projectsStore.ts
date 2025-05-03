@@ -3,6 +3,7 @@ import {
   Board,
   BoardElement,
   Project,
+  ProjectMember,
   ProjectSection,
   RawProject,
   TextElement,
@@ -34,6 +35,8 @@ class ProjectsStore {
       updateProject: action,
       updateProjectChild: action,
       deleteProjectChild: action,
+      updateProjectMember: action,
+      removeProjectMember: action,
     });
   }
 
@@ -279,6 +282,30 @@ class ProjectsStore {
     // удаление с верхнего уровеня
     if (parentSections.length === 0)
       this.activeProject.sections.delete(childId);
+  };
+
+  updateProjectMember = (
+    memberId: string,
+    newAttrs: Partial<ProjectMember>,
+  ) => {
+    if (this.activeProject) {
+      const memberIndex = this.activeProject.members.findIndex(
+        (member) => member.id === memberId,
+      );
+      if (memberIndex >= 0)
+        this.activeProject.members[memberIndex] = {
+          ...this.activeProject.members[memberIndex],
+          ...newAttrs,
+        };
+    }
+  };
+
+  removeProjectMember = (memberId: string) => {
+    if (this.activeProject) {
+      this.activeProject.members = this.activeProject.members.filter(
+        (member) => member.id !== memberId,
+      );
+    }
   };
 }
 

@@ -14,7 +14,7 @@ import { profileFormSchema } from '@/app/lib/types/schemas';
 import { updateUserData } from '@/app/lib/server/actions/updateUserData';
 import { deleteUserById } from '@/app/lib/server/actions/deleteUserById';
 import { signUserOut } from '@/app/lib/server/actions/signUserOut';
-import AreYouSureModal from '@/app/lib/components/areYouSureModal';
+import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
