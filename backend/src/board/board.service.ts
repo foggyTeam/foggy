@@ -12,8 +12,9 @@ import { BaseElement, BaseElementModel } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { CreateElementDto } from './dto/create-element.dto';
 import { CustomException } from '../exceptions/custom-exception';
-import { getErrorMessages } from '../errorMessages';
+import { getErrorMessages } from '../errorMessages/errorMessages';
 
 @Injectable()
 export class BoardService {
@@ -93,7 +94,7 @@ export class BoardService {
   async addElement(
     boardId: Types.ObjectId,
     layerNumber: number = 2,
-    elementDto: any,
+    createElementDto: any,
   ): Promise<any> {
     const board = await this.findById(boardId);
     const layerId = board.layers[layerNumber];
@@ -109,32 +110,32 @@ export class BoardService {
       throw new NotFoundException(`Layer with ID "${layerId}" not found`);
     }
 
-    if (!(await this.isElementIdUnique(boardId, elementDto.id))) {
+    if (!(await this.isElementIdUnique(boardId, createElementDto.id))) {
       throw new BadRequestException(
-        `Element with ID "${elementDto.id}" already exists in board "${boardId}"`,
+        `Element with ID "${createElementDto.id}" already exists in board "${boardId}"`,
       );
     }
 
     let element;
-    switch (elementDto.type) {
+    switch (createElementDto.type) {
       case 'rect':
-        element = new BaseElementModel.discriminators.rect(elementDto);
+        element = new BaseElementModel.discriminators.rect(createElementDto);
         break;
       case 'ellipse':
-        element = new BaseElementModel.discriminators.ellipse(elementDto);
+        element = new BaseElementModel.discriminators.ellipse(createElementDto);
         break;
       case 'text':
-        element = new BaseElementModel.discriminators.text(elementDto);
+        element = new BaseElementModel.discriminators.text(createElementDto);
         break;
       case 'line':
-        element = new BaseElementModel.discriminators.line(elementDto);
+        element = new BaseElementModel.discriminators.line(createElementDto);
         break;
       case 'marker':
-        element = new BaseElementModel.discriminators.marker(elementDto);
+        element = new BaseElementModel.discriminators.marker(createElementDto);
         break;
       default:
         throw new BadRequestException(
-          `Unsupported element type: "${elementDto.type}"`,
+          `Unsupported element type: "${createElementDto.type}"`,
         );
     }
 

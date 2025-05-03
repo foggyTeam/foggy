@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { getErrorMessages } from '../../errorMessages';
+import { getErrorMessages } from '../../errorMessages/errorMessages';
 
 export class GoogleUserDto {
   @IsNotEmpty({ message: getErrorMessages({ email: 'required' }).email })

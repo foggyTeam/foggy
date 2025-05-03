@@ -6,7 +6,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { getErrorMessages } from '../../errorMessages';
+import { getErrorMessages } from '../../errorMessages/errorMessages';
 
 export class CreateUserDto {
   @IsNotEmpty({ message: getErrorMessages({ email: 'required' }).email })

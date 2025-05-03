@@ -1,3 +1,5 @@
+import { elementError } from './elementError';
+
 const errorMessages = {
   nickname: {
     required: {
@@ -165,6 +167,7 @@ const errorMessages = {
       ru: 'Тип должен быть представлен строкой',
     },
   },
+  ...elementError,
 };
 
 type Field = keyof typeof errorMessages;

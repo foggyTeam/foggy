@@ -8,7 +8,7 @@ import { Counter } from './schemas/user-counter.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { GoogleUserDto } from './dto/login-google.dto';
-import { getErrorMessages } from '../errorMessages';
+import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 import { isURL } from 'class-validator';
 
@@ -57,6 +57,72 @@ export class UsersService {
     }
 
     return this.transformUserResponse(user as User);
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.userModel.find().exec();
+  }
+
+  async findUserById(id: string): Promise<User> {
+    const user = await this.userModel.findById(id);
+    if (!user) {
+      throw new CustomException(
+        getErrorMessages({ id: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return user as User;
+  }
+
+  async deleteUserById(id: string): Promise<void> {
+    try {
+      await this.userModel.findByIdAndDelete(id);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
+  }
+
+  async deleteAllUsers(): Promise<void> {
+    await this.userModel.deleteMany({});
+    await this.counterModel.updateOne({}, { count: 0 });
+  }
+
+  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
+    const user = await this.findUserById(userId);
+
+    if (updateData.email) {
+      throw new CustomException(
+        getErrorMessages({ email: 'cannotChange' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (
+      updateData.nickname &&
+      !(await this.validateNickname(updateData.nickname))
+    ) {
+      throw new CustomException(
+        getErrorMessages({ nickname: 'invalid' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (updateData.password) {
+      updateData.password = await this.hashPassword(updateData.password);
+    }
+
+    if (updateData.settings) {
+      user.settings = {
+        ...user.settings,
+        ...updateData.settings,
+      };
+      delete updateData.settings;
+    }
+
+    Object.assign(user, updateData);
+    await user.save();
+
+    return user;
   }
 
   private async generateNickname(): Promise<string> {
@@ -184,72 +250,6 @@ export class UsersService {
       getErrorMessages({ general: 'errorNotRecognized' }),
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
-  async findUserById(id: string): Promise<User> {
-    const user = await this.userModel.findById(id);
-    if (!user) {
-      throw new CustomException(
-        getErrorMessages({ id: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return user as User;
-  }
-
-  async deleteUserById(id: string): Promise<void> {
-    try {
-      await this.userModel.findByIdAndDelete(id);
-    } catch (error) {
-      this.handleSaveUserError(error);
-    }
-  }
-
-  async deleteAllUsers(): Promise<void> {
-    await this.userModel.deleteMany({});
-    await this.counterModel.updateOne({}, { count: 0 });
-  }
-
-  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
-    const user = await this.findUserById(userId);
-
-    if (updateData.email) {
-      throw new CustomException(
-        getErrorMessages({ email: 'cannotChange' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (
-      updateData.nickname &&
-      !(await this.validateNickname(updateData.nickname))
-    ) {
-      throw new CustomException(
-        getErrorMessages({ nickname: 'invalid' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (updateData.password) {
-      updateData.password = await this.hashPassword(updateData.password);
-    }
-
-    if (updateData.settings) {
-      user.settings = {
-        ...user.settings,
-        ...updateData.settings,
-      };
-      delete updateData.settings;
-    }
-
-    Object.assign(user, updateData);
-    await user.save();
-
-    return user;
   }
 
   private async saveUser(newUser: User): Promise<Partial<User>> {

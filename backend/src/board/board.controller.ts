@@ -25,6 +25,7 @@ import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { CreateElementDto } from './dto/create-element.dto';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -291,9 +292,9 @@ export class BoardController {
   async addElement(
     @Param('id') id: Types.ObjectId,
     @Query('layerNumber') layerNumber: number,
-    @Body() elementDto: any,
+    @Body() createElementDto: any,
   ): Promise<BaseElement> {
-    return this.boardService.addElement(id, layerNumber, elementDto);
+    return this.boardService.addElement(id, layerNumber, createElementDto);
   }
 
   @Delete(':id/elements/:elementId')
