@@ -155,22 +155,46 @@
   },
 
   "members": {
-    "areYouSure": {
-      "modalHeader": "Do you really want to leave?",
-      "modalSure": "Leave",
-      "modalDismiss": "Dismiss"
-    },
-    "removeMember": {
-      "modalHeader": "Do you really want to remove _?",
-      "modalSure": "Remove",
+    "removeTeamMember": {
+      "modalHeader": "Remove team _ member",
+      "breakup": {
+        "option": "Detach team members",
+        "hint": "The member will be removed from project and other team members will lose their team membership in this project."
+      },
+      "entire": {
+        "option": "Remove the entire team",
+        "hint": "All team members will be removed from the project. You can invite a team again to rollback this action."
+      },
+      "modalSure": "Continue",
       "modalDismiss": "Dismiss"
     },
     "changeRole": {
       "modalHeader": "Change _'s role",
       "modalDismiss": "Dismiss",
       "modalSave": "Save",
-      "modalUpgradeTeam": "Update maximum team role",
-      "modalUpgradeMember": "Override _'s team role"
+      "upgradeTeam": "Update maximum team role",
+      "upgradeMember": "Override _'s team role"
+    },
+    "selectOwner": {
+      "modalHeader": "Select a new owner",
+      "label": "New owner",
+      "modalDismiss": "Dismiss",
+      "modalSave": "Save"
+    },
+    "areYouSure": {
+      "newOwner": {
+        "modalHeader": "Are you sure you want to appoint a new owner?",
+        "modalSure": "Appoint"
+      },
+      "leave": {
+        "modalHeader": "Do you really want to leave?",
+        "modalSure": "Leave"
+      },
+      "removeMember": {
+        "modalHeader": "Do you really want to remove _?",
+        "modalSure": "Remove"
+      },
+      "modalDismiss": "Dismiss"
     }
   },
 

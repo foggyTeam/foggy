@@ -12,6 +12,7 @@ import { Button } from '@heroui/button';
 import FunnelIcon from '@/app/lib/components/svg/funnelIcon';
 import AllFilters from '@/app/lib/components/filters/allFilters';
 import { FilterSet } from '@/app/lib/types/definitions';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 export interface ActionBarProps {
   setSearchValue: any;
@@ -112,18 +113,19 @@ export default function ContentActionBar({
             </Button>
           )}
         </div>
+
         <div className="flex gap-1">
           {addNew !== undefined && (
             <Button onPress={addNew} isIconOnly variant="light" size="sm">
               <PlusIcon className="stroke-default-500" />
             </Button>
           )}
-          {addMember !== undefined && (
+          {addMember !== undefined && CheckAccess(['admin', 'owner']) && (
             <Button onPress={addMember} isIconOnly variant="light" size="sm">
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
-          {openSettings !== undefined && (
+          {openSettings !== undefined && CheckAccess(['admin', 'owner']) && (
             <Button onPress={openSettings} isIconOnly variant="light" size="sm">
               <SettingsIcon className="stroke-default-500" />
             </Button>

@@ -30,17 +30,17 @@ export default function ({
   action: () => void;
 }) {
   const changeTypes = {
-    override: settingsStore.t.members.changeRole.modalUpgradeMember.replace(
+    override: settingsStore.t.members.changeRole.upgradeMember.replace(
       '_',
       member.nickname,
     ),
-    updateMax: settingsStore.t.members.changeRole.modalUpgradeTeam,
+    updateMax: settingsStore.t.members.changeRole.upgradeTeam,
   };
   const [newRole, setNewRole] = useState<Role[]>([member.role]);
   const [changeType, setChangeType] = useState<('override' | 'updateMax')[]>([
     'override',
   ]);
-  const rolesList: Role[] = ['admin', 'editor', 'reader'];
+  const rolesList: Role[] = ['admin', 'editor', 'reader', 'owner'];
 
   useEffect(() => {
     submitRole(newRole[0]);
@@ -75,6 +75,7 @@ export default function ({
                     ),
                   }}
                   selectedKeys={newRole}
+                  disabledKeys={['owner']}
                   onSelectionChange={(keys) =>
                     setNewRole(Array.from(keys) as Role[])
                   }

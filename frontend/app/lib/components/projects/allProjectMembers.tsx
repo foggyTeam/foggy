@@ -22,7 +22,7 @@ interface MembersContextType {
   updateMemberRole: (
     id: string,
     newRole: Role,
-    changeType?: 'override' | 'updateMax',
+    changeType?: 'override' | 'updateMax' | null,
   ) => void;
 }
 
@@ -55,7 +55,7 @@ const AllProjectMembers = observer(() => {
   const handleUpdateMemberRole = (
     id: string,
     newRole: Role,
-    changeType?: 'override' | 'updateMax',
+    changeType?: 'override' | 'updateMax' | null,
   ) => {
     console.log('new role', id, newRole, changeType);
     projectsStore.updateProjectMember(id, { role: newRole });

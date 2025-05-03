@@ -8,7 +8,6 @@ import { projectFormSchema } from '@/app/lib/types/schemas';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { Form } from '@heroui/form';
 import settingsStore from '@/app/stores/settingsStore';
-import { Button } from '@heroui/button';
 import { Input, Textarea } from '@heroui/input';
 import { Checkbox } from '@heroui/checkbox';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
@@ -16,6 +15,7 @@ import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
 import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
+import CheckAccess from '@/app/lib/utils/checkAccess';
 
 const ProjectSettingsModal = observer(
   ({
@@ -176,68 +176,55 @@ const ProjectSettingsModal = observer(
                         onValueChange={setDescription}
                       />
                     </div>
-                    <div className="flex h-full w-full flex-col justify-between gap-6">
-                      <div className="flex h-full w-full flex-col gap-2">
-                        <Checkbox
-                          isSelected={checkboxes.allowRequests}
-                          onValueChange={(value) =>
-                            setCheckboxes({
-                              ...checkboxes,
-                              allowRequests: value,
-                            })
-                          }
-                          size="sm"
-                        >
-                          {
-                            settingsStore.t.projects.projectSettings
-                              .allowRequests
-                          }
-                        </Checkbox>
-                        <Checkbox
-                          isSelected={checkboxes.isPublic}
-                          onValueChange={(value) =>
-                            setCheckboxes({ ...checkboxes, isPublic: value })
-                          }
-                          size="sm"
-                        >
-                          {settingsStore.t.projects.projectSettings.isPublic}
-                        </Checkbox>
-                        <Checkbox
-                          className="align-top"
-                          isSelected={checkboxes.memberListIsPublic}
-                          onValueChange={(value) =>
-                            setCheckboxes({
-                              ...checkboxes,
-                              memberListIsPublic: value,
-                            })
-                          }
-                          size="sm"
-                        >
-                          {
-                            settingsStore.t.projects.projectSettings
-                              .memberListIsPublic
-                          }
-                        </Checkbox>
-                      </div>
-                      {!isNewProject && (
-                        <div className="flex w-full justify-end">
-                          <Button variant="light" size="md" color="secondary">
-                            {
-                              settingsStore.t.projects.projectSettings
-                                .leaveButton
-                            }
-                          </Button>
-                        </div>
-                      )}
+                    <div className="flex h-fit w-full flex-col items-start justify-start gap-2">
+                      <Checkbox
+                        isSelected={checkboxes.allowRequests}
+                        onValueChange={(value) =>
+                          setCheckboxes({
+                            ...checkboxes,
+                            allowRequests: value,
+                          })
+                        }
+                        size="sm"
+                      >
+                        {settingsStore.t.projects.projectSettings.allowRequests}
+                      </Checkbox>
+                      <Checkbox
+                        isSelected={checkboxes.isPublic}
+                        onValueChange={(value) =>
+                          setCheckboxes({ ...checkboxes, isPublic: value })
+                        }
+                        size="sm"
+                      >
+                        {settingsStore.t.projects.projectSettings.isPublic}
+                      </Checkbox>
+                      <Checkbox
+                        className="align-top"
+                        isSelected={checkboxes.memberListIsPublic}
+                        onValueChange={(value) =>
+                          setCheckboxes({
+                            ...checkboxes,
+                            memberListIsPublic: value,
+                          })
+                        }
+                        size="sm"
+                      >
+                        {
+                          settingsStore.t.projects.projectSettings
+                            .memberListIsPublic
+                        }
+                      </Checkbox>
                     </div>
                   </div>
                   <div
                     className={clsx(
                       'flex w-full items-center gap-2',
-                      isNewProject ? 'justify-end' : 'justify-between',
+                      isNewProject || !CheckAccess(['owner'])
+                        ? 'justify-end'
+                        : 'justify-between',
                     )}
                   >
-                    {!isNewProject && (
+                    {!isNewProject && CheckAccess(['owner']) && (
                       <FButton
                         onPress={onDeleteProjectOpen}
                         variant="bordered"
