@@ -51,11 +51,22 @@ export class BoardService {
   }
 
   async findById(boardId: Types.ObjectId): Promise<BoardDocument> {
-    const board = await this.boardModel.findById(boardId).exec();
-    if (!board) {
-      throw new NotFoundException(`Board with ID "${boardId}" not found`);
+    if (!Types.ObjectId.isValid(boardId)) {
+      throw new CustomException(
+        getErrorMessages({ board: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    return board;
+    return await this.boardModel
+      .findById(boardId)
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ board: 'idNotFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
   }
 
   async deleteById(boardId: Types.ObjectId): Promise<void> {

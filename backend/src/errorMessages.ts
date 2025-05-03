@@ -94,6 +94,14 @@ const errorMessages = {
       en: 'Failed to create board',
       ru: 'Не удалось создать доску',
     },
+    idNotFound: {
+      en: 'Board not found',
+      ru: 'Доска не найдена',
+    },
+    invalidIdType: {
+      en: 'Board ID must be supported by MongoDB',
+      ru: 'ID доски должен поддерживаться MongoDB',
+    },
   },
   general: {
     fieldNotRecognized: {

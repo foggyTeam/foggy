@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotFoundException,
   Param,
   Post,
   Put,
@@ -93,21 +92,26 @@ export class BoardController {
   @ApiOperation({ summary: 'Get a board by ID' })
   @ApiParam({
     name: 'id',
-    description: 'ID of the board to retrieve',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
     type: String,
+    example: '68155ed60664ac3e46713d58',
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns the board with the specified ID.',
+    description: 'Returns the full board document',
     type: Board,
   })
-  @ApiResponse({ status: 404, description: 'Board not found.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid ID format',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Board not found',
+  })
   async findById(@Param('id') id: Types.ObjectId): Promise<BoardDocument> {
-    const board = await this.boardService.findById(id);
-    if (!board) {
-      throw new NotFoundException(`Board with ID "${id}" not found`);
-    }
-    return board;
+    return await this.boardService.findById(id);
   }
 
   @Put(':id/title')
