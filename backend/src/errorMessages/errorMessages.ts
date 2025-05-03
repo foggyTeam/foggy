@@ -1,5 +1,3 @@
-import { elementError } from './elementError';
-
 const errorMessages = {
   nickname: {
     required: {
@@ -83,28 +81,6 @@ const errorMessages = {
       ru: 'Неверное поле для аватара',
     },
   },
-  board: {
-    required: {
-      en: 'Board data is required',
-      ru: 'Данные доски являются обязательными',
-    },
-    unique: {
-      en: 'Board with this name already exists',
-      ru: 'Доска с таким названием уже существует',
-    },
-    creationFailed: {
-      en: 'Failed to create board',
-      ru: 'Не удалось создать доску',
-    },
-    idNotFound: {
-      en: 'Board not found',
-      ru: 'Доска не найдена',
-    },
-    invalidIdType: {
-      en: 'Board ID must be supported by MongoDB',
-      ru: 'ID доски должен поддерживаться MongoDB',
-    },
-  },
   general: {
     fieldNotRecognized: {
       en: 'This field is not recognized',
@@ -122,10 +98,6 @@ const errorMessages = {
       en: 'Invalid API Key',
       ru: 'Неверный API ключ',
     },
-    devOnly: {
-      en: 'This endpoint is available only in development environment',
-      ru: 'Эта точка доступа доступна только в среде разработки',
-    },
   },
   projectId: {
     required: {
@@ -133,18 +105,18 @@ const errorMessages = {
       ru: 'ID проекта является обязательным',
     },
     invalidType: {
-      en: 'Project ID must be supported by MongoDB',
-      ru: 'ID проекта должен поддерживаться MongoDB',
+      en: 'Project ID must be a string',
+      ru: 'ID проекта должен быть строкой',
     },
   },
   section: {
     required: {
-      en: 'Section is required',
-      ru: 'Раздел является обязательным',
+      en: 'SectionHeader is required',
+      ru: 'Секция является обязательным',
     },
     invalidType: {
-      en: 'Section ID must be supported by MongoDB',
-      ru: 'ID раздела должен поддерживаться MongoDB',
+      en: 'SectionHeader must be a string',
+      ru: 'Раздел должен быть строкой',
     },
   },
   name: {
@@ -167,7 +139,6 @@ const errorMessages = {
       ru: 'Тип должен быть представлен строкой',
     },
   },
-  ...elementError,
 };
 
 type Field = keyof typeof errorMessages;
