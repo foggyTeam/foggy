@@ -283,9 +283,10 @@ export class BoardService {
 
   private async createLayers(
     boardId: Types.ObjectId,
+    layerCount: number = 3,
   ): Promise<LayerDocument[]> {
     return Promise.all(
-      Array.from({ length: 3 }, (_, index) => {
+      Array.from({ length: layerCount }, (_, index) => {
         const layer = new this.layerModel({ boardId, layerNumber: index });
         return layer.save();
       }),
@@ -296,12 +297,9 @@ export class BoardService {
     createBoardDto: CreateBoardDto,
   ): Promise<void> {
     const { sectionId, name } = createBoardDto;
+    const boardExists = await this.boardModel.exists({ sectionId, name });
 
-    const existingBoard = await this.boardModel
-      .findOne({ sectionId, name })
-      .exec();
-
-    if (existingBoard) {
+    if (boardExists) {
       throw new CustomException(
         getErrorMessages({ board: 'unique' }),
         HttpStatus.CONFLICT,
@@ -314,13 +312,11 @@ export class BoardService {
     elementId: string,
   ): Promise<boolean> {
     const board = await this.findById(boardId);
-    for (const layerId of board.layers) {
-      const layer = await this.layerModel.findById(layerId).exec();
-      if (layer && layer.elements.some((element) => element.id === elementId)) {
-        return false;
-      }
-    }
-    return true;
+    const duplicateExists = await this.layerModel.exists({
+      _id: { $in: board.layers },
+      'elements.id': elementId,
+    });
+    return !duplicateExists;
   }
 
   private async findLayerAndElementById(
