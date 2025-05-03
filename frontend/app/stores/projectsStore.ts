@@ -12,11 +12,18 @@ import {
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 import ConvertRawProject from '@/app/lib/utils/convertRawProject';
 import userStore from '@/app/stores/userStore';
+import { Socket } from 'socket.io-client';
+import openBoardSocketConnection, {
+  socketAddEventListeners,
+} from '@/app/lib/utils/boardSocketConnection';
 
 const MAX_LAYER = 2;
 
 class ProjectsStore {
   myRole: Role | undefined = undefined;
+
+  boardWebsocket: Socket | null = null;
+
   activeBoard: Board | undefined = undefined;
   activeProject: Project | undefined = undefined;
   allProjects: Project[] = [];
@@ -41,6 +48,25 @@ class ProjectsStore {
       updateProjectMember: action,
       removeProjectMember: action,
     });
+  }
+
+  connectSocket(boardId: string) {
+    if (boardId && userStore.user) {
+      this.boardWebsocket = openBoardSocketConnection(
+        boardId,
+        userStore.user.id,
+      );
+
+      if (this.boardWebsocket) {
+        socketAddEventListeners(this.boardWebsocket);
+      }
+    } else console.error('Failed to connect to websocket.');
+  }
+  disconnectSocket() {
+    if (this.boardWebsocket) {
+      this.boardWebsocket.disconnect();
+      this.boardWebsocket = null;
+    }
   }
 
   addElement = (newElement: BoardElement) => {
@@ -150,9 +176,14 @@ class ProjectsStore {
     return currentIndex;
   };
 
-  setActiveBoard = (board: Board) => {
+  setActiveBoard = (board: Board | undefined) => {
+    if (!board) {
+      this.activeBoard = board;
+      this.disconnectSocket();
+    }
     if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
     else this.activeBoard = board;
+    this.connectSocket(board?.id || '');
   };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);

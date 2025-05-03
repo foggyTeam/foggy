@@ -9,6 +9,7 @@ const BoardLoader = ({ boardData }: { boardData: Board | undefined }) => {
     if (boardData) {
       projectsStore.setActiveBoard(boardData);
     }
+    return () => projectsStore.setActiveBoard(undefined);
   }, [boardData]);
 
   return null;
