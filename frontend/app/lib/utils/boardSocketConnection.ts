@@ -21,6 +21,10 @@ export default function openBoardSocketConnection(boardId, userId) {
     console.log('Socket disconnected');
   });
 
+  socket.on('custom_error', (error) => {
+    console.error('Socket error:', error);
+  });
+
   socket.on('connect_error', (error) => {
     console.error('Socket connection error:', error);
   });

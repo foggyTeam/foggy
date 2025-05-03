@@ -70,13 +70,19 @@ class ProjectsStore {
   }
 
   addElement = (newElement: BoardElement) => {
-    if (this.activeBoard?.layers)
+    if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
         newElement,
       );
+      try {
+        this.boardWebsocket.emit('addElement', newElement);
+      } catch (e) {
+        console.log(e);
+      }
+    }
   };
   updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
-    if (this.activeBoard?.layers) {
+    if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers = this.activeBoard.layers.map(
         (layer: BoardElement[]) =>
           layer.map((element) => {
@@ -86,13 +92,14 @@ class ProjectsStore {
             return UpdateTextElement(element, newAttrs as Partial<TextElement>);
           }),
       );
+      this.boardWebsocket.emit('updateElement', { id: id, newAttrs: newAttrs });
     }
   };
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
   ): { layer: number; index: number } => {
-    if (this.activeBoard?.layers) {
+    if (this.activeBoard?.layers && this.boardWebsocket) {
       let elementToMove: BoardElement | null = null;
       let currentLayerIndex: number = -1;
 
@@ -152,14 +159,17 @@ class ProjectsStore {
             };
         }
       }
+
+      this.boardWebsocket.emit('moveElement', { id: id, action: action });
     }
     return { layer: -1, index: -1 };
   };
   removeElement = (id: string) => {
-    if (this.activeBoard?.layers)
+    if (this.activeBoard?.layers && this.boardWebsocket)
       this.activeBoard.layers = this.activeBoard.layers.map((layer) =>
         layer.filter((element) => element.id !== id),
       );
+    this.boardWebsocket.emit('removeElement', id);
   };
   getElementLayer = (id: string): { layer: number; index: number } => {
     const currentIndex = { layer: -1, index: -1 };

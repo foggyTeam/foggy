@@ -1,6 +1,7 @@
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import userStore from '@/app/stores/userStore';
 
 interface DrawingHandlersProps {
   stageRef: any;
@@ -60,7 +61,7 @@ export const handleMouseDown =
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
       const element = {
-        id: `${activeTool}_${Date.now()}`,
+        id: `${activeTool}${Date.now().toString()}${userStore.user?.id.toString().substring(19, 23)}`,
         type: activeTool,
         draggable: true,
         dragDistance: 4,
