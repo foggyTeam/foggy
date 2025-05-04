@@ -59,11 +59,7 @@ export class BoardElementsGateway
 
   @SubscribeMessage('addElement')
   async handleAddElement(
-    @MessageBody()
-    data: {
-      layerNumber?: number;
-      elementData: any;
-    },
+    @MessageBody() elementData: any,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -72,27 +68,31 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
+      this.logger.log(`[AddElement] Received:`, elementData);
+
+      if (!elementData?.type) {
+        throw new Error('Element type is required');
+      }
+
+      const layerNumber = elementData.layerNumber ?? 2;
       const element = await this.boardService.addElement(
         new Types.ObjectId(boardId),
-        data.layerNumber,
-        data.elementData,
+        layerNumber,
+        elementData,
       );
 
       client.to(boardId).emit('elementAdded', { boardId, element });
       return { status: 'success', element };
     } catch (error) {
-      this.logger.error(`Error adding element: ${error.message}`);
-      return {
-        status: 'error',
-        statusCode: error.statusCode || 500,
-        message: error.message,
-      };
+      this.logger.error(`[AddElement] Error:`, error);
+      return this.handleError(error);
     }
   }
 
   @SubscribeMessage('updateElement')
   async handleUpdateElement(
-    @MessageBody() data: { elementId: string; updateData: UpdateElementDto },
+    @MessageBody()
+    updateData: { id: string; newAttrs: Partial<UpdateElementDto> },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -101,29 +101,35 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
+      this.logger.log(`[UpdateElement] Received:`, updateData);
+
+      if (!updateData?.id) {
+        throw new Error('Element ID is required');
+      }
+
+      if (!updateData?.newAttrs) {
+        throw new Error('Updated attributes are required');
+      }
+
       const element = await this.boardService.updateElement(
-        data.elementId,
-        data.updateData,
+        updateData.id,
+        updateData.newAttrs, // Используем newAttrs вместо changes
       );
 
       client.to(boardId).emit('elementUpdated', {
-        elementId: data.elementId,
+        elementId: updateData.id,
         element,
       });
       return { status: 'success', element };
     } catch (error) {
-      this.logger.error(`Error updating element: ${error.message}`);
-      return {
-        status: 'error',
-        statusCode: error.statusCode || 500,
-        message: error.message,
-      };
+      this.logger.error(`[UpdateElement] Error:`, error);
+      return this.handleError(error);
     }
   }
 
   @SubscribeMessage('deleteElement')
   async handleDeleteElement(
-    @MessageBody() data: { elementId: string },
+    @MessageBody() elementId: string,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -132,23 +138,26 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      await this.boardService.removeElement(data.elementId);
-      client.to(boardId).emit('elementDeleted', { elementId: data.elementId });
+      this.logger.log(`[DeleteElement] Received elementId:`, elementId);
+
+      if (!elementId) {
+        throw new Error('Element ID is required');
+      }
+
+      await this.boardService.removeElement(elementId);
+
+      client.to(boardId).emit('elementRemoved', elementId);
       return { status: 'success' };
     } catch (error) {
-      this.logger.error(`Error deleting element: ${error.message}`);
-      return {
-        status: 'error',
-        statusCode: error.statusCode || 500,
-        message: error.message,
-      };
+      this.logger.error(`[DeleteElement] Error:`, error);
+      return this.handleError(error);
     }
   }
 
   @SubscribeMessage('moveElement')
   async handleMoveElement(
     @MessageBody()
-    data: { elementId: string; direction: 'up' | 'down'; withinLayer: boolean },
+    moveData: { id: string; direction: 'up' | 'down'; withinLayer?: boolean },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -157,33 +166,42 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
+      this.logger.log(`[MoveElement] Received:`, moveData);
+
+      if (!moveData?.id) {
+        throw new Error('Element ID is required');
+      }
+
       let element;
-      if (data.withinLayer) {
+      if (moveData.withinLayer) {
         element = await this.boardService.moveElementWithinLayer(
-          data.elementId,
-          data.direction,
+          moveData.id,
+          moveData.direction,
         );
       } else {
-        const board = await this.findBoardContainingElement(data.elementId);
+        const board = await this.findBoardContainingElement(moveData.id);
         element = await this.boardService.moveElementToLayer(
           board._id,
-          data.elementId,
-          data.direction,
+          moveData.id,
+          moveData.direction,
         );
       }
 
+      const actionMap = {
+        up: 'forward',
+        down: 'back',
+      };
+      const action = actionMap[moveData.direction] || moveData.direction;
+
       client.to(boardId).emit('elementMoved', {
-        elementId: data.elementId,
-        element,
+        id: moveData.id,
+        action,
       });
+
       return { status: 'success', element };
     } catch (error) {
-      this.logger.error(`Error moving element: ${error.message}`);
-      return {
-        status: 'error',
-        statusCode: error.statusCode || 500,
-        message: error.message,
-      };
+      this.logger.error(`[MoveElement] Error:`, error);
+      return this.handleError(error);
     }
   }
 
@@ -195,11 +213,18 @@ export class BoardElementsGateway
         await this.boardService.getElementLayerIndex(board.layers, elementId);
         return board;
       } catch (error) {
-        this.logger.log(error);
         continue;
       }
     }
 
     throw new Error(`Element with ID ${elementId} not found in any board`);
+  }
+
+  private handleError(error: Error) {
+    return {
+      status: 'error',
+      statusCode: error['statusCode'] || 500,
+      message: error.message,
+    };
   }
 }
