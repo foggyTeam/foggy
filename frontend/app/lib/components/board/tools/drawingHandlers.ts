@@ -1,4 +1,8 @@
-import { BoardElement, TextElement } from '@/app/lib/types/definitions';
+import {
+  BoardElement,
+  LineElement,
+  TextElement,
+} from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
@@ -15,6 +19,18 @@ interface DrawingHandlersProps {
   newElement: BoardElement | null;
 }
 
+interface FreeDrawingHandlersProps {
+  stageRef: any;
+  activeTool: 'pencil' | 'eraser';
+  setActiveTool: (tool: string) => void;
+  addElement: (element: LineElement) => void;
+  updateElement: (id: string, newAttrs: Partial<LineElement>) => void;
+  drawing?: boolean;
+  setDrawing: (drawing: boolean) => void;
+  setNewElement: (element: LineElement | null) => void;
+  newElement: LineElement | null;
+}
+
 export interface TextEdit {
   id: string;
   isEditing: boolean;
@@ -27,6 +43,7 @@ export interface TextEdit {
 
 const DEFAULT_FILL = primary['200'];
 const DEFAULT_STROKE = primary['300'];
+const DEFAULT_STROKE_WIDTH = 2;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -61,7 +78,7 @@ export const handleMouseDown =
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
       const element = {
-        id: `${activeTool}${Date.now().toString()}${userStore.user?.id.toString().substring(19, 23)}`,
+        id: getElementId(activeTool),
         type: activeTool,
         draggable: true,
         dragDistance: 4,
@@ -70,7 +87,7 @@ export const handleMouseDown =
         rotation: 0,
         fill: DEFAULT_FILL,
         stroke: DEFAULT_STROKE,
-        strokeWidth: 2,
+        strokeWidth: DEFAULT_STROKE_WIDTH,
         cornerRadius: 4,
         width: 16,
         height: 16,
@@ -92,7 +109,6 @@ export const handleMouseMove =
       const height = y - newElement.y;
 
       const updatedElement = {
-        ...newElement,
         x: width < 0 ? x : newElement.x,
         y: height < 0 ? y : newElement.y,
         width: Math.abs(width),
@@ -142,7 +158,7 @@ export const handlePlaceText =
       const svg = HtmlToSvg(content, defaultTextWidth, textHeight);
 
       const element = {
-        id: `${activeTool}_${Date.now()}`,
+        id: getElementId(activeTool),
         type: 'text',
         draggable: true,
         dragDistance: 4,
@@ -234,6 +250,75 @@ const hideTextElement = (
   });
 };
 
+export const handleStartDrawing =
+  ({
+    stageRef,
+    activeTool,
+    addElement,
+    setDrawing,
+    setNewElement,
+  }: FreeDrawingHandlersProps) =>
+  (e: any) => {
+    if (activeTool === 'pencil' && stageRef.current) {
+      const stage = stageRef.current.getStage();
+      const { x, y } = getRelativePointerPosition(stage).stagePosition;
+
+      const element = {
+        id: getElementId(activeTool),
+        type: 'line',
+        draggable: true,
+        dragDistance: 4,
+        x: 0,
+        y: 0,
+        rotation: 0,
+        points: [x, y],
+        stroke: DEFAULT_STROKE,
+        strokeWidth: DEFAULT_STROKE_WIDTH,
+        lineCap: 'round',
+        lineJoin: 'round',
+        tension: 0.5,
+      } as LineElement;
+
+      setNewElement(element);
+      addElement(element);
+      setDrawing(true);
+    }
+  };
+
+export const handleDrawing =
+  ({
+    stageRef,
+    drawing,
+    newElement,
+    setNewElement,
+    updateElement,
+  }: FreeDrawingHandlersProps) =>
+  (e: any) => {
+    if (drawing && newElement && stageRef.current) {
+      const stage = stageRef.current.getStage();
+      const { x, y } = getRelativePointerPosition(stage).stagePosition;
+
+      const updatedPoints = [...newElement.points, x, y];
+      setNewElement({ ...newElement, points: updatedPoints });
+      updateElement(newElement.id, { points: updatedPoints });
+    }
+  };
+
+export const handleEndDrawing =
+  ({
+    drawing,
+    setDrawing,
+    setNewElement,
+    setActiveTool,
+  }: FreeDrawingHandlersProps) =>
+  (e: any) => {
+    if (drawing) {
+      setDrawing(false);
+      setNewElement(null);
+      setActiveTool('');
+    }
+  };
+
 const isTransparent = (color: string) => {
   if (!color) return true;
   return (
@@ -251,4 +336,9 @@ export const isElementVisible = (
     (!strokeColor || isTransparent(strokeColor)) &&
     isTransparent(fillColor)
   );
+};
+
+const getElementId = (tool: string) => {
+  const userId = userStore.user?.id || '';
+  return `${tool}_${Date.now()}_${userId.slice(userId.length - 5, userId.length - 1)}`;
 };

@@ -226,6 +226,7 @@
   "toolTips": {
     "tools": {
       "textTool": "Text",
+      "pencilTool": "Pencil",
       "rectTool": "Rectangle",
       "ellipseTool": "Ellipse",
       "fillTool": "Fill color",

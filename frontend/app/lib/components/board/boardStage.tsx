@@ -142,6 +142,7 @@ const BoardStage = observer(() => {
   }, [selectedElements]);
 
   const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
+    console.log(id, newAttrs);
     projectsStore.updateElement(id, newAttrs);
   };
 

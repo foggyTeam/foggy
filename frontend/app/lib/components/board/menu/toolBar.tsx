@@ -9,6 +9,7 @@ import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 import { Divider } from '@heroui/divider';
 import TextTool from '@/app/lib/components/board/tools/textTool';
 import { BoardElement } from '@/app/lib/types/definitions';
+import PencilTool from '@/app/lib/components/board/tools/pencilTool';
 
 export type ToolProps = {
   activeTool: string;
@@ -35,7 +36,7 @@ export default function ToolBar({
   resetStage: any;
 }) {
   const [activeTool, setActiveTool] = useState('');
-  const tools = [TextTool, RectTool, EllipseTool];
+  const tools = [TextTool, PencilTool, RectTool, EllipseTool];
 
   return (
     <div

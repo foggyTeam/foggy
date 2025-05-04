@@ -225,6 +225,7 @@
   "toolTips": {
     "tools": {
       "textTool": "Текст",
+      "pencilTool": "Карандаш",
       "rectTool": "Прямоугольник",
       "ellipseTool": "Эллипс",
       "fillTool": "Цвет заливки",

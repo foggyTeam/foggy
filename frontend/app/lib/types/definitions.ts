@@ -66,7 +66,9 @@ export interface TextElement extends BaseElement {
 export interface LineElement extends BaseElement {
   type: 'line';
   points: number[];
-  width: number;
+  tension: number;
+  lineJoin: 'miter' | 'round' | 'bevel';
+  lineCap: 'butt' | 'round' | 'square';
 }
 
 export interface MarkerElement extends BaseElement {
