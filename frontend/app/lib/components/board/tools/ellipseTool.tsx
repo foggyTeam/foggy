@@ -18,6 +18,7 @@ export default function EllipseTool({
   addElement,
   updateElement,
   activeColor,
+  isDisabled,
 }: ToolProps) {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
@@ -77,6 +78,7 @@ export default function EllipseTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
       <Button
+        isDisabled={isDisabled}
         onPress={() => {
           if (activeTool === 'ellipse') setActiveTool('');
           else setActiveTool('ellipse');

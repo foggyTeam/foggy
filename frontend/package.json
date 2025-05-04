@@ -23,6 +23,7 @@
     "@heroui/dropdown": "^2.3.17",
     "@heroui/form": "2.1.9",
     "@heroui/input": "2.4.10",
+    "@heroui/listbox": "^2.3.18",
     "@heroui/modal": "^2.2.14",
     "@heroui/number-input": "^2.0.7",
     "@heroui/popover": "^2.3.17",

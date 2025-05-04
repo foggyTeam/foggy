@@ -11,6 +11,7 @@ import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
 
 export default function TextTool({
+  isDisabled,
   activeTool,
   setActiveTool,
   stageRef,
@@ -70,6 +71,7 @@ export default function TextTool({
     <>
       <FTooltip content={settingsStore.t.toolTips.tools.textTool}>
         <Button
+          isDisabled={isDisabled}
           onPress={() => {
             if (activeTool === 'text') setActiveTool('');
             else setActiveTool('text');

@@ -227,6 +227,13 @@
     "tools": {
       "textTool": "Text",
       "pencilTool": "Pencil",
+      "pencilColor": "Color",
+      "pencilWidth": "Size",
+      "pencilTension": "Smoothness",
+      "pencilCap": "Edge",
+      "lineCapButt": "Cut",
+      "lineCapRound": "Rounded",
+      "lineCapSquare": "Squared",
       "rectTool": "Rectangle",
       "ellipseTool": "Ellipse",
       "fillTool": "Fill color",

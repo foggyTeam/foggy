@@ -318,12 +318,18 @@ export const handleDrawing =
 export const handleEndDrawing =
   ({
     drawing,
+    newElement,
     setDrawing,
     setNewElement,
-    setActiveTool,
+    updateElement,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
     if (drawing) {
+      if (newElement && newElement.points.length < 4)
+        updateElement(newElement.id, {
+          points: [...newElement.points, ...newElement.points],
+        });
+
       setDrawing(false);
       setNewElement(null);
     }

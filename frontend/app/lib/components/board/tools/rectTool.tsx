@@ -18,6 +18,7 @@ export default function RectTool({
   addElement,
   updateElement,
   activeColor,
+  isDisabled,
 }: ToolProps) {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
@@ -77,6 +78,7 @@ export default function RectTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
       <Button
+        isDisabled={isDisabled}
         onPress={() => {
           if (activeTool === 'rect') setActiveTool('');
           else setActiveTool('rect');

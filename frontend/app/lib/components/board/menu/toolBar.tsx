@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RectTool from '@/app/lib/components/board/tools/rectTool';
 import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
@@ -11,14 +11,27 @@ import TextTool from '@/app/lib/components/board/tools/textTool';
 import { BoardElement } from '@/app/lib/types/definitions';
 import PencilTool from '@/app/lib/components/board/tools/pencilTool';
 import DeleteTool from '@/app/lib/components/board/tools/deleteTool';
+import PencilToolBar from '@/app/lib/components/board/menu/pencilToolBar';
+import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
+import { foggy_accent } from '@/tailwind.config';
 
 export type ToolProps = {
+  isDisabled: boolean;
   activeTool: string;
   setActiveTool: any;
   addElement: any;
   updateElement: any;
   stageRef: any;
   resetStage: any;
+  pencilParams?: PencilParams;
+};
+
+const DEFAULT_PENCIL: PencilParams = {
+  color: foggy_accent.DEFAULT,
+  width: 4,
+  tension: 0.4,
+  lineJoin: 'round',
+  lineCap: 'round',
 };
 
 export default function ToolBar({
@@ -39,6 +52,13 @@ export default function ToolBar({
   const [activeTool, setActiveTool] = useState('');
   const tools = [TextTool, PencilTool, RectTool, EllipseTool];
 
+  const [pencilParams, setPencilParams] =
+    useState<PencilParams>(DEFAULT_PENCIL);
+
+  useEffect(() => {
+    if (activeTool !== 'pencil') setPencilParams(DEFAULT_PENCIL);
+  }, [activeTool]);
+
   return (
     <div
       className={clsx(
@@ -49,17 +69,31 @@ export default function ToolBar({
         'overflow-visible',
       )}
     >
-      {element ? (
-        <ElementToolBar
-          updateElement={updateElement}
-          removeElement={removeElement}
-          element={element}
+      {element &&
+        (element?.attrs.type !== 'line' ? (
+          <ElementToolBar
+            updateElement={updateElement}
+            removeElement={removeElement}
+            element={element}
+          />
+        ) : (
+          <PencilToolBar
+            updateElement={updateElement}
+            element={element}
+            pencilParams={pencilParams}
+          />
+        ))}
+      {activeTool === 'pencil' && !element && (
+        <PencilToolBar
+          pencilParams={pencilParams}
+          setPencilParams={setPencilParams}
         />
-      ) : null}
-      {element ? <Divider /> : null}
+      )}
+      {(element || activeTool === 'pencil') && <Divider />}
       <div className="flex justify-center gap-1">
         {tools.map((Tool, index) => (
           <Tool
+            isDisabled={!!element}
             key={index}
             activeTool={activeTool}
             setActiveTool={setActiveTool}
@@ -67,6 +101,7 @@ export default function ToolBar({
             updateElement={updateElement}
             stageRef={stageRef}
             resetStage={resetStage}
+            pencilParams={pencilParams}
           />
         ))}
 

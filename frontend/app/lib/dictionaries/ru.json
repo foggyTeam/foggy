@@ -226,6 +226,13 @@
     "tools": {
       "textTool": "Текст",
       "pencilTool": "Карандаш",
+      "pencilColor": "Цвет",
+      "pencilWidth": "Размер",
+      "pencilTension": "Сглаживание",
+      "pencilCap": "Край",
+      "lineCapButt": "Обрезанный",
+      "lineCapRound": "Скругленный",
+      "lineCapSquare": "Квадратный",
       "rectTool": "Прямоугольник",
       "ellipseTool": "Эллипс",
       "fillTool": "Цвет заливки",

@@ -19,7 +19,7 @@ export default function ColorTool({
     <Popover>
       <PopoverTrigger>
         <Button variant="light" color="default" isIconOnly size="md">
-          <FTooltip content={settingsStore.t.toolTips.tools.fillTool}>
+          <FTooltip content={settingsStore.t.toolTips.tools.pencilColor}>
             <CircleIcon fill={color} stroke={`rgba(${to_rgb(color)}, .48)`} />
           </FTooltip>
         </Button>
