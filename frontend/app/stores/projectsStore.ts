@@ -77,7 +77,7 @@ class ProjectsStore {
       try {
         this.boardWebsocket.emit('addElement', newElement);
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     }
   };

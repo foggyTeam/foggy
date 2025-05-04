@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import RectTool from '@/app/lib/components/board/tools/rectTool';
 import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
@@ -10,6 +10,7 @@ import { Divider } from '@heroui/divider';
 import TextTool from '@/app/lib/components/board/tools/textTool';
 import { BoardElement } from '@/app/lib/types/definitions';
 import PencilTool from '@/app/lib/components/board/tools/pencilTool';
+import DeleteTool from '@/app/lib/components/board/tools/deleteTool';
 
 export type ToolProps = {
   activeTool: string;
@@ -66,8 +67,15 @@ export default function ToolBar({
             updateElement={updateElement}
             stageRef={stageRef}
             resetStage={resetStage}
-          ></Tool>
+          />
         ))}
+
+        {element && (
+          <>
+            <Divider orientation="vertical" />
+            <DeleteTool element={element} removeElement={removeElement} />
+          </>
+        )}
       </div>
     </div>
   );

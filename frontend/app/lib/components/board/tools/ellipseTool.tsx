@@ -17,6 +17,7 @@ export default function EllipseTool({
   stageRef,
   addElement,
   updateElement,
+  activeColor,
 }: ToolProps) {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
@@ -28,6 +29,7 @@ export default function EllipseTool({
       addElement,
       setDrawing,
       setNewElement,
+      activeColor,
     } as any);
 
     const mouseMoveHandler = handleMouseMove({
@@ -69,6 +71,7 @@ export default function EllipseTool({
     updateElement,
     drawing,
     newElement,
+    activeColor,
   ]);
 
   return (

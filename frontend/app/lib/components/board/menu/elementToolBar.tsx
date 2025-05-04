@@ -36,9 +36,6 @@ export default function ElementToolBar({
           removeElement={removeElement}
         ></Tool>
       ))}
-      <Divider className="mx-0.5" orientation={`vertical`} />
-
-      <DeleteTool element={element} removeElement={removeElement} />
     </div>
   );
 }

@@ -40,8 +40,8 @@ export function socketAddEventListeners(socket: Socket) {
   // updateElement
   socket.on(
     'elementUpdated',
-    (data: { id: string; newAttrs: Partial<BoardElement> }) =>
-      this.updateElement(data.id, data.newAttrs),
+    (data: { elementId: string; newAttrs: Partial<BoardElement> }) =>
+      this.updateElement(data.elementId, data.newAttrs),
   );
   // removeElement
   socket.on('elementRemoved', (id: string) => this.removeElement(id));

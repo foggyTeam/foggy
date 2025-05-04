@@ -29,6 +29,15 @@ interface FreeDrawingHandlersProps {
   setDrawing: (drawing: boolean) => void;
   setNewElement: (element: LineElement | null) => void;
   newElement: LineElement | null;
+  pencilParams: PencilParams;
+}
+
+export interface PencilParams {
+  color: string;
+  width: number;
+  tension: number;
+  lineJoin: 'miter' | 'round' | 'bevel';
+  lineCap: 'butt' | 'round' | 'square';
 }
 
 export interface TextEdit {
@@ -257,6 +266,7 @@ export const handleStartDrawing =
     addElement,
     setDrawing,
     setNewElement,
+    pencilParams,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
     if (activeTool === 'pencil' && stageRef.current) {
@@ -272,11 +282,11 @@ export const handleStartDrawing =
         y: 0,
         rotation: 0,
         points: [x, y],
-        stroke: DEFAULT_STROKE,
-        strokeWidth: DEFAULT_STROKE_WIDTH,
-        lineCap: 'round',
-        lineJoin: 'round',
-        tension: 0.5,
+        stroke: pencilParams.color,
+        strokeWidth: pencilParams.width,
+        lineCap: pencilParams.lineCap,
+        lineJoin: pencilParams.lineJoin,
+        tension: pencilParams.tension,
       } as LineElement;
 
       setNewElement(element);
@@ -300,6 +310,7 @@ export const handleDrawing =
 
       const updatedPoints = [...newElement.points, x, y];
       setNewElement({ ...newElement, points: updatedPoints });
+
       updateElement(newElement.id, { points: updatedPoints });
     }
   };
@@ -315,7 +326,6 @@ export const handleEndDrawing =
     if (drawing) {
       setDrawing(false);
       setNewElement(null);
-      setActiveTool('');
     }
   };
 
