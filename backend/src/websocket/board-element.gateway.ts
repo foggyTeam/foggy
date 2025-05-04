@@ -113,7 +113,7 @@ export class BoardElementsGateway
 
       const element = await this.boardService.updateElement(
         updateData.id,
-        updateData.newAttrs, // Используем newAttrs вместо changes
+        updateData.newAttrs,
       );
 
       client.to(boardId).emit('elementUpdated', {
@@ -127,9 +127,9 @@ export class BoardElementsGateway
     }
   }
 
-  @SubscribeMessage('deleteElement')
+  @SubscribeMessage('removeElement')
   async handleDeleteElement(
-    @MessageBody() elementId: string,
+    @MessageBody() data: any,
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -138,7 +138,23 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      this.logger.log(`[DeleteElement] Received elementId:`, elementId);
+      this.logger.log(`[DeleteElement] Raw received data:`, data);
+      this.logger.log(`[DeleteElement] Type of data: ${typeof data}`);
+
+      let elementId: string;
+
+      if (typeof data === 'string') {
+        this.logger.log(`[DeleteElement] Received string ID: ${data}`);
+        elementId = data;
+      } else if (data?.id) {
+        this.logger.log(`[DeleteElement] Received object with ID: ${data.id}`);
+        elementId = data.id;
+      } else {
+        this.logger.error(`[DeleteElement] Invalid data format:`, data);
+        throw new Error('Element ID is required');
+      }
+
+      this.logger.log(`[DeleteElement] Processing ID: ${elementId}`);
 
       if (!elementId) {
         throw new Error('Element ID is required');
@@ -146,15 +162,24 @@ export class BoardElementsGateway
 
       await this.boardService.removeElement(elementId);
 
+      // Отправляем в формате, ожидаемом фронтендом (просто ID)
       client.to(boardId).emit('elementRemoved', elementId);
       return { status: 'success' };
     } catch (error) {
-      this.logger.error(`[DeleteElement] Error:`, error);
+      this.logger.error(`[DeleteElement] Detailed error:`, {
+        message: error.message,
+        stack: error.stack,
+        receivedData: data,
+        connectionData: {
+          clientId: client.id,
+          boardId: client.data.boardId,
+        },
+      });
       return this.handleError(error);
     }
   }
 
-  @SubscribeMessage('moveElement')
+  @SubscribeMessage('changeElementLayer')
   async handleMoveElement(
     @MessageBody()
     moveData: { id: string; direction: 'up' | 'down'; withinLayer?: boolean },
