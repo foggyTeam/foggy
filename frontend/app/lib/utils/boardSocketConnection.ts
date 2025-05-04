@@ -3,7 +3,7 @@ import { BoardElement } from '@/app/lib/types/definitions';
 
 export default function openBoardSocketConnection(boardId, userId) {
   const socket = io(`${process.env.NEXT_PUBLIC_API_URI}/elements`, {
-    query: {
+    auth: {
       boardId,
     },
     extraHeaders: {
