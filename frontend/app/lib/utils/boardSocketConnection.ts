@@ -39,10 +39,13 @@ export function socketAddEventListeners(socket: Socket) {
     projectsStore.addElement(newElement, true);
   });
   // updateElement
-  socket.on('elementUpdated', (newAttrs: Partial<BoardElement>) => {
-    console.log(newAttrs, newAttrs.id);
-    if (newAttrs.id) projectsStore.updateElement(newAttrs.id, newAttrs, true);
-  });
+  socket.on(
+    'elementUpdated',
+    (data: { id: string; newAttrs: Partial<BoardElement> }) => {
+      console.log(data.id, data.newAttrs);
+      projectsStore.updateElement(data.id, data.newAttrs, true);
+    },
+  );
   // removeElement
   socket.on('elementRemoved', (id: string) =>
     projectsStore.removeElement(id, true),
