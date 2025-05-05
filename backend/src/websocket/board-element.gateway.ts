@@ -116,10 +116,7 @@ export class BoardElementsGateway
         updateData.newAttrs,
       );
 
-      client.to(boardId).emit('elementUpdated', {
-        elementId: updateData.id,
-        element,
-      });
+      client.to(boardId).emit('elementUpdated', element);
       return { status: 'success', element };
     } catch (error) {
       this.logger.error(`[UpdateElement] Error:`, error);
@@ -162,7 +159,6 @@ export class BoardElementsGateway
 
       await this.boardService.removeElement(elementId);
 
-      // Отправляем в формате, ожидаемом фронтендом (просто ID)
       client.to(boardId).emit('elementRemoved', elementId);
       return { status: 'success' };
     } catch (error) {
