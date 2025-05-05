@@ -174,11 +174,14 @@ export const handlePlaceText =
         x,
         y,
         rotation: 0,
+        fill: '#AA99B900',
+        stroke: '#AA99B900',
+        strokeWidth: 0,
         svg: svg,
         content: content,
+        cornerRadius: 0,
         width: defaultTextWidth,
         height: textHeight,
-        cornerRadius: 0,
       } as BoardElement;
 
       addElement(element);
@@ -281,9 +284,10 @@ export const handleStartDrawing =
         x: 0,
         y: 0,
         rotation: 0,
-        points: [x, y],
+        fill: '#AA99B900',
         stroke: pencilParams.color,
         strokeWidth: pencilParams.width,
+        points: [x, y],
         lineCap: pencilParams.lineCap,
         lineJoin: pencilParams.lineJoin,
         tension: pencilParams.tension,

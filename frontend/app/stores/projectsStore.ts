@@ -69,35 +69,39 @@ class ProjectsStore {
     }
   }
 
-  addElement = (newElement: BoardElement) => {
+  addElement = (newElement: BoardElement, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
         newElement,
       );
-      try {
-        this.boardWebsocket.emit('addElement', newElement);
-      } catch (e) {
-        console.error(e);
-      }
+      if (!external) this.boardWebsocket.emit('addElement', newElement);
     }
   };
-  updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
+  updateElement = (
+    id: string,
+    newAttrs: Partial<BoardElement>,
+    external?: boolean,
+  ) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
+      console.log(newAttrs);
       this.activeBoard.layers = this.activeBoard.layers.map(
         (layer: BoardElement[]) =>
           layer.map((element) => {
             if (!(element.id === id)) return element;
             if (!(element.type === 'text'))
               return { ...element, ...newAttrs } as BoardElement;
+
             return UpdateTextElement(element, newAttrs as Partial<TextElement>);
           }),
       );
-      this.boardWebsocket.emit('updateElement', { id: id, newAttrs: newAttrs });
+      if (!external)
+        this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
   };
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
+    external?: boolean,
   ): { layer: number; index: number } => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
       let elementToMove: BoardElement | null = null;
@@ -160,16 +164,18 @@ class ProjectsStore {
         }
       }
 
-      this.boardWebsocket.emit('moveElement', { id: id, action: action });
+      if (!external)
+        this.boardWebsocket.emit('moveElement', { id: id, action: action });
     }
     return { layer: -1, index: -1 };
   };
-  removeElement = (id: string) => {
-    if (this.activeBoard?.layers && this.boardWebsocket)
+  removeElement = (id: string, external?: boolean) => {
+    if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers = this.activeBoard.layers.map((layer) =>
         layer.filter((element) => element.id !== id),
       );
-    this.boardWebsocket.emit('removeElement', id);
+      if (!external) this.boardWebsocket.emit('removeElement', id);
+    }
   };
   getElementLayer = (id: string): { layer: number; index: number } => {
     const currentIndex = { layer: -1, index: -1 };

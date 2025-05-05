@@ -101,7 +101,7 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      //this.logger.log(`[UpdateElement] Received:`, updateData);
+      this.logger.log(`[UpdateElement] Received:`, updateData);
 
       if (!updateData?.id) {
         throw new Error('Element ID is required');
