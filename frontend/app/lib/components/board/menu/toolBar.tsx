@@ -14,6 +14,7 @@ import DeleteTool from '@/app/lib/components/board/tools/deleteTool';
 import PencilToolBar from '@/app/lib/components/board/menu/pencilToolBar';
 import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
 import { foggy_accent } from '@/tailwind.config';
+import EraserTool from '@/app/lib/components/board/tools/eraserTool';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -35,6 +36,8 @@ const DEFAULT_PENCIL: PencilParams = {
 };
 
 export default function ToolBar({
+  activeTool,
+  setActiveTool,
   stageRef,
   updateElement,
   addElement,
@@ -42,6 +45,8 @@ export default function ToolBar({
   element,
   resetStage,
 }: {
+  activeTool: string;
+  setActiveTool: (newActiveTool: string) => void;
   stageRef: any;
   updateElement: any;
   addElement: any;
@@ -49,8 +54,7 @@ export default function ToolBar({
   element: BoardElement;
   resetStage: any;
 }) {
-  const [activeTool, setActiveTool] = useState('');
-  const tools = [TextTool, PencilTool, RectTool, EllipseTool];
+  const tools = [TextTool, PencilTool, EraserTool, RectTool, EllipseTool];
 
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
@@ -102,6 +106,7 @@ export default function ToolBar({
             stageRef={stageRef}
             resetStage={resetStage}
             pencilParams={pencilParams}
+            removeElement={removeElement}
           />
         ))}
 

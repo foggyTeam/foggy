@@ -76,6 +76,7 @@ const BoardStage = observer(() => {
     }
   };
 
+  const [activeTool, setActiveTool] = useState('');
   const [selectedElements, changeSelection] = useState<any[]>([]);
   const selectionRef: any = useRef(null);
 
@@ -177,10 +178,11 @@ const BoardStage = observer(() => {
             }
             updateElement={updateElement}
             handleTextEdit={handleTextEdit}
+            areElementsDraggable={!activeTool}
           />
         ))}
 
-        {selectedElements.length > 0 && (
+        {selectedElements.length > 0 && !activeTool && (
           <Layer>
             <Group draggable>
               {selectedElements.map((element, index) => (
@@ -207,8 +209,12 @@ const BoardStage = observer(() => {
 
       <div className="flex justify-center">
         <ToolBar
+          activeTool={activeTool}
+          setActiveTool={setActiveTool}
           stageRef={stageRef}
-          element={selectedElements.length === 1 && selectedElements[0]}
+          element={
+            selectedElements.length === 1 && !activeTool && selectedElements[0]
+          }
           addElement={addElement}
           updateElement={updateElement}
           removeElement={removeElement}

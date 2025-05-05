@@ -335,6 +335,27 @@ export const handleEndDrawing =
     }
   };
 
+export const handleStartErasing =
+  ({ stageRef, activeTool, setDrawing }) =>
+  (e: any) => {
+    if (activeTool === 'eraser' && stageRef.current) {
+      setDrawing(true);
+    }
+  };
+
+export const handleErasing =
+  ({ stageRef, activeTool, drawing, setDrawing, removeElement }) =>
+  (e: any) => {
+    if (drawing && stageRef.current)
+      if (e.target && e.target.attrs.id) removeElement(e.target.attrs.id);
+  };
+
+export const handleEndErasing =
+  ({ drawing, setDrawing }) =>
+  (e: any) => {
+    if (drawing) setDrawing(false);
+  };
+
 const isTransparent = (color: string) => {
   if (!color) return true;
   return (

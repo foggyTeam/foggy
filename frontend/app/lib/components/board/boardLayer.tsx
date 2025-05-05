@@ -11,6 +11,7 @@ export default function BoardLayer({
   fitCoordinates,
   handleSelect,
   handleTextEdit,
+  areElementsDraggable,
 }: {
   layer: BoardElement[];
   updateElement: (id: string, newAttrs: Partial<any>) => void;
@@ -20,6 +21,7 @@ export default function BoardLayer({
     pos: { x: number; y: number },
     element: any,
   ) => { x: number; y: number };
+  areElementsDraggable: boolean;
 }) {
   const holdTextTransform = (e: any, element: TextElement) => {
     const node = e.target;
@@ -79,6 +81,7 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={areElementsDraggable}
               />
             );
           case 'ellipse':
@@ -97,6 +100,7 @@ export default function BoardLayer({
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 radiusX={element.width / 2}
                 radiusY={element.height / 2}
+                draggable={areElementsDraggable}
               />
             );
           case 'line':
@@ -109,6 +113,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
+                draggable={areElementsDraggable}
               />
             );
           case 'text':
@@ -144,6 +149,7 @@ export default function BoardLayer({
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
+                draggable={areElementsDraggable}
               />
             );
           case 'marker':
@@ -156,6 +162,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
+                draggable={areElementsDraggable}
               />
             );
           default:

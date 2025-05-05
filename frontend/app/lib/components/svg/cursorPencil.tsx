@@ -1,7 +1,6 @@
 import { PencilIcon } from 'lucide-react';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import '@/app/globals.css';
 
 const svgString = ReactDOMServer.renderToStaticMarkup(
   <PencilIcon stroke="#71717a" />,

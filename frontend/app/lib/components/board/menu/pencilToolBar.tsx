@@ -19,24 +19,24 @@ export default function PencilToolBar({
   pencilParams: PencilParams;
   setPencilParams?: (newParams: Partial<PencilParams>) => void;
 }) {
-  const selectedElement: LineElement | undefined = element?.attrs;
   const additionalTools = [LayerTool];
 
-  const [color, setColor] = useState(
-    selectedElement?.stroke || pencilParams.color,
-  );
-  const [width, setWidth] = useState(
-    selectedElement?.strokeWidth || pencilParams.width,
-  );
-  const [tension, setTension] = useState(
-    (selectedElement?.tension || pencilParams.tension) * 10,
-  );
-  const [lineCap, setLineCap] = useState(
-    selectedElement?.lineCap || pencilParams.lineCap,
-  );
+  const [color, setColor] = useState(pencilParams.color);
+  const [width, setWidth] = useState(pencilParams.width);
+  const [tension, setTension] = useState(pencilParams.tension * 10);
+  const [lineCap, setLineCap] = useState(pencilParams.lineCap);
 
   useEffect(() => {
-    if (!selectedElement)
+    if (element?.attrs) {
+      setColor(element.attrs.stroke);
+      setWidth(element.attrs.strokeWidth);
+      setTension(element.attrs.tension * 10);
+      setLineCap(element.attrs.lineCap);
+    }
+  }, [element]);
+
+  useEffect(() => {
+    if (!element?.attrs)
       setPencilParams({
         ...pencilParams,
         color,
@@ -45,7 +45,7 @@ export default function PencilToolBar({
         lineCap,
       });
     else
-      updateElement(selectedElement.id, {
+      updateElement(element.attrs.id, {
         stroke: color,
         strokeWidth: width,
         lineCap,
