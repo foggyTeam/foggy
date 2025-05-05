@@ -12,7 +12,6 @@ import { BaseElement, BaseElementModel } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { CreateElementDto } from './dto/create-element.dto';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 
@@ -282,6 +281,21 @@ export class BoardService {
     return board;
   }
 
+  public async findLayerAndElementById(
+    elementId: string,
+  ): Promise<{ layer: LayerDocument; element: BaseElement }> {
+    const layers = await this.layerModel.find().exec();
+    for (const layer of layers) {
+      const element = layer.elements.find(
+        (element) => element.id === elementId,
+      );
+      if (element) {
+        return { layer, element };
+      }
+    }
+    throw new NotFoundException(`Element with ID "${elementId}" not found`);
+  }
+
   private async createLayers(
     boardId: Types.ObjectId,
     layerCount: number = 3,
@@ -318,21 +332,6 @@ export class BoardService {
       'elements.id': elementId,
     });
     return !duplicateExists;
-  }
-
-  public async findLayerAndElementById(
-    elementId: string,
-  ): Promise<{ layer: LayerDocument; element: BaseElement }> {
-    const layers = await this.layerModel.find().exec();
-    for (const layer of layers) {
-      const element = layer.elements.find(
-        (element) => element.id === elementId,
-      );
-      if (element) {
-        return { layer, element };
-      }
-    }
-    throw new NotFoundException(`Element with ID "${elementId}" not found`);
   }
 
   private async findLayerAndElementIndexById(

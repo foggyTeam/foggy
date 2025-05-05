@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { BoardService } from '../board/board.service';
 import { Types } from 'mongoose';
 import { UpdateElementDto } from '../board/dto/update-element.dto';
+import { HttpStatus } from '@nestjs/common/enums/http-status.enum';
 
 @WebSocketGateway({
   namespace: '/elements',
@@ -104,10 +105,12 @@ export class BoardElementsGateway
       this.logger.log(`[UpdateElement] Received:`, updateData);
 
       if (!updateData?.id) {
+        client.to(boardId).emit('custom_error', HttpStatus.NOT_FOUND);
         throw new Error('Element ID is required');
       }
 
       if (!updateData?.newAttrs) {
+        client.to(boardId).emit('custom_error', HttpStatus.BAD_REQUEST);
         throw new Error('Updated attributes are required');
       }
 
@@ -115,9 +118,9 @@ export class BoardElementsGateway
         updateData.id,
         updateData.newAttrs,
       );
-
-      client.to(boardId).emit('elementUpdated', element);
-      return { status: 'success', element };
+      //this.logger.log(`[UpdateElement] Otpravleno:`, element);
+      client.to(boardId).emit('elementUpdated', updateData);
+      return { status: 'success', updateData };
     } catch (error) {
       this.logger.error(`[UpdateElement] Error:`, error);
       return this.handleError(error);
