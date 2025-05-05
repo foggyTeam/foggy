@@ -80,8 +80,8 @@ export class BoardElementsGateway
         layerNumber,
         elementData,
       );
-
-      client.to(boardId).emit('elementAdded', { boardId, element });
+      this.logger.log(`Emitting elementAdded to room ${boardId}`, element);
+      client.to(boardId).emit('elementAdded', element);
       return { status: 'success', element };
     } catch (error) {
       this.logger.error(`[AddElement] Error:`, error);
@@ -101,7 +101,7 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      this.logger.log(`[UpdateElement] Received:`, updateData);
+      //this.logger.log(`[UpdateElement] Received:`, updateData);
 
       if (!updateData?.id) {
         throw new Error('Element ID is required');
