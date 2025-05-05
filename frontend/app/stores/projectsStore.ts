@@ -83,7 +83,6 @@ class ProjectsStore {
     external?: boolean,
   ) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
-      console.log(newAttrs);
       this.activeBoard.layers = this.activeBoard.layers.map(
         (layer: BoardElement[]) =>
           layer.map((element) => {

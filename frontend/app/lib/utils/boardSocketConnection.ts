@@ -42,7 +42,7 @@ export function socketAddEventListeners(socket: Socket) {
   socket.on(
     'elementUpdated',
     (data: { id: string; newAttrs: Partial<BoardElement> }) => {
-      console.log(data.id, data.newAttrs);
+      console.log(data.newAttrs);
       projectsStore.updateElement(data.id, data.newAttrs, true);
     },
   );
