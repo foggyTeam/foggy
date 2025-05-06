@@ -19,8 +19,8 @@ export default function useTool({
   const { stageRef, activeTool } = useBoardContext();
 
   useEffect(() => {
-    if ((activeTool === toolName && stageRef.current) || isTextEditing) {
-      const stage = stageRef.current.getStage();
+    if ((activeTool === toolName || isTextEditing) && stageRef.current) {
+      const stage = stageRef.current?.getStage();
 
       if (handlers.mouseDownHandler)
         stage.on('mousedown', handlers.mouseDownHandler);

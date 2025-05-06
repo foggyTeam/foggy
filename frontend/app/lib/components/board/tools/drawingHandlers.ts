@@ -340,7 +340,15 @@ export const handleEndDrawing =
   };
 
 export const handleStartErasing =
-  ({ stageRef, activeTool, setDrawing }) =>
+  ({
+    stageRef,
+    activeTool,
+    setDrawing,
+  }: {
+    stageRef: any;
+    activeTool: string;
+    setDrawing: (isDrawing: boolean) => void;
+  }) =>
   (e: any) => {
     if (activeTool === 'eraser' && stageRef.current) {
       setDrawing(true);
@@ -348,14 +356,28 @@ export const handleStartErasing =
   };
 
 export const handleErasing =
-  ({ stageRef, activeTool, drawing, setDrawing, removeElement }) =>
+  ({
+    stageRef,
+    drawing,
+    removeElement,
+  }: {
+    stageRef: any;
+    drawing: boolean;
+    removeElement: (id: string) => void;
+  }) =>
   (e: any) => {
     if (drawing && stageRef.current)
       if (e.target && e.target.attrs.id) removeElement(e.target.attrs.id);
   };
 
 export const handleEndErasing =
-  ({ drawing, setDrawing }) =>
+  ({
+    drawing,
+    setDrawing,
+  }: {
+    drawing: boolean;
+    setDrawing: (isDrawing: boolean) => void;
+  }) =>
   (e: any) => {
     if (drawing) setDrawing(false);
   };

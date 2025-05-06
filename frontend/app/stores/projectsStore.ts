@@ -202,7 +202,7 @@ class ProjectsStore {
   };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);
-    this.myRole = this.activeProject.members.find(
+    this.myRole = this.activeProject.members?.find(
       (member) => member.id === userStore.user?.id,
     ).role;
   };

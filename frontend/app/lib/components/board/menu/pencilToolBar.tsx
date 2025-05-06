@@ -14,7 +14,7 @@ export default function PencilToolBar({
   setPencilParams,
 }: {
   pencilParams: PencilParams;
-  setPencilParams?: (newParams: Partial<PencilParams>) => void;
+  setPencilParams: (newParams: PencilParams) => void;
 }) {
   const { selectedElement, updateElement } = useBoardContext();
 

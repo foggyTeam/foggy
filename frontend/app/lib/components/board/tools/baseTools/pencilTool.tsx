@@ -9,7 +9,7 @@ import {
 } from '@/app/lib/components/board/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import debounce from 'lodash/debounce';
+import debounce from 'lodash.debounce';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
 

@@ -11,7 +11,6 @@ import React, { ReactNode, useEffect, useState } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import { Select, SelectItem } from '@heroui/select';
-import { useDebouncedCallback } from 'use-debounce';
 import RoleCard from '@/app/lib/components/members/roleCard';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -25,6 +24,7 @@ import {
 import { Button } from '@heroui/button';
 import { X } from 'lucide-react';
 import { FilterReducerActionPayload } from '@/app/lib/components/contentSection';
+import debounce from 'lodash.debounce';
 
 const teamRoles: Set<Role> = new Set(['owner', 'admin', 'editor', 'reader']);
 
@@ -110,7 +110,7 @@ export default function FilterModal({
     }
   }, []);
 
-  const debouncedUpdateFilters = useDebouncedCallback(
+  const debouncedUpdateFilters = debounce(
     (payload: FilterReducerActionPayload[]) =>
       dispatchFilters({
         type: 'SET',

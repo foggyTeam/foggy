@@ -47,7 +47,9 @@ export default function SliderTool({
       >
         <Slider
           value={value}
-          onChange={setValue}
+          onChange={(value: number | number[]) =>
+            setValue(Array.isArray(value) ? value[0] : value)
+          }
           maxValue={boundary[type].max}
           minValue={boundary[type].min}
           step={boundary[type].step}

@@ -49,7 +49,7 @@ export default function RemoveTeamMemberModal({
                 {'team' in member &&
                   settingsStore.t.members.removeTeamMember.modalHeader.replace(
                     '_',
-                    member.team,
+                    member.team || '',
                   )}
               </ModalHeader>
 
@@ -61,8 +61,8 @@ export default function RemoveTeamMemberModal({
                   type="text"
                   className="m-0 w-full p-0"
                   classNames={{
-                    inputWrapper: 'text-sm',
-                    input: 'text-sm',
+                    innerWrapper: 'text-sm',
+                    value: 'text-sm',
                     popoverContent: clsx(
                       bg_container_no_padding,
                       'p-2 sm:p-3 bg-opacity-100',
@@ -70,19 +70,19 @@ export default function RemoveTeamMemberModal({
                   }}
                   selectedKeys={removeType}
                   onSelectionChange={(keys) =>
-                    setRemoveType(Array.from(keys) as string[])
+                    setRemoveType(Array.from(keys) as ('breakup' | 'entire')[])
                   }
                   aria-label="Select type of remove"
-                  renderValue={(items) => {
+                  renderValue={(items: any[]) => {
                     return (
                       <div className="flex gap-1 overflow-hidden p-1">
-                        {items.map((item) => removeTypes[item.key])}
+                        {items.map((item: any) => removeTypes[item.key])}
                       </div>
                     );
                   }}
                 >
                   {Object.keys(removeTypes).map(
-                    (item) =>
+                    (item: 'breakup' | 'entire') =>
                       (
                         <SelectItem key={item} textValue={item}>
                           {removeTypes[item]}

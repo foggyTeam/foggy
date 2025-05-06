@@ -64,11 +64,10 @@ export default function ({
                 <Select
                   radius="full"
                   size="sm"
-                  type="text"
                   className="m-0 w-full p-0"
                   classNames={{
-                    inputWrapper: 'text-sm',
-                    input: 'text-sm',
+                    innerWrapper: 'text-sm',
+                    value: 'text-sm',
                     popoverContent: clsx(
                       bg_container_no_padding,
                       'p-2 sm:p-3 bg-opacity-100',
@@ -104,11 +103,10 @@ export default function ({
                     color="primary"
                     radius="full"
                     size="sm"
-                    type="text"
                     className="m-0 w-full p-0"
                     classNames={{
-                      inputWrapper: 'text-sm',
-                      input: 'text-sm',
+                      innerWrapper: 'text-sm',
+                      value: 'text-sm',
                       popoverContent: clsx(
                         bg_container_no_padding,
                         'p-2 sm:p-3 bg-opacity-100',
@@ -119,16 +117,16 @@ export default function ({
                       setChangeType(Array.from(keys) as string[])
                     }
                     aria-label="Select type of change"
-                    renderValue={(items) => {
+                    renderValue={(items: any[]) => {
                       return (
                         <div className="flex gap-1 overflow-hidden p-1">
-                          {items.map((item) => changeTypes[item.key])}
+                          {items.map((item: any) => changeTypes[item.key])}
                         </div>
                       );
                     }}
                   >
                     {Object.keys(changeTypes).map(
-                      (item) =>
+                      (item: any) =>
                         (
                           <SelectItem key={item} textValue={item}>
                             {changeTypes[item]}

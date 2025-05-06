@@ -29,14 +29,14 @@ interface BoardContextProps {
   setScale: (scale: number) => void;
   // TRANSFORMER
   transformAvailable: boolean;
-  selectedElement: BoardElement;
-  selectedElements: BoardElement[];
+  selectedElement: Konva.Shape;
+  selectedElements: Konva.Shape[];
   changeSelection: (elements: BoardElement[]) => void;
   // TOOLS
   toolsDisabled: boolean;
   activeTool: string;
   setActiveTool: (tool: string) => void;
-  isEditingText: TextEdit;
+  isEditingText: TextEdit | undefined;
   setIsEditingText: (isEditing: TextEdit) => void;
   textContent: string;
   setTextContent: (content: string) => void;
@@ -152,8 +152,8 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
   }, [selectedElements]);
 
   useEffect(() => {
-    const stage = stageRef.current.getStage();
-    if (activeTool) {
+    const stage = stageRef.current?.getStage();
+    if (activeTool && stage) {
       switch (activeTool) {
         case 'eraser':
           stage.container().style.cursor = `url(${cursorEraser}) 0 24, auto`;
@@ -168,12 +168,14 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
           stage.container().style.cursor = 'default';
           break;
         default:
-          stage.container().style.cursor = `url(${cursorAdd}) 0 24, auto`;
+          stage.container().style.cursor = `url(${cursorAdd}) 12 12, auto`;
       }
 
       return () => {
-        const stage = stageRef.current.getStage();
-        stage.container().style.cursor = 'default';
+        if (stageRef.current) {
+          const stage = stageRef.current?.getStage();
+          stage.container().style.cursor = 'default';
+        }
       };
     }
   }, [activeTool]);
