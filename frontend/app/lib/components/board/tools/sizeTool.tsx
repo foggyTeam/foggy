@@ -14,44 +14,48 @@ import { NumberInput } from '@heroui/number-input';
 import settingsStore from '@/app/stores/settingsStore';
 import { BoardElement } from '@/app/lib/types/definitions';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function SizeTool({ element, updateElement }: ElementToolProps) {
+export default function SizeTool() {
+  const { selectedElement, updateElement } = useBoardContext();
+
   const [width, setWidth] = useState(undefined as any);
   const [height, setHeight] = useState(undefined as any);
   const [cornerRadius, setCornerRadius] = useState(0);
   const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
-    if (element.attrs.type === 'ellipse') {
-      setWidth(element.attrs.radiusX * 2);
-      setHeight(element.attrs.radiusY * 2);
+    if (selectedElement.attrs.type === 'ellipse') {
+      setWidth(selectedElement.attrs.radiusX * 2);
+      setHeight(selectedElement.attrs.radiusY * 2);
     } else {
-      setWidth(element.attrs.width);
-      setHeight(element.attrs.height);
+      setWidth(selectedElement.attrs.width);
+      setHeight(selectedElement.attrs.height);
     }
     setCornerRadius(
-      element.attrs.cornerRadius ? element.attrs.cornerRadius : 0,
+      selectedElement.attrs.cornerRadius
+        ? selectedElement.attrs.cornerRadius
+        : 0,
     );
-    setRotation(element.attrs.rotation);
-  }, [element]);
+    setRotation(selectedElement.attrs.rotation);
+  }, [selectedElement]);
 
   useEffect(() => {
     if (width || height)
-      updateElement(element.attrs.id, {
+      updateElement(selectedElement.attrs.id, {
         width: width ? width : 16,
         height: height ? height : 16,
       } as BoardElement);
   }, [width, height]);
 
   useEffect(() => {
-    updateElement(element.attrs.id, {
+    updateElement(selectedElement.attrs.id, {
       cornerRadius: cornerRadius,
     } as BoardElement);
   }, [cornerRadius]);
 
   useEffect(() => {
-    updateElement(element.attrs.id, {
+    updateElement(selectedElement.attrs.id, {
       rotation: rotation,
     } as BoardElement);
   }, [rotation]);

@@ -8,17 +8,13 @@ import {
 } from '@/app/lib/components/board/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
 import debounce from 'lodash/debounce';
-import cursorEraser from '@/app/lib/components/svg/cursorEraser';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function EraserTool({
-  activeTool,
-  setActiveTool,
-  stageRef,
-  removeElement,
-  isDisabled,
-}: ToolProps) {
+export default function EraserTool() {
+  const { stageRef, toolsDisabled, activeTool, setActiveTool, removeElement } =
+    useBoardContext();
+
   const [drawing, setDrawing] = useState(false);
 
   useEffect(() => {
@@ -46,7 +42,6 @@ export default function EraserTool({
 
     if (activeTool === 'eraser' && stageRef.current) {
       const stage = stageRef.current.getStage();
-      stage.container().style.cursor = `url(${cursorEraser}) 0 24, auto`;
       stage.on('mousedown', mouseDownHandler);
       stage.on('mousemove', mouseMoveHandler);
       stage.on('mouseup', mouseUpHandler);
@@ -55,7 +50,6 @@ export default function EraserTool({
     return () => {
       if (stageRef.current) {
         const stage = stageRef.current.getStage();
-        stage.container().style.cursor = 'default';
         stage.off('mousedown', mouseDownHandler);
         stage.off('mousemove', mouseMoveHandler);
         stage.off('mouseup', mouseUpHandler);
@@ -66,7 +60,7 @@ export default function EraserTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
       <Button
-        isDisabled={isDisabled}
+        isDisabled={toolsDisabled}
         onPress={() => {
           if (activeTool === 'eraser') setActiveTool('');
           else setActiveTool('eraser');

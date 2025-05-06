@@ -11,35 +11,36 @@ import settingsStore from '@/app/stores/settingsStore';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function StrokeTool({
-  element,
-  updateElement,
-}: ElementToolProps) {
+export default function StrokeTool() {
+  const { selectedElement, updateElement } = useBoardContext();
+
   const [strokeColor, changeColor] = useState(primary.DEFAULT);
   const [strokeWidth, changeWidth] = useState<number>(0);
 
   useEffect(() => {
     changeColor(
-      element.attrs.stroke && element.attrs.strokeWidth
-        ? element.attrs.stroke
+      selectedElement.attrs.stroke && selectedElement.attrs.strokeWidth
+        ? selectedElement.attrs.stroke
         : primary.DEFAULT,
     );
-    changeWidth(element.attrs.strokeWidth ? element.attrs.strokeWidth : 0);
-  }, [element]);
+    changeWidth(
+      selectedElement.attrs.strokeWidth ? selectedElement.attrs.strokeWidth : 0,
+    );
+  }, [selectedElement]);
 
   useEffect(() => {
-    if (element.attrs.type !== 'text') {
+    if (selectedElement.attrs.type !== 'text') {
       if (
         isElementVisible(
-          element.attrs.type,
-          element.attrs.fill,
+          selectedElement.attrs.type,
+          selectedElement.attrs.fill,
           strokeColor,
           strokeWidth,
         )
       )
-        updateElement(element.attrs.id, {
+        updateElement(selectedElement.attrs.id, {
           strokeWidth: strokeWidth,
           stroke:
             strokeColor &&
@@ -47,17 +48,17 @@ export default function StrokeTool({
               ? strokeColor
               : primary.DEFAULT,
         } as BoardElement);
-      else console.log('Element is invisible!');
+      else console.error('Element is invisible!');
     } else {
       if (
         isElementVisible(
-          element.attrs.type,
+          selectedElement.attrs.type,
           primary.DEFAULT,
           strokeColor,
           strokeWidth,
         )
       ) {
-        updateElement(element.attrs.id, {
+        updateElement(selectedElement.attrs.id, {
           strokeWidth: strokeWidth,
           stroke:
             strokeColor &&
@@ -66,7 +67,7 @@ export default function StrokeTool({
               : primary.DEFAULT,
         } as Partial<BoardElement>);
       } else {
-        updateElement(element.attrs.id, {
+        updateElement(selectedElement.attrs.id, {
           strokeWidth: undefined,
           stroke: undefined,
         } as Partial<BoardElement>);

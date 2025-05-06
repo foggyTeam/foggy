@@ -49,7 +49,6 @@ const AllProjectMembers = observer(() => {
     newOwnerId?: string | null,
     removeType?: 'breakup' | 'entire' | null,
   ) => {
-    console.log('remove member', id, newOwnerId, removeType);
     projectsStore.removeProjectMember(id);
   };
   const handleUpdateMemberRole = (
@@ -57,7 +56,6 @@ const AllProjectMembers = observer(() => {
     newRole: Role,
     changeType?: 'override' | 'updateMax' | null,
   ) => {
-    console.log('new role', id, newRole, changeType);
     projectsStore.updateProjectMember(id, { role: newRole });
   };
 

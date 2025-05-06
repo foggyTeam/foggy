@@ -6,20 +6,20 @@ import {
   handleMouseMove,
   handleMouseUp,
 } from '@/app/lib/components/board/tools/drawingHandlers';
-import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function RectTool({
-  activeTool,
-  setActiveTool,
-  stageRef,
-  addElement,
-  updateElement,
-  activeColor,
-  isDisabled,
-}: ToolProps) {
+export default function RectTool() {
+  const {
+    stageRef,
+    activeTool,
+    setActiveTool,
+    addElement,
+    updateElement,
+    toolsDisabled,
+  } = useBoardContext();
+
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
@@ -30,7 +30,6 @@ export default function RectTool({
       addElement,
       setDrawing,
       setNewElement,
-      activeColor,
     } as any);
 
     const mouseMoveHandler = handleMouseMove({
@@ -49,7 +48,6 @@ export default function RectTool({
 
     if (activeTool === 'rect' && stageRef.current) {
       const stage = stageRef.current.getStage();
-      stage.container().style.cursor = `url(${cursorAdd}) 12 12, auto`;
       stage.on('mousedown', mouseDownHandler);
       stage.on('mousemove', mouseMoveHandler);
       stage.on('mouseup', mouseUpHandler);
@@ -58,7 +56,6 @@ export default function RectTool({
     return () => {
       if (stageRef.current) {
         const stage = stageRef.current.getStage();
-        stage.container().style.cursor = 'default';
         stage.off('mousedown', mouseDownHandler);
         stage.off('mousemove', mouseMoveHandler);
         stage.off('mouseup', mouseUpHandler);
@@ -72,13 +69,12 @@ export default function RectTool({
     updateElement,
     drawing,
     newElement,
-    activeColor,
   ]);
 
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
       <Button
-        isDisabled={isDisabled}
+        isDisabled={toolsDisabled}
         onPress={() => {
           if (activeTool === 'rect') setActiveTool('');
           else setActiveTool('rect');

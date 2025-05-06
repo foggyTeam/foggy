@@ -1,28 +1,23 @@
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
 export default function BoardLayer({
   layer,
-  updateElement,
   fitCoordinates,
-  handleSelect,
-  handleTextEdit,
-  areElementsDraggable,
 }: {
   layer: BoardElement[];
-  updateElement: (id: string, newAttrs: Partial<any>) => void;
-  handleSelect: (event: any) => void;
-  handleTextEdit: (event: any) => void;
   fitCoordinates: (
     pos: { x: number; y: number },
     element: any,
   ) => { x: number; y: number };
-  areElementsDraggable: boolean;
 }) {
+  const { updateElement, handleSelect, handleTextEdit, transformAvailable } =
+    useBoardContext();
   const holdTextTransform = (e: any, element: TextElement) => {
     const node = e.target;
 
@@ -81,7 +76,7 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
-                draggable={areElementsDraggable}
+                draggable={transformAvailable}
               />
             );
           case 'ellipse':
@@ -100,7 +95,7 @@ export default function BoardLayer({
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 radiusX={element.width / 2}
                 radiusY={element.height / 2}
-                draggable={areElementsDraggable}
+                draggable={transformAvailable}
               />
             );
           case 'line':
@@ -113,7 +108,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
-                draggable={areElementsDraggable}
+                draggable={transformAvailable}
               />
             );
           case 'text':
@@ -149,7 +144,7 @@ export default function BoardLayer({
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
-                draggable={areElementsDraggable}
+                draggable={transformAvailable}
               />
             );
           case 'marker':
@@ -162,7 +157,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
-                draggable={areElementsDraggable}
+                draggable={transformAvailable}
               />
             );
           default:

@@ -7,18 +7,17 @@ import SliderTool from '@/app/lib/components/board/tools/pencilTools/sliderTool'
 import LineCapTool from '@/app/lib/components/board/tools/pencilTools/lineCapTool';
 import { LineElement } from '@/app/lib/types/definitions';
 import LayerTool from '@/app/lib/components/board/tools/layerTool';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function PencilToolBar({
-  updateElement,
-  element,
   pencilParams,
   setPencilParams,
 }: {
-  updateElement?: any;
-  element?: any;
   pencilParams: PencilParams;
   setPencilParams?: (newParams: Partial<PencilParams>) => void;
 }) {
+  const { selectedElement, updateElement } = useBoardContext();
+
   const additionalTools = [LayerTool];
 
   const [color, setColor] = useState(pencilParams.color);
@@ -27,16 +26,16 @@ export default function PencilToolBar({
   const [lineCap, setLineCap] = useState(pencilParams.lineCap);
 
   useEffect(() => {
-    if (element?.attrs) {
-      setColor(element.attrs.stroke);
-      setWidth(element.attrs.strokeWidth);
-      setTension(element.attrs.tension * 10);
-      setLineCap(element.attrs.lineCap);
+    if (selectedElement?.attrs) {
+      setColor(selectedElement.attrs.stroke);
+      setWidth(selectedElement.attrs.strokeWidth);
+      setTension(selectedElement.attrs.tension * 10);
+      setLineCap(selectedElement.attrs.lineCap);
     }
-  }, [element]);
+  }, [selectedElement]);
 
   useEffect(() => {
-    if (!element?.attrs)
+    if (!selectedElement?.attrs)
       setPencilParams({
         ...pencilParams,
         color,
@@ -45,13 +44,13 @@ export default function PencilToolBar({
         lineCap,
       });
     else
-      updateElement(element.attrs.id, {
+      updateElement(selectedElement.attrs.id, {
         stroke: color,
         strokeWidth: width,
         lineCap,
         tension: tension / 10,
       } as Partial<LineElement>);
-  }, [color, width, tension, lineCap, element, setPencilParams]);
+  }, [color, width, tension, lineCap, selectedElement, setPencilParams]);
 
   return (
     <div className="flex justify-center gap-1">
@@ -59,10 +58,8 @@ export default function PencilToolBar({
       <SliderTool type="width" value={width} setValue={setWidth} />
       <SliderTool type="tension" value={tension} setValue={setTension} />
       <LineCapTool value={lineCap} setValue={setLineCap} />
-      {element &&
-        additionalTools.map((Tool: any, index) => (
-          <Tool key={index} element={element} updateElement={updateElement} />
-        ))}
+      {selectedElement &&
+        additionalTools.map((Tool: any, index) => <Tool key={index} />)}
     </div>
   );
 }

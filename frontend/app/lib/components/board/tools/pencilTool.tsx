@@ -5,22 +5,27 @@ import {
   handleDrawing,
   handleEndDrawing,
   handleStartDrawing,
+  PencilParams,
 } from '@/app/lib/components/board/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ToolProps } from '@/app/lib/components/board/menu/toolBar';
-import cursorPencil from '@/app/lib/components/svg/cursorPencil';
 import debounce from 'lodash/debounce';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function PencilTool({
-  activeTool,
-  setActiveTool,
-  stageRef,
-  addElement,
-  updateElement,
   pencilParams,
-  isDisabled,
-}: ToolProps) {
+}: {
+  pencilParams: PencilParams;
+}) {
+  const {
+    stageRef,
+    activeTool,
+    setActiveTool,
+    addElement,
+    updateElement,
+    toolsDisabled,
+  } = useBoardContext();
+
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
@@ -42,7 +47,7 @@ export default function PencilTool({
         newElement,
         updateElement,
       } as any),
-      2,
+      4,
     );
 
     const mouseUpHandler = handleEndDrawing({
@@ -55,7 +60,6 @@ export default function PencilTool({
 
     if (activeTool === 'pencil' && stageRef.current) {
       const stage = stageRef.current.getStage();
-      stage.container().style.cursor = `url(${cursorPencil}) 0 24, auto`;
       stage.on('mousedown', mouseDownHandler);
       stage.on('mousemove', mouseMoveHandler);
       stage.on('mouseup', mouseUpHandler);
@@ -64,7 +68,6 @@ export default function PencilTool({
     return () => {
       if (stageRef.current) {
         const stage = stageRef.current.getStage();
-        stage.container().style.cursor = 'default';
         stage.off('mousedown', mouseDownHandler);
         stage.off('mousemove', mouseMoveHandler);
         stage.off('mouseup', mouseUpHandler);
@@ -84,7 +87,7 @@ export default function PencilTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
       <Button
-        isDisabled={isDisabled}
+        isDisabled={toolsDisabled}
         onPress={() => {
           if (activeTool === 'pencil') setActiveTool('');
           else setActiveTool('pencil');
