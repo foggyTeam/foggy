@@ -1,6 +1,6 @@
 import { PencilIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   handleDrawing,
   handleEndDrawing,
@@ -11,6 +11,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import debounce from 'lodash/debounce';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useTool from '@/app/lib/hooks/useTool';
 
 export default function PencilTool({
   pencilParams,
@@ -29,60 +30,40 @@ export default function PencilTool({
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
-  useEffect(() => {
-    const mouseDownHandler = handleStartDrawing({
-      stageRef,
-      activeTool,
-      addElement,
-      setDrawing,
-      setNewElement,
-      pencilParams,
-    } as any);
-
-    const mouseMoveHandler = debounce(
-      handleDrawing({
-        stageRef,
-        drawing,
-        setNewElement,
-        newElement,
-        updateElement,
-      } as any),
-      4,
-    );
-
-    const mouseUpHandler = handleEndDrawing({
-      drawing,
-      newElement,
-      setDrawing,
-      setNewElement,
-      updateElement,
-    } as any);
-
-    if (activeTool === 'pencil' && stageRef.current) {
-      const stage = stageRef.current.getStage();
-      stage.on('mousedown', mouseDownHandler);
-      stage.on('mousemove', mouseMoveHandler);
-      stage.on('mouseup', mouseUpHandler);
-    }
-
-    return () => {
-      if (stageRef.current) {
-        const stage = stageRef.current.getStage();
-        stage.off('mousedown', mouseDownHandler);
-        stage.off('mousemove', mouseMoveHandler);
-        stage.off('mouseup', mouseUpHandler);
-      }
-    };
-  }, [
-    activeTool,
-    setActiveTool,
+  const mouseDownHandler = handleStartDrawing({
     stageRef,
+    activeTool,
     addElement,
-    updateElement,
+    setDrawing,
+    setNewElement,
+    pencilParams,
+  } as any);
+  const mouseMoveHandler = debounce(
+    handleDrawing({
+      stageRef,
+      drawing,
+      setNewElement,
+      newElement,
+      updateElement,
+    } as any),
+    4,
+  );
+  const mouseUpHandler = handleEndDrawing({
     drawing,
     newElement,
-    pencilParams,
-  ]);
+    setDrawing,
+    setNewElement,
+    updateElement,
+  } as any);
+
+  useTool({
+    toolName: 'pencil',
+    handlers: {
+      mouseDownHandler,
+      mouseMoveHandler,
+      mouseUpHandler,
+    },
+  });
 
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>

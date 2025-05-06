@@ -1,6 +1,6 @@
 import { CircleIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   handleMouseDown,
   handleMouseMove,
@@ -9,6 +9,7 @@ import {
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useTool from '@/app/lib/hooks/useTool';
 
 export default function EllipseTool() {
   const {
@@ -23,53 +24,34 @@ export default function EllipseTool() {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
-  useEffect(() => {
-    const mouseDownHandler = handleMouseDown({
-      stageRef,
-      activeTool,
-      addElement,
-      setDrawing,
-      setNewElement,
-    } as any);
-
-    const mouseMoveHandler = handleMouseMove({
-      stageRef,
-      drawing,
-      newElement,
-      updateElement,
-    } as any);
-
-    const mouseUpHandler = handleMouseUp({
-      drawing,
-      setDrawing,
-      setNewElement,
-      setActiveTool,
-    } as any);
-
-    if (activeTool === 'ellipse' && stageRef.current) {
-      const stage = stageRef.current.getStage();
-      stage.on('mousedown', mouseDownHandler);
-      stage.on('mousemove', mouseMoveHandler);
-      stage.on('mouseup', mouseUpHandler);
-    }
-
-    return () => {
-      if (stageRef.current) {
-        const stage = stageRef.current.getStage();
-        stage.off('mousedown', mouseDownHandler);
-        stage.off('mousemove', mouseMoveHandler);
-        stage.off('mouseup', mouseUpHandler);
-      }
-    };
-  }, [
-    activeTool,
-    setActiveTool,
+  const mouseDownHandler = handleMouseDown({
     stageRef,
+    activeTool,
     addElement,
-    updateElement,
+    setDrawing,
+    setNewElement,
+  } as any);
+  const mouseMoveHandler = handleMouseMove({
+    stageRef,
     drawing,
     newElement,
-  ]);
+    updateElement,
+  } as any);
+  const mouseUpHandler = handleMouseUp({
+    drawing,
+    setDrawing,
+    setNewElement,
+    setActiveTool,
+  } as any);
+
+  useTool({
+    toolName: 'ellipse',
+    handlers: {
+      mouseDownHandler,
+      mouseMoveHandler,
+      mouseUpHandler,
+    },
+  });
 
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>

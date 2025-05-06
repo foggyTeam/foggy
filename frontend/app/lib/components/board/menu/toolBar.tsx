@@ -3,17 +3,17 @@
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
 import React, { useEffect, useState } from 'react';
-import RectTool from '@/app/lib/components/board/tools/rectTool';
-import EllipseTool from '@/app/lib/components/board/tools/ellipseTool';
+import RectTool from '@/app/lib/components/board/tools/baseTools/rectTool';
+import EllipseTool from '@/app/lib/components/board/tools/baseTools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
 import { Divider } from '@heroui/divider';
-import TextTool from '@/app/lib/components/board/tools/textTool';
-import PencilTool from '@/app/lib/components/board/tools/pencilTool';
-import DeleteTool from '@/app/lib/components/board/tools/deleteTool';
+import TextTool from '@/app/lib/components/board/tools/baseTools/textTool';
+import PencilTool from '@/app/lib/components/board/tools/baseTools/pencilTool';
+import DeleteTool from '@/app/lib/components/board/tools/baseTools/deleteTool';
 import PencilToolBar from '@/app/lib/components/board/menu/pencilToolBar';
 import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
 import { foggy_accent } from '@/tailwind.config';
-import EraserTool from '@/app/lib/components/board/tools/eraserTool';
+import EraserTool from '@/app/lib/components/board/tools/baseTools/eraserTool';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export type ToolProps = {

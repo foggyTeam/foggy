@@ -6,7 +6,7 @@ import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
 import SliderTool from '@/app/lib/components/board/tools/pencilTools/sliderTool';
 import LineCapTool from '@/app/lib/components/board/tools/pencilTools/lineCapTool';
 import { LineElement } from '@/app/lib/types/definitions';
-import LayerTool from '@/app/lib/components/board/tools/layerTool';
+import LayerTool from '@/app/lib/components/board/tools/elementTools/layerTool';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function PencilToolBar({

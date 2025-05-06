@@ -1,9 +1,9 @@
 'use client';
 
-import FillTool from '@/app/lib/components/board/tools/fillTool';
-import StrokeTool from '@/app/lib/components/board/tools/strokeTool';
-import SizeTool from '@/app/lib/components/board/tools/sizeTool';
-import LayerTool from '@/app/lib/components/board/tools/layerTool';
+import FillTool from '@/app/lib/components/board/tools/elementTools/fillTool';
+import StrokeTool from '@/app/lib/components/board/tools/elementTools/strokeTool';
+import SizeTool from '@/app/lib/components/board/tools/elementTools/sizeTool';
+import LayerTool from '@/app/lib/components/board/tools/elementTools/layerTool';
 import React from 'react';
 
 export default function ElementToolBar() {
