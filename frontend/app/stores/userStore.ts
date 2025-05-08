@@ -10,6 +10,7 @@ class UserStore {
       user: observable,
       isAuthenticated: observable,
       setUser: action,
+      updateUserData: action,
       clearUser: action,
     });
   }
@@ -22,6 +23,10 @@ class UserStore {
       image: userData.image,
     };
     this.isAuthenticated = true;
+  }
+
+  updateUserData(newUserData: Partial<User>) {
+    if (this.user) this.user = { ...this.user, ...newUserData };
   }
 
   clearUser() {
