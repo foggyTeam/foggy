@@ -72,13 +72,9 @@ const ProfileForm = observer((userData: ProfileData) => {
             -1
           )
             console.error(result);
-          else {
-            userStore.updateUserData({ image: response.url });
-          }
+          else userStore.updateUserData({ image: response.url });
         });
-      } else {
-        console.error(response.error);
-      }
+      } else console.error(response.error);
     }
     setIsAvatarLoading(false);
 
