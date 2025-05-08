@@ -19,9 +19,11 @@ import { useDisclosure } from '@heroui/modal';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
 import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [errors, setErrors] = useState({} as any);
 
@@ -49,8 +51,38 @@ const ProfileForm = observer((userData: ProfileData) => {
     IsFormValid({ nickname, email, about }, profileFormSchema, setErrors);
   }, [nickname, email, about]);
 
-  const handleImageUpload = (event: any) => {
-    const resizedImageURL = HandleImageUpload(event);
+  const handleImageUpload = async (event: any) => {
+    setIsAvatarLoading(true);
+    const initialURL = userStore.user?.image;
+
+    const imageBlob = await HandleImageUpload(event);
+    if (imageBlob && userStore.user) {
+      const response = await uploadImage(
+        userStore.user.id,
+        'avatar',
+        imageBlob,
+      );
+
+      if ('url' in response) {
+        await updateUserData(userStore.user.id, {
+          avatar: response.url,
+        }).then((result) => {
+          if (
+            Object.keys(result).findIndex((element) => element === 'errors') !==
+            -1
+          )
+            console.error(result);
+          else {
+            userStore.updateUserData({ image: response.url });
+          }
+        });
+      } else {
+        console.error(response.error);
+      }
+    }
+    setIsAvatarLoading(false);
+
+    await clearImage(initialURL);
   };
 
   const onSubmit = async () => {
@@ -106,11 +138,19 @@ const ProfileForm = observer((userData: ProfileData) => {
     await onSignOut();
   };
 
+  const clearImage = async (initialURL: string | null | undefined) => {
+    if (userStore.user?.image !== initialURL && initialURL)
+      await deleteImage(initialURL).then((response) => {
+        if ('error' in response) console.error(response.error);
+      });
+  };
+
   return (
     <>
       <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
         <div className="items-top flex w-full justify-between gap-2">
           <UploadAvatarButton
+            isLoading={isAvatarLoading}
             handleImageUpload={handleImageUpload}
             name={userStore.user?.name as string}
             src={userStore.user?.image as string}
