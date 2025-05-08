@@ -312,9 +312,13 @@ export const handleDrawing =
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
-      const updatedPoints = [...newElement.points, x, y];
-      setNewElement({ ...newElement, points: updatedPoints });
+      const updatedPoints = [
+        ...(e.evt.shiftKey ? newElement.points.slice(0, 2) : newElement.points),
+        x,
+        y,
+      ];
 
+      setNewElement({ ...newElement, points: updatedPoints });
       updateElement(newElement.id, { points: updatedPoints });
     }
   };

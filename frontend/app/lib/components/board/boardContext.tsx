@@ -121,10 +121,10 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetStage = (e: any = undefined) => {
-    const onlyZoom = !!e;
+    const onlyZoom = !(e instanceof Object);
     const stage = stageRef.current;
     if (stage) {
-      if (onlyZoom === true) {
+      if (onlyZoom) {
         setScale(1);
         stage.scale({ x: 1, y: 1 });
         stage.batchDraw();

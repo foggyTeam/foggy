@@ -1,5 +1,34 @@
 import { useEffect, useState } from 'react';
-import { fitCoordinates } from '@/app/lib/components/board/boardStage';
+import { STAGE_SIZE } from '@/app/lib/components/board/boardStage';
+
+const MAX_X = 1000;
+const MAX_Y = 1000;
+const MIN_X = -2000;
+const MIN_Y = -2000;
+
+export const fitBoardCoordinates = (
+  x: number,
+  y: number,
+  elementWidth: number = 200,
+  elementHeight: number = 200,
+  scale: number,
+) => {
+  let newX = x;
+  let newY = y;
+
+  if (newX >= MAX_X * scale) {
+    newX = MAX_X * scale - 1;
+  } else if (newX - elementWidth <= MIN_X * scale) {
+    newX = MIN_X * scale + elementWidth + 1;
+  }
+
+  if (newY >= MAX_Y * scale) {
+    newY = MAX_Y * scale - 1;
+  } else if (newY - elementHeight <= MIN_Y * scale) {
+    newY = MIN_Y * scale + elementHeight + 1;
+  }
+  return { x: newX, y: newY };
+};
 
 export default function UseBoardNavigation(stageRef: any, scale: number) {
   const [isDragging, setIsDragging] = useState(false);
@@ -18,11 +47,11 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() + e.evt.movementX;
           const newY = stage.y() + e.evt.movementY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
-            window.innerWidth,
-            window.innerHeight,
+            STAGE_SIZE,
+            STAGE_SIZE,
             scale,
           );
 
@@ -45,7 +74,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() - e.evt.deltaX;
           const newY = stage.y() - e.evt.deltaY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
             window.innerWidth,
@@ -76,11 +105,11 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() + movementX;
           const newY = stage.y() + movementY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
-            window.innerWidth,
-            window.innerHeight,
+            STAGE_SIZE,
+            STAGE_SIZE,
             scale,
           );
 

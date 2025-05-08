@@ -19,32 +19,36 @@ import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const GRID_SIZE = 24;
+export const STAGE_SIZE = 3000;
 const MAX_X = 1000;
 const MAX_Y = 1000;
 const MIN_X = -2000;
 const MIN_Y = -2000;
 
-export const fitCoordinates = (
+const fitCoordinates = (
   x: number,
   y: number,
   elementWidth: number = 200,
   elementHeight: number = 200,
+  board: { x: number; y: number },
   scale: number,
-) => {
+): { x: number; y: number } => {
   let newX = x;
   let newY = y;
+  const screenW = window.innerWidth;
+  const screenH = window.innerHeight;
 
-  if (newX >= MAX_X * scale) {
-    newX = MAX_X * scale - 1;
-  } else if (newX - elementWidth <= MIN_X * scale) {
-    newX = MIN_X * scale + elementWidth + 1;
+  if (board.x - x > MAX_X * scale) newX = 0;
+  if (board.y - y > MAX_Y * scale) newY = 0;
+
+  if (board.x - x - elementWidth < MIN_X * scale) {
+    newX = screenW - elementWidth * scale;
   }
 
-  if (newY >= MAX_Y * scale) {
-    newY = MAX_Y * scale - 1;
-  } else if (newY - elementHeight <= MIN_Y * scale) {
-    newY = MIN_Y * scale + elementHeight + 1;
+  if (board.y - y - elementHeight < MIN_Y * scale) {
+    newY = screenY - elementHeight * scale;
   }
+
   return { x: newX, y: newY };
 };
 
@@ -68,10 +72,10 @@ const BoardStage = observer(() => {
   UseBoardZoom(stageRef, scale, setScale);
 
   return (
-    <>
+    <div className="h-screen w-screen overflow-hidden">
       <Stage
-        width={window?.innerWidth}
-        height={window?.innerHeight}
+        width={STAGE_SIZE}
+        height={STAGE_SIZE}
         ref={stageRef}
         onClick={handleSelect}
       >
@@ -81,9 +85,17 @@ const BoardStage = observer(() => {
           <BoardLayer
             key={index}
             layer={layer}
-            fitCoordinates={(pos, element) =>
-              fitCoordinates(pos.x, pos.y, element.width, element.height, scale)
-            }
+            fitCoordinates={(pos, element) => {
+              return fitCoordinates(
+                pos.x,
+                pos.y,
+                element.width,
+                element.height,
+
+                stageRef.current?.getPosition(),
+                scale,
+              );
+            }}
           />
         ))}
 
@@ -146,7 +158,7 @@ const BoardStage = observer(() => {
           <MaximizeIcon />
         </Button>
       </FTooltip>
-    </>
+    </div>
   );
 });
 
