@@ -5,10 +5,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import mongoose, { Model, Types } from 'mongoose';
 import { Board, BoardDocument } from './schemas/board.schema';
 import { Layer, LayerDocument } from './schemas/layer.schema';
-import { BaseElement, BaseElementModel } from './schemas/element.schema';
+import {
+  BaseElement,
+  BaseElementModel,
+  BaseElementSchema,
+  EllipseElementSchema,
+  LineElementSchema,
+  MarkerElementSchema,
+  RectElementSchema,
+  TextElementSchema,
+} from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -143,36 +152,60 @@ export class BoardService {
     return element;
   }
 
-  async removeElement(elementId: string): Promise<{ message: string }> {
-    const { layer } = await this.findLayerAndElementById(elementId);
+  public async removeElement(
+    boardId: Types.ObjectId,
+    elementId: string,
+  ): Promise<{ message: string }> {
+    const layer = await this.findLayerByElement(boardId, elementId);
 
-    const elementIndex = layer.elements.findIndex(
-      (element) => element.id === elementId,
-    );
-    if (elementIndex === -1) {
-      throw new NotFoundException(`Element with ID "${elementId}" not found`);
+    if (!layer) {
+      throw new NotFoundException(
+        `Element with ID "${elementId}" not found in board "${boardId}"`,
+      );
     }
 
-    layer.elements.splice(elementIndex, 1);
+    layer.elements = layer.elements.filter((el) => el.id !== elementId);
+
     await layer.save();
-    await this.updateAtBoard(layer.boardId);
+    await this.updateAtBoard(boardId);
+
     return { message: 'Element successfully deleted' };
   }
 
   async updateElement(
+    boardId: Types.ObjectId,
     elementId: string,
     updateDto: UpdateElementDto,
-  ): Promise<BaseElement> {
-    const { layer, element } = await this.findLayerAndElementById(elementId);
+  ): Promise<void> {
+    const layer = await this.findLayerByElement(boardId, elementId);
 
-    if ((updateDto as any).type || (updateDto as any).id) {
-      throw new BadRequestException('Cannot update type or id of the element');
+    const elementIndex = layer.elements.findIndex(
+      (elem) => elem.id === elementId,
+    );
+    if (elementIndex === -1) {
+      throw new Error('Element not found');
+    }
+    const currentElement = layer.elements[elementIndex];
+    const permittedUpdates = this.getPermittedUpdates(
+      updateDto,
+      currentElement.type,
+    );
+
+    if (Object.keys(permittedUpdates).length === 0) {
+      throw new Error('No valid fields to update for this element type');
     }
 
-    Object.assign(element, updateDto);
-    await layer.save();
-    await this.updateAtBoard(layer.boardId);
-    return element;
+    const updatedElement = {
+      ...currentElement.toObject(),
+      ...permittedUpdates,
+    };
+
+    layer.elements.splice(elementIndex, 1, updatedElement);
+
+    await this.layerModel.updateOne(
+      { _id: layer._id },
+      { $set: { elements: layer.elements } },
+    );
   }
 
   async moveElementToLayer(
@@ -281,19 +314,55 @@ export class BoardService {
     return board;
   }
 
-  public async findLayerAndElementById(
+  public async findLayerByElement(
+    boardId: Types.ObjectId,
     elementId: string,
-  ): Promise<{ layer: LayerDocument; element: BaseElement }> {
-    const layers = await this.layerModel.find().exec();
+  ): Promise<LayerDocument> {
+    const board = await this.boardModel.findById(boardId).exec();
+    if (!board) {
+      throw new NotFoundException(`Board with ID "${boardId}" not found`);
+    }
+
+    const layerIds = board.layers;
+    const layers = await this.layerModel
+      .find({ _id: { $in: layerIds } })
+      .exec();
+
     for (const layer of layers) {
-      const element = layer.elements.find(
-        (element) => element.id === elementId,
-      );
+      const element = layer.elements.find((el) => el.id === elementId);
       if (element) {
-        return { layer, element };
+        return layer;
       }
     }
-    throw new NotFoundException(`Element with ID "${elementId}" not found`);
+    throw new NotFoundException(
+      `Element with ID "${elementId}" not found in board "${boardId}"`,
+    );
+  }
+
+  private getPermittedUpdates(
+    updateDto: UpdateElementDto,
+    elementType: string,
+  ): Partial<UpdateElementDto> {
+    const baseFields = Object.keys(BaseElementSchema.paths);
+    const discriminators: Record<string, mongoose.Schema> = {
+      rect: RectElementSchema,
+      ellipse: EllipseElementSchema,
+      text: TextElementSchema,
+      line: LineElementSchema,
+      marker: MarkerElementSchema,
+    };
+
+    const typeSpecificFields = discriminators[elementType]?.paths
+      ? Object.keys(discriminators[elementType].paths)
+      : [];
+    const allowedFields = [...baseFields, ...typeSpecificFields];
+
+    return Object.keys(updateDto)
+      .filter((key) => allowedFields.includes(key))
+      .reduce((acc, key) => {
+        acc[key] = updateDto[key];
+        return acc;
+      }, {} as Partial<UpdateElementDto>);
   }
 
   private async createLayers(

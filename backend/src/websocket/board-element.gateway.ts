@@ -102,8 +102,6 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      this.logger.log(`[UpdateElement] Received:`, updateData);
-
       if (!updateData?.id) {
         client.to(boardId).emit('custom_error', HttpStatus.NOT_FOUND);
         throw new Error('Element ID is required');
@@ -114,11 +112,11 @@ export class BoardElementsGateway
         throw new Error('Updated attributes are required');
       }
 
-      const element = await this.boardService.updateElement(
+      await this.boardService.updateElement(
+        boardId,
         updateData.id,
         updateData.newAttrs,
       );
-      //this.logger.log(`[UpdateElement] Otpravleno:`, element);
       client.to(boardId).emit('elementUpdated', updateData);
       return { status: 'success', updateData };
     } catch (error) {
@@ -137,10 +135,6 @@ export class BoardElementsGateway
       if (!boardId) {
         throw new Error('Board ID not found in connection');
       }
-
-      this.logger.log(`[DeleteElement] Raw received data:`, data);
-      this.logger.log(`[DeleteElement] Type of data: ${typeof data}`);
-
       let elementId: string;
 
       if (typeof data === 'string') {
@@ -154,13 +148,11 @@ export class BoardElementsGateway
         throw new Error('Element ID is required');
       }
 
-      this.logger.log(`[DeleteElement] Processing ID: ${elementId}`);
-
       if (!elementId) {
         throw new Error('Element ID is required');
       }
 
-      await this.boardService.removeElement(elementId);
+      await this.boardService.removeElement(boardId, elementId);
 
       client.to(boardId).emit('elementRemoved', elementId);
       return { status: 'success' };

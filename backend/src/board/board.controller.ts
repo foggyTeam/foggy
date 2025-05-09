@@ -319,10 +319,10 @@ export class BoardController {
     description: 'Board, layer, or element not found.',
   })
   async removeElement(
-    @Param('id') id: string,
+    @Param('boardId') boardId: Types.ObjectId,
     @Param('elementId') elementId: string,
   ): Promise<{ message: string }> {
-    return this.boardService.removeElement(elementId);
+    return this.boardService.removeElement(boardId, elementId);
   }
 
   @Put(':id/elements/:elementId')
@@ -375,11 +375,11 @@ export class BoardController {
     },
   })
   async updateElement(
-    @Param('id') id: Types.ObjectId,
+    @Param('boardId') boardId: Types.ObjectId,
     @Param('elementId') elementId: string,
     @Body() updateDto: UpdateElementDto,
-  ): Promise<BaseElement> {
-    return this.boardService.updateElement(elementId, updateDto);
+  ): Promise<void> {
+    return this.boardService.updateElement(boardId, elementId, updateDto);
   }
 
   @Put(':id/elements/:elementId/move')

@@ -1,12 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, model } from 'mongoose';
 
-@Schema({ discriminatorKey: 'elementType' })
+@Schema({ discriminatorKey: 'type' })
 export class BaseElement extends Document {
   @Prop({ required: true })
   id: string;
 
-  @Prop({ required: true })
   type: string;
 
   @Prop({ required: true })

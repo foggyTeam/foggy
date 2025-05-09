@@ -138,7 +138,7 @@ export class CreateElementDto {
   @ValidateNested()
   @Type(() => BaseElementDto, {
     discriminator: {
-      property: 'elementType',
+      property: 'type',
       subTypes: [
         { value: RectElementDto, name: ElementType.RECT },
         { value: EllipseElementDto, name: ElementType.ELLIPSE },
