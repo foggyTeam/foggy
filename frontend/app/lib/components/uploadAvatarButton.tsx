@@ -4,18 +4,21 @@ import { Avatar } from '@heroui/avatar';
 import { User2Icon } from 'lucide-react';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import clsx from 'clsx';
+import { Spinner } from '@heroui/spinner';
 
 export default function UploadAvatarButton({
   handleImageUpload,
   tooltipContent,
   name,
   src,
+  isLoading,
   classNames,
 }: {
   handleImageUpload: any;
   tooltipContent: string;
   name?: string;
   src?: string;
+  isLoading?: boolean;
   classNames?: {
     icon?: string;
     avatar?: string;
@@ -30,10 +33,12 @@ export default function UploadAvatarButton({
   return (
     <FTooltip content={tooltipContent} placement="right">
       <Button
+        isDisabled={isLoading}
         onPress={handleClick}
         variant="bordered"
-        className="h-fit w-fit min-w-fit rounded-full border-none p-0"
+        className="flex h-fit w-fit min-w-fit items-center justify-center rounded-full border-none p-0"
       >
+        {isLoading && <Spinner size="lg" className="absolute z-50" />}
         <Avatar
           showFallback
           icon={

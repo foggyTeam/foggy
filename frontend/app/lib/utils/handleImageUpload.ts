@@ -59,8 +59,6 @@ export default async function HandleImageUpload(event: any, minSize = 288) {
     );
     if (!resizedImage) return null;
 
-    const reader = new FileReader();
-    reader.readAsDataURL(resizedImage);
-    return reader.result;
+    return resizedImage;
   }
 }
