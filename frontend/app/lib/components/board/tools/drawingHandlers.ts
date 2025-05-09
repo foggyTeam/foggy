@@ -332,11 +332,20 @@ export const handleEndDrawing =
     updateElement,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
-    if (drawing) {
-      if (newElement && newElement.points.length < 4)
-        updateElement(newElement.id, {
+    if (drawing && newElement) {
+      let xPoints = [];
+      let yPoints = [];
+      newElement.points.map((point, index) =>
+        index % 2 ? yPoints.push(point) : xPoints.push(point),
+      );
+
+      updateElement(newElement.id, {
+        ...(newElement.points.length < 4 && {
           points: [...newElement.points, ...newElement.points],
-        });
+        }),
+        width: Math.max(...xPoints) - Math.min(...xPoints) + 1,
+        height: Math.max(...yPoints) - Math.min(...yPoints) + 1,
+      });
 
       setDrawing(false);
       setNewElement(null);

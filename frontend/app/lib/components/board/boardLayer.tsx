@@ -13,7 +13,7 @@ export default function BoardLayer({
   layer: BoardElement[];
   fitCoordinates: (
     pos: { x: number; y: number },
-    element: any,
+    element: BoardElement,
   ) => { x: number; y: number };
 }) {
   const { updateElement, handleSelect, handleTextEdit, transformAvailable } =

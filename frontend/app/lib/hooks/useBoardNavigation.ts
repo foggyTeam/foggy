@@ -37,20 +37,30 @@ export const fitElementCoordinates = (
   elementHeight: number = 200,
   board: { x: number; y: number },
   scale: number,
+  // real coordinates for line
+  line?: { x: number; y: number },
 ) => {
   let newX = x;
   let newY = y;
 
-  const boardX = x - board.x + MAX_X * scale;
-  const boardY = y - board.y + MAX_Y * scale;
+  const boardX = x + line?.x * scale - board.x + MAX_X * scale;
+  const boardY = y + line?.y * scale - board.y + MAX_Y * scale;
 
-  if (boardX < 0) newX = board.x - MAX_X * scale;
+  if (boardX < 0) newX = board.x - MAX_X * scale - line?.x * scale;
   else if (boardX > (STAGE_SIZE - elementWidth) * scale)
-    newX = (STAGE_SIZE - elementWidth) * scale + board.x - MAX_X * scale;
+    newX =
+      (STAGE_SIZE - elementWidth) * scale +
+      board.x -
+      MAX_X * scale -
+      line?.x * scale;
 
-  if (boardY < 0) newY = board.y - MAX_Y * scale;
+  if (boardY < 0) newY = board.y - MAX_Y * scale - line?.y * scale;
   else if (boardY > (STAGE_SIZE - elementHeight) * scale)
-    newY = (STAGE_SIZE - elementHeight) * scale + board.y - MAX_Y * scale;
+    newY =
+      (STAGE_SIZE - elementHeight) * scale +
+      board.y -
+      MAX_Y * scale -
+      line?.y * scale;
 
   return { x: newX, y: newY };
 };

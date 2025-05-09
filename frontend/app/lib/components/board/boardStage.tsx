@@ -56,16 +56,25 @@ const BoardStage = observer(() => {
           <BoardLayer
             key={index}
             layer={layer}
-            fitCoordinates={(pos, element) => {
-              return fitElementCoordinates(
+            fitCoordinates={(pos, element) =>
+              fitElementCoordinates(
                 pos.x,
                 pos.y,
                 element.width,
                 element.height,
                 stageRef.current?.getPosition() || { x: 0, y: 0 },
                 scale,
-              );
-            }}
+                (element.type === 'line' && {
+                  x: Math.min(
+                    ...element.points.filter((point, index) => !(index % 2)),
+                  ),
+                  y: Math.min(
+                    ...element.points.filter((point, index) => index % 2),
+                  ),
+                }) ||
+                  undefined,
+              )
+            }
           />
         ))}
 
