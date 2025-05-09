@@ -57,6 +57,8 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
   const [scale, setScale] = useState(1);
   // TRANSFORMER
   const [selectedElements, changeSelection] = useState<any[]>([]);
+  const selectedElementsRef = useRef(selectedElements);
+
   // TOOLS
   const [activeTool, setActiveTool] = useState('');
   const [isEditingText, setIsEditingText] = useState<TextEdit>();
@@ -79,6 +81,8 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
 
   // OPERATIONS
   const handleSelect = (e: KonvaEventObject<any>) => {
+    if (activeTool) return;
+
     e.cancelBubble = true;
     const target = e.target;
 
@@ -137,19 +141,24 @@ export const BoardProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const handleDelKey = (e: KeyboardEvent) => {
-    if (e.key === 'Delete' && selectedElements) {
-      selectedElements.forEach((element) => {
-        removeElement(element.attrs.id);
-      });
-    }
-  };
   useEffect(() => {
+    selectedElementsRef.current = selectedElements;
+  }, [selectedElements]);
+
+  useEffect(() => {
+    const handleDelKey = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' && selectedElementsRef.current) {
+        selectedElementsRef.current.forEach((element) => {
+          removeElement(element.attrs.id);
+        });
+      }
+    };
+
     window.addEventListener('keydown', handleDelKey);
     return () => {
       window.removeEventListener('keydown', handleDelKey);
     };
-  }, [selectedElements]);
+  }, []);
 
   useEffect(() => {
     const stage = stageRef.current?.getStage();
