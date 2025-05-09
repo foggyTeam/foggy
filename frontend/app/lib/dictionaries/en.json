@@ -234,6 +234,7 @@
       "lineCapButt": "Cut",
       "lineCapRound": "Rounded",
       "lineCapSquare": "Squared",
+      "eraserTool": "Eraser",
       "rectTool": "Rectangle",
       "ellipseTool": "Ellipse",
       "fillTool": "Fill color",

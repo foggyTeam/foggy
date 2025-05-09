@@ -47,7 +47,7 @@ export default function EraserTool() {
   });
 
   return (
-    <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
+    <FTooltip content={settingsStore.t.toolTips.tools.eraserTool}>
       <Button
         isDisabled={toolsDisabled}
         onPress={() => {
