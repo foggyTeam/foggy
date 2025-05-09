@@ -7,7 +7,9 @@ import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
-import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
+import UseBoardNavigation, {
+  fitElementCoordinates,
+} from '@/app/lib/hooks/useBoardNavigation';
 import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
@@ -20,37 +22,6 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const GRID_SIZE = 24;
 export const STAGE_SIZE = 3000;
-const MAX_X = 1000;
-const MAX_Y = 1000;
-const MIN_X = -2000;
-const MIN_Y = -2000;
-
-const fitCoordinates = (
-  x: number,
-  y: number,
-  elementWidth: number = 200,
-  elementHeight: number = 200,
-  board: { x: number; y: number },
-  scale: number,
-): { x: number; y: number } => {
-  let newX = x;
-  let newY = y;
-  const screenW = window.innerWidth;
-  const screenH = window.innerHeight;
-
-  if (board.x - x > MAX_X * scale) newX = 0;
-  if (board.y - y > MAX_Y * scale) newY = 0;
-
-  if (board.x - x - elementWidth < MIN_X * scale) {
-    newX = screenW - elementWidth * scale;
-  }
-
-  if (board.y - y - elementHeight < MIN_Y * scale) {
-    newY = screenY - elementHeight * scale;
-  }
-
-  return { x: newX, y: newY };
-};
 
 const BoardStage = observer(() => {
   const {
@@ -86,13 +57,12 @@ const BoardStage = observer(() => {
             key={index}
             layer={layer}
             fitCoordinates={(pos, element) => {
-              return fitCoordinates(
+              return fitElementCoordinates(
                 pos.x,
                 pos.y,
                 element.width,
                 element.height,
-
-                stageRef.current?.getPosition(),
+                stageRef.current?.getPosition() || { x: 0, y: 0 },
                 scale,
               );
             }}
@@ -137,9 +107,10 @@ const BoardStage = observer(() => {
               content={textContent}
               setContent={setTextContent}
               height={isEditingText.textHeight}
-              setHeight={(newHeight: number) =>
-                setIsEditingText({ ...isEditingText, textHeight: newHeight })
-              }
+              setHeight={(newHeight: number) => {
+                if (isEditingText)
+                  setIsEditingText({ ...isEditingText, textHeight: newHeight });
+              }}
               width={isEditingText.textWidth}
             />
           ) as ReactNode,

@@ -6,7 +6,7 @@ const MAX_Y = 1000;
 const MIN_X = -2000;
 const MIN_Y = -2000;
 
-export const fitBoardCoordinates = (
+const fitBoardCoordinates = (
   x: number,
   y: number,
   elementWidth: number = 200,
@@ -30,6 +30,31 @@ export const fitBoardCoordinates = (
   return { x: newX, y: newY };
 };
 
+export const fitElementCoordinates = (
+  x: number,
+  y: number,
+  elementWidth: number = 200,
+  elementHeight: number = 200,
+  board: { x: number; y: number },
+  scale: number,
+) => {
+  let newX = x;
+  let newY = y;
+
+  const boardX = x - board.x + MAX_X * scale;
+  const boardY = y - board.y + MAX_Y * scale;
+
+  if (boardX < 0) newX = board.x - MAX_X * scale;
+  else if (boardX > (STAGE_SIZE - elementWidth) * scale)
+    newX = (STAGE_SIZE - elementWidth) * scale + board.x - MAX_X * scale;
+
+  if (boardY < 0) newY = board.y - MAX_Y * scale;
+  else if (boardY > (STAGE_SIZE - elementHeight) * scale)
+    newY = (STAGE_SIZE - elementHeight) * scale + board.y - MAX_Y * scale;
+
+  return { x: newX, y: newY };
+};
+
 export default function UseBoardNavigation(stageRef: any, scale: number) {
   const [isDragging, setIsDragging] = useState(false);
 
@@ -50,8 +75,8 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const fit = fitBoardCoordinates(
             newX,
             newY,
-            STAGE_SIZE,
-            STAGE_SIZE,
+            window.innerWidth,
+            window.innerHeight,
             scale,
           );
 
@@ -108,8 +133,8 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const fit = fitBoardCoordinates(
             newX,
             newY,
-            STAGE_SIZE,
-            STAGE_SIZE,
+            window.innerWidth,
+            window.innerHeight,
             scale,
           );
 
