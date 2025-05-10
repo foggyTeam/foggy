@@ -30,7 +30,6 @@ export default function StrokeTool() {
   }, [selectedElement]);
 
   useEffect(() => {
-    console.log('updating stroke');
     if (selectedElement.attrs.type !== 'text') {
       if (
         isElementVisible(
