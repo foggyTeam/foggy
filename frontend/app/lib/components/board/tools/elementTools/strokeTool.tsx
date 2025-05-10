@@ -15,22 +15,22 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function StrokeTool() {
   const { selectedElement, updateElement } = useBoardContext();
-
-  const [strokeColor, changeColor] = useState(primary.DEFAULT);
-  const [strokeWidth, changeWidth] = useState<number>(0);
+  const [strokeColor, changeColor] = useState(
+    selectedElement.attrs.stroke || '',
+  );
+  const [strokeWidth, changeWidth] = useState(
+    selectedElement.attrs.strokeWidth || 0,
+  );
 
   useEffect(() => {
-    changeColor(
-      selectedElement.attrs.stroke && selectedElement.attrs.strokeWidth
-        ? selectedElement.attrs.stroke
-        : primary.DEFAULT,
-    );
-    changeWidth(
-      selectedElement.attrs.strokeWidth ? selectedElement.attrs.strokeWidth : 0,
-    );
+    if (strokeColor !== (selectedElement.attrs.stroke || ''))
+      changeColor(selectedElement.attrs.stroke || '');
+    if (strokeWidth !== (selectedElement.attrs.strokeWidth || 0))
+      changeWidth(selectedElement.attrs.strokeWidth || 0);
   }, [selectedElement]);
 
   useEffect(() => {
+    console.log('updating stroke');
     if (selectedElement.attrs.type !== 'text') {
       if (
         isElementVisible(

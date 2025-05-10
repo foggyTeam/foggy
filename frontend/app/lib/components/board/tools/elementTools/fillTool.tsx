@@ -14,15 +14,11 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function FillTool() {
   const { selectedElement, updateElement } = useBoardContext();
-
-  const [fillColor, changeColor] = useState(primary.DEFAULT);
+  const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');
 
   useEffect(() => {
-    changeColor(
-      selectedElement.attrs.fill
-        ? selectedElement.attrs.fill
-        : `${primary.DEFAULT}00`,
-    );
+    if (fillColor === (selectedElement.attrs.fill || '')) return;
+    changeColor(selectedElement.attrs.fill || '');
   }, [selectedElement]);
 
   useEffect(() => {
@@ -40,7 +36,7 @@ export default function FillTool() {
           fill: fillColor,
         } as BoardElement);
       else console.error('Element is invisible!');
-    } else {
+    } else
       updateElement(selectedElement.attrs.id, {
         fill: isElementVisible(
           selectedElement.attrs.type,
@@ -51,7 +47,6 @@ export default function FillTool() {
           ? fillColor
           : undefined,
       } as BoardElement);
-    }
   }, [fillColor]);
 
   return (

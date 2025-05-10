@@ -46,6 +46,7 @@
     "framer-motion": "^11.18.2",
     "jose": "^5.10.0",
     "konva": "^9.3.20",
+    "lodash": "^4.17.21",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.471.2",

@@ -19,25 +19,30 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 export default function SizeTool() {
   const { selectedElement, updateElement } = useBoardContext();
 
-  const [width, setWidth] = useState(undefined as any);
-  const [height, setHeight] = useState(undefined as any);
-  const [cornerRadius, setCornerRadius] = useState(0);
-  const [rotation, setRotation] = useState(0);
+  const [width, setWidth] = useState(selectedElement.attrs.width);
+  const [height, setHeight] = useState(selectedElement.attrs.height);
+  const [cornerRadius, setCornerRadius] = useState(
+    selectedElement.attrs.cornerRadius || 0,
+  );
+  const [rotation, setRotation] = useState(selectedElement.attrs.rotation);
 
   useEffect(() => {
-    if (selectedElement.attrs.type === 'ellipse') {
-      setWidth(selectedElement.attrs.radiusX * 2);
-      setHeight(selectedElement.attrs.radiusY * 2);
-    } else {
-      setWidth(selectedElement.attrs.width);
-      setHeight(selectedElement.attrs.height);
+    if (
+      selectedElement.attrs.width != width ||
+      selectedElement.attrs.height != height
+    ) {
+      if (selectedElement.attrs.type === 'ellipse') {
+        setWidth(selectedElement.attrs.radiusX * 2);
+        setHeight(selectedElement.attrs.radiusY * 2);
+      } else {
+        setWidth(selectedElement.attrs.width);
+        setHeight(selectedElement.attrs.height);
+      }
     }
-    setCornerRadius(
-      selectedElement.attrs.cornerRadius
-        ? selectedElement.attrs.cornerRadius
-        : 0,
-    );
-    setRotation(selectedElement.attrs.rotation);
+    if (selectedElement.attrs.cornerRadius != cornerRadius)
+      setCornerRadius(selectedElement.attrs.cornerRadius || 0);
+    if (selectedElement.attrs.rotation != rotation)
+      setRotation(selectedElement.attrs.rotation);
   }, [selectedElement]);
 
   useEffect(() => {

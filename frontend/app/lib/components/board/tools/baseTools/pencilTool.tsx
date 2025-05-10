@@ -12,6 +12,7 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import debounce from 'lodash.debounce';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
+import { throttle } from 'lodash';
 
 export default function PencilTool({
   pencilParams,
@@ -38,16 +39,13 @@ export default function PencilTool({
     setNewElement,
     pencilParams,
   } as any);
-  const mouseMoveHandler = debounce(
-    handleDrawing({
-      stageRef,
-      drawing,
-      setNewElement,
-      newElement,
-      updateElement,
-    } as any),
-    4,
-  );
+  const mouseMoveHandler = handleDrawing({
+    stageRef,
+    drawing,
+    setNewElement,
+    newElement,
+    updateElement,
+  } as any);
   const mouseUpHandler = handleEndDrawing({
     drawing,
     newElement,

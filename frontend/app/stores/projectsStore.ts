@@ -57,9 +57,7 @@ class ProjectsStore {
         userStore.user.id,
       );
 
-      if (this.boardWebsocket) {
-        socketAddEventListeners(this.boardWebsocket);
-      }
+      if (this.boardWebsocket) socketAddEventListeners(this.boardWebsocket);
     } else console.error('Failed to connect to websocket.');
   }
   disconnectSocket() {
@@ -97,6 +95,7 @@ class ProjectsStore {
         this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
   };
+
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',

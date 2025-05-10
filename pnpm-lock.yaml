@@ -246,6 +246,9 @@ importers:
       konva:
         specifier: ^9.3.20
         version: 9.3.20
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
