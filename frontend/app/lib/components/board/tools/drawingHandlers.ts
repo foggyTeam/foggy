@@ -283,6 +283,8 @@ export const handleStartDrawing =
         dragDistance: 4,
         x: 0,
         y: 0,
+        width: 200,
+        height: 200,
         rotation: 0,
         fill: '#AA99B900',
         stroke: pencilParams.color,
