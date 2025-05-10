@@ -105,9 +105,12 @@ export default function BoardLayer({
                 {...element}
                 onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
-                onDragEnd={(e: any) =>
-                  updateElement(element.id, { points: e.target.points() })
-                }
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
                 draggable={transformAvailable}
               />
             );
