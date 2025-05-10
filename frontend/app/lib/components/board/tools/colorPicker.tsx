@@ -33,7 +33,7 @@ export default function ColorPicker({
               navigator.clipboard
                 .writeText(value)
                 .catch(() => console.error('Failed to copy to clipboard.'));
-              console.log('Copied to clipboard!');
+              console.error('Copied to clipboard!');
             }}
             isIconOnly
             size="sm"

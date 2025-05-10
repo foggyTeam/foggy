@@ -1,5 +1,6 @@
 import { Layer } from 'react-konva';
 import { useEffect, useState } from 'react';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const createGridPattern = (gridSize: number) => {
   const size = gridSize;
@@ -10,15 +11,8 @@ const createGridPattern = (gridSize: number) => {
   `;
 };
 
-export default function GridLayer({
-  stageRef,
-  scale,
-  gridSize,
-}: {
-  stageRef: any;
-  scale: number;
-  gridSize: number;
-}) {
+export default function GridLayer({ gridSize }: { gridSize: number }) {
+  const { stageRef, scale } = useBoardContext();
   const [pattern, setPattern] = useState(null);
 
   useEffect(() => {
@@ -27,7 +21,7 @@ export default function GridLayer({
     image.src = `data:image/svg+xml;base64,${btoa(svgPattern)}`;
     image.onload = () => {
       setPattern(image);
-      if (stageRef.current) {
+      if (stageRef.current?.container && stageRef.current?.container()) {
         stageRef.current.container().style.backgroundImage = `url(${image.src})`;
         stageRef.current.container().style.backgroundRepeat = 'repeat';
       }

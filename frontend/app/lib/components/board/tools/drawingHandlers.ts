@@ -312,9 +312,13 @@ export const handleDrawing =
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
-      const updatedPoints = [...newElement.points, x, y];
-      setNewElement({ ...newElement, points: updatedPoints });
+      const updatedPoints = [
+        ...(e.evt.shiftKey ? newElement.points.slice(0, 2) : newElement.points),
+        x,
+        y,
+      ];
 
+      setNewElement({ ...newElement, points: updatedPoints });
       updateElement(newElement.id, { points: updatedPoints });
     }
   };
@@ -328,11 +332,20 @@ export const handleEndDrawing =
     updateElement,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
-    if (drawing) {
-      if (newElement && newElement.points.length < 4)
-        updateElement(newElement.id, {
+    if (drawing && newElement) {
+      let xPoints = [];
+      let yPoints = [];
+      newElement.points.map((point, index) =>
+        index % 2 ? yPoints.push(point) : xPoints.push(point),
+      );
+
+      updateElement(newElement.id, {
+        ...(newElement.points.length < 4 && {
           points: [...newElement.points, ...newElement.points],
-        });
+        }),
+        width: Math.max(...xPoints) - Math.min(...xPoints) + 1,
+        height: Math.max(...yPoints) - Math.min(...yPoints) + 1,
+      });
 
       setDrawing(false);
       setNewElement(null);
@@ -340,7 +353,15 @@ export const handleEndDrawing =
   };
 
 export const handleStartErasing =
-  ({ stageRef, activeTool, setDrawing }) =>
+  ({
+    stageRef,
+    activeTool,
+    setDrawing,
+  }: {
+    stageRef: any;
+    activeTool: string;
+    setDrawing: (isDrawing: boolean) => void;
+  }) =>
   (e: any) => {
     if (activeTool === 'eraser' && stageRef.current) {
       setDrawing(true);
@@ -348,14 +369,28 @@ export const handleStartErasing =
   };
 
 export const handleErasing =
-  ({ stageRef, activeTool, drawing, setDrawing, removeElement }) =>
+  ({
+    stageRef,
+    drawing,
+    removeElement,
+  }: {
+    stageRef: any;
+    drawing: boolean;
+    removeElement: (id: string) => void;
+  }) =>
   (e: any) => {
     if (drawing && stageRef.current)
       if (e.target && e.target.attrs.id) removeElement(e.target.attrs.id);
   };
 
 export const handleEndErasing =
-  ({ drawing, setDrawing }) =>
+  ({
+    drawing,
+    setDrawing,
+  }: {
+    drawing: boolean;
+    setDrawing: (isDrawing: boolean) => void;
+  }) =>
   (e: any) => {
     if (drawing) setDrawing(false);
   };

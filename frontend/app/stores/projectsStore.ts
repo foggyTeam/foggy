@@ -57,9 +57,7 @@ class ProjectsStore {
         userStore.user.id,
       );
 
-      if (this.boardWebsocket) {
-        socketAddEventListeners(this.boardWebsocket);
-      }
+      if (this.boardWebsocket) socketAddEventListeners(this.boardWebsocket);
     } else console.error('Failed to connect to websocket.');
   }
   disconnectSocket() {
@@ -97,6 +95,7 @@ class ProjectsStore {
         this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
   };
+
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
@@ -202,7 +201,7 @@ class ProjectsStore {
   };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);
-    this.myRole = this.activeProject.members.find(
+    this.myRole = this.activeProject.members?.find(
       (member) => member.id === userStore.user?.id,
     ).role;
   };

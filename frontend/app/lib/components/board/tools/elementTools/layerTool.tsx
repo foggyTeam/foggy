@@ -13,17 +13,20 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
-import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function LayerTool({ element }: ElementToolProps) {
+export default function LayerTool() {
+  const { selectedElement } = useBoardContext();
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {
-    setCurrentLayer(projectsStore.getElementLayer(element.attrs.id));
-  }, [element]);
+    setCurrentLayer(projectsStore.getElementLayer(selectedElement.attrs.id));
+  }, [selectedElement]);
 
   const changeLayer = (action: 'back' | 'forward' | 'bottom' | 'top') => {
-    setCurrentLayer(projectsStore.changeElementLayer(element.attrs.id, action));
+    setCurrentLayer(
+      projectsStore.changeElementLayer(selectedElement.attrs.id, action),
+    );
   };
 
   return (

@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
 import board from '@/app/mockData/board.json';
+import { BoardProvider } from '@/app/lib/components/board/boardContext';
 
 interface BoardPageProps {
   project_id: string;
@@ -50,7 +51,9 @@ export default async function BoardPage({
       <Cursors />
       <BoardLoader boardData={boardData} />
       <RecentBar />
-      <BoardStage />
+      <BoardProvider>
+        <BoardStage />
+      </BoardProvider>
     </>
   );
 }

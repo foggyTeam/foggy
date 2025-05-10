@@ -142,9 +142,11 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
             {userStore.user?.id === member.id ? (
               <Button
                 isDisabled={
-                  'team' in member &&
-                  member.team &&
-                  member.role in ['reader', 'editor']
+                  !!(
+                    'team' in member &&
+                    member.team &&
+                    member.role in ['reader', 'editor']
+                  )
                 }
                 onPress={handleLeave}
                 isIconOnly

@@ -1,5 +1,69 @@
 import { useEffect, useState } from 'react';
-import { fitCoordinates } from '@/app/lib/components/board/boardStage';
+import { STAGE_SIZE } from '@/app/lib/components/board/boardStage';
+
+const MAX_X = 1000;
+const MAX_Y = 1000;
+const MIN_X = -2000;
+const MIN_Y = -2000;
+
+const fitBoardCoordinates = (
+  x: number,
+  y: number,
+  elementWidth: number = 200,
+  elementHeight: number = 200,
+  scale: number,
+) => {
+  let newX = x;
+  let newY = y;
+
+  if (newX >= MAX_X * scale) {
+    newX = MAX_X * scale - 1;
+  } else if (newX - elementWidth <= MIN_X * scale) {
+    newX = MIN_X * scale + elementWidth + 1;
+  }
+
+  if (newY >= MAX_Y * scale) {
+    newY = MAX_Y * scale - 1;
+  } else if (newY - elementHeight <= MIN_Y * scale) {
+    newY = MIN_Y * scale + elementHeight + 1;
+  }
+  return { x: newX, y: newY };
+};
+
+export const fitElementCoordinates = (
+  x: number,
+  y: number,
+  elementWidth: number = 200,
+  elementHeight: number = 200,
+  board: { x: number; y: number },
+  scale: number,
+  // real coordinates for line
+  line?: { x: number; y: number },
+) => {
+  let newX = x;
+  let newY = y;
+
+  const boardX = x + line?.x * scale - board.x + MAX_X * scale;
+  const boardY = y + line?.y * scale - board.y + MAX_Y * scale;
+
+  if (boardX < 0) newX = board.x - MAX_X * scale - line?.x * scale;
+  else if (boardX > (STAGE_SIZE - elementWidth) * scale)
+    newX =
+      (STAGE_SIZE - elementWidth) * scale +
+      board.x -
+      MAX_X * scale -
+      line?.x * scale;
+
+  if (boardY < 0) newY = board.y - MAX_Y * scale - line?.y * scale;
+  else if (boardY > (STAGE_SIZE - elementHeight) * scale)
+    newY =
+      (STAGE_SIZE - elementHeight) * scale +
+      board.y -
+      MAX_Y * scale -
+      line?.y * scale;
+
+  return { x: newX, y: newY };
+};
 
 export default function UseBoardNavigation(stageRef: any, scale: number) {
   const [isDragging, setIsDragging] = useState(false);
@@ -18,7 +82,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() + e.evt.movementX;
           const newY = stage.y() + e.evt.movementY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
             window.innerWidth,
@@ -45,7 +109,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() - e.evt.deltaX;
           const newY = stage.y() - e.evt.deltaY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
             window.innerWidth,
@@ -76,7 +140,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           const newX = stage.x() + movementX;
           const newY = stage.y() + movementY;
 
-          const fit = fitCoordinates(
+          const fit = fitBoardCoordinates(
             newX,
             newY,
             window.innerWidth,

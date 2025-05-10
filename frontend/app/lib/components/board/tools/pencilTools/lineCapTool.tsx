@@ -30,7 +30,7 @@ export default function LineCapTool({
     },
   };
 
-  const getIcon = (value): ReactNode | undefined => {
+  const getIcon = (value: string): ReactNode | undefined => {
     if (Object.keys(options).includes(value)) {
       const Icon = options[value].icon;
       return (
@@ -61,19 +61,13 @@ export default function LineCapTool({
         )}
       >
         <Listbox
-          radius="md"
           className="w-fit"
-          classNames={{
-            popoverContent: clsx(
-              bg_container_no_padding,
-              'p-2 sm:p-3 bg-opacity-100',
-            ),
-          }}
           selectedKeys={[value]}
           onSelectionChange={(keys) =>
             setValue((Array.from(keys) as ('butt' | 'round' | 'square')[])[0])
           }
           selectionMode="single"
+          disallowEmptySelection
           label={settingsStore.t.filters.byMember.label}
           placeholder={settingsStore.t.filters.byMember.placeholder}
         >

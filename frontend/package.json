@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@heroui/alert": "^2.2.19",
-    "@heroui/autocomplete": "^2.3.18",
     "@heroui/avatar": "^2.2.13",
     "@heroui/badge": "^2.2.10",
     "@heroui/button": "2.2.10",
@@ -39,7 +38,6 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "@types/tailwindcss": "^3.1.0",
     "add": "^2.0.6",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.8.4",
@@ -49,6 +47,8 @@
     "jose": "^5.10.0",
     "konva": "^9.3.20",
     "lodash": "^4.17.21",
+    "lodash.debounce": "^4.0.8",
+    "lodash.throttle": "^4.1.1",
     "lucide-react": "^0.471.2",
     "mobx": "^6.13.7",
     "mobx-react-lite": "^4.1.0",
@@ -67,14 +67,15 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
-    "use-debounce": "^10.0.4",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^20.17.30",
     "eslint": "^9.24.0",
     "eslint-config-next": "15.1.2",
+    "install": "^0.13.0",
     "openapi-typescript": "^7.6.1",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11"

@@ -34,6 +34,8 @@ interface BaseElement {
   dragDistance: 4;
   x: number;
   y: number;
+  width: number;
+  height: number;
   rotation: number;
   fill: string;
   stroke: string;
@@ -43,14 +45,10 @@ interface BaseElement {
 export interface RectElement extends BaseElement {
   type: 'rect';
   cornerRadius: number;
-  width: number;
-  height: number;
 }
 
 export interface EllipseElement extends BaseElement {
   type: 'ellipse';
-  width: number;
-  height: number;
 }
 
 export interface TextElement extends BaseElement {
@@ -59,8 +57,6 @@ export interface TextElement extends BaseElement {
   svg: string;
   content: string;
   cornerRadius: number;
-  width: number;
-  height: number;
 }
 
 export interface LineElement extends BaseElement {
@@ -74,7 +70,6 @@ export interface LineElement extends BaseElement {
 export interface MarkerElement extends BaseElement {
   type: 'marker';
   points: number[];
-  width: number;
   opacity: number;
 }
 

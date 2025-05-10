@@ -10,36 +10,36 @@ import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import { ElementToolProps } from '@/app/lib/components/board/menu/elementToolBar';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
-export default function FillTool({ element, updateElement }: ElementToolProps) {
-  const [fillColor, changeColor] = useState(primary.DEFAULT);
-
-  useEffect(() => {
-    changeColor(
-      element.attrs.fill ? element.attrs.fill : `${primary.DEFAULT}00`,
-    );
-  }, [element]);
+export default function FillTool() {
+  const { selectedElement, updateElement } = useBoardContext();
+  const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');
 
   useEffect(() => {
-    if (element.attrs.type !== 'text') {
+    if (fillColor === (selectedElement.attrs.fill || '')) return;
+    changeColor(selectedElement.attrs.fill || '');
+  }, [selectedElement]);
+
+  useEffect(() => {
+    if (selectedElement.attrs.type !== 'text') {
       if (
         (fillColor.length === 7 || fillColor.length === 9) &&
         isElementVisible(
-          element.attrs.type,
+          selectedElement.attrs.type,
           fillColor,
-          element.attrs.stroke,
-          element.attrs.strokeWidth,
+          selectedElement.attrs.stroke,
+          selectedElement.attrs.strokeWidth,
         )
       )
-        updateElement(element.attrs.id, {
+        updateElement(selectedElement.attrs.id, {
           fill: fillColor,
         } as BoardElement);
-      else console.log('Element is invisible!');
-    } else {
-      updateElement(element.attrs.id, {
+      else console.error('Element is invisible!');
+    } else
+      updateElement(selectedElement.attrs.id, {
         fill: isElementVisible(
-          element.attrs.type,
+          selectedElement.attrs.type,
           fillColor,
           primary.DEFAULT,
           1,
@@ -47,7 +47,6 @@ export default function FillTool({ element, updateElement }: ElementToolProps) {
           ? fillColor
           : undefined,
       } as BoardElement);
-    }
   }, [fillColor]);
 
   return (
