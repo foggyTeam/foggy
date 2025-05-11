@@ -1,6 +1,5 @@
 import RecentBar from '@/app/lib/components/menu/projectBar/recentBar';
 import BoardStage from '@/app/lib/components/board/boardStage';
-import Cursors from '@/app/lib/components/board/cursors';
 import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
 import { Board } from '@/app/lib/types/definitions';
 import { cookies } from 'next/headers';
@@ -8,6 +7,7 @@ import { decrypt } from '@/app/lib/session';
 import { signOut } from '@/auth';
 import board from '@/app/mockData/board.json';
 import { BoardProvider } from '@/app/lib/components/board/boardContext';
+import Cursors from '@/app/lib/components/board/cursors';
 
 interface BoardPageProps {
   project_id: string;
@@ -48,12 +48,12 @@ export default async function BoardPage({
 
   return (
     <>
-      <Cursors />
-      <BoardLoader boardData={boardData} />
       <RecentBar />
       <BoardProvider>
         <BoardStage />
+        <Cursors />
       </BoardProvider>
+      <BoardLoader boardData={boardData} />
     </>
   );
 }
