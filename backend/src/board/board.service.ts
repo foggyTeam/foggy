@@ -217,136 +217,89 @@ export class BoardService {
       .find({ _id: { $in: board.layers } })
       .sort({ layerNumber: 1 })
       .exec();
-
-    const allElements: {
-      element: any;
-      layerIndex: number;
-      elementIndex: number;
-      layerId: Types.ObjectId;
-    }[] = [];
+    let currentLayerIndex = -1;
+    let currentElementIndex = -1;
 
     for (let layerIndex = 0; layerIndex < layers.length; layerIndex++) {
-      const layer = layers[layerIndex];
-      for (
-        let elementIndex = 0;
-        elementIndex < layer.elements.length;
-        elementIndex++
-      ) {
-        allElements.push({
-          element: layer.elements[elementIndex],
-          layerIndex,
-          elementIndex,
-          layerId: layer._id,
-        });
+      const elementIndex = layers[layerIndex].elements.findIndex(
+        (e) => e.id === elementId,
+      );
+      if (elementIndex !== -1) {
+        currentLayerIndex = layerIndex;
+        currentElementIndex = elementIndex;
+        break;
       }
     }
-    const currentElementIndex = allElements.findIndex(
-      (e) => e.element.id === elementId,
-    );
-    if (currentElementIndex === -1) {
+    if (currentLayerIndex === -1 || currentElementIndex === -1) {
       throw new NotFoundException(
         `Element with ID "${elementId}" not found in board "${boardId}"`,
       );
     }
 
-    const currentElement = allElements[currentElementIndex];
+    const currentElement =
+      layers[currentLayerIndex].elements[currentElementIndex];
 
     switch (action) {
       case 'back': {
-        layers[currentElement.layerIndex].elements.splice(
-          currentElement.elementIndex,
-          1,
-        );
-
+        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
         let inserted = false;
         for (
-          let targetLayerIndex = currentElement.layerIndex;
+          let targetLayerIndex = currentLayerIndex;
           targetLayerIndex >= 0;
           targetLayerIndex--
         ) {
           const targetLayer = layers[targetLayerIndex];
           const startIndex =
-            targetLayerIndex === currentElement.layerIndex
-              ? currentElement.elementIndex - 1
+            targetLayerIndex === currentLayerIndex
+              ? currentElementIndex - 1
               : targetLayer.elements.length - 1;
 
-          for (
-            let targetElementIndex = startIndex;
-            targetElementIndex >= 0;
-            targetElementIndex--
-          ) {
-            targetLayer.elements.splice(
-              targetElementIndex,
-              0,
-              currentElement.element,
-            );
+          if (startIndex >= 0) {
+            targetLayer.elements.splice(startIndex, 0, currentElement);
             inserted = true;
             break;
           }
-
-          if (inserted) break;
         }
-
         if (!inserted) {
-          layers[0].elements.unshift(currentElement.element);
+          layers[0].elements.unshift(currentElement);
         }
         break;
       }
       case 'forward': {
-        layers[currentElement.layerIndex].elements.splice(
-          currentElement.elementIndex,
-          1,
-        );
-
+        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
         let inserted = false;
         for (
-          let targetLayerIndex = currentElement.layerIndex;
+          let targetLayerIndex = currentLayerIndex;
           targetLayerIndex < layers.length;
           targetLayerIndex++
         ) {
           const targetLayer = layers[targetLayerIndex];
           const startIndex =
-            targetLayerIndex === currentElement.layerIndex
-              ? currentElement.elementIndex + 1
+            targetLayerIndex === currentLayerIndex
+              ? currentElementIndex + 1
               : 0;
 
-          for (
-            let targetElementIndex = startIndex;
-            targetElementIndex < targetLayer.elements.length;
-            targetElementIndex++
-          ) {
-            targetLayer.elements.splice(
-              targetElementIndex + 1,
-              0,
-              currentElement.element,
-            );
+          if (startIndex < targetLayer.elements.length) {
+            targetLayer.elements.splice(startIndex + 1, 0, currentElement);
             inserted = true;
             break;
           }
-          if (inserted) break;
         }
         if (!inserted) {
-          layers[layers.length - 1].elements.push(currentElement.element);
+          layers[layers.length - 1].elements.push(currentElement);
         }
         break;
       }
       case 'bottom': {
-        layers[currentElement.layerIndex].elements.splice(
-          currentElement.elementIndex,
-          1,
-        );
-        layers[0].elements.unshift(currentElement.element);
+        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
+        layers[0].elements.unshift(currentElement);
         break;
       }
       case 'top': {
-        layers[currentElement.layerIndex].elements.splice(
-          currentElement.elementIndex,
-          1,
-        );
-        layers[layers.length - 1].elements.push(currentElement.element);
+        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
+        layers[layers.length - 1].elements.push(currentElement);
         break;
       }
-
       default:
         throw new Error(`Unknown action: ${action}`);
     }
