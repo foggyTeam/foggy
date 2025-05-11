@@ -212,113 +212,35 @@ export class BoardService {
     elementId: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
   ): Promise<void> {
-    const board = await this.findById(boardId);
-    const layers = await this.layerModel
-      .find({ _id: { $in: board.layers } })
-      .sort({ layerNumber: 1 })
-      .exec();
-    let currentLayerIndex = -1;
-    let currentElementIndex = -1;
-
-    for (let layerIndex = 0; layerIndex < layers.length; layerIndex++) {
-      const elementIndex = layers[layerIndex].elements.findIndex(
-        (e) => e.id === elementId,
-      );
-      if (elementIndex !== -1) {
-        currentLayerIndex = layerIndex;
-        currentElementIndex = elementIndex;
-        break;
-      }
-    }
-    if (currentLayerIndex === -1 || currentElementIndex === -1) {
-      throw new NotFoundException(
-        `Element with ID "${elementId}" not found in board "${boardId}"`,
-      );
-    }
-
-    const currentElement =
-      layers[currentLayerIndex].elements[currentElementIndex];
-
+    const { layers, layerIndex, elementIndex } = await this.findElementAndLayer(
+      boardId,
+      elementId,
+    );
+    const currentElement = layers[layerIndex].elements[elementIndex];
+    layers[layerIndex].elements.splice(elementIndex, 1);
     switch (action) {
-      case 'back': {
-        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
-        let inserted = false;
-        for (
-          let targetLayerIndex = currentLayerIndex;
-          targetLayerIndex >= 0;
-          targetLayerIndex--
-        ) {
-          const targetLayer = layers[targetLayerIndex];
-          const startIndex =
-            targetLayerIndex === currentLayerIndex
-              ? currentElementIndex - 1
-              : targetLayer.elements.length - 1;
-
-          if (startIndex >= 0) {
-            targetLayer.elements.splice(startIndex, 0, currentElement);
-            inserted = true;
-            break;
-          }
-        }
-        if (!inserted) {
-          layers[0].elements.unshift(currentElement);
-        }
+      case 'back':
+        this.moveElementBack(layers, layerIndex, elementIndex, currentElement);
         break;
-      }
-      case 'forward': {
-        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
-        let inserted = false;
-        for (
-          let targetLayerIndex = currentLayerIndex;
-          targetLayerIndex < layers.length;
-          targetLayerIndex++
-        ) {
-          const targetLayer = layers[targetLayerIndex];
-          const startIndex =
-            targetLayerIndex === currentLayerIndex
-              ? currentElementIndex + 1
-              : 0;
-
-          if (startIndex < targetLayer.elements.length) {
-            targetLayer.elements.splice(startIndex + 1, 0, currentElement);
-            inserted = true;
-            break;
-          }
-        }
-        if (!inserted) {
-          layers[layers.length - 1].elements.push(currentElement);
-        }
+      case 'forward':
+        this.moveElementForward(
+          layers,
+          layerIndex,
+          elementIndex,
+          currentElement,
+        );
         break;
-      }
-      case 'bottom': {
-        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
+      case 'bottom':
         layers[0].elements.unshift(currentElement);
         break;
-      }
-      case 'top': {
-        layers[currentLayerIndex].elements.splice(currentElementIndex, 1);
+      case 'top':
         layers[layers.length - 1].elements.push(currentElement);
         break;
-      }
       default:
         throw new Error(`Unknown action: ${action}`);
     }
     await Promise.all(layers.map((layer) => layer.save()));
-  }
-
-  async getElementLayerIndex(
-    layerIds: Types.ObjectId[],
-    elementId: string,
-  ): Promise<number> {
-    for (let i = 0; i < layerIds.length; i++) {
-      const layer = await this.layerModel.findById(layerIds[i]).exec();
-      if (layer && layer.elements.some((element) => element.id === elementId)) {
-        return i;
-      }
-    }
-    throw new NotFoundException(
-      `Element with ID "${elementId}" not found in any layer`,
-    );
+    await this.updateAtBoard(boardId);
   }
 
   async updateBoardTitle(
@@ -359,6 +281,94 @@ export class BoardService {
     throw new NotFoundException(
       `Element with ID "${elementId}" not found in board "${boardId}"`,
     );
+  }
+
+  private async findElementAndLayer(
+    boardId: Types.ObjectId,
+    elementId: string,
+  ): Promise<{
+    layers: LayerDocument[];
+    layerIndex: number;
+    elementIndex: number;
+  }> {
+    const board = await this.findById(boardId);
+    const layers = await this.layerModel
+      .find({ _id: { $in: board.layers } })
+      .sort({ layerNumber: 1 })
+      .exec();
+
+    for (let layerIndex = 0; layerIndex < layers.length; layerIndex++) {
+      const elementIndex = layers[layerIndex].elements.findIndex(
+        (e) => e.id === elementId,
+      );
+      if (elementIndex !== -1) {
+        return { layers, layerIndex, elementIndex };
+      }
+    }
+
+    throw new NotFoundException(
+      `Element with ID "${elementId}" not found in board "${boardId}"`,
+    );
+  }
+
+  private moveElementBack(
+    layers: LayerDocument[],
+    currentLayerIndex: number,
+    currentElementIndex: number,
+    currentElement: any,
+  ): void {
+    let inserted = false;
+
+    for (
+      let targetLayerIndex = currentLayerIndex;
+      targetLayerIndex >= 0;
+      targetLayerIndex--
+    ) {
+      const targetLayer = layers[targetLayerIndex];
+      const startIndex =
+        targetLayerIndex === currentLayerIndex
+          ? currentElementIndex - 1
+          : targetLayer.elements.length - 1;
+
+      if (startIndex >= 0) {
+        targetLayer.elements.splice(startIndex, 0, currentElement);
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      layers[0].elements.unshift(currentElement);
+    }
+  }
+
+  private moveElementForward(
+    layers: LayerDocument[],
+    currentLayerIndex: number,
+    currentElementIndex: number,
+    currentElement: any,
+  ): void {
+    let inserted = false;
+
+    for (
+      let targetLayerIndex = currentLayerIndex;
+      targetLayerIndex < layers.length;
+      targetLayerIndex++
+    ) {
+      const targetLayer = layers[targetLayerIndex];
+      const startIndex =
+        targetLayerIndex === currentLayerIndex ? currentElementIndex + 1 : 0;
+
+      if (startIndex < targetLayer.elements.length) {
+        targetLayer.elements.splice(startIndex + 1, 0, currentElement);
+        inserted = true;
+        break;
+      }
+    }
+
+    if (!inserted) {
+      layers[layers.length - 1].elements.push(currentElement);
+    }
   }
 
   private getPermittedUpdates(
