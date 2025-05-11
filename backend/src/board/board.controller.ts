@@ -25,7 +25,6 @@ import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { CreateElementDto } from './dto/create-element.dto';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -382,9 +381,12 @@ export class BoardController {
     return this.boardService.updateElement(boardId, elementId, updateDto);
   }
 
-  @Put(':id/elements/:elementId/move')
+  @Put(':id/elements/:elementId/change-layer')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Move an element within a layer' })
+  @ApiOperation({
+    summary: 'Change element layer',
+    description: 'Move element between layers with specified action',
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the board',
@@ -396,60 +398,34 @@ export class BoardController {
     type: String,
   })
   @ApiQuery({
-    name: 'direction',
-    description: 'Direction to move the element ("up" or "down")',
-    type: String,
+    name: 'action',
+    description: 'Action to perform: "back", "forward", "bottom" or "top"',
+    enum: ['back', 'forward', 'bottom', 'top'],
   })
   @ApiResponse({
     status: 200,
-    description: 'The element has been successfully moved.',
-    type: BaseElement,
+    description: 'Element successfully moved to another layer',
+    schema: {
+      type: 'object',
+      properties: {
+        layer: { type: 'number', description: 'New layer index' },
+        index: { type: 'number', description: 'New position index in layer' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid action parameter',
   })
   @ApiResponse({
     status: 404,
-    description: 'Board, layer, or element not found.',
+    description: 'Board, element or layer not found',
   })
-  async moveElementWithinLayer(
-    @Param('id') id: Types.ObjectId,
+  async changeElementLayer(
+    @Param('id') boardId: Types.ObjectId,
     @Param('elementId') elementId: string,
-    @Query('direction') direction: 'up' | 'down',
-  ): Promise<BaseElement> {
-    return this.boardService.moveElementWithinLayer(elementId, direction);
-  }
-
-  @Put(':id/elements/:elementId/move-to-layer')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Move an element to another layer' })
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the board',
-    type: String,
-  })
-  @ApiParam({
-    name: 'elementId',
-    description: 'ID of the element to move',
-    type: String,
-  })
-  @ApiQuery({
-    name: 'direction',
-    description:
-      'Direction to move the element to another layer ("up" or "down")',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'The element has been successfully moved to another layer.',
-    type: BaseElement,
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Board, layer, or element not found.',
-  })
-  async moveElementToLayer(
-    @Param('id') id: Types.ObjectId,
-    @Param('elementId') elementId: string,
-    @Query('direction') direction: 'up' | 'down',
-  ): Promise<BaseElement> {
-    return this.boardService.moveElementToLayer(id, elementId, direction);
+    @Query('action') action: 'back' | 'forward' | 'bottom' | 'top',
+  ): Promise<void> {
+    return this.boardService.changeElementLayer(boardId, elementId, action);
   }
 }

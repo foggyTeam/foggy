@@ -171,9 +171,9 @@ export class BoardElementsGateway
   }
 
   @SubscribeMessage('changeElementLayer')
-  async handleMoveElement(
+  async handleChangeElementLayer(
     @MessageBody()
-    moveData: { id: string; direction: 'up' | 'down'; withinLayer?: boolean },
+    data: { id: string; action: 'back' | 'forward' | 'bottom' | 'top' },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -181,59 +181,25 @@ export class BoardElementsGateway
       if (!boardId) {
         throw new Error('Board ID not found in connection');
       }
-
-      this.logger.log(`[MoveElement] Received:`, moveData);
-
-      if (!moveData?.id) {
+      if (!data?.id) {
         throw new Error('Element ID is required');
       }
-
-      let element;
-      if (moveData.withinLayer) {
-        element = await this.boardService.moveElementWithinLayer(
-          moveData.id,
-          moveData.direction,
-        );
-      } else {
-        const board = await this.findBoardContainingElement(moveData.id);
-        element = await this.boardService.moveElementToLayer(
-          board._id,
-          moveData.id,
-          moveData.direction,
-        );
+      if (!data?.action) {
+        throw new Error('Action is required');
       }
 
-      const actionMap = {
-        up: 'forward',
-        down: 'back',
-      };
-      const action = actionMap[moveData.direction] || moveData.direction;
+      await this.boardService.changeElementLayer(
+        new Types.ObjectId(boardId),
+        data.id,
+        data.action,
+      );
 
-      client.to(boardId).emit('elementMoved', {
-        id: moveData.id,
-        action,
-      });
-
-      return { status: 'success', element };
+      this.server.to(boardId).emit('elementMoved', data);
+      return { status: 'success', data };
     } catch (error) {
       this.logger.error(`[MoveElement] Error:`, error);
       return this.handleError(error);
     }
-  }
-
-  private async findBoardContainingElement(elementId: string): Promise<any> {
-    const boards = await this.boardService.findAll();
-
-    for (const board of boards) {
-      try {
-        await this.boardService.getElementLayerIndex(board.layers, elementId);
-        return board;
-      } catch (error) {
-        continue;
-      }
-    }
-
-    throw new Error(`Element with ID ${elementId} not found in any board`);
   }
 
   private handleError(error: Error) {

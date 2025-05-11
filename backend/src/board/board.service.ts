@@ -9,7 +9,6 @@ import mongoose, { Model, Types } from 'mongoose';
 import { Board, BoardDocument } from './schemas/board.schema';
 import { Layer, LayerDocument } from './schemas/layer.schema';
 import {
-  BaseElement,
   BaseElementModel,
   BaseElementSchema,
   EllipseElementSchema,
@@ -172,7 +171,7 @@ export class BoardService {
     return { message: 'Element successfully deleted' };
   }
 
-  async updateElement(
+  public async updateElement(
     boardId: Types.ObjectId,
     elementId: string,
     updateDto: UpdateElementDto,
@@ -208,80 +207,150 @@ export class BoardService {
     );
   }
 
-  async moveElementToLayer(
+  public async changeElementLayer(
     boardId: Types.ObjectId,
     elementId: string,
-    direction: 'up' | 'down',
-  ): Promise<BaseElement> {
+    action: 'back' | 'forward' | 'bottom' | 'top',
+  ): Promise<void> {
     const board = await this.findById(boardId);
-    const currentLayerIndex = await this.getElementLayerIndex(
-      board.layers,
-      elementId,
-    );
-    const targetLayerIndex =
-      direction === 'up' ? currentLayerIndex - 1 : currentLayerIndex + 1;
+    const layers = await this.layerModel
+      .find({ _id: { $in: board.layers } })
+      .sort({ layerNumber: 1 })
+      .exec();
 
-    if (targetLayerIndex < 0 || targetLayerIndex >= board.layers.length) {
-      throw new BadRequestException(
-        `Cannot move element "${elementId}" ${direction} from layer "${currentLayerIndex}"`,
+    const allElements: {
+      element: any;
+      layerIndex: number;
+      elementIndex: number;
+      layerId: Types.ObjectId;
+    }[] = [];
+
+    for (let layerIndex = 0; layerIndex < layers.length; layerIndex++) {
+      const layer = layers[layerIndex];
+      for (
+        let elementIndex = 0;
+        elementIndex < layer.elements.length;
+        elementIndex++
+      ) {
+        allElements.push({
+          element: layer.elements[elementIndex],
+          layerIndex,
+          elementIndex,
+          layerId: layer._id,
+        });
+      }
+    }
+    const currentElementIndex = allElements.findIndex(
+      (e) => e.element.id === elementId,
+    );
+    if (currentElementIndex === -1) {
+      throw new NotFoundException(
+        `Element with ID "${elementId}" not found in board "${boardId}"`,
       );
     }
 
-    const currentLayer = await this.layerModel
-      .findById(board.layers[currentLayerIndex])
-      .exec();
-    const targetLayer = await this.layerModel
-      .findById(board.layers[targetLayerIndex])
-      .exec();
+    const currentElement = allElements[currentElementIndex];
 
-    if (!currentLayer || !targetLayer) {
-      throw new NotFoundException(`Layer not found`);
+    switch (action) {
+      case 'back': {
+        layers[currentElement.layerIndex].elements.splice(
+          currentElement.elementIndex,
+          1,
+        );
+
+        let inserted = false;
+        for (
+          let targetLayerIndex = currentElement.layerIndex;
+          targetLayerIndex >= 0;
+          targetLayerIndex--
+        ) {
+          const targetLayer = layers[targetLayerIndex];
+          const startIndex =
+            targetLayerIndex === currentElement.layerIndex
+              ? currentElement.elementIndex - 1
+              : targetLayer.elements.length - 1;
+
+          for (
+            let targetElementIndex = startIndex;
+            targetElementIndex >= 0;
+            targetElementIndex--
+          ) {
+            targetLayer.elements.splice(
+              targetElementIndex,
+              0,
+              currentElement.element,
+            );
+            inserted = true;
+            break;
+          }
+
+          if (inserted) break;
+        }
+
+        if (!inserted) {
+          layers[0].elements.unshift(currentElement.element);
+        }
+        break;
+      }
+      case 'forward': {
+        layers[currentElement.layerIndex].elements.splice(
+          currentElement.elementIndex,
+          1,
+        );
+
+        let inserted = false;
+        for (
+          let targetLayerIndex = currentElement.layerIndex;
+          targetLayerIndex < layers.length;
+          targetLayerIndex++
+        ) {
+          const targetLayer = layers[targetLayerIndex];
+          const startIndex =
+            targetLayerIndex === currentElement.layerIndex
+              ? currentElement.elementIndex + 1
+              : 0;
+
+          for (
+            let targetElementIndex = startIndex;
+            targetElementIndex < targetLayer.elements.length;
+            targetElementIndex++
+          ) {
+            targetLayer.elements.splice(
+              targetElementIndex + 1,
+              0,
+              currentElement.element,
+            );
+            inserted = true;
+            break;
+          }
+          if (inserted) break;
+        }
+        if (!inserted) {
+          layers[layers.length - 1].elements.push(currentElement.element);
+        }
+        break;
+      }
+      case 'bottom': {
+        layers[currentElement.layerIndex].elements.splice(
+          currentElement.elementIndex,
+          1,
+        );
+        layers[0].elements.unshift(currentElement.element);
+        break;
+      }
+      case 'top': {
+        layers[currentElement.layerIndex].elements.splice(
+          currentElement.elementIndex,
+          1,
+        );
+        layers[layers.length - 1].elements.push(currentElement.element);
+        break;
+      }
+
+      default:
+        throw new Error(`Unknown action: ${action}`);
     }
-
-    const elementIndex = currentLayer.elements.findIndex(
-      (element) => element.id === elementId,
-    );
-    const [element] = currentLayer.elements.splice(elementIndex, 1);
-
-    if (direction === 'up') {
-      targetLayer.elements.push(element);
-    } else {
-      targetLayer.elements.unshift(element);
-    }
-
-    await currentLayer.save();
-    await targetLayer.save();
-    await this.updateAtBoard(boardId);
-    return element;
-  }
-
-  async moveElementWithinLayer(
-    elementId: string,
-    direction: 'up' | 'down',
-  ): Promise<BaseElement> {
-    const { layer, elementIndex } =
-      await this.findLayerAndElementIndexById(elementId);
-
-    if (direction === 'up' && elementIndex > 0) {
-      [layer.elements[elementIndex - 1], layer.elements[elementIndex]] = [
-        layer.elements[elementIndex],
-        layer.elements[elementIndex - 1],
-      ];
-    } else if (
-      direction === 'down' &&
-      elementIndex < layer.elements.length - 1
-    ) {
-      [layer.elements[elementIndex + 1], layer.elements[elementIndex]] = [
-        layer.elements[elementIndex],
-        layer.elements[elementIndex + 1],
-      ];
-    } else {
-      return this.moveElementToLayer(layer.boardId, elementId, direction);
-    }
-
-    await layer.save();
-    await this.updateAtBoard(layer.boardId);
-    return layer.elements[elementIndex];
+    await Promise.all(layers.map((layer) => layer.save()));
   }
 
   async getElementLayerIndex(
@@ -318,7 +387,7 @@ export class BoardService {
     boardId: Types.ObjectId,
     elementId: string,
   ): Promise<LayerDocument> {
-    const board = await this.boardModel.findById(boardId).exec();
+    const board = await this.findById(boardId);
     if (!board) {
       throw new NotFoundException(`Board with ID "${boardId}" not found`);
     }
@@ -401,21 +470,6 @@ export class BoardService {
       'elements.id': elementId,
     });
     return !duplicateExists;
-  }
-
-  private async findLayerAndElementIndexById(
-    elementId: string,
-  ): Promise<{ layer: LayerDocument; elementIndex: number }> {
-    const layers = await this.layerModel.find().exec();
-    for (const layer of layers) {
-      const elementIndex = layer.elements.findIndex(
-        (element) => element.id === elementId,
-      );
-      if (elementIndex !== -1) {
-        return { layer, elementIndex };
-      }
-    }
-    throw new NotFoundException(`Element with ID "${elementId}" not found`);
   }
 
   private async updateAtBoard(boardId: Types.ObjectId): Promise<void> {
