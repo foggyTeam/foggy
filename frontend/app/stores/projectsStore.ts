@@ -101,70 +101,64 @@ class ProjectsStore {
     action: 'back' | 'forward' | 'bottom' | 'top',
     external?: boolean,
   ): { layer: number; index: number } => {
-    if (this.activeBoard?.layers && this.boardWebsocket) {
-      let elementToMove: BoardElement | null = null;
-      let currentLayerIndex: number = -1;
-
-      this.activeBoard.layers = this.activeBoard.layers.map(
-        (layer, layerIndex) => {
-          const index = layer.findIndex((element) => element.id === id);
-          if (index !== -1) {
-            elementToMove = layer[index];
-            currentLayerIndex = layerIndex;
-            return layer.filter((_, i) => i !== index);
-          }
-          return layer;
-        },
-      );
-
-      if (elementToMove) {
-        switch (action) {
-          case 'back':
-            if (currentLayerIndex > 0) {
-              this.activeBoard.layers[currentLayerIndex - 1].push(
-                elementToMove,
-              );
-              return {
-                layer: currentLayerIndex - 1,
-                index:
-                  this.activeBoard.layers[currentLayerIndex - 1].length - 1,
-              };
-            } else {
-              this.activeBoard.layers[0].unshift(elementToMove);
-              return { layer: currentLayerIndex - 1, index: 0 };
-            }
-          case 'forward':
-            if (currentLayerIndex < MAX_LAYER) {
-              this.activeBoard.layers[currentLayerIndex + 1].push(
-                elementToMove,
-              );
-              return {
-                layer: currentLayerIndex + 1,
-                index:
-                  this.activeBoard.layers[currentLayerIndex + 1].length - 1,
-              };
-            } else {
-              this.activeBoard.layers[MAX_LAYER].push(elementToMove);
-              return {
-                layer: -2,
-                index: -2,
-              };
-            }
-          case 'bottom':
-            this.activeBoard.layers[0].unshift(elementToMove);
-            return { layer: 0, index: 0 };
-          case 'top':
-            this.activeBoard.layers[MAX_LAYER].push(elementToMove);
-            return {
-              layer: -2,
-              index: -2,
-            };
-        }
-      }
-
-      if (!external)
-        this.boardWebsocket.emit('moveElement', { id: id, action: action });
+    if (!this.activeBoard?.layers || !this.boardWebsocket) {
+      return { layer: -1, index: -1 };
     }
+
+    let elementToMove: BoardElement | null = null;
+    let currentLayerIndex: number = -1;
+
+    this.activeBoard.layers = this.activeBoard.layers.map(
+      (layer, layerIndex) => {
+        const index = layer.findIndex((element) => element.id === id);
+        if (index !== -1) {
+          elementToMove = layer[index];
+          currentLayerIndex = layerIndex;
+          return layer.filter((_, i) => i !== index);
+        }
+        return layer;
+      },
+    );
+
+    if (elementToMove) {
+      switch (action) {
+        case 'back':
+          if (currentLayerIndex > 0) {
+            this.activeBoard.layers[currentLayerIndex - 1].push(elementToMove);
+            if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+            return {
+              layer: currentLayerIndex - 1,
+              index: this.activeBoard.layers[currentLayerIndex - 1].length - 1,
+            };
+          } else {
+            this.activeBoard.layers[0].unshift(elementToMove);
+            if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+            return { layer: 0, index: 0 };
+          }
+        case 'forward':
+          if (currentLayerIndex < MAX_LAYER) {
+            this.activeBoard.layers[currentLayerIndex + 1].push(elementToMove);
+            if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+            return {
+              layer: currentLayerIndex + 1,
+              index: this.activeBoard.layers[currentLayerIndex + 1].length - 1,
+            };
+          } else {
+            this.activeBoard.layers[MAX_LAYER].push(elementToMove);
+            if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+            return { layer: MAX_LAYER, index: this.activeBoard.layers[MAX_LAYER].length - 1 };
+          }
+        case 'bottom':
+          this.activeBoard.layers[0].unshift(elementToMove);
+          if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+          return { layer: 0, index: 0 };
+        case 'top':
+          this.activeBoard.layers[MAX_LAYER].push(elementToMove);
+          if (!external) this.boardWebsocket.emit('changeElementLayer', { id, action });
+          return { layer: MAX_LAYER, index: this.activeBoard.layers[MAX_LAYER].length - 1 };
+      }
+    }
+
     return { layer: -1, index: -1 };
   };
   removeElement = (id: string, external?: boolean) => {
