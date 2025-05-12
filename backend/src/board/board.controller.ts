@@ -25,6 +25,7 @@ import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { Layer, LayerDocument } from './schemas/layer.schema';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -427,5 +428,53 @@ export class BoardController {
     @Query('action') action: 'back' | 'forward' | 'bottom' | 'top',
   ): Promise<void> {
     return this.boardService.changeElementLayer(boardId, elementId, action);
+  }
+
+  @Get(':id/layers')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all layers from a board' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
+    type: String,
+    example: '68155ed60664ac3e46713d58',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns all layers from the board',
+    type: [Layer],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid ID format',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Board not found',
+  })
+  async getBoardLayers(
+    @Param('id') id: Types.ObjectId,
+  ): Promise<LayerDocument[]> {
+    return await this.boardService.getBoardLayers(id);
+  }
+
+  @Delete('dev-only/all')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: '[DEV ONLY] Delete all boards and layers',
+    description:
+      'This endpoint is available only in development environment for testing purposes. Deletes ALL boards and their layers.',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'All boards and layers were successfully deleted',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden in production environment',
+  })
+  async deleteAll(): Promise<void> {
+    return this.boardService.deleteAll();
   }
 }

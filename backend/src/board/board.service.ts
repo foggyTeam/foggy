@@ -207,6 +207,41 @@ export class BoardService {
     );
   }
 
+  async getBoardLayers(boardId: Types.ObjectId): Promise<LayerDocument[]> {
+    if (!Types.ObjectId.isValid(boardId)) {
+      throw new CustomException(
+        getErrorMessages({ board: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const board = await this.boardModel
+      .findById(boardId)
+      .populate<{ layers: LayerDocument[] }>('layers')
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ board: 'idNotFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
+
+    return board.layers as LayerDocument[];
+  }
+
+  async deleteAll(): Promise<void> {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new CustomException(
+        getErrorMessages({ general: 'devOnly' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await this.boardModel.deleteMany({}).exec();
+    await this.layerModel.deleteMany({}).exec();
+  }
+
   public async changeElementLayer(
     boardId: Types.ObjectId,
     elementId: string,
