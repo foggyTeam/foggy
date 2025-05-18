@@ -173,7 +173,11 @@ export class BoardElementsGateway
   @SubscribeMessage('changeElementLayer')
   async handleChangeElementLayer(
     @MessageBody()
-    data: { id: string; action: 'back' | 'forward' | 'bottom' | 'top' },
+    data: {
+      id: string;
+      prevPosition: { layer: number; index: number };
+      newPosition: { layer: number; index: number };
+    },
     @ConnectedSocket() client: Socket,
   ) {
     try {
@@ -184,14 +188,15 @@ export class BoardElementsGateway
       if (!data?.id) {
         throw new Error('Element ID is required');
       }
-      if (!data?.action) {
-        throw new Error('Action is required');
+      if (!data?.prevPosition || !data?.newPosition) {
+        throw new Error('Both previous and new positions are required');
       }
 
       await this.boardService.changeElementLayer(
         new Types.ObjectId(boardId),
         data.id,
-        data.action,
+        data.prevPosition,
+        data.newPosition,
       );
 
       this.server.to(boardId).emit('elementMoved', data);

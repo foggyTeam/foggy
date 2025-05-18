@@ -386,7 +386,7 @@ export class BoardController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Change element layer',
-    description: 'Move element between layers with specified action',
+    description: 'Move element between layers with specified positions',
   })
   @ApiParam({
     name: 'id',
@@ -398,25 +398,41 @@ export class BoardController {
     description: 'ID of the element to move',
     type: String,
   })
-  @ApiQuery({
-    name: 'action',
-    description: 'Action to perform: "back", "forward", "bottom" or "top"',
-    enum: ['back', 'forward', 'bottom', 'top'],
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Element successfully moved to another layer',
+  @ApiBody({
+    description: 'Element positions data',
     schema: {
       type: 'object',
       properties: {
-        layer: { type: 'number', description: 'New layer index' },
-        index: { type: 'number', description: 'New position index in layer' },
+        prevPosition: {
+          type: 'object',
+          properties: {
+            layer: { type: 'number', description: 'Previous layer index' },
+            index: {
+              type: 'number',
+              description: 'Previous position index in layer',
+            },
+          },
+        },
+        newPosition: {
+          type: 'object',
+          properties: {
+            layer: { type: 'number', description: 'New layer index' },
+            index: {
+              type: 'number',
+              description: 'New position index in layer',
+            },
+          },
+        },
       },
     },
   })
   @ApiResponse({
+    status: 200,
+    description: 'Element successfully moved to another layer',
+  })
+  @ApiResponse({
     status: 400,
-    description: 'Invalid action parameter',
+    description: 'Invalid position data',
   })
   @ApiResponse({
     status: 404,
@@ -425,9 +441,18 @@ export class BoardController {
   async changeElementLayer(
     @Param('id') boardId: Types.ObjectId,
     @Param('elementId') elementId: string,
-    @Query('action') action: 'back' | 'forward' | 'bottom' | 'top',
+    @Body()
+    positions: {
+      prevPosition: { layer: number; index: number };
+      newPosition: { layer: number; index: number };
+    },
   ): Promise<void> {
-    return this.boardService.changeElementLayer(boardId, elementId, action);
+    return this.boardService.changeElementLayer(
+      boardId,
+      elementId,
+      positions.prevPosition,
+      positions.newPosition,
+    );
   }
 
   @Get(':id/layers')
