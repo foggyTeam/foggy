@@ -124,31 +124,48 @@ export class BoardService {
     }
 
     let element;
-    switch (createElementDto.type) {
-      case 'rect':
-        element = new BaseElementModel.discriminators.rect(createElementDto);
-        break;
-      case 'ellipse':
-        element = new BaseElementModel.discriminators.ellipse(createElementDto);
-        break;
-      case 'text':
-        element = new BaseElementModel.discriminators.text(createElementDto);
-        break;
-      case 'line':
-        element = new BaseElementModel.discriminators.line(createElementDto);
-        break;
-      case 'marker':
-        element = new BaseElementModel.discriminators.marker(createElementDto);
-        break;
-      default:
-        throw new BadRequestException(
-          `Unsupported element type: "${createElementDto.type}"`,
-        );
-    }
+    try {
+      switch (createElementDto.type) {
+        case 'rect':
+          element = new BaseElementModel.discriminators.rect(createElementDto);
+          break;
+        case 'ellipse':
+          element = new BaseElementModel.discriminators.ellipse(
+            createElementDto,
+          );
+          break;
+        case 'text':
+          element = new BaseElementModel.discriminators.text(createElementDto);
+          break;
+        case 'line':
+          element = new BaseElementModel.discriminators.line(createElementDto);
+          break;
+        case 'marker':
+          element = new BaseElementModel.discriminators.marker(
+            createElementDto,
+          );
+          break;
+        default:
+          throw new BadRequestException(
+            `Unsupported element type: "${createElementDto.type}"`,
+          );
+      }
 
-    layer.elements.push(element);
-    await layer.save();
-    return element;
+      layer.elements.push(element);
+      await layer.save();
+      return element;
+    } catch (error) {
+      if (
+        error.message.includes('BSON document too large') ||
+        error.message.includes('document is larger than the maximum size')
+      ) {
+        throw new CustomException(
+          getErrorMessages({ element: 'sizeLimit' }),
+          HttpStatus.PAYLOAD_TOO_LARGE,
+        );
+      }
+      throw error;
+    }
   }
 
   public async removeElement(

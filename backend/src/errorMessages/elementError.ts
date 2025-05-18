@@ -2,53 +2,57 @@ export const elementError = {
   element: {
     required: {
       en: 'Element data is required',
-      ru: 'Данные элемента являются обязательными',
+      ru: 'Необходимо указать данные элемента',
     },
     invalidType: {
       en: 'Invalid element type',
-      ru: 'Неверный тип элемента',
+      ru: 'Недопустимый тип элемента',
+    },
+    sizeLimit: {
+      en: 'Too many elements on the board',
+      ru: 'Превышено максимальное количество элементов на доске',
     },
   },
   elementId: {
     invalidType: {
       en: 'ID must be a string',
-      ru: 'ID должен быть строкой',
+      ru: 'Идентификатор должен быть строкой',
     },
   },
   elementType: {
     required: {
       en: 'Element type is required',
-      ru: 'Тип элемента является обязательным',
+      ru: 'Необходимо указать тип элемента',
     },
     invalidValue: {
-      en: 'Element type must be one of: rect, ellipse, text, line, marker',
-      ru: 'Тип элемента должен быть одним из: rect, ellipse, text, line, marker',
+      en: 'Element type not supported',
+      ru: 'Тип элемента не поддерживается',
     },
   },
   draggable: {
     required: {
       en: 'Draggable flag is required',
-      ru: 'Флаг перетаскивания является обязательным',
+      ru: 'Необходимо указать, можно ли перемещать элемент',
     },
     invalidType: {
       en: 'Draggable must be a boolean',
-      ru: 'Флаг перетаскивания должен быть true/false',
+      ru: 'Параметр перемещения должен иметь значение "да" или "нет"',
     },
   },
   dragDistance: {
     required: {
       en: 'Drag distance is required',
-      ru: 'Дистанция перетаскивания является обязательной',
+      ru: 'Необходимо указать дистанцию перемещения',
     },
     invalidType: {
       en: 'Drag distance must be a number',
-      ru: 'Дистанция перетаскивания должна быть числом',
+      ru: 'Дистанция перемещения должна быть числом',
     },
   },
   x: {
     required: {
       en: 'X coordinate is required',
-      ru: 'Координата X является обязательной',
+      ru: 'Необходимо указать координату X',
     },
     invalidType: {
       en: 'X coordinate must be a number',
@@ -58,7 +62,7 @@ export const elementError = {
   y: {
     required: {
       en: 'Y coordinate is required',
-      ru: 'Координата Y является обязательной',
+      ru: 'Необходимо указать координату Y',
     },
     invalidType: {
       en: 'Y coordinate must be a number',
@@ -68,7 +72,7 @@ export const elementError = {
   rotation: {
     required: {
       en: 'Rotation angle is required',
-      ru: 'Угол поворота является обязательным',
+      ru: 'Необходимо указать угол поворота',
     },
     invalidType: {
       en: 'Rotation angle must be a number',
@@ -78,7 +82,7 @@ export const elementError = {
   fill: {
     required: {
       en: 'Fill color is required',
-      ru: 'Цвет заливки является обязательным',
+      ru: 'Необходимо указать цвет заливки',
     },
     invalidType: {
       en: 'Fill color must be a string',
@@ -86,13 +90,13 @@ export const elementError = {
     },
     invalidFormat: {
       en: 'Fill color must be a valid HEX/RGB color',
-      ru: 'Цвет заливки должен быть в формате HEX/RGB',
+      ru: 'Цвет заливки должен быть в формате HEX или RGB',
     },
   },
   stroke: {
     required: {
       en: 'Stroke color is required',
-      ru: 'Цвет обводки является обязательным',
+      ru: 'Необходимо указать цвет обводки',
     },
     invalidType: {
       en: 'Stroke color must be a string',
@@ -100,13 +104,13 @@ export const elementError = {
     },
     invalidFormat: {
       en: 'Stroke color must be a valid HEX/RGB color',
-      ru: 'Цвет обводки должен быть в формате HEX/RGB',
+      ru: 'Цвет обводки должен быть в формате HEX или RGB',
     },
   },
   strokeWidth: {
     required: {
       en: 'Stroke width is required',
-      ru: 'Толщина обводки является обязательной',
+      ru: 'Необходимо указать толщину обводки',
     },
     invalidType: {
       en: 'Stroke width must be a number',
@@ -115,8 +119,8 @@ export const elementError = {
   },
   cornerRadius: {
     required: {
-      en: 'Corner radius is required for rectangles',
-      ru: 'Радиус скругления углов обязателен для прямоугольников',
+      en: 'Corner radius is required',
+      ru: 'Необходимо указать радиус скругления углов',
     },
     invalidType: {
       en: 'Corner radius must be a number',
@@ -126,7 +130,7 @@ export const elementError = {
   width: {
     required: {
       en: 'Width is required',
-      ru: 'Ширина является обязательной',
+      ru: 'Необходимо указать ширину',
     },
     invalidType: {
       en: 'Width must be a number',
@@ -136,7 +140,7 @@ export const elementError = {
   height: {
     required: {
       en: 'Height is required',
-      ru: 'Высота является обязательной',
+      ru: 'Необходимо указать высоту',
     },
     invalidType: {
       en: 'Height must be a number',
@@ -146,7 +150,7 @@ export const elementError = {
   svg: {
     required: {
       en: 'SVG data is required for text elements',
-      ru: 'SVG-данные обязательны для текстовых элементов',
+      ru: 'Для текстовых элементов необходимы SVG-данные',
     },
     invalidType: {
       en: 'SVG data must be a string',
@@ -156,7 +160,7 @@ export const elementError = {
   content: {
     required: {
       en: 'Content is required for text elements',
-      ru: 'Содержание обязательно для текстовых элементов',
+      ru: 'Для текстовых элементов необходимо указать содержание',
     },
     invalidType: {
       en: 'Content must be a string',
@@ -166,11 +170,11 @@ export const elementError = {
   points: {
     required: {
       en: 'Points array is required for lines/markers',
-      ru: 'Массив точек обязателен для линий/маркеров',
+      ru: 'Для линий и маркеров необходим массив точек',
     },
     invalidType: {
       en: 'Points must be an array',
-      ru: 'Точки должны быть массивом',
+      ru: 'Точки должны быть указаны в виде массива',
     },
     invalidArrayItems: {
       en: 'All points must be numbers',
@@ -183,8 +187,8 @@ export const elementError = {
   },
   opacity: {
     required: {
-      en: 'Opacity is required for markers',
-      ru: 'Прозрачность обязательна для маркеров',
+      en: 'Opacity is required',
+      ru: 'Необходимо указать прозрачность',
     },
     invalidType: {
       en: 'Opacity must be a number',
@@ -192,7 +196,7 @@ export const elementError = {
     },
     invalidRange: {
       en: 'Opacity must be between 0 and 1',
-      ru: 'Прозрачность должна быть между 0 и 1',
+      ru: 'Прозрачность должна быть в диапазоне от 0 до 1',
     },
   },
 } as const;
