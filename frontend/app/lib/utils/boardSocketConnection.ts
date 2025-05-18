@@ -51,8 +51,16 @@ export function socketAddEventListeners(socket: Socket) {
   );
   // changeElementLayer
   socket.on(
-    'elementMoved',
-    (data: { id: string; action: 'back' | 'forward' | 'bottom' | 'top' }) =>
-      projectsStore.changeElementLayer(data.id, data.action, true),
+    'changeElementLayer',
+    (data: {
+      id: string;
+      prevPosition: { layer: number; index: number };
+      newPosition: { layer: number; index: number };
+    }) =>
+      projectsStore.changeElementLayerSocket(
+        data.id,
+        data.prevPosition,
+        data.newPosition,
+      ),
   );
 }

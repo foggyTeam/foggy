@@ -24,9 +24,28 @@ export default function LayerTool() {
   }, [selectedElement]);
 
   const changeLayer = (action: 'back' | 'forward' | 'bottom' | 'top') => {
-    setCurrentLayer(
-      projectsStore.changeElementLayer(selectedElement.attrs.id, action),
+    const newLayer = projectsStore.changeElementLayer(
+      selectedElement.attrs.id,
+      action,
     );
+    setCurrentLayer(newLayer);
+  };
+
+  const isDisabled = (top: boolean) => {
+    if (top)
+      return (
+        currentLayer.layer ===
+          projectsStore.getMaxMinElementPositions().max.layer &&
+        currentLayer.index ===
+          projectsStore.getMaxMinElementPositions().max.index
+      );
+    else
+      return (
+        currentLayer.layer ===
+          projectsStore.getMaxMinElementPositions().min.layer &&
+        currentLayer.index ===
+          projectsStore.getMaxMinElementPositions().min.index
+      );
   };
 
   return (
@@ -43,7 +62,7 @@ export default function LayerTool() {
           <FTooltip content={settingsStore.t.toolTips.tools.layerBottom}>
             <Button
               onPress={() => changeLayer('bottom')}
-              isDisabled={currentLayer.layer === 0 && currentLayer.index === 0}
+              isDisabled={isDisabled(false)}
               variant="light"
               color="default"
               isIconOnly
@@ -55,7 +74,7 @@ export default function LayerTool() {
           <FTooltip content={settingsStore.t.toolTips.tools.layerBack}>
             <Button
               onPress={() => changeLayer('back')}
-              isDisabled={currentLayer.layer === 0 && currentLayer.index === 0}
+              isDisabled={isDisabled(false)}
               variant="light"
               color="default"
               isIconOnly
@@ -67,9 +86,7 @@ export default function LayerTool() {
           <FTooltip content={settingsStore.t.toolTips.tools.layerForward}>
             <Button
               onPress={() => changeLayer('forward')}
-              isDisabled={
-                currentLayer.layer === -2 && currentLayer.index === -2
-              }
+              isDisabled={isDisabled(true)}
               variant="light"
               color="default"
               isIconOnly
@@ -81,9 +98,7 @@ export default function LayerTool() {
           <FTooltip content={settingsStore.t.toolTips.tools.layerTop}>
             <Button
               onPress={() => changeLayer('top')}
-              isDisabled={
-                currentLayer.layer === -2 && currentLayer.index === -2
-              }
+              isDisabled={isDisabled(true)}
               variant="light"
               color="default"
               isIconOnly

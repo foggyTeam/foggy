@@ -17,8 +17,6 @@ import openBoardSocketConnection, {
   socketAddEventListeners,
 } from '@/app/lib/utils/boardSocketConnection';
 
-const MAX_LAYER = 2;
-
 class ProjectsStore {
   myRole: Role | undefined = undefined;
 
@@ -99,73 +97,133 @@ class ProjectsStore {
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
-    external?: boolean,
   ): { layer: number; index: number } => {
-    if (this.activeBoard?.layers && this.boardWebsocket) {
-      let elementToMove: BoardElement | null = null;
-      let currentLayerIndex: number = -1;
+    if (!this.activeBoard?.layers || !this.boardWebsocket)
+      return { layer: -1, index: -1 };
 
-      this.activeBoard.layers = this.activeBoard.layers.map(
-        (layer, layerIndex) => {
-          const index = layer.findIndex((element) => element.id === id);
-          if (index !== -1) {
-            elementToMove = layer[index];
-            currentLayerIndex = layerIndex;
-            return layer.filter((_, i) => i !== index);
-          }
-          return layer;
-        },
-      );
+    const layers = this.activeBoard.layers;
+    const position = this.getElementLayer(id);
+    if (position.index < 0 || position.layer < 0) {
+      console.error("Element wasn't found");
+      return { layer: -1, index: -1 };
+    }
 
-      if (elementToMove) {
-        switch (action) {
-          case 'back':
-            if (currentLayerIndex > 0) {
-              this.activeBoard.layers[currentLayerIndex - 1].push(
-                elementToMove,
-              );
-              return {
-                layer: currentLayerIndex - 1,
-                index:
-                  this.activeBoard.layers[currentLayerIndex - 1].length - 1,
-              };
-            } else {
-              this.activeBoard.layers[0].unshift(elementToMove);
-              return { layer: currentLayerIndex - 1, index: 0 };
-            }
-          case 'forward':
-            if (currentLayerIndex < MAX_LAYER) {
-              this.activeBoard.layers[currentLayerIndex + 1].push(
-                elementToMove,
-              );
-              return {
-                layer: currentLayerIndex + 1,
-                index:
-                  this.activeBoard.layers[currentLayerIndex + 1].length - 1,
-              };
-            } else {
-              this.activeBoard.layers[MAX_LAYER].push(elementToMove);
-              return {
-                layer: -2,
-                index: -2,
-              };
-            }
-          case 'bottom':
-            this.activeBoard.layers[0].unshift(elementToMove);
-            return { layer: 0, index: 0 };
-          case 'top':
-            this.activeBoard.layers[MAX_LAYER].push(elementToMove);
-            return {
-              layer: -2,
-              index: -2,
-            };
+    const element: BoardElement = layers[position.layer][position.index];
+    layers[position.layer].splice(position.index, 1);
+
+    layers[position.layer] = [...layers[position.layer]];
+
+    const maxMin = this.getMaxMinElementPositions();
+    let firstNonEmptyLayer = maxMin.min.layer;
+    let lastNonEmptyLayer = maxMin.max.layer;
+
+    let targetLayer = position.layer;
+    let targetIndex = position.index;
+
+    switch (action) {
+      case 'back': {
+        if (position.layer === firstNonEmptyLayer && position.index === 0) {
+          targetLayer = position.layer;
+          targetIndex = 0;
+          break;
         }
+        if (position.index > 0) {
+          targetIndex = position.index - 1;
+        } else {
+          let prevLayer = position.layer - 1;
+          while (prevLayer >= 0 && layers[prevLayer].length === 0) prevLayer--;
+          targetLayer = prevLayer;
+          let len = layers[targetLayer].length;
+          targetIndex = len > 0 ? len - 1 : 0;
+        }
+        break;
       }
 
-      if (!external)
-        this.boardWebsocket.emit('moveElement', { id: id, action: action });
+      case 'forward': {
+        if (
+          position.layer === lastNonEmptyLayer &&
+          position.index === layers[position.layer].length
+        ) {
+          targetLayer = position.layer;
+          targetIndex = layers[position.layer].length;
+          break;
+        }
+        if (position.index < layers[position.layer].length) {
+          targetIndex = position.index + 1;
+        } else {
+          let nextLayer =
+            position.layer < layers.length - 1
+              ? position.layer + 1
+              : position.layer;
+          while (
+            nextLayer < layers.length - 1 &&
+            layers[nextLayer].length === 0
+          )
+            nextLayer++;
+          targetLayer = nextLayer;
+          targetIndex = layers[targetLayer].length > 0 ? 1 : 0;
+        }
+        break;
+      }
+
+      case 'bottom': {
+        targetLayer = firstNonEmptyLayer;
+        targetIndex = 0;
+        break;
+      }
+
+      case 'top': {
+        targetLayer = lastNonEmptyLayer;
+        targetIndex = layers[lastNonEmptyLayer].length;
+        break;
+      }
     }
-    return { layer: -1, index: -1 };
+
+    layers[targetLayer].splice(targetIndex, 0, element);
+    if (targetLayer !== position.layer)
+      layers[targetLayer] = [...layers[targetLayer]];
+
+    this.boardWebsocket.emit('changeElementLayer', {
+      id: id,
+      prevPosition: position,
+      newPosition: { layer: targetLayer, index: targetIndex },
+    });
+
+    return { layer: targetLayer, index: targetIndex };
+  };
+  changeElementLayerSocket = (
+    id: string,
+    prevPosition: { layer: number; index: number },
+    newPosition: { layer: number; index: number },
+  ) => {
+    if (!this.activeBoard) {
+      console.error('An error occured!');
+      return;
+    }
+    if (
+      prevPosition.layer == newPosition.layer &&
+      prevPosition.index == newPosition.index
+    )
+      return;
+    try {
+      const element =
+        this.activeBoard.layers[prevPosition.layer][prevPosition.index];
+
+      this.activeBoard.layers[prevPosition.layer].splice(prevPosition.index, 1);
+      this.activeBoard.layers[newPosition.layer].splice(
+        newPosition.index,
+        0,
+        element,
+      );
+      this.activeBoard.layers[prevPosition.layer] = [
+        ...this.activeBoard.layers[prevPosition.layer],
+      ];
+      this.activeBoard.layers[newPosition.layer] = [
+        ...this.activeBoard.layers[newPosition.layer],
+      ];
+    } catch (error) {
+      console.error('An error occured!');
+    }
   };
   removeElement = (id: string, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
@@ -189,15 +247,41 @@ class ProjectsStore {
 
     return currentIndex;
   };
+  getMaxMinElementPositions = (): {
+    max: { layer: number; index: number };
+    min: { layer: number; index: number };
+  } => {
+    const layers = this.activeBoard?.layers;
+    if (!layers)
+      return { max: { layer: -1, index: -1 }, min: { layer: -1, index: -1 } };
+
+    let firstNonEmptyLayer = layers.findIndex((l) => l.length > 0);
+    if (firstNonEmptyLayer === -1) firstNonEmptyLayer = 0;
+    let lastNonEmptyLayer =
+      layers.length - 1 - [...layers].reverse().findIndex((l) => l.length > 0);
+    if (lastNonEmptyLayer === layers.length)
+      lastNonEmptyLayer = layers.length - 1;
+
+    return {
+      max: {
+        layer: lastNonEmptyLayer,
+        index: layers[lastNonEmptyLayer].length - 1,
+      },
+      min: { layer: firstNonEmptyLayer, index: 0 },
+    };
+  };
 
   setActiveBoard = (board: Board | undefined) => {
     if (!board) {
       this.activeBoard = board;
       this.disconnectSocket();
+    } else {
+      this.activeBoard = {
+        ...board,
+        layers: board.layers.map((layer) => observable.array(layer)),
+      };
+      this.connectSocket(board?.id || '');
     }
-    if (this.activeBoard) this.activeBoard = { ...this.activeBoard, ...board };
-    else this.activeBoard = board;
-    this.connectSocket(board?.id || '');
   };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);
