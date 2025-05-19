@@ -50,10 +50,9 @@ interface UserData {
 export class BoardGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer() server: Server;
   private logger: Logger = new Logger('BoardGateway');
   private clients: Map<string, UserData> = new Map();
-
-  @WebSocketServer() server: Server;
 
   constructor(private readonly configService: ConfigService) {
     this.logger.log(

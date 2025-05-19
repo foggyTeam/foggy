@@ -1,27 +1,24 @@
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
 export default function BoardLayer({
   layer,
-  updateElement,
   fitCoordinates,
-  handleSelect,
-  handleTextEdit,
 }: {
   layer: BoardElement[];
-  updateElement: (id: string, newAttrs: Partial<any>) => void;
-  handleSelect: (event) => void;
-  handleTextEdit: (event) => void;
   fitCoordinates: (
     pos: { x: number; y: number },
-    element: any,
+    element: BoardElement,
   ) => { x: number; y: number };
 }) {
-  const holdTextTransform = (e, element) => {
+  const { updateElement, handleSelect, handleTextEdit, transformAvailable } =
+    useBoardContext();
+  const holdTextTransform = (e: any, element: TextElement) => {
     const node = e.target;
 
     const scaleX = node.scaleX();
@@ -45,7 +42,7 @@ export default function BoardLayer({
     });
   };
 
-  const holdTransformEnd = (e, element) => {
+  const holdTransformEnd = (e: any, element: BoardElement) => {
     const node = e.target;
 
     const scaleX = node.scaleX();
@@ -79,6 +76,7 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable}
               />
             );
           case 'ellipse':
@@ -95,6 +93,9 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
+                radiusX={element.width / 2}
+                radiusY={element.height / 2}
+                draggable={transformAvailable}
               />
             );
           case 'line':
@@ -104,9 +105,13 @@ export default function BoardLayer({
                 {...element}
                 onClick={handleSelect}
                 dragBoundFunc={(pos) => fitCoordinates(pos, element)}
-                onDragEnd={(e: any) =>
-                  updateElement(element.id, { points: e.target.points() })
-                }
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                draggable={transformAvailable}
               />
             );
           case 'text':
@@ -137,9 +142,12 @@ export default function BoardLayer({
                     y: e.target.y(),
                   })
                 }
-                onTransform={(e) => holdTextTransform(e, element)}
+                onTransform={(e) =>
+                  holdTextTransform(e, element as TextElement)
+                }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
+                draggable={transformAvailable}
               />
             );
           case 'marker':
@@ -152,6 +160,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
+                draggable={transformAvailable}
               />
             );
           default:

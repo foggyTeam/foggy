@@ -1,5 +1,5 @@
 import { foggy_accent } from '@/tailwind.config';
-import { debounce } from 'next/dist/server/utils';
+import debounce from 'lodash.debounce';
 
 const preprocessContent = (content: string): string => {
   return content.replace(/<br>/g, '<span class="line-break"></span>');

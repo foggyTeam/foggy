@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { transliterate } from 'transliteration';
-import { User } from '../schemas/user.schema';
-import { Counter } from '../schemas/user-counter.schema';
-import { CreateUserDto } from './create-user.dto';
-import { LoginUserDto } from './login-user.dto';
-import { GoogleUserDto } from './login-google.dto';
-import { getErrorMessages } from '../errorMessages';
+import { User } from './schemas/user.schema';
+import { Counter } from './schemas/user-counter.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { GoogleUserDto } from './dto/login-google.dto';
+import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 import { isURL } from 'class-validator';
 
@@ -123,19 +123,6 @@ export class UsersService {
     await user.save();
 
     return user;
-  }
-
-  private async saveUser(newUser: User): Promise<Partial<User>> {
-    await this.checkUniqueFields({
-      email: newUser.email,
-      nickname: newUser.nickname,
-    });
-    try {
-      const user = await newUser.save();
-      return this.transformUserResponse(user);
-    } catch (error) {
-      this.handleSaveUserError(error);
-    }
   }
 
   private async generateNickname(): Promise<string> {
@@ -263,5 +250,18 @@ export class UsersService {
       getErrorMessages({ general: 'errorNotRecognized' }),
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+
+  private async saveUser(newUser: User): Promise<Partial<User>> {
+    await this.checkUniqueFields({
+      email: newUser.email,
+      nickname: newUser.nickname,
+    });
+    try {
+      const user = await newUser.save();
+      return this.transformUserResponse(user);
+    } catch (error) {
+      this.handleSaveUserError(error);
+    }
   }
 }

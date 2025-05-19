@@ -39,7 +39,7 @@ async function getUserData() {
   return userData ? userData : null;
 }
 
-export default async function Profile() {
+export default async function ProfilePage() {
   const userData = await getUserData();
   return (
     <div className="flex h-screen w-screen items-center justify-center">

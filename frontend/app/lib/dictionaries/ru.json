@@ -10,6 +10,7 @@
   },
   "validationErrors": {
     "nickname": {
+      "required": "Имя пользователя обязательно",
       "maxLength": "Имя пользователя не может быть длиннее 14 символов",
       "invalidSymbols": "Имя пользователя может состоять только из латинских букв, цифр и специальных символов \".@_\""
     },
@@ -27,7 +28,21 @@
     },
     "about": {
       "maxLength": "О себе не может быть длиннее 140 символов",
-      "invalidSymbols": "О себе может состоять только из латинских букв, цифр и специальных символов"
+      "invalidSymbols": "О себе может состоять только из букв, цифр и специальных символов"
+    },
+    "projectName": {
+      "required": "Название проекта обязательно",
+      "maxLength": "Название проекта не может быть длиннее 20 символов",
+      "invalidSymbols": "Название проекта может состоять только из букв, цифр и специальных символов"
+    },
+    "projectDescription": {
+      "maxLength": "Описание не может быть длиннее 300 символов",
+      "invalidSymbols": "Описание может состоять только из букв, цифр и специальных символов"
+    },
+    "projectElementName": {
+      "required": "Название обязательно",
+      "maxLength": "Название не может быть длиннее 20 символов",
+      "invalidSymbols": "Название может состоять только из букв, цифр и специальных символов"
     }
   },
 
@@ -52,12 +67,147 @@
     }
   },
 
+  "main": {
+    "myProjects": "МОИ ПРОЕКТЫ",
+    "myTeams": "МОИ КОМАНДЫ",
+    "teamProjects": "ПРОЕКТЫ _",
+    "participants": "УЧАСТНИКИ",
+    "andNMore": "И еще _...",
+    "you": "(вы)",
+    "searchPlaceholder": "Найти...",
+    "noProjectDescription": "У этого проекта пока нет описания...",
+    "roles": {
+      "owner": "владелец",
+      "admin": "админ",
+      "editor": "редактор",
+      "reader": "читатель",
+      "team": "команда"
+    }
+  },
+
+  "projects": {
+    "projectSettings": {
+      "name": "Название проекта",
+      "description": "Описание проекта",
+      "uploadAvatarHint": "Загрузить новую обложку проекта",
+      "allowRequests": "Разрешить заявки в проект",
+      "isPublic": "Проект виден всем",
+      "memberListIsPublic": "Список участников виден всем",
+      "leaveButton": "Покинуть проект",
+      "deleteButton": "Удалить проект",
+      "saveButton": "Сохранить",
+      "createButton": "Создать проект"
+    },
+    "deleteProject": {
+      "modalHeader": "Вы действительно хотите удалить проект?",
+      "modalDescription": "Удаление проекта приведет к необратимой потере всех данных проекта, включая разделы и доски. После удаления проекта восстановление данных будет невозможным.",
+      "modalSure": "Удалить",
+      "modalDismiss": "Отмена"
+    },
+    "deleteProjectChild": {
+      "modalHeader": "Вы действительно хотите удалить этот элемент?",
+      "modalSure": "Удалить",
+      "modalDismiss": "Отмена"
+    },
+    "addElement": {
+      "section": {
+        "new": "Новая секция",
+        "placeholder": "Название секции"
+      },
+      "simple": {
+        "new": "Новая доска",
+        "placeholder": "Название доски"
+      },
+      "graph": {
+        "new": "Новый граф",
+        "placeholder": "Название графа"
+      },
+      "tree": {
+        "new": "Новое дерево",
+        "placeholder": "Название дерева"
+      },
+      "create": "Создать"
+    },
+    "projectMembers": "УЧАСТНИКИ",
+    "projectSections": "РАЗДЕЛЫ",
+    "addSection": "ДОБАВИТЬ РАЗДЕЛ"
+  },
+
+  "filters": {
+    "menuHeader": "Фильтры",
+    "byMember": {
+      "label": "Имя пользователя участника",
+      "placeholder": "Где участвует..."
+    },
+    "byTeam": {
+      "label": "Название команды участника",
+      "placeholder": "Где участвует команда..."
+    },
+    "byRole": {
+      "label": "Моя роль",
+      "placeholder": "Где я..."
+    },
+    "byLastChange": {
+      "label": "Последнее изменение",
+      "placeholder": "Изменено..."
+    }
+  },
+
+  "members": {
+    "removeTeamMember": {
+      "modalHeader": "Удалить участника команды _",
+      "breakup": {
+        "option": "Отвязать участников команды",
+        "hint": "Участник будет удален из проекта, а остальные члены команды потеряют свою привязку к команде в этом проекте."
+      },
+      "entire": {
+        "option": "Удалить команду полностью",
+        "hint": "Все участники команды будут удалены из проекта. Вы можете снова пригласить команду, чтобы отменить это действие."
+      },
+      "modalSure": "Продолжить",
+      "modalDismiss": "Отмена"
+    },
+    "changeRole": {
+      "modalHeader": "Изменить роль _",
+      "modalDismiss": "Отмена",
+      "modalSave": "Сохранить",
+      "upgradeTeam": "Обновить макс. роль команды",
+      "upgradeMember": "Переопределить командную роль _"
+    },
+    "selectOwner": {
+      "modalHeader": "Выберите нового владельца",
+      "label": "Новый владелец",
+      "modalDismiss": "Отмена",
+      "modalSave": "Сохранить"
+    },
+    "areYouSure": {
+      "newOwner": {
+        "modalHeader": "Вы действительно хотите назначить нового владельца?",
+        "modalSure": "Назначить"
+      },
+      "leave": {
+        "modalHeader": "Вы действительно хотите выйти?",
+        "modalSure": "Выйти"
+      },
+      "removeMember": {
+        "modalHeader": "Вы действительно хотите удалить _?",
+        "modalSure": "Удалить"
+      },
+      "modalDismiss": "Отмена"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",
       "teams": "КОМАНДЫ",
       "notifications": "УВЕДОМЛЕНИЯ"
     }
+  },
+
+  "time": {
+    "today": "Сегодня",
+    "yesterday": "Вчера"
   },
 
   "toolBar": {
@@ -75,6 +225,15 @@
   "toolTips": {
     "tools": {
       "textTool": "Текст",
+      "pencilTool": "Карандаш",
+      "pencilColor": "Цвет",
+      "pencilWidth": "Размер",
+      "pencilTension": "Сглаживание",
+      "pencilCap": "Край",
+      "lineCapButt": "Обрезанный",
+      "lineCapRound": "Скругленный",
+      "lineCapSquare": "Квадратный",
+      "eraserTool": "Ластик",
       "rectTool": "Прямоугольник",
       "ellipseTool": "Эллипс",
       "fillTool": "Цвет заливки",

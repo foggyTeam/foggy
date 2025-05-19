@@ -1,52 +1,87 @@
-import { Button } from '@heroui/button';
-import { Avatar } from '@heroui/avatar';
-import { Badge } from '@heroui/badge';
+import React from 'react';
 
-export default function Main() {
+import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
+import { Project, Team } from '@/app/lib/types/definitions';
+import { cookies } from 'next/headers';
+import { decrypt } from '@/app/lib/session';
+import { signOut } from '@/auth';
+import { bg_container_no_padding } from '@/app/lib/types/styles';
+import clsx from 'clsx';
+import AllProjects from '@/app/lib/components/projects/allProjects';
+import AllTeams from '@/app/lib/components/teams/allTeams';
+import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
+import allProjects from '@/app/mockData/projects.json';
+import allTeams from '@/app/mockData/teams.json';
+
+async function getUserProjects(): Promise<Project[] | undefined> {
+  const cookie = (await cookies()).get('session' as any)?.value;
+  const session = await decrypt(cookie);
+
+  if (!session) {
+    return undefined;
+  }
+
+  try {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(allProjects as Project[]), 300);
+    });
+  } catch (e) {
+    console.error('User with this id does not exist.');
+    await signOut();
+    return undefined;
+  }
+}
+async function getUserTeams(): Promise<Team[] | undefined> {
+  const cookie = (await cookies()).get('session' as any)?.value;
+  const session = await decrypt(cookie);
+
+  if (!session) {
+    return undefined;
+  }
+
+  try {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(allTeams as Team[]), 300);
+    });
+  } catch (e) {
+    console.error('User with this id does not exist.');
+    await signOut();
+    return undefined;
+  }
+}
+
+export default async function MainPage() {
+  const userProjects = await getUserProjects();
+  const userTeams = await getUserTeams();
+
   return (
-    <div className="flex h-screen w-screen items-start justify-center gap-4 py-16">
-      <div className="flex w-fit flex-col items-center justify-start gap-2">
-        <Avatar isBordered className="accent-avatar" name="Junior" />
+    <>
+      <ProjectsLoader projectsData={userProjects} />
+      <TeamsLoader teamsData={userTeams} />
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-24 py-8">
+        <div
+          className={clsx(
+            'flex h-full min-h-56 w-full flex-col items-center justify-center',
+            bg_container_no_padding,
+            'rounded-bl-[64px] px-8 pt-8',
+          )}
+        >
+          {userProjects?.length !== undefined ? (
+            <AllProjects />
+          ) : (
+            <p> Loading </p>
+          )}
+        </div>
+        <div
+          className={clsx(
+            'flex h-full max-h-72 min-h-52 w-full flex-col items-center justify-center',
+            bg_container_no_padding,
+            'rounded-tr-[64px] px-8 pt-8',
+          )}
+        >
+          {userTeams?.length !== undefined ? <AllTeams /> : <p> Loading </p>}
+        </div>
       </div>
-
-      <div className="flex w-fit flex-col items-center justify-start gap-2">
-        <Badge content="5" className="accent-badge-s">
-          <Avatar name="Junior" />
-        </Badge>
-        <Badge content="5" className="accent-badge-fl">
-          <Avatar name="Junior" />
-        </Badge>
-        <Badge content="5" className="accent-badge-f">
-          <Avatar name="Junior" />
-        </Badge>
-        <Badge content="5" className="accent-badge-sh">
-          <Avatar name="Junior" />
-        </Badge>
-      </div>
-
-      <div className="flex w-fit flex-col items-center justify-start gap-2">
-        <Button size="lg" className="accent-s">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-f">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-b">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-l">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-fl">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-g">
-          Foggy
-        </Button>
-        <Button size="lg" className="accent-sh">
-          Foggy
-        </Button>
-      </div>
-    </div>
+    </>
   );
 }

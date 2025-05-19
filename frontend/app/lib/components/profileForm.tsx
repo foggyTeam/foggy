@@ -2,28 +2,28 @@
 
 import { observer } from 'mobx-react-lite';
 import { Form } from '@heroui/form';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
-import { Avatar } from '@heroui/avatar';
 import userStore from '@/app/stores/userStore';
-import { User2Icon } from 'lucide-react';
 import { Input, Textarea } from '@heroui/input';
 import { ProfileData } from '@/app/(pages)/(main)/profile/page';
 import { Checkbox } from '@heroui/checkbox';
 import { profileFormSchema } from '@/app/lib/types/schemas';
-import z from 'zod';
 import { updateUserData } from '@/app/lib/server/actions/updateUserData';
 import { deleteUserById } from '@/app/lib/server/actions/deleteUserById';
 import { signUserOut } from '@/app/lib/server/actions/signUserOut';
-import AreYouSureModal from '@/app/lib/components/areYouSureModal';
+import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
-import resizeImage from '@/app/lib/utils/resizeImage';
-import { Tooltip } from '@heroui/tooltip';
+import IsFormValid from '@/app/lib/utils/isFormValid';
+import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
+import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [errors, setErrors] = useState({} as any);
 
@@ -35,7 +35,6 @@ const ProfileForm = observer((userData: ProfileData) => {
     project: userData.projectNotifications,
     email: userData.emailNotifications,
   });
-  const imageInputRef = useRef(null);
 
   useEffect(() => {
     setNickname(userData.nickname);
@@ -49,57 +48,37 @@ const ProfileForm = observer((userData: ProfileData) => {
   }, [userData]);
 
   useEffect(() => {
-    isFormValid({ nickname, email, about });
+    IsFormValid({ nickname, email, about }, profileFormSchema, setErrors);
   }, [nickname, email, about]);
 
-  const isFormValid = (data: {
-    nickname: string;
-    email: string;
-    about: string;
-  }) => {
-    try {
-      profileFormSchema.parse(data);
-      setErrors({});
-      return true;
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        const newErrors: any = {};
-        e.errors.forEach((error) => {
-          if (error.path.length > 0) {
-            newErrors[error.path[0]] = error.message;
-          }
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
-  };
+  const handleImageUpload = async (event: any) => {
+    setIsAvatarLoading(true);
+    const initialURL = userStore.user?.image;
 
-  const uploadImage = () => {
-    imageInputRef.current.click();
-  };
-
-  const handleImageChange = async (event) => {
-    const image = event.target.files[0];
-    if (image) {
-      if (!image.type.startsWith('image/')) {
-        console.error('File is not an image');
-        return;
-      }
-
-      const resizedImage = await resizeImage(image, 288).catch((error) =>
-        console.error(error),
+    const imageBlob = await HandleImageUpload(event);
+    if (imageBlob && userStore.user) {
+      const response = await uploadImage(
+        userStore.user.id,
+        'avatar',
+        imageBlob,
       );
-      if (!resizedImage) return;
 
-      const reader = new FileReader();
-      reader.readAsDataURL(resizedImage);
-      reader.onloadend = () => {
-        const resizedUrl = reader.result as string;
-        // await patch new image: resizedUrl
-        console.log('Successfully loaded: ');
-      };
+      if ('url' in response) {
+        await updateUserData(userStore.user.id, {
+          avatar: response.url,
+        }).then((result) => {
+          if (
+            Object.keys(result).findIndex((element) => element === 'errors') !==
+            -1
+          )
+            console.error(result);
+          else userStore.updateUserData({ image: response.url });
+        });
+      } else console.error(response.error);
     }
+    setIsAvatarLoading(false);
+
+    await clearImage(initialURL);
   };
 
   const onSubmit = async () => {
@@ -126,7 +105,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         },
       };
 
-      await updateUserData(userStore.user?.id, updatedData)
+      await updateUserData(userStore.user?.id as string, updatedData)
         .then((result) => {
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
@@ -145,7 +124,7 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   const deleteAccount = async () => {
-    await deleteUserById(userStore.user?.id).then((result) => {
+    await deleteUserById(userStore.user?.id as string).then((result) => {
       if (
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
       ) {
@@ -155,44 +134,24 @@ const ProfileForm = observer((userData: ProfileData) => {
     await onSignOut();
   };
 
+  const clearImage = async (initialURL: string | null | undefined) => {
+    if (userStore.user?.image !== initialURL && initialURL)
+      await deleteImage(initialURL).then((response) => {
+        if ('error' in response) console.error(response.error);
+      });
+  };
+
   return (
     <>
       <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
         <div className="items-top flex w-full justify-between gap-2">
-          {/*TODO: replace with FTooltip after merge*/}
-          <Tooltip
-            content={settingsStore.t.profile.uploadAvatarHint}
-            classNames={{
-              base: 'before:shadow-container',
-              content: 'shadow-container',
-            }}
-            size="sm"
-            placement="right"
-            delay={600}
-          >
-            <Button
-              onPress={uploadImage}
-              variant="bordered"
-              className="h-fit w-fit min-w-fit rounded-full border-none p-0"
-            >
-              <Avatar
-                showFallback
-                icon={<User2Icon className="h-72 w-72 stroke-default-200" />}
-                name={userStore.user?.name as string}
-                src={userStore.user?.image as string}
-                size="lg"
-                className="h-72 w-72"
-                color="default"
-              />
-              <input
-                type="file"
-                accept="image/*"
-                ref={imageInputRef as any}
-                onChange={handleImageChange}
-                style={{ display: 'none' }}
-              />
-            </Button>
-          </Tooltip>
+          <UploadAvatarButton
+            isLoading={isAvatarLoading}
+            handleImageUpload={handleImageUpload}
+            name={userStore.user?.name as string}
+            src={userStore.user?.image as string}
+            tooltipContent={settingsStore.t.profile.uploadAvatarHint}
+          />
           <Button
             onPress={onSignOut}
             type={'button'}
@@ -307,15 +266,17 @@ const ProfileForm = observer((userData: ProfileData) => {
           </FButton>
         </div>
       </Form>
-      <AreYouSureModal
-        header={settingsStore.t.profile.deleteAccount.modalHeader}
-        description={settingsStore.t.profile.deleteAccount.modalDescription}
-        sure={settingsStore.t.profile.deleteAccount.modalSure}
-        dismiss={settingsStore.t.profile.deleteAccount.modalDismiss}
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        action={deleteAccount}
-      />
+      {isOpen && (
+        <AreYouSureModal
+          header={settingsStore.t.profile.deleteAccount.modalHeader}
+          description={settingsStore.t.profile.deleteAccount.modalDescription}
+          sure={settingsStore.t.profile.deleteAccount.modalSure}
+          dismiss={settingsStore.t.profile.deleteAccount.modalDismiss}
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          action={deleteAccount}
+        />
+      )}
     </>
   );
 });

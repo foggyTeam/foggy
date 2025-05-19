@@ -1,4 +1,4 @@
-import React, { JSX, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dropdown,
   DropdownItem,
@@ -20,7 +20,8 @@ export default function EditorToolDropdown({
   id?: string;
   options: any[];
   activeOption: any;
-  Icon: JSX.Element;
+  Icon: React.ComponentType<any>;
+  handleClick: any;
   isAccent: boolean;
 }) {
   const [selectedOption, setSelectedOption] = useState(activeOption);

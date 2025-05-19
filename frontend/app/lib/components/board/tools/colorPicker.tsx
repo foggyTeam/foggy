@@ -3,7 +3,13 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
 
-export default function ColorPicker({ value, changeValue }) {
+export default function ColorPicker({
+  value,
+  changeValue,
+}: {
+  value: string;
+  changeValue: any;
+}) {
   return (
     <>
       <HexAlphaColorPicker
@@ -27,7 +33,7 @@ export default function ColorPicker({ value, changeValue }) {
               navigator.clipboard
                 .writeText(value)
                 .catch(() => console.error('Failed to copy to clipboard.'));
-              console.log('Copied to clipboard!');
+              console.error('Copied to clipboard!');
             }}
             isIconOnly
             size="sm"
