@@ -3,16 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
   Patch,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiHeader,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -32,6 +33,11 @@ export class ProjectController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiResponse({
     status: 201,
     description: 'The project has been successfully created.',
@@ -39,28 +45,41 @@ export class ProjectController {
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiBody({ type: CreateProjectDto })
-  async create(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
+  async create(
+    @Body() createProjectDto: CreateProjectDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<Project> {
     return this.projectService.createProject(
       createProjectDto,
-      new Types.ObjectId(),
+      new Types.ObjectId(userId),
     );
   }
 
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all projects for current user' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: 'Returns an array of projects.',
     type: [Project],
   })
-  async findAll(@Query('userId') userId: Types.ObjectId): Promise<Project[]> {
-    return this.projectService.getAllUserProjects(userId);
+  async findAll(@Headers('x-user-id') userId: Types.ObjectId): Promise<Project[]> {
+    return this.projectService.getAllUserProjects(new Types.ObjectId(userId));
   }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get project by ID' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     required: true,
@@ -76,14 +95,19 @@ export class ProjectController {
   @ApiResponse({ status: 404, description: 'Project not found' })
   async findById(
     @Param('id') id: Types.ObjectId,
-    @Query('userId') userId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<Project> {
-    return this.projectService.getProjectById(id, userId);
+    return this.projectService.getProjectById(id, new Types.ObjectId(userId));
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Partially update project information' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -99,6 +123,7 @@ export class ProjectController {
   async update(
     @Param('id') id: Types.ObjectId,
     @Body() updateProjectDto: UpdateProjectDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<Project> {
     return this.projectService.updateProjectInfo(id, updateProjectDto);
   }
@@ -106,6 +131,11 @@ export class ProjectController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     required: true,
@@ -121,14 +151,19 @@ export class ProjectController {
   @ApiResponse({ status: 403, description: 'Forbidden - not an owner' })
   async delete(
     @Param('id') id: Types.ObjectId,
-    @Query('userId') userId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
-    return this.projectService.deleteProject(id, userId);
+    return this.projectService.deleteProject(id, new Types.ObjectId(userId));
   }
 
   @Post(':id/users')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Add user to project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID making the request',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -156,6 +191,7 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Body('userId') userId: Types.ObjectId,
     @Body('role') role: Role,
+    @Headers('x-user-id') requestingUserId: Types.ObjectId,
   ): Promise<Project> {
     return this.projectService.addUser(projectId, userId, role);
   }
@@ -163,6 +199,11 @@ export class ProjectController {
   @Delete(':id/users/:userId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Remove user from project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID making the request',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -183,6 +224,7 @@ export class ProjectController {
   async removeUser(
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') userId: Types.ObjectId,
+    @Headers('x-user-id') requestingUserId: Types.ObjectId,
   ): Promise<Project> {
     return this.projectService.removeUser(projectId, userId);
   }
@@ -190,6 +232,11 @@ export class ProjectController {
   @Put(':id/users/:userId/role')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update user role in project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID making the request',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -223,6 +270,7 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') userId: Types.ObjectId,
     @Body('role') newRole: Role,
+    @Headers('x-user-id') requestingUserId: Types.ObjectId,
   ): Promise<Project> {
     return this.projectService.updateUserRole(projectId, userId, newRole);
   }
@@ -230,6 +278,11 @@ export class ProjectController {
   @Get(':id/access-control')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get project access control list' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -256,6 +309,7 @@ export class ProjectController {
   @ApiResponse({ status: 404, description: 'Project not found' })
   async getAccessControlList(
     @Param('id') projectId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<any[]> {
     return this.projectService.getAccessControlList(projectId);
   }
@@ -263,6 +317,11 @@ export class ProjectController {
   @Post(':id/sections')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add section to project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -287,15 +346,24 @@ export class ProjectController {
   })
   async addSectionToProject(
     @Param('id') projectId: Types.ObjectId,
-    @Param('name') name: string,
-    @Query('userId') userId: Types.ObjectId,
+    @Body('name') name: string,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<Project> {
-    return this.projectService.addSectionToProject(projectId, name, userId);
+    return this.projectService.addSectionToProject(
+      projectId,
+      name,
+      new Types.ObjectId(userId),
+    );
   }
 
   @Post('sections/:parentSectionId/sections')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add nested section to parent section' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'parentSectionId',
     description: 'ID of the parent section',
@@ -321,20 +389,25 @@ export class ProjectController {
   async addSectionToSection(
     @Param('id') projectId: Types.ObjectId,
     @Param('parentSectionId') parentSectionId: Types.ObjectId,
-    @Param('name') name: string,
-    @Query('userId') userId: Types.ObjectId,
+    @Body('name') name: string,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<any> {
     return this.projectService.addSectionToSection(
       projectId,
       parentSectionId,
       name,
-      userId,
+      new Types.ObjectId(userId),
     );
   }
 
   @Get(':id/sections/:sectionId')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get section with children' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -381,6 +454,7 @@ export class ProjectController {
   async getSection(
     @Param('id') projectId: Types.ObjectId,
     @Param('sectionId') sectionId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<any> {
     return this.projectService.getSection(projectId, sectionId);
   }
@@ -388,6 +462,11 @@ export class ProjectController {
   @Delete(':id/sections/:sectionId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove section from project' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'User ID',
+    required: true,
+  })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
@@ -406,6 +485,7 @@ export class ProjectController {
   async removeSection(
     @Param('id') projectId: Types.ObjectId,
     @Param('sectionId') sectionId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
     await this.projectService.removeSection(projectId, sectionId);
   }
