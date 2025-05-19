@@ -7,6 +7,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'path';
 import { ApiKeyMiddleware } from './api-key.middleware';
 import { BoardGateway } from './websocket/board.gateway';
+import { ProjectModule } from './projects/projects.module';
 import { BoardModule } from './board/board.module';
 
 @Module({
@@ -24,6 +25,7 @@ import { BoardModule } from './board/board.module';
       inject: [ConfigService],
     }),
     UsersModule,
+    ProjectModule,
     BoardModule,
   ],
   controllers: [AppController],

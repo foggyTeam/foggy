@@ -31,13 +31,28 @@ async function bootstrap() {
     origin: configService.get<string>('FRONTEND_URI'),
     methods: 'GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS',
     credentials: true,
+    allowedHeaders: ['x-api-key', 'x-user-id'],
   });
 
   const config = new DocumentBuilder()
     .setTitle('Foggy API Documentation')
     .setDescription('The API description')
     .setVersion('1.0')
-    .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' })
+    .addApiKey({
+      type: 'apiKey',
+      name: 'x-api-key',
+      in: 'header',
+      description: 'API Key for external services',
+    })
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-user-id',
+        in: 'header',
+        description: 'User ID for authentication',
+      },
+      'x-user-id',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

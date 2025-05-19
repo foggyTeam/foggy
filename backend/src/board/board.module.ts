@@ -15,5 +15,6 @@ import { Layer, LayerSchema } from './schemas/layer.schema';
   ],
   controllers: [BoardController],
   providers: [BoardService, BoardElementsGateway],
+  exports: [MongooseModule],
 })
 export class BoardModule {}
