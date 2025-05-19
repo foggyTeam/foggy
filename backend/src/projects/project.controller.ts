@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -80,9 +81,9 @@ export class ProjectController {
     return this.projectService.getProjectById(id, userId);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update project information' })
+  @ApiOperation({ summary: 'Partially update project information' })
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
