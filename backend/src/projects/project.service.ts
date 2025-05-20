@@ -14,6 +14,7 @@ import {
 } from './schemas/section.schema';
 import { Board, BoardDocument } from '../board/schemas/board.schema';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { CreateSectionDto } from './dto/create-section.dto';
 
 @Injectable()
 export class ProjectService {
@@ -472,15 +473,14 @@ export class ProjectService {
     }
   }
 
-  async addSectionToProject(
+  public async addSection(
     projectId: Types.ObjectId,
-    sectionName: string,
     userId: Types.ObjectId,
+    createSectionDto: CreateSectionDto,
   ): Promise<SectionDocument> {
     await this.validateUser(userId);
     const project = await this.findProjectById(projectId, userId);
     const userRole = await this.getUserRole(projectId, userId);
-
     if (!['owner', 'admin', 'editor'].includes(userRole)) {
       throw new CustomException(
         getErrorMessages({ project: 'noPermission' }),
@@ -488,53 +488,14 @@ export class ProjectService {
       );
     }
 
-    const newSection = new this.sectionModel({ projectId, name: sectionName });
-    await newSection.save();
-
-    project.sections.push(newSection._id);
-    await project.save();
-
-    return newSection;
-  }
-
-  async addSectionToSection(
-    projectId: Types.ObjectId,
-    parentSectionId: Types.ObjectId,
-    sectionName: string,
-    userId: Types.ObjectId,
-  ): Promise<SectionDocument> {
-    await this.validateUser(userId);
-    const parentSection = await this.sectionModel
-      .findById(parentSectionId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ section: 'notFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      );
-
-    const userRole = await this.getUserRole(projectId, userId);
-    if (!['owner', 'admin', 'editor'].includes(userRole)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'noPermission' }),
-        HttpStatus.FORBIDDEN,
-      );
+    const { parentSectionId, name } = createSectionDto;
+    if (parentSectionId) {
+      return this.addSectionToSection(projectId, parentSectionId, name);
+    } else {
+      return this.addSectionToProject(project, name);
     }
-
-    const newSection = new this.sectionModel({
-      name: sectionName,
-      parent: parentSectionId,
-    });
-    await newSection.save();
-
-    parentSection.items.push({ type: 'section', itemId: newSection._id });
-    await parentSection.save();
-
-    return parentSection;
   }
 
-  // Методы для работы с командами (заглушки)
   async addTeamToProject(
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
@@ -571,6 +532,46 @@ export class ProjectService {
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
+  }
+
+  private async addSectionToProject(
+    project: ProjectDocument,
+    name: string,
+  ): Promise<SectionDocument> {
+    const newSection = new this.sectionModel({ projectId: project.id, name });
+    await newSection.save();
+
+    project.sections.push(newSection._id);
+    await project.save();
+
+    return newSection;
+  }
+
+  private async addSectionToSection(
+    projectId: Types.ObjectId,
+    parentSectionId: Types.ObjectId,
+    name: string,
+  ): Promise<SectionDocument> {
+    const parentSection = await this.sectionModel
+      .findById(parentSectionId)
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ section: 'notFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      );
+    const newSection = new this.sectionModel({
+      projectId,
+      name,
+      parent: parentSectionId,
+    });
+    await newSection.save();
+
+    parentSection.items.push({ type: 'section', itemId: newSection._id });
+    await parentSection.save();
+
+    return parentSection;
   }
 
   private async validateUser(userId: Types.ObjectId): Promise<void> {

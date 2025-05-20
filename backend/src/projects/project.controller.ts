@@ -25,6 +25,7 @@ import { Project, Role } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SectionDocument } from './schemas/section.schema';
+import { CreateSectionDto } from './dto/create-section.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -326,7 +327,7 @@ export class ProjectController {
 
   @Post(':id/sections')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Add section to project' })
+  @ApiOperation({ summary: 'Add section to project or to parent section' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
@@ -335,71 +336,17 @@ export class ProjectController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Section has been successfully added to project',
-    type: Project,
+    description: 'Section has been successfully added',
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
-  @ApiBody({
-    description: 'Section data',
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        description: { type: 'string', nullable: true },
-      },
-    },
-  })
-  async addSectionToProject(
+  @ApiBody({ type: CreateSectionDto })
+  async addSection(
     @Param('id') projectId: Types.ObjectId,
-    @Body('name') name: string,
+    @Body() createSectionDto: CreateSectionDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.addSectionToProject(
-      projectId,
-      name,
-      new Types.ObjectId(userId),
-    );
-  }
-
-  @Post('sections/:parentSectionId/sections')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Add nested section to parent section' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'parentSectionId',
-    description: 'ID of the parent section',
-    type: String,
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Section has been successfully added to parent section',
-    type: Project,
-  })
-  @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
-  @ApiBody({
-    description: 'Section data',
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string' },
-        description: { type: 'string', nullable: true },
-      },
-    },
-  })
-  async addSectionToSection(
-    @Param('id') projectId: Types.ObjectId,
-    @Param('parentSectionId') parentSectionId: Types.ObjectId,
-    @Body('name') name: string,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<any> {
-    return this.projectService.addSectionToSection(
-      projectId,
-      parentSectionId,
-      name,
-      new Types.ObjectId(userId),
-    );
+  ): Promise<SectionDocument> {
+    return this.projectService.addSection(projectId, userId, createSectionDto);
   }
 
   @Get(':id/sections/:sectionId')
