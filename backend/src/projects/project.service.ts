@@ -51,7 +51,12 @@ export class ProjectService {
     }
   }
 
-  async findProjectById(projectId: Types.ObjectId): Promise<ProjectDocument> {
+  async findProjectById(
+    projectId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<ProjectDocument> {
+    await this.validateUser(userId);
+
     if (!Types.ObjectId.isValid(projectId)) {
       throw new CustomException(
         getErrorMessages({ project: 'invalidIdType' }),
@@ -75,7 +80,8 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<string | null> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
     const userAccess = project.accessControlUsers.find((user) =>
       user.userId.equals(userId),
     );
@@ -107,7 +113,8 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
     const userAccess = project.accessControlUsers.find((user) =>
       user.userId.equals(userId),
     );
@@ -132,8 +139,10 @@ export class ProjectService {
   async removeSection(
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
 
     project.sections = project.sections.filter(
       (section) => !section.equals(sectionId),
@@ -151,6 +160,8 @@ export class ProjectService {
   }
 
   async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectDocument[]> {
+    await this.validateUser(userId);
+
     if (!Types.ObjectId.isValid(userId)) {
       throw new CustomException(
         getErrorMessages({ user: 'invalidIdType' }),
@@ -169,6 +180,7 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<ProjectDocument> {
+    await this.validateUser(userId);
     return await this.projectModel
       .findOne({
         _id: projectId,
@@ -186,12 +198,15 @@ export class ProjectService {
 
   async addUser(
     projectId: Types.ObjectId,
-    userId: Types.ObjectId,
+    requestingUserId: Types.ObjectId,
+    targetUserId: Types.ObjectId,
     role: Role,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(requestingUserId);
+    await this.validateUser(targetUserId);
+    const project = await this.findProjectById(projectId, requestingUserId);
     const userExists = project.accessControlUsers.some((user) =>
-      user.userId.equals(userId),
+      user.userId.equals(targetUserId),
     );
 
     if (userExists) {
@@ -207,7 +222,7 @@ export class ProjectService {
       );
     }
 
-    project.accessControlUsers.push({ userId, role });
+    project.accessControlUsers.push({ userId: targetUserId, role });
 
     try {
       await project.save();
@@ -222,11 +237,14 @@ export class ProjectService {
 
   async removeUser(
     projectId: Types.ObjectId,
-    userId: Types.ObjectId,
+    requestingUserId: Types.ObjectId,
+    targetUserId: Types.ObjectId,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(requestingUserId);
+    await this.validateUser(targetUserId);
+    const project = await this.findProjectById(projectId, requestingUserId);
     const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(userId) && user.role === 'owner',
+      (user) => user.userId.equals(targetUserId) && user.role === 'owner',
     );
 
     if (isOwner) {
@@ -237,7 +255,7 @@ export class ProjectService {
     }
 
     project.accessControlUsers = project.accessControlUsers.filter(
-      (user) => !user.userId.equals(userId),
+      (user) => !user.userId.equals(targetUserId),
     );
 
     try {
@@ -253,12 +271,15 @@ export class ProjectService {
 
   async updateUserRole(
     projectId: Types.ObjectId,
-    userId: Types.ObjectId,
+    requestingUserId: Types.ObjectId,
+    targetUserId: Types.ObjectId,
     newRole: Role,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(requestingUserId);
+    await this.validateUser(targetUserId);
+    const project = await this.findProjectById(projectId, requestingUserId);
     const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(userId) && user.role === 'owner',
+      (user) => user.userId.equals(targetUserId) && user.role === 'owner',
     );
 
     if (isOwner) {
@@ -269,7 +290,7 @@ export class ProjectService {
     }
 
     const userIndex = project.accessControlUsers.findIndex((user) =>
-      user.userId.equals(userId),
+      user.userId.equals(targetUserId),
     );
 
     if (userIndex === -1) {
@@ -292,7 +313,10 @@ export class ProjectService {
     }
   }
 
-  async getAccessControlList(projectId: Types.ObjectId): Promise<
+  async getAccessControlList(
+    projectId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<
     {
       id: string;
       nickname: string;
@@ -302,7 +326,8 @@ export class ProjectService {
       teamRole?: string;
     }[]
   > {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
 
     // TODO: Реализовать полную логику, когда будет сервис команд
     return project.accessControlUsers.map((user) => ({
@@ -316,8 +341,10 @@ export class ProjectService {
   async updateProjectInfo(
     projectId: Types.ObjectId,
     updateData: UpdateProjectDto,
+    userId: Types.ObjectId,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
 
     if (updateData.name) {
       project.name = updateData.name;
@@ -352,6 +379,7 @@ export class ProjectService {
   async getSection(
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<{
     id: string;
     name: string;
@@ -363,6 +391,7 @@ export class ProjectService {
       updatedAt: Date;
     }>;
   }> {
+    await this.validateUser(userId);
     const section = await this.sectionModel
       .findById(sectionId)
       .populate<{ items: PopulatedSectionItem[] }>({
@@ -398,7 +427,8 @@ export class ProjectService {
     sectionName: string,
     userId: Types.ObjectId,
   ): Promise<ProjectDocument> {
-    const project = await this.findProjectById(projectId);
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
     const userRole = await this.getUserRole(projectId, userId);
 
     if (!['owner', 'admin', 'editor'].includes(userRole)) {
@@ -423,6 +453,7 @@ export class ProjectService {
     sectionName: string,
     userId: Types.ObjectId,
   ): Promise<SectionDocument> {
+    await this.validateUser(userId);
     const parentSection = await this.sectionModel
       .findById(parentSectionId)
       .orFail(
@@ -458,7 +489,9 @@ export class ProjectService {
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
     role: Role,
+    userId: Types.ObjectId,
   ): Promise<void> {
+    await this.validateUser(userId);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -468,7 +501,9 @@ export class ProjectService {
   async removeTeamFromProject(
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<void> {
+    await this.validateUser(userId);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -479,20 +514,29 @@ export class ProjectService {
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
     newRole: Role,
+    userId: Types.ObjectId,
   ): Promise<void> {
+    await this.validateUser(userId);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
   }
 
-  /**
-   * Проверяет, является ли пользователь частью команды.
-   * (Заглушка, пока сервис команд не реализован)
-   * @param teamId - ID команды.
-   * @param userId - ID пользователя.
-   * @returns true, если пользователь в команде, иначе false.
-   */
+  private async validateUser(userId: Types.ObjectId): Promise<void> {
+    try {
+      await this.usersService.findUserById(userId.toString());
+    } catch (error) {
+      if (error instanceof CustomException) {
+        throw error;
+      }
+      throw new CustomException(
+        getErrorMessages({ user: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
   private async isUserInTeam(
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
