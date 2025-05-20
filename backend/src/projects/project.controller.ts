@@ -24,6 +24,7 @@ import { ProjectService } from './project.service';
 import { Project, Role } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { SectionDocument } from './schemas/section.schema';
 
 @ApiTags('projects')
 @Controller('projects')

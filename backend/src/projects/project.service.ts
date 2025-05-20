@@ -117,17 +117,21 @@ export class ProjectService {
   ): Promise<void> {
     await this.validateUser(userId);
     const project = await this.findProjectById(projectId, userId);
-    const userAccess = project.accessControlUsers.find((user) =>
-      user.userId.equals(userId),
+    const isOwner = project.accessControlUsers.some(
+      (user) => user.userId.equals(userId) && user.role === 'owner',
     );
 
-    if (!userAccess || userAccess.role !== 'owner') {
+    if (!isOwner) {
       throw new CustomException(
         getErrorMessages({ project: 'CannotDelete' }),
         HttpStatus.FORBIDDEN,
       );
     }
 
+    await this.boardService.deleteBoardsByProject(projectId);
+    await this.sectionModel.deleteMany({
+      $or: [{ _id: { $in: project.sections } }, { projectId }],
+    });
     const result = await this.projectModel.deleteOne({ _id: projectId }).exec();
 
     if (result.deletedCount === 0) {

@@ -93,6 +93,33 @@ export class BoardService {
       .exec();
   }
 
+  async deleteBoardsByProject(projectId: Types.ObjectId): Promise<void> {
+    if (!Types.ObjectId.isValid(projectId)) {
+      throw new CustomException(
+        getErrorMessages({ board: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const boards = await this.boardModel.find({ projectId }).exec();
+    await Promise.all(
+      boards.map(async (board) => {
+        await this.layerModel.deleteMany({ boardId: board._id }).exec();
+        await this.projectService.removeBoardFromSection(
+          board.sectionId,
+          board._id,
+        );
+      }),
+    );
+    const result = await this.boardModel.deleteMany({ projectId }).exec();
+
+    if (result.deletedCount === 0) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async deleteById(boardId: Types.ObjectId): Promise<void> {
     const board = await this.findById(boardId);
     await this.projectService.removeBoardFromSection(board.sectionId, boardId);
