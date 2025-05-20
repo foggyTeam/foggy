@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProjectService } from './project.service';
 import { ProjectController } from './project.controller';
@@ -14,9 +14,10 @@ import { BoardModule } from '../board/board.module';
       { name: Section.name, schema: SectionSchema },
     ]),
     UsersModule,
-    BoardModule,
+    forwardRef(() => BoardModule),
   ],
   controllers: [ProjectController],
   providers: [ProjectService],
+  exports: [ProjectService],
 })
 export class ProjectModule {}

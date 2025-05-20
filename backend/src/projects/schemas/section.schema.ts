@@ -20,12 +20,16 @@ export class Section {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true })
+  projectId: Types.ObjectId;
+
   @Prop({ default: null, type: Types.ObjectId, ref: 'Section' })
   parent?: Types.ObjectId;
 
   @Prop({
     type: [
       {
+        _id: false,
         type: { type: String, required: true, enum: ['board', 'section'] },
         itemId: { type: Types.ObjectId, required: true, refPath: 'items.type' },
       },

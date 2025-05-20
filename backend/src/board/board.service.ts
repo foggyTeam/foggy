@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,12 +24,15 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
+import { ProjectService } from '../projects/project.service';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
     @InjectModel(Layer.name) private layerModel: Model<LayerDocument>,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
   ) {}
 
   async createBoard(createBoardDto: CreateBoardDto): Promise<BoardDocument> {
@@ -38,6 +43,11 @@ export class BoardService {
       const layers = await this.createLayers(createdBoard._id);
       createdBoard.layers = layers.map((layer) => layer._id);
       await createdBoard.save();
+
+      await this.projectService.addBoardToSection(
+        createdBoard.sectionId,
+        createdBoard._id,
+      );
 
       return createdBoard;
     } catch {
@@ -85,7 +95,7 @@ export class BoardService {
 
   async deleteById(boardId: Types.ObjectId): Promise<void> {
     const board = await this.findById(boardId);
-
+    await this.projectService.removeBoardFromSection(board.sectionId, boardId);
     await this.layerModel.deleteMany({ boardId: board._id }).exec();
 
     const result = await this.boardModel.deleteOne({ _id: boardId }).exec();

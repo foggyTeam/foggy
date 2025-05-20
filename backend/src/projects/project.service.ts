@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Project, ProjectDocument, Role } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from '../users/users.service';
+import { BoardService } from '../board/board.service';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 import {
@@ -20,6 +21,7 @@ export class ProjectService {
     @InjectModel(Project.name) private projectModel: Model<ProjectDocument>,
     @InjectModel(Section.name) private sectionModel: Model<SectionDocument>,
     @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
+    private readonly boardService: BoardService,
     private readonly usersService: UsersService,
   ) {}
 
@@ -401,7 +403,7 @@ export class ProjectService {
       .orFail(
         () =>
           new CustomException(
-            getErrorMessages({ section: 'idNotFound' }),
+            getErrorMessages({ section: 'notFound' }),
             HttpStatus.NOT_FOUND,
           ),
       )
@@ -422,11 +424,55 @@ export class ProjectService {
     };
   }
 
+  public async addBoardToSection(
+    sectionId: Types.ObjectId,
+    boardId: Types.ObjectId,
+  ): Promise<void> {
+    const section = await this.sectionModel.findById(sectionId).exec();
+    if (!section) {
+      throw new CustomException(
+        getErrorMessages({ section: 'notFound' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    section.items.push({ type: 'board', itemId: boardId });
+    await section.save();
+  }
+
+  public async removeBoardFromSection(
+    sectionId: Types.ObjectId,
+    boardId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      if (!sectionId || !Types.ObjectId.isValid(sectionId)) {
+        console.warn(
+          `Skipping section cleanup - invalid sectionId for board ${boardId}`,
+        );
+        return;
+      }
+      const result = await this.sectionModel
+        .updateOne(
+          { _id: sectionId },
+          { $pull: { items: { type: 'board', itemId: boardId } } },
+        )
+        .exec();
+
+      if (result.modifiedCount === 0) {
+        console.warn(`Board ${boardId} not found in section ${sectionId}`);
+      }
+    } catch {
+      throw new CustomException(
+        getErrorMessages({ section: 'failedRemoveBoard' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async addSectionToProject(
     projectId: Types.ObjectId,
     sectionName: string,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<SectionDocument> {
     await this.validateUser(userId);
     const project = await this.findProjectById(projectId, userId);
     const userRole = await this.getUserRole(projectId, userId);
@@ -438,13 +484,13 @@ export class ProjectService {
       );
     }
 
-    const newSection = new this.sectionModel({ name: sectionName });
+    const newSection = new this.sectionModel({ projectId, name: sectionName });
     await newSection.save();
 
     project.sections.push(newSection._id);
     await project.save();
 
-    return project;
+    return newSection;
   }
 
   async addSectionToSection(
@@ -459,7 +505,7 @@ export class ProjectService {
       .orFail(
         () =>
           new CustomException(
-            getErrorMessages({ section: 'idNotFound' }),
+            getErrorMessages({ section: 'notFound' }),
             HttpStatus.NOT_FOUND,
           ),
       );

@@ -62,10 +62,6 @@ export const projectError = {
       en: 'Section ID must be supported by MongoDB',
       ru: 'ID раздела должен поддерживаться MongoDB',
     },
-    idNotFound: {
-      en: 'Section not found',
-      ru: 'Секция не найдена',
-    },
     updateFailed: {
       en: 'Failed to update section',
       ru: 'Не удалось обновить секцию',
@@ -93,6 +89,10 @@ export const projectError = {
     notFoundInProject: {
       en: 'Section not found in this project',
       ru: 'Секция не найдена в данном проекте',
+    },
+    failedRemoveBoard: {
+      en: 'Failed to remove board from section',
+      ru: 'Не удалось удалить доску из секции',
     },
   },
 } as const;
