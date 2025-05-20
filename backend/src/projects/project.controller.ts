@@ -26,6 +26,8 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SectionDocument } from './schemas/section.schema';
 import { CreateSectionDto } from './dto/create-section.dto';
+import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
+import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 
 @ApiTags('projects')
 @Controller('projects')
