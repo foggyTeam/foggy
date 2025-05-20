@@ -51,7 +51,7 @@ export class Project {
     type: [
       {
         userId: { type: Types.ObjectId, ref: 'User' },
-        role: { type: ROLES },
+        role: { type: String, enum: ROLES },
       },
     ],
     default: [],
@@ -62,11 +62,11 @@ export class Project {
     type: [
       {
         teamId: { type: Types.ObjectId, ref: 'Team' },
-        role: { type: ROLES },
+        role: { type: String, enum: ROLES },
         individualOverrides: [
           {
             userId: { type: Types.ObjectId, ref: 'User' },
-            role: { type: ROLES },
+            role: { type: String, enum: ROLES },
           },
         ],
       },
@@ -82,5 +82,3 @@ export class Project {
 export type ProjectDocument = HydratedDocument<Project>;
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
-
-ProjectSchema.index({ 'accessControlUsers.userId': 1 });

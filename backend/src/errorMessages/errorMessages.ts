@@ -42,12 +42,6 @@ const errorMessages = {
       ru: 'Нельзя менять электронную почту',
     },
   },
-  id: {
-    notFound: {
-      en: 'User not found',
-      ru: 'Пользователь не найден',
-    },
-  },
   password: {
     required: {
       en: 'Password is required',
@@ -162,6 +156,10 @@ const errorMessages = {
     invalidIdType: {
       en: 'Invalid user ID format',
       ru: 'Неверный формат ID пользователя',
+    },
+    notFound: {
+      en: 'User not found',
+      ru: 'Пользователь не найден',
     },
   },
   feature: {

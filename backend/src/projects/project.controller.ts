@@ -17,6 +17,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
@@ -33,26 +34,31 @@ export class ProjectController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a new project' })
-  @ApiHeader({
-    name: 'x-user-id',
-    description: 'User ID',
-    required: true,
-  })
+  @ApiSecurity('x-user-id')
   @ApiResponse({
     status: 201,
     description: 'The project has been successfully created.',
     type: Project,
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
-  @ApiBody({ type: CreateProjectDto })
+  @ApiBody({
+    description: 'Data for the new project',
+    examples: {
+      example1: {
+        summary: 'Simple project example',
+        value: {
+          name: 'My Project',
+          description: 'Project description',
+          avatar: 'url',
+        },
+      },
+    },
+  })
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<Project> {
-    return this.projectService.createProject(
-      createProjectDto,
-      new Types.ObjectId(userId),
-    );
+    return this.projectService.createProject(createProjectDto, userId);
   }
 
   @Get()

@@ -28,8 +28,7 @@ export class ProjectService {
     userId: Types.ObjectId,
   ): Promise<ProjectDocument> {
     try {
-      await this.usersService.findUserById(userId.toString());
-
+      await this.validateUser(userId);
       const newProject = new this.projectModel({
         ...createProjectDto,
         accessControlUsers: [
