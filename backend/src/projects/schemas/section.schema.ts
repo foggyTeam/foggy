@@ -24,7 +24,7 @@ export class Section {
   projectId: Types.ObjectId;
 
   @Prop({ default: null, type: Types.ObjectId, ref: 'Section' })
-  parent?: Types.ObjectId;
+  parent: Types.ObjectId | null;
 
   @Prop({
     type: [

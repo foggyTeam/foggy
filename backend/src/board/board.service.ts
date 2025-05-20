@@ -93,7 +93,7 @@ export class BoardService {
       .exec();
   }
 
-  async deleteBoardsByProject(projectId: Types.ObjectId): Promise<void> {
+  async deleteByProject(projectId: Types.ObjectId): Promise<void> {
     if (!Types.ObjectId.isValid(projectId)) {
       throw new CustomException(
         getErrorMessages({ board: 'invalidIdType' }),
@@ -223,6 +223,25 @@ export class BoardService {
     await this.updateAtBoard(boardId);
 
     return { message: 'Element successfully deleted' };
+  }
+
+  public async changeBoardSection(
+    boardId: Types.ObjectId,
+    newSectionId: Types.ObjectId,
+  ): Promise<void> {
+    const board = await this.findById(boardId);
+    const oldSectionId = board.sectionId;
+
+    if (!newSectionId || oldSectionId.toString() === newSectionId.toString()) {
+      return;
+    }
+    board.sectionId = newSectionId;
+    await board.save();
+
+    await Promise.all([
+      this.projectService.removeBoardFromSection(oldSectionId, boardId),
+      this.projectService.addBoardToSection(newSectionId, boardId),
+    ]);
   }
 
   public async updateElement(

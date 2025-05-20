@@ -15,6 +15,8 @@ import {
 import { Board, BoardDocument } from '../board/schemas/board.schema';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
+import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
+import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 
 @Injectable()
 export class ProjectService {
@@ -129,7 +131,7 @@ export class ProjectService {
       );
     }
 
-    await this.boardService.deleteBoardsByProject(projectId);
+    await this.boardService.deleteByProject(projectId);
     await this.sectionModel.deleteMany({
       $or: [{ _id: { $in: project.sections } }, { projectId }],
     });
@@ -141,6 +143,84 @@ export class ProjectService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async changeBoardSection(
+    projectId: Types.ObjectId,
+    boardId: Types.ObjectId,
+    changeBoardParentDto: ChangeBoardSectionDto,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.validateUser(userId);
+    const userRole = await this.getUserRole(projectId, userId);
+
+    if (!['owner', 'admin', 'editor'].includes(userRole)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    const newSectionId = changeBoardParentDto.newSectionId;
+    if (!Types.ObjectId.isValid(newSectionId)) {
+      throw new CustomException(
+        getErrorMessages({ section: 'invalidType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    await this.boardService.changeBoardSection(boardId, newSectionId);
+  }
+
+  async changeSectionParent(
+    projectId: Types.ObjectId,
+    sectionId: Types.ObjectId,
+    changeSectionParentDto: ChangeSectionParentDto,
+    userId: Types.ObjectId,
+  ): Promise<SectionDocument> {
+    await this.validateUser(userId);
+    const project = await this.findProjectById(projectId, userId);
+    const userRole = await this.getUserRole(projectId, userId);
+
+    if (!['owner', 'admin', 'editor'].includes(userRole)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const section = await this.sectionModel
+      .findById(sectionId)
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ section: 'notFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
+    const newParentSectionId = changeSectionParentDto.newParent;
+    if (section.parent === null && newParentSectionId !== null) {
+      project.sections = project.sections.filter((id) => id !== sectionId);
+      await project.save();
+    } else if (section.parent !== null && newParentSectionId === null) {
+      project.sections.push(sectionId);
+      await project.save();
+    }
+    if (section.parent) {
+      await this.sectionModel.updateOne(
+        { _id: section.parent },
+        { $pull: { items: { type: 'section', itemId: sectionId } } },
+      );
+    }
+    if (newParentSectionId) {
+      await this.sectionModel.updateOne(
+        { _id: newParentSectionId },
+        { $push: { items: { type: 'section', itemId: sectionId } } },
+      );
+    }
+    section.parent = newParentSectionId;
+    await section.save();
+
+    return section;
   }
 
   async removeSection(

@@ -431,6 +431,79 @@ export class ProjectController {
     await this.projectService.removeSection(projectId, sectionId, userId);
   }
 
+  @Patch(':id/sections/boards/:boardId/section')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change board section' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'boardId',
+    description: 'ID of the board to move',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Board section has been successfully changed',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  @ApiResponse({
+    status: 404,
+    description: 'Project, board or section not found',
+  })
+  async changeBoardSection(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('boardId') boardId: Types.ObjectId,
+    @Body() changeBoardSectionDto: ChangeBoardSectionDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.projectService.changeBoardSection(
+      projectId,
+      boardId,
+      changeBoardSectionDto,
+      userId,
+    );
+  }
+
+  @Patch(':id/sections/:sectionId/parent')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Change section parent' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'sectionId',
+    description: 'ID of the section to move',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Section parent has been successfully changed',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  @ApiResponse({ status: 404, description: 'Project or section not found' })
+  async changeSectionParent(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('sectionId') sectionId: Types.ObjectId,
+    @Body() changeSectionParentDto: ChangeSectionParentDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<SectionDocument> {
+    return this.projectService.changeSectionParent(
+      projectId,
+      sectionId,
+      changeSectionParentDto,
+      userId,
+    );
+  }
+
   @Post(':id/teams')
   @HttpCode(HttpStatus.NOT_IMPLEMENTED)
   @ApiOperation({ summary: 'Add team to project (not implemented)' })
