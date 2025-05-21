@@ -3,65 +3,73 @@ import { Avatar } from '@heroui/avatar';
 import { Badge } from '@heroui/badge';
 import { observer } from 'mobx-react-lite';
 import userStore from '@/app/stores/userStore';
-import { BellIcon, ChevronLeft, User2Icon } from 'lucide-react';
+import { BellIcon, User2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import menuStore from '@/app/stores/menuStore';
-import { bg_container } from '@/app/lib/types/styles';
+import { bg_container, sidebar_layout } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 
-const ClosedSideBar = observer((props: { sideBarLayout: string }) => {
-  const router = useRouter();
-  return (
-    <div
-      className={clsx(
-        bg_container,
-        props['sideBarLayout'],
-        'flex flex-col items-center justify-center gap-4',
-      )}
-    >
-      <Button
-        onPress={menuStore.toggleRightMenu}
-        isIconOnly
-        variant="bordered"
-        color="secondary"
-        size="sm"
-        className="absolute -left-8 -mt-12 border-none"
+const ClosedSideBar = observer(
+  ({
+    setActiveTab,
+    openSideBar,
+  }: {
+    setActiveTab: (newTab: 'projects' | 'teams' | 'notifications') => void;
+    openSideBar: () => void;
+  }) => {
+    const router = useRouter();
+    return (
+      <div
+        onClick={openSideBar}
+        className={clsx(
+          bg_container,
+          sidebar_layout,
+          'flex flex-col items-center justify-center gap-4',
+          'transform transition-all hover:bg-opacity-65 hover:pr-2',
+        )}
       >
-        <ChevronLeft className="stroke-default-400" />
-      </Button>
-
-      <Button
-        onPress={() => {
-          router.push('/profile');
-        }}
-        className="h-fit w-fit min-w-fit rounded-full border-none p-0"
-        variant="bordered"
-      >
-        <Avatar
-          showFallback
-          icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
-          name={userStore.user?.name as string}
-          src={userStore.user?.image as string}
-          size="lg"
-          color="default"
-        />
-      </Button>
-      <Badge color="success" content={15} variant="flat">
         <Button
           onPress={() => {
-            menuStore.setActiveTab('2');
-            menuStore.toggleRightMenu();
+            router.push('/profile');
           }}
-          isIconOnly
-          variant="light"
-          size="md"
+          className="h-fit w-fit min-w-fit rounded-full border-none p-0"
+          variant="bordered"
         >
-          <BellIcon className="stroke-default-500" />
+          <Avatar
+            showFallback
+            icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
+            name={userStore.user?.name || undefined}
+            src={userStore.user?.image || undefined}
+            size="lg"
+            color="default"
+          />
         </Button>
-      </Badge>
-    </div>
-  );
-});
+        {
+          // TODO: add real notifications number
+        }
+        <Badge
+          showOutline={false}
+          size="sm"
+          color="success"
+          content={15 < 100 ? 15 : '99+'}
+          variant="flat"
+          shape="circle"
+        >
+          <Button
+            onPress={() => {
+              setActiveTab('notifications');
+              openSideBar();
+            }}
+            isIconOnly
+            variant="light"
+            size="md"
+          >
+            <BellIcon className="stroke-default-500" />
+          </Button>
+        </Badge>
+      </div>
+    );
+  },
+);
 
 export default ClosedSideBar;

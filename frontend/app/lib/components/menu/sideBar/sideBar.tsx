@@ -2,20 +2,28 @@
 
 import ClosedSideBar from '@/app/lib/components/menu/sideBar/closedSideBar';
 import OpenedSideBar from '@/app/lib/components/menu/sideBar/openedSideBar';
-import menuStore from '@/app/stores/menuStore';
-import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 
-const SideBar = observer(() => {
-  const sideBarLayout: string =
-    'absolute right-0 top-8 z-50 rounded-r-none ' +
-    'rounded-bl-[64px] rounded-tl-2xl px-1 py-12 overflow-visible';
+export default function SideBar() {
+  const [isOpened, setIsOpened] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    'projects' | 'teams' | 'notifications'
+  >('projects');
 
   return (
     <>
-      {!menuStore.isOpen && <ClosedSideBar sideBarLayout={sideBarLayout} />}
-      {menuStore.isOpen && <OpenedSideBar sideBarLayout={sideBarLayout} />}
+      {!isOpened && (
+        <ClosedSideBar
+          openSideBar={() => setIsOpened(true)}
+          setActiveTab={setActiveTab}
+        />
+      )}
+      <OpenedSideBar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpened={isOpened}
+        closeSideBar={() => setIsOpened(false)}
+      />
     </>
   );
-});
-
-export default SideBar;
+}
