@@ -4,18 +4,21 @@ import {
   DrawerBody,
   DrawerContent,
   DrawerHeader,
-  Tab,
-} from '@heroui/react';
-import { Tabs } from '@heroui/tabs';
+} from '@heroui/drawer';
+import { Tab, Tabs } from '@heroui/tabs';
 import { observer } from 'mobx-react-lite';
 import { bg_container, sidebar_layout } from '@/app/lib/types/styles';
 import clsx from 'clsx';
-import { User2Icon, UserCog2Icon } from 'lucide-react';
+import { ChevronLeftIcon, User2Icon, UserCog2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import { Avatar } from '@heroui/avatar';
 import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
+import projectsStore from '@/app/stores/projectsStore';
+import MenuElementCard from '@/app/lib/components/menu/sideBar/menuElementCard';
+import React from 'react';
+import teamsStore from '@/app/stores/teamsStore';
 
 const OpenedSideBar = observer(
   ({
@@ -84,6 +87,7 @@ const OpenedSideBar = observer(
           <DrawerBody className="gap-2 py-0">
             <Tabs
               defaultSelectedKey={activeTab}
+              selectedKey={activeTab}
               onSelectionChange={setActiveTab}
               variant="underlined"
               className="pl-0 font-medium"
@@ -94,11 +98,47 @@ const OpenedSideBar = observer(
               }}
             >
               <Tab key="projects" title={settingsStore.t.menu.tabs.projects}>
-                Your projects!
+                <div className="flex flex-col gap-2">
+                  {
+                    // TODO: show only recent projects / teams
+                  }
+                  {projectsStore.allProjects.slice(0, 4).map((project) => (
+                    <MenuElementCard
+                      key={project.id}
+                      element={project}
+                      isActive={projectsStore.activeProject?.id === project.id}
+                    />
+                  ))}
+                  <MenuElementCard
+                    link={{
+                      href: '/',
+                      text: settingsStore.t.menu.projects.seeAll,
+                      Icon: ChevronLeftIcon,
+                    }}
+                  />
+                </div>
               </Tab>
               <Tab key="teams" title={settingsStore.t.menu.tabs.teams}>
-                Your teams!
+                <div className="flex flex-col gap-2">
+                  {teamsStore.allTeams.slice(0, 4).map((team) => (
+                    <MenuElementCard
+                      key={team.id}
+                      element={team}
+                      isActive={teamsStore.activeTeam?.id === team.id}
+                    />
+                  ))}
+                  <MenuElementCard
+                    link={{
+                      href: '/',
+                      text: settingsStore.t.menu.teams.seeAll,
+                      Icon: ChevronLeftIcon,
+                    }}
+                  />
+                </div>
               </Tab>
+              {
+                // TODO: add notifications
+              }
               <Tab
                 key="notifications"
                 title={settingsStore.t.menu.tabs.notifications}

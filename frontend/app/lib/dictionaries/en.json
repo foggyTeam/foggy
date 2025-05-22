@@ -203,6 +203,12 @@
       "projects": "PROJECTS",
       "teams": "TEAMS",
       "notifications": "NOTIFICATIONS"
+    },
+    "projects": {
+      "seeAll": "All projects..."
+    },
+    "teams": {
+      "seeAll": "All teams..."
     }
   },
 
