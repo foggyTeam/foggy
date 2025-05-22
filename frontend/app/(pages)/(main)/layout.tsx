@@ -1,6 +1,5 @@
 import React from 'react';
-import LogoBar from '@/app/lib/components/menu/logoBar';
-import SideBar from '@/app/lib/components/menu/sideBar/sideBar';
+import RightSideBar from '@/app/lib/components/menu/rightSideBar/rightSideBar';
 import { User } from 'next-auth';
 import { getRequest } from '@/app/lib/server/requests';
 import { cookies } from 'next/headers';
@@ -12,6 +11,7 @@ import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 import { Project, Team } from '@/app/lib/types/definitions';
 import allProjects from '@/app/mockData/projects.json';
 import allTeams from '@/app/mockData/teams.json';
+import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 
 async function getUser() {
   const cookie = (await cookies()).get('session' as any)?.value;
@@ -88,8 +88,8 @@ export default async function MainLayout({
       <UserLoader userData={user} />
       <ProjectsLoader projectsData={userProjects} />
       <TeamsLoader teamsData={userTeams} />
-      <LogoBar />
-      <SideBar />
+      <LeftSideBar />
+      <RightSideBar />
       {children}
     </>
   );

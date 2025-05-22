@@ -12,7 +12,7 @@ function FoggySmall(props: any) {
       {...props}
     >
       <defs>
-        <linearGradient id="logo-gradient" x1="0" y1="1" x2="0,5" y2="0">
+        <linearGradient id="logo-gradient" x1="0" y1="1" x2="1" y2="0">
           <stop offset="0%" stopColor={primary.DEFAULT} />
           <stop offset="30%" stopColor={secondary[400]} />
           <stop offset="35%" stopColor={danger[400]} />

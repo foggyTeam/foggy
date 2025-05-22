@@ -45,6 +45,8 @@ class ProjectsStore {
       deleteProjectChild: action,
       updateProjectMember: action,
       removeProjectMember: action,
+      activeBoardParentList: observable,
+      getActiveBoardParentList: action,
     });
   }
 
@@ -283,6 +285,36 @@ class ProjectsStore {
       this.connectSocket(board?.id || '');
     }
   };
+  getActiveBoardParentList = (): string[] => {
+    if (!(this.activeBoard && this.activeProject)) return [];
+
+    const parentList = [];
+    function searchSection(
+      activeBoardId: string,
+      section: ProjectSection,
+      path: string[],
+    ): string[] {
+      for (let child of section.children) {
+        if ('type' in child && child.id === activeBoardId) {
+          return [...path, section.id];
+        }
+        if (!('type' in child)) {
+          const result = searchSection(activeBoardId, child as ProjectSection, [
+            ...path,
+            section.id,
+          ]);
+          if (result) return result;
+        }
+      }
+      return path;
+    }
+
+    for (const section of this.activeProject.sections.values()) {
+      const result = searchSection(this.activeBoard.id, section, []);
+      if (result) return result;
+    }
+    return parentList;
+  };
   setActiveProject = (project: RawProject) => {
     this.activeProject = ConvertRawProject(project);
     this.myRole = this.activeProject.members?.find(
@@ -442,6 +474,8 @@ class ProjectsStore {
       );
     }
   };
+
+  activeBoardParentList: string[] = this.getActiveBoardParentList() || [];
 }
 
 const projectsStore = new ProjectsStore();

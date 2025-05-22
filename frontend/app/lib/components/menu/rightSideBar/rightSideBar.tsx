@@ -1,10 +1,10 @@
 'use client';
 
-import ClosedSideBar from '@/app/lib/components/menu/sideBar/closedSideBar';
-import OpenedSideBar from '@/app/lib/components/menu/sideBar/openedSideBar';
+import ClosedRightSideBar from '@/app/lib/components/menu/rightSideBar/closedRightSideBar';
+import OpenedRightSideBar from '@/app/lib/components/menu/rightSideBar/openedRightSideBar';
 import { useState } from 'react';
 
-export default function SideBar() {
+export default function RightSideBar() {
   const [isOpened, setIsOpened] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'projects' | 'teams' | 'notifications'
@@ -13,12 +13,12 @@ export default function SideBar() {
   return (
     <>
       {!isOpened && (
-        <ClosedSideBar
+        <ClosedRightSideBar
           openSideBar={() => setIsOpened(true)}
           setActiveTab={setActiveTab}
         />
       )}
-      <OpenedSideBar
+      <OpenedRightSideBar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isOpened={isOpened}

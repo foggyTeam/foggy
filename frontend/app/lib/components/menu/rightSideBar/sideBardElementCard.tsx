@@ -5,7 +5,7 @@ import { Button } from '@heroui/button';
 import Link from 'next/link';
 import clsx from 'clsx';
 
-export default function MenuElementCard({
+export default function SideBardElementCard({
   element,
   link,
   isActive,

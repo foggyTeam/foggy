@@ -68,14 +68,17 @@ export default function Cursors() {
     const handleStageChange = () => setForceUpdate((prev) => !prev);
     const handleMouseMove = (event: MouseEvent) => {
       if (event.buttons > 0) handleStageChange();
-      const { x, y } = stageRef.current?.getRelativePointerPosition();
-      socket.emit('cursorMove', {
-        id: userId,
-        nickname: nickname,
-        color: userColor,
-        x,
-        y,
-      });
+      const relativePosition = stageRef.current?.getRelativePointerPosition();
+      if (relativePosition) {
+        const { x, y } = relativePosition;
+        socket.emit('cursorMove', {
+          id: userId,
+          nickname: nickname,
+          color: userColor,
+          x,
+          y,
+        });
+      }
     };
 
     const throttledMouseMove = throttle(handleMouseMove, 50);

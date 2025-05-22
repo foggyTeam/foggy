@@ -1,7 +1,7 @@
 import { Board } from '@/app/lib/types/definitions';
 import { useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
-import ElementIcon from '@/app/lib/components/menu/projectBar/elementIcon';
+import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';

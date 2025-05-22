@@ -2,7 +2,7 @@ import { Modal, ModalBody, ModalContent, ModalHeader } from '@heroui/modal';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Tab, Tabs } from '@heroui/tabs';
 import { ProjectElementTypes } from '@/app/lib/types/definitions';
-import ElementIcon from '@/app/lib/components/menu/projectBar/elementIcon';
+import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import settingsStore from '@/app/stores/settingsStore';
 import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';

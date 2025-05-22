@@ -5,11 +5,11 @@ import { observer } from 'mobx-react-lite';
 import userStore from '@/app/stores/userStore';
 import { BellIcon, User2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { bg_container, sidebar_layout } from '@/app/lib/types/styles';
+import { bg_container, right_sidebar_layout } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 
-const ClosedSideBar = observer(
+const ClosedRightSideBar = observer(
   ({
     setActiveTab,
     openSideBar,
@@ -23,7 +23,7 @@ const ClosedSideBar = observer(
         onClick={openSideBar}
         className={clsx(
           bg_container,
-          sidebar_layout,
+          right_sidebar_layout,
           'flex flex-col items-center justify-center gap-4',
           'transform transition-all hover:bg-opacity-65 hover:pr-2',
         )}
@@ -72,4 +72,4 @@ const ClosedSideBar = observer(
   },
 );
 
-export default ClosedSideBar;
+export default ClosedRightSideBar;

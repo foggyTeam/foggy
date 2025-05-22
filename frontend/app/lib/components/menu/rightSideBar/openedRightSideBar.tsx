@@ -7,7 +7,7 @@ import {
 } from '@heroui/drawer';
 import { Tab, Tabs } from '@heroui/tabs';
 import { observer } from 'mobx-react-lite';
-import { bg_container, sidebar_layout } from '@/app/lib/types/styles';
+import { bg_container, right_sidebar_layout } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { ChevronLeftIcon, User2Icon, UserCog2Icon } from 'lucide-react';
 import { Button } from '@heroui/button';
@@ -16,11 +16,11 @@ import { Avatar } from '@heroui/avatar';
 import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
 import projectsStore from '@/app/stores/projectsStore';
-import MenuElementCard from '@/app/lib/components/menu/sideBar/menuElementCard';
+import SideBardElementCard from '@/app/lib/components/menu/rightSideBar/sideBardElementCard';
 import React from 'react';
 import teamsStore from '@/app/stores/teamsStore';
 
-const OpenedSideBar = observer(
+const OpenedRightSideBar = observer(
   ({
     activeTab,
     setActiveTab,
@@ -44,7 +44,7 @@ const OpenedSideBar = observer(
         hideCloseButton
         className={clsx(
           bg_container,
-          sidebar_layout,
+          right_sidebar_layout,
           'h-fit w-fit',
           'transform transition-all hover:bg-opacity-65 hover:pr-0.5',
         )}
@@ -103,13 +103,13 @@ const OpenedSideBar = observer(
                     // TODO: show only recent projects / teams
                   }
                   {projectsStore.allProjects.slice(0, 4).map((project) => (
-                    <MenuElementCard
+                    <SideBardElementCard
                       key={project.id}
                       element={project}
                       isActive={projectsStore.activeProject?.id === project.id}
                     />
                   ))}
-                  <MenuElementCard
+                  <SideBardElementCard
                     link={{
                       href: '/',
                       text: settingsStore.t.menu.projects.seeAll,
@@ -121,13 +121,13 @@ const OpenedSideBar = observer(
               <Tab key="teams" title={settingsStore.t.menu.tabs.teams}>
                 <div className="flex flex-col gap-2">
                   {teamsStore.allTeams.slice(0, 4).map((team) => (
-                    <MenuElementCard
+                    <SideBardElementCard
                       key={team.id}
                       element={team}
                       isActive={teamsStore.activeTeam?.id === team.id}
                     />
                   ))}
-                  <MenuElementCard
+                  <SideBardElementCard
                     link={{
                       href: '/',
                       text: settingsStore.t.menu.teams.seeAll,
@@ -153,4 +153,4 @@ const OpenedSideBar = observer(
   },
 );
 
-export default OpenedSideBar;
+export default OpenedRightSideBar;
