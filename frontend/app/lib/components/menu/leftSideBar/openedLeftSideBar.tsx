@@ -12,6 +12,10 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import FoggyLarge from '@/app/lib/components/svg/foggyLarge';
+import { BreadcrumbItem, Breadcrumbs } from '@heroui/breadcrumbs';
+import { Button } from '@heroui/button';
+import { SettingsIcon } from 'lucide-react';
+import projectsStore from '@/app/stores/projectsStore';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -46,7 +50,50 @@ const OpenedLeftSideBar = observer(
               />
             </Link>
           </DrawerHeader>
-          <DrawerBody className="gap-2 py-0">body</DrawerBody>
+          <DrawerBody className="gap-2 py-0">
+            <div className="flex items-center justify-between gap-2">
+              <Breadcrumbs
+                className="w-64"
+                itemClasses={{
+                  separator: 'px-1',
+                }}
+                separator="/"
+                maxItems={3}
+                itemsBeforeCollapse={1}
+                itemsAfterCollapse={1}
+              >
+                <BreadcrumbItem>
+                  <p className="max-w-24 overflow-hidden text-ellipsis text-nowrap">
+                    PROJECT FOGGY
+                  </p>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <p className="max-w-24 overflow-hidden text-ellipsis text-nowrap">
+                    SECTION
+                  </p>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <p className="max-w-24 overflow-hidden text-ellipsis text-nowrap">
+                    SECTION
+                  </p>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <p className="max-w-24 overflow-hidden text-ellipsis text-nowrap">
+                    FINAL SECTION
+                  </p>
+                </BreadcrumbItem>
+              </Breadcrumbs>
+              <Button
+                as={Link}
+                href={`/project/${projectsStore.activeProject?.id}`}
+                isIconOnly
+                variant="light"
+                size="md"
+              >
+                <SettingsIcon className="stroke-default-500" />
+              </Button>
+            </div>
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     );

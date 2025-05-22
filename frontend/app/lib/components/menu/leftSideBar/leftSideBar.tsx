@@ -1,7 +1,7 @@
 'use client';
 
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LogoBar from '@/app/lib/components/menu/leftSideBar/logoBar';
 import RecentBar from '@/app/lib/components/menu/leftSideBar/recentBar';
 import { usePathname } from 'next/navigation';
@@ -15,6 +15,10 @@ const LeftSideBar = observer(() => {
 
   const [isOpened, setIsOpened] = useState(false);
   const path = usePathname();
+
+  useEffect(() => {
+    if (!pathRegex.test(path)) setIsOpened(false);
+  }, [path]);
 
   return (
     <>

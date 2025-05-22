@@ -315,7 +315,12 @@ class ProjectsStore {
     }
     return parentList;
   };
-  setActiveProject = (project: RawProject) => {
+  setActiveProject = (project: RawProject | null) => {
+    if (!project) {
+      this.activeProject = undefined;
+      this.myRole = undefined;
+      return;
+    }
     this.activeProject = ConvertRawProject(project);
     this.myRole = this.activeProject.members?.find(
       (member) => member.id === userStore.user?.id,

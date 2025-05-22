@@ -11,6 +11,7 @@ export default function ProjectLoader({
 }) {
   useEffect(() => {
     if (projectData) projectsStore.setActiveProject(projectData);
+    return () => projectsStore.setActiveProject(null);
   }, [projectData]);
 
   return null;
