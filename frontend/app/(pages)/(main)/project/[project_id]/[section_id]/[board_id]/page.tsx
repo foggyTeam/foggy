@@ -37,7 +37,11 @@ async function getBoard(
 
   try {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(board as Board), 300);
+      setTimeout(
+        () =>
+          resolve({ ...board, sectionId: section_id, id: board_id } as Board),
+        300,
+      );
     });
   } catch (e) {
     console.error('User with this id does not exist.');

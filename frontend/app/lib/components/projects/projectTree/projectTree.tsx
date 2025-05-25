@@ -24,7 +24,9 @@ const ActiveNodeContext = createContext<ActiveNodeContextType | null>(null);
 export const useActiveSectionContext = () => {
   const context = useContext(ActiveNodeContext);
   if (!context)
-    throw new Error('useMyContext must be used within a MyContextProvider');
+    throw new Error(
+      'useActiveSectionContext must be used within a ActiveSectionContextProvider',
+    );
   return context;
 };
 

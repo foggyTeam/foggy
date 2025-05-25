@@ -65,8 +65,25 @@
           "id": "section-1-1",
           "name": "Wireframes",
           "parentId": "section-1",
-          "childrenNumber": 0,
-          "children": {}
+          "childrenNumber": 1,
+          "children": {
+            "section-1-1-1": {
+              "id": "section-1-1-1",
+              "name": "Last child",
+              "parentId": "section-1-1",
+              "childrenNumber": 1,
+              "children": {
+                "68223ee314345c6594f83ead": {
+                  "sectionId": "section-1-1-1",
+                  "id": "68223ee314345c6594f83ead",
+                  "name": "Test board",
+                  "type": "SIMPLE",
+                  "layers": [],
+                  "lastChange": "2025-04-17T16:36:24.000Z"
+                }
+              }
+            }
+          }
         },
         "section-1-2": {
           "id": "section-1-2",
