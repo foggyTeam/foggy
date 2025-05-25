@@ -20,7 +20,7 @@ export class Section {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Types.ObjectId })
   projectId: Types.ObjectId;
 
   @Prop({ default: null, type: Types.ObjectId, ref: 'Section' })
