@@ -227,23 +227,116 @@ export class ProjectService {
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<void> {
     await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-
-    project.sections = project.sections.filter(
-      (section) => !section.equals(sectionId),
-    );
-
-    try {
-      await project.save();
-      return project;
-    } catch {
+    await this.findProjectById(projectId, userId);
+    const userRole = await this.getUserRole(projectId, userId);
+    if (!['owner', 'admin', 'editor'].includes(userRole)) {
       throw new CustomException(
-        getErrorMessages({ project: 'updateFailed' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.FORBIDDEN,
       );
     }
+    const targetSection = await this.sectionModel.findById(sectionId).exec();
+    if (!targetSection) {
+      throw new CustomException(
+        getErrorMessages({ section: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    if (targetSection.parent) {
+      await this.sectionModel.updateOne(
+        { _id: targetSection.parent },
+        { $pull: { items: { type: 'section', itemId: sectionId } } },
+      );
+    } else if (targetSection.parent === null) {
+      await this.projectModel.updateOne(
+        { _id: projectId },
+        { $pull: { sections: sectionId } },
+      );
+    }
+
+    const sectionsToDelete = await this.sectionModel
+      .aggregate([
+        {
+          $match: { _id: sectionId },
+        },
+        {
+          $graphLookup: {
+            from: 'sections',
+            startWith: '$_id',
+            connectFromField: '_id',
+            connectToField: 'parent',
+            as: 'descendants',
+            depthField: 'depth',
+          },
+        },
+        {
+          $project: {
+            allSections: {
+              $concatArrays: [['$_id'], '$descendants._id'],
+            },
+          },
+        },
+        {
+          $unwind: '$allSections',
+        },
+        {
+          $group: {
+            _id: null,
+            sectionIds: { $addToSet: '$allSections' },
+          },
+        },
+      ])
+      .exec();
+    console.log('2', sectionsToDelete);
+    if (sectionsToDelete.length === 0) {
+      throw new CustomException(
+        getErrorMessages({ section: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const sectionIds = sectionsToDelete[0].sectionIds;
+
+    const boardsInSections = await this.sectionModel
+      .aggregate([
+        {
+          $match: { _id: { $in: sectionIds } },
+        },
+        {
+          $unwind: '$items',
+        },
+        {
+          $match: { 'items.type': 'board' },
+        },
+        {
+          $group: {
+            _id: null,
+            boardIds: { $addToSet: '$items.itemId' },
+          },
+        },
+      ])
+      .exec();
+
+    const boardIds =
+      boardsInSections.length > 0 ? boardsInSections[0].boardIds : [];
+    await Promise.all(
+      boardIds.map((boardId) =>
+        this.boardService.deleteById(boardId, { removeFromParent: false }),
+      ),
+    );
+
+    await Promise.all([
+      this.sectionModel.deleteMany({ _id: { $in: sectionIds } }),
+      this.sectionModel.updateMany(
+        { 'items.itemId': { $in: sectionIds } },
+        { $pull: { items: { itemId: { $in: sectionIds } } } },
+      ),
+      this.projectModel.updateOne(
+        { _id: projectId, sections: sectionId },
+        { $pull: { sections: sectionId } },
+      ),
+    ]);
   }
 
   async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectDocument[]> {
@@ -529,7 +622,7 @@ export class ProjectService {
     boardId: Types.ObjectId,
   ): Promise<void> {
     try {
-      if (!sectionId || !Types.ObjectId.isValid(sectionId)) {
+      if (!Types.ObjectId.isValid(sectionId)) {
         console.warn(
           `Skipping section cleanup - invalid sectionId for board ${boardId}`,
         );
@@ -640,7 +733,8 @@ export class ProjectService {
             getErrorMessages({ section: 'notFound' }),
             HttpStatus.NOT_FOUND,
           ),
-      );
+      )
+      .exec();
     const newSection = new this.sectionModel({
       projectId,
       name,
