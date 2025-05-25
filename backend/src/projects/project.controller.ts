@@ -348,7 +348,16 @@ export class ProjectController {
     @Body() createSectionDto: CreateSectionDto,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<SectionDocument> {
-    return this.projectService.addSection(projectId, userId, createSectionDto);
+    return this.projectService.addSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(userId),
+      {
+        ...createSectionDto,
+        parentSectionId: createSectionDto.parentSectionId
+          ? new Types.ObjectId(createSectionDto.parentSectionId)
+          : undefined,
+      },
+    );
   }
 
   @Get(':id/sections/:sectionId')
@@ -408,7 +417,7 @@ export class ProjectController {
 
   @Delete(':id/sections/:sectionId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Remove section from project' })
+  @ApiOperation({ summary: 'Delete section' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
@@ -430,7 +439,11 @@ export class ProjectController {
     @Param('sectionId') sectionId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
-    await this.projectService.removeSection(projectId, sectionId, userId);
+    await this.projectService.removeSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(sectionId),
+      userId,
+    );
   }
 
   @Patch(':id/sections/boards/:boardId/section')

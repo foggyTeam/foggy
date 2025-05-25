@@ -120,9 +120,18 @@ export class BoardService {
     }
   }
 
-  async deleteById(boardId: Types.ObjectId): Promise<void> {
+  async deleteById(
+    boardId: Types.ObjectId,
+    options?: { removeFromParent: boolean },
+  ): Promise<void> {
     const board = await this.findById(boardId);
-    await this.projectService.removeBoardFromSection(board.sectionId, boardId);
+    const shouldRemoveFromParent = options?.removeFromParent !== false;
+    if (shouldRemoveFromParent && board.sectionId) {
+      await this.projectService.removeBoardFromSection(
+        board.sectionId,
+        boardId,
+      );
+    }
     await this.layerModel.deleteMany({ boardId: board._id }).exec();
 
     const result = await this.boardModel.deleteOne({ _id: boardId }).exec();
