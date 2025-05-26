@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateSectionDto {
@@ -18,5 +18,6 @@ export class CreateSectionDto {
     nullable: true,
   })
   @IsOptional()
+  @IsMongoId()
   parentSectionId?: Types.ObjectId | null;
 }

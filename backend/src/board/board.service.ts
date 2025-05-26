@@ -244,16 +244,19 @@ export class BoardService {
     const board = await this.findById(boardId);
     const oldSectionId = board.sectionId;
 
-    if (!newSectionId || oldSectionId.toString() === newSectionId.toString()) {
+    if (
+      !newSectionId ||
+      (oldSectionId && oldSectionId.toString() === newSectionId.toString())
+    ) {
       return;
     }
     board.sectionId = newSectionId;
     await board.save();
 
-    await Promise.all([
-      this.projectService.removeBoardFromSection(oldSectionId, boardId),
-      this.projectService.addBoardToSection(newSectionId, boardId),
-    ]);
+    if (oldSectionId) {
+      await this.projectService.removeBoardFromSection(oldSectionId, boardId);
+    }
+    await this.projectService.addBoardToSection(newSectionId, boardId);
   }
 
   public async updateElement(
