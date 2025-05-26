@@ -190,11 +190,20 @@ export class ProjectController {
   @ApiResponse({ status: 409, description: 'User already in project' })
   @ApiBody({
     description: 'User and role data',
-    schema: {
-      type: 'object',
-      properties: {
-        userId: { type: 'string', description: 'User ID to add' },
-        role: { type: 'Role' },
+    examples: {
+      example1: {
+        summary: 'Add user as editor',
+        value: {
+          userId: '507f1f77bcf86cd799439011',
+          role: 'editor',
+        },
+      },
+      example2: {
+        summary: 'Add user as reader',
+        value: {
+          userId: '507f1f77bcf86cd799439012',
+          role: 'reader',
+        },
       },
     },
   })
@@ -245,7 +254,7 @@ export class ProjectController {
     );
   }
 
-  @Put(':id/users/:userId/role')
+  @Patch(':id/users/:userId/role')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update user role in project' })
   @ApiSecurity('x-user-id')
@@ -271,16 +280,26 @@ export class ProjectController {
   })
   @ApiBody({
     description: 'New role for user',
-    schema: {
-      type: 'object',
-      properties: {
-        role: { type: 'Role' },
+    examples: {
+      example1: {
+        summary: 'Change role to admin',
+        value: {
+          userId: '507f1f77bcf86cd799439012',
+          role: 'admin',
+        },
+      },
+      example2: {
+        summary: 'Change role to reader',
+        value: {
+          userId: '507f1f77bcf86cd799439012',
+          role: 'reader',
+        },
       },
     },
   })
   async updateUserRole(
     @Param('id') projectId: Types.ObjectId,
-    @Param('userId') targetUserId: Types.ObjectId,
+    @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') newRole: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
   ): Promise<Project> {
