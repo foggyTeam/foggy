@@ -1,5 +1,4 @@
 import FoggySmall from '@/app/lib/components/svg/foggySmall';
-import { primary } from '@/tailwind.config';
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
 import Link from 'next/link';
@@ -14,7 +13,11 @@ export default function LogoBar() {
       )}
     >
       <Link href="/">
-        <FoggySmall fill={primary[500]} width={48} height={48} />
+        <FoggySmall
+          className="fill-primary stroke-primary stroke-0 transition-all duration-300 hover:fill-[url(#logo-gradient)] hover:stroke-2"
+          width={48}
+          height={48}
+        />
       </Link>
     </div>
   );

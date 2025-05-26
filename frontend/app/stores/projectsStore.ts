@@ -45,6 +45,8 @@ class ProjectsStore {
       deleteProjectChild: action,
       updateProjectMember: action,
       removeProjectMember: action,
+      activeBoardParentList: observable,
+      getProjectChildParentList: action,
     });
   }
 
@@ -283,7 +285,45 @@ class ProjectsStore {
       this.connectSocket(board?.id || '');
     }
   };
-  setActiveProject = (project: RawProject) => {
+  getProjectChildParentList = (childId?: string): string[] => {
+    if (!this.activeProject) return [];
+    const searchId = childId || this.activeBoard?.id;
+    if (!searchId) return [];
+
+    function searchSection(
+      searchId: string,
+      section: ProjectSection,
+      path: string[],
+    ): string[] | undefined {
+      if (searchId === section.id) return path;
+      for (let child of section.children.values()) {
+        if ('type' in child && child.id === searchId) {
+          return [...path, section.id];
+        }
+        if (!('type' in child)) {
+          const result = searchSection(searchId, child as ProjectSection, [
+            ...path,
+            section.id,
+          ]);
+          if (result) return result;
+        }
+      }
+      return undefined;
+    }
+
+    for (const section of this.activeProject.sections.values()) {
+      const result = searchSection(searchId, section, []);
+      if (result) return result;
+    }
+    throw new Error('Project child with this id not found!');
+  };
+
+  setActiveProject = (project: RawProject | null) => {
+    if (!project) {
+      this.activeProject = undefined;
+      this.myRole = undefined;
+      return;
+    }
     this.activeProject = ConvertRawProject(project);
     this.myRole = this.activeProject.members?.find(
       (member) => member.id === userStore.user?.id,
@@ -403,7 +443,7 @@ class ProjectsStore {
 
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
-        console.error('Не удалось добавить элемент');
+        console.error('Не удалось удалить элемент');
         return;
       }
 
@@ -417,6 +457,49 @@ class ProjectsStore {
     // удаление с верхнего уровеня
     if (parentSections.length === 0)
       this.activeProject.sections.delete(childId);
+
+    if (childId === this.activeBoard?.id) this.setActiveBoard(undefined);
+  };
+  getProjectChild = (
+    childId: string | undefined,
+    parentSections?: string[],
+  ): Board | ProjectSection | Map<string, ProjectSection> => {
+    if (!this.activeProject) return;
+    if (childId === undefined && parentSections === undefined) return;
+
+    parentSections =
+      parentSections !== undefined
+        ? parentSections
+        : this.getProjectChildParentList(childId);
+
+    let currentSection: Map<string, ProjectSection> =
+      this.activeProject.sections;
+
+    for (let i = 0; i < parentSections.length; i++) {
+      const sectionId = parentSections[i];
+      const nextSection = currentSection.get(sectionId);
+
+      // если секция не найдена или структура некорректна
+      if (!nextSection || !('children' in nextSection)) {
+        throw new Error(
+          'Project child with this id not found or parent list is invalid!',
+        );
+      }
+
+      if (i === parentSections.length - 1) {
+        if (nextSection.id === childId) return nextSection;
+
+        if (nextSection.children) return nextSection.children[childId];
+      } else currentSection = nextSection.children;
+    }
+
+    // поиск на верхнем уровне
+    if (parentSections.length === 0) {
+      if (childId) return this.activeProject.sections[childId];
+      return currentSection;
+    }
+
+    throw new Error('Project child with this id not found!');
   };
 
   updateProjectMember = (
@@ -442,6 +525,8 @@ class ProjectsStore {
       );
     }
   };
+
+  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
 }
 
 const projectsStore = new ProjectsStore();

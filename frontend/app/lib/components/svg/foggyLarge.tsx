@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { danger, primary, secondary } from '@/tailwind.config';
 
 function FoggyLarge(props: any) {
   return (
@@ -10,6 +11,24 @@ function FoggyLarge(props: any) {
       viewBox="0 0 360 150"
       {...props}
     >
+      <defs>
+        <linearGradient id="logo-gradient" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stopColor={primary.DEFAULT} />
+          <stop offset="30%" stopColor={secondary[400]} />
+          <stop offset="35%" stopColor={danger[400]} />
+          <stop offset="40%" stopColor={secondary[400]} />
+          <stop offset="70%" stopColor={primary.DEFAULT} />
+          <animateTransform
+            attributeName="gradientTransform"
+            type="translate"
+            values="-0,5; 10,0"
+            dur="4s"
+            repeatCount="indefinite"
+            additive="sum"
+          />
+        </linearGradient>
+      </defs>
+
       <path
         fill="#fff"
         fillRule="evenodd"

@@ -5,12 +5,14 @@ import React from 'react';
 import clsx from 'clsx';
 import RoleCard from '@/app/lib/components/members/roleCard';
 import userStore from '@/app/stores/userStore';
+import { useRouter } from 'next/navigation';
 
 export default function TeamCard(team: Team) {
+  const router = useRouter();
+
   return (
     <div
-      // TODO: navigate to team
-      onClick={() => console.log('hi')}
+      onClick={() => router.push(`/team/${team.id}`)}
       className={clsx(
         'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
         el_animation,
