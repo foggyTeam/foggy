@@ -21,7 +21,12 @@ import {
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { ProjectService } from './project.service';
-import { Project, ProjectListItem, Role } from './schemas/project.schema';
+import {
+  ExtendedProjectListItem,
+  Project,
+  ProjectListItem,
+  Role,
+} from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SectionDocument } from './schemas/section.schema';
@@ -108,7 +113,10 @@ export class ProjectController {
                 _id: { type: 'string' },
                 name: { type: 'string' },
                 avatar: { type: 'string' },
-                role: { type: 'string' },
+                role: {
+                  type: 'string',
+                  enum: ['owner', 'admin', 'editor', 'reader'],
+                },
                 team: { type: 'string', nullable: true },
                 teamId: { type: 'string', nullable: true },
               },
@@ -126,7 +134,7 @@ export class ProjectController {
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get project by ID' })
+  @ApiOperation({ summary: 'Get project by ID with sections hierarchy' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
@@ -136,15 +144,88 @@ export class ProjectController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns the project document',
-    type: Project,
+    description: 'Returns the project with sections hierarchy',
+    schema: {
+      type: 'object',
+      properties: {
+        _id: { type: 'string' },
+        name: { type: 'string' },
+        avatar: { type: 'string' },
+        description: { type: 'string', nullable: true },
+        updatedAt: { type: 'string', format: 'date-time' },
+        settings: {
+          type: 'object',
+          properties: {
+            allowRequests: { type: 'boolean' },
+            isPublic: { type: 'boolean' },
+            memberListIsPublic: { type: 'boolean' },
+          },
+        },
+        members: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              _id: { type: 'string' },
+              nickname: { type: 'string' },
+              avatar: { type: 'string' },
+              role: {
+                type: 'string',
+                enum: ['owner', 'admin', 'editor', 'reader'],
+              },
+              team: { type: 'string', nullable: true },
+              teamId: { type: 'string', nullable: true },
+            },
+          },
+        },
+        sections: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              _id: { type: 'string' },
+              parentId: { type: 'string', nullable: true },
+              name: { type: 'string' },
+              childrenNumber: { type: 'number' },
+              children: {
+                type: 'array',
+                items: {
+                  oneOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        _id: { type: 'string' },
+                        parentId: { type: 'string' },
+                        name: { type: 'string' },
+                        childrenNumber: { type: 'number' },
+                        children: { type: 'array', items: {} },
+                      },
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        _id: { type: 'string' },
+                        sectionId: { type: 'string' },
+                        name: { type: 'string' },
+                        type: { type: 'string' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 404, description: 'Project not found' })
   async findById(
     @Param('id') id: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
+  ): Promise<ExtendedProjectListItem> {
     return this.projectService.getProjectById(id, new Types.ObjectId(userId));
   }
 

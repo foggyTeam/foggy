@@ -2,6 +2,9 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
+  ChildBoard,
+  ChildSection,
+  ExtendedProjectListItem,
   Project,
   ProjectDocument,
   ProjectListItem,
@@ -329,9 +332,123 @@ export class ProjectService {
   async getProjectById(
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<ExtendedProjectListItem> {
     await this.validateUser(userId, projectId, 'reader');
-    return this.findProjectById(projectId);
+
+    const project = await this.projectModel
+      .findById(projectId)
+      .populate({
+        path: 'accessControlUsers.userId',
+        select: 'nickname avatar',
+      })
+      .exec();
+
+    if (!project) {
+      throw new CustomException(
+        getErrorMessages({ project: 'idNotFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const members = project.accessControlUsers.map((user) => {
+      const userObj = user.userId as any;
+      return {
+        _id: userObj._id,
+        nickname: userObj.nickname,
+        avatar: userObj.avatar,
+        role: user.role,
+        team: undefined,
+        teamId: undefined,
+      };
+    });
+
+    const rootSections = await this.sectionModel
+      .find({ _id: { $in: project.sections }, parent: null })
+      .lean()
+      .exec();
+
+    const rootSectionIds = rootSections.map((s) => s._id);
+    const childSections = await this.sectionModel
+      .find({ parent: { $in: rootSectionIds } })
+      .lean()
+      .exec();
+
+    const allBoardIds: Types.ObjectId[] = [];
+    rootSections.forEach((section) => {
+      section.items.forEach((item) => {
+        if (item.type === 'board') {
+          allBoardIds.push(item.itemId);
+        }
+      });
+    });
+    childSections.forEach((section) => {
+      section.items.forEach((item) => {
+        if (item.type === 'board') {
+          allBoardIds.push(item.itemId);
+        }
+      });
+    });
+
+    const boards = allBoardIds.length
+      ? await this.boardModel
+          .find({ _id: { $in: allBoardIds } })
+          .lean()
+          .exec()
+      : [];
+
+    const boardMap = new Map(boards.map((b) => [b._id.toString(), b]));
+    const childSectionMap = new Map(
+      childSections.map((s) => [s._id.toString(), s]),
+    );
+
+    function buildSectionChildren(section): Array<ChildSection | ChildBoard> {
+      return section.items
+        .map((item) => {
+          if (item.type === 'section') {
+            const child = childSectionMap.get(item.itemId.toString());
+            if (!child) return null;
+            return {
+              _id: child._id,
+              parentId: child.parent,
+              name: child.name,
+              childrenNumber: child.items.length,
+              // Дальше детей НЕ включаем (children: [])
+              children: [],
+            } as ChildSection;
+          } else if (item.type === 'board') {
+            const board = boardMap.get(item.itemId.toString());
+            if (!board) return null;
+            return {
+              _id: board._id,
+              sectionId: board.sectionId,
+              name: board.name,
+              type: board.type,
+              updatedAt: board.updatedAt,
+            } as ChildBoard;
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
+
+    const sections: ChildSection[] = rootSections.map((section) => ({
+      _id: section._id,
+      parentId: section.parent,
+      name: section.name,
+      childrenNumber: section.items.length,
+      children: buildSectionChildren(section),
+    }));
+
+    return {
+      _id: project._id,
+      name: project.name,
+      avatar: project.avatar,
+      description: project.description,
+      updatedAt: project.updatedAt,
+      members,
+      settings: project.settings,
+      sections,
+    };
   }
 
   async addUser(

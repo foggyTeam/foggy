@@ -19,6 +19,9 @@ export class Board {
   layers: Types.ObjectId[];
 }
 
-export type BoardDocument = HydratedDocument<Board>;
+export type BoardDocument = HydratedDocument<Board> & {
+  updatedAt: Date;
+  createdAt: Date;
+};
 
 export const BoardSchema = SchemaFactory.createForClass(Board);
