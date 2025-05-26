@@ -102,8 +102,8 @@ export default function ProjectCard(project: Project) {
             {project.members
               .sort(CompareByRole)
               .slice(0, 7)
-              .map((member) => (
-                <MediumMemberCard key={member.id} {...member} />
+              .map((member, index) => (
+                <MediumMemberCard key={index} {...member} />
               ))}
             {project.members.length > 7 && (
               <a
@@ -119,12 +119,12 @@ export default function ProjectCard(project: Project) {
           </div>
         ) : (
           <AvatarGroup>
-            {project.members.slice(0, 3).map((member) => (
+            {project.members.slice(0, 3).map((member, index) => (
               <Avatar
                 classNames={{
                   base: 'h-7 w-7 border-white border-1.5',
                 }}
-                key={member.id}
+                key={index}
                 name={member.nickname}
                 src={member.avatar}
               />

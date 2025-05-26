@@ -330,12 +330,16 @@ class ProjectsStore {
     ).role;
   };
   setAllProjects = (projects: any[]) => {
-    console.log(projects);
     this.allProjects = projects.map((project) => {
       return {
         id: project._id,
         lastChange: project.updatedAt,
-        members: [],
+        members: project.members.map((member) => {
+          return {
+            id: member._id,
+            ...member,
+          } as ProjectMember;
+        }),
         ...project,
       } as Project;
     }) as Project[];

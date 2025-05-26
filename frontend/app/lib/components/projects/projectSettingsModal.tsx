@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import { addNewProject } from '@/app/lib/server/actions/addNewProject';
 import userStore from '@/app/stores/userStore';
-import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
 const ProjectSettingsModal = observer(
   ({
@@ -74,6 +74,10 @@ const ProjectSettingsModal = observer(
         );
 
         if ('url' in response) {
+          if (avatar)
+            await deleteImage(avatar).then((response) => {
+              if ('error' in response) console.error(response.error);
+            });
           setAvatar(response.url);
         } else console.error(response.error);
       }
@@ -107,7 +111,7 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
               } else {
                 const newProject = {
-                  id: result._id,
+                  id: result.data._id,
                   members: [
                     {
                       id: userStore.user.id,

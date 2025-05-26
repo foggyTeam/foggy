@@ -11,6 +11,7 @@ import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 import { Project, Team } from '@/app/lib/types/definitions';
 import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
+import getUserId from '@/app/lib/getUserId';
 
 async function getUser() {
   const cookie = (await cookies()).get('session' as any)?.value;
@@ -37,17 +38,10 @@ async function getUser() {
 }
 
 async function getUserProjects(): Promise<Project[] | undefined> {
-  const cookie = (await cookies()).get('session' as any)?.value;
-  const session = await decrypt(cookie);
-
-  if (!session) {
-    return undefined;
-  }
-
   try {
     return await getRequest('projects', {
       headers: {
-        'x-user-id': `${session.userId}`,
+        'x-user-id': await getUserId(),
       },
     });
   } catch (e) {

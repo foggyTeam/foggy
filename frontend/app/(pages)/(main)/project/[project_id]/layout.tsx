@@ -1,16 +1,26 @@
 import React from 'react';
 import { RawProject } from '@/app/lib/types/definitions';
-import project from '@/app/mockData/project.json';
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
+import { getRequest } from '@/app/lib/server/requests';
+import getUserId from '@/app/lib/getUserId';
+import { signOut } from '@/auth';
 
 interface ProjectPageProps {
   project_id: string;
 }
 
 async function getProject(id: string): Promise<RawProject | undefined> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(project as RawProject), 300);
-  });
+  try {
+    return await getRequest(`projects/${id}`, {
+      headers: {
+        'x-user-id': await getUserId(),
+      },
+    });
+  } catch (e) {
+    console.error('Project with this id does not exist.', e);
+    await signOut();
+    return undefined;
+  }
 }
 export default async function ProjectLayout({
   params,

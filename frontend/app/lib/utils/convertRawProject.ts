@@ -1,6 +1,7 @@
 import {
   Board,
   Project,
+  ProjectMember,
   ProjectSection,
   RawProject,
 } from '@/app/lib/types/definitions';
@@ -70,7 +71,12 @@ export default function ConvertRawProject(rawProject: RawProject): Project {
   });
 
   return {
+    id: rawProject._id,
+    members: rawProject.members.map((member) => {
+      return { id: member._id, ...member } as ProjectMember;
+    }),
+    lastChange: rawProject.updatedAt,
     ...rawProject,
     sections,
-  };
+  } as Project;
 }
