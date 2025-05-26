@@ -56,31 +56,6 @@ export class ProjectService {
     }
   }
 
-  async findProjectById(
-    projectId: Types.ObjectId,
-    userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
-    await this.validateUser(userId);
-
-    if (!Types.ObjectId.isValid(projectId)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return await this.projectModel
-      .findById(projectId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ project: 'idNotFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
-  }
-
   async getUserRole(
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
@@ -705,6 +680,31 @@ export class ProjectService {
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
+  }
+
+  private async findProjectById(
+    projectId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<ProjectDocument> {
+    await this.validateUser(userId);
+
+    if (!Types.ObjectId.isValid(projectId)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.projectModel
+      .findById(projectId)
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ project: 'idNotFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
   }
 
   private async addSectionToProject(
