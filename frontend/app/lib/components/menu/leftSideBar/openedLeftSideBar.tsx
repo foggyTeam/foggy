@@ -8,7 +8,7 @@ import {
   DrawerHeader,
 } from '@heroui/drawer';
 import { bg_container, left_sidebar_layout } from '@/app/lib/types/styles';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import FoggyLarge from '@/app/lib/components/svg/foggyLarge';
@@ -27,9 +27,17 @@ const OpenedLeftSideBar = observer(
   ({
     isOpened,
     closeSideBar,
+    parentList,
+    setParentList,
+    onAddOpen,
   }: {
     isOpened: boolean;
     closeSideBar: () => void;
+    parentList: string[];
+    setParentList: (
+      value: ((prevState: string[]) => string[]) | string[],
+    ) => void;
+    onAddOpen: (newParentId: string) => void;
   }) => {
     const router = useRouter();
     const {
@@ -42,9 +50,6 @@ const OpenedLeftSideBar = observer(
       parentList: string[];
     } | null>(null);
 
-    const [parentList, setParentList] = useState<string[]>(
-      projectsStore.getProjectChildParentList(),
-    );
     const activeSection = useMemo(
       () =>
         projectsStore.getProjectChild(
@@ -53,6 +58,10 @@ const OpenedLeftSideBar = observer(
         ),
       [parentList],
     );
+
+    useEffect(() => {
+      setParentList(projectsStore.getProjectChildParentList());
+    }, []);
 
     const handleOpenRoot = () => {
       setParentList([]);
@@ -79,7 +88,6 @@ const OpenedLeftSideBar = observer(
           `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
         );
     };
-
     const removeNode = (id: string) => {
       setNodeToRemove({ id: id, parentList: parentList });
       onDeleteChildOpen();
@@ -97,7 +105,7 @@ const OpenedLeftSideBar = observer(
           className={clsx(
             bg_container,
             left_sidebar_layout,
-            'h-fit w-fit',
+            'h-fit w-fit overflow-clip',
             'transform transition-all hover:bg-opacity-65 hover:pl-0.5',
           )}
         >
@@ -105,13 +113,13 @@ const OpenedLeftSideBar = observer(
             <DrawerHeader className="flex items-center justify-center gap-4 py-0">
               <Link href="/">
                 <FoggyLarge
-                  className="fill-primary stroke-primary stroke-0 transition-all duration-300 hover:fill-[url(#logo-gradient)] hover:stroke-2"
+                  className="group fill-primary stroke-primary stroke-0 transition-all duration-300 group-hover:fill-[url(#logo-gradient)] group-hover:stroke-2"
                   height={48}
                   width={116}
                 />
               </Link>
             </DrawerHeader>
-            <DrawerBody className="gap-2 py-0">
+            <DrawerBody className="max-h-64 gap-2 py-0">
               <div className="flex items-center justify-between gap-2">
                 <Breadcrumbs
                   classNames={{
@@ -154,21 +162,29 @@ const OpenedLeftSideBar = observer(
                   <SettingsIcon className="stroke-default-500" />
                 </Button>
               </div>
-              <div className="flex flex-col">
-                {Array.from(
-                  'children' in activeSection
-                    ? activeSection.children.values()
-                    : activeSection.values(),
-                ).map((child: ProjectSection | Board) => (
-                  <SideBarElementCard
-                    element={child}
-                    isActive={child.id === projectsStore.activeBoard?.id}
-                    key={child.id}
-                    handleClick={() => handleChildClick(child)}
-                    addNode={() => console.log('add node')}
-                    removeNode={() => removeNode(child.id)}
-                  />
-                ))}
+              <div
+                className={clsx(
+                  'relative h-full w-full flex-1 overflow-y-auto',
+                  'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+                  'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
+                )}
+              >
+                <div className="flex flex-col pr-1">
+                  {Array.from(
+                    'children' in activeSection
+                      ? activeSection.children.values()
+                      : activeSection.values(),
+                  ).map((child: ProjectSection | Board) => (
+                    <SideBarElementCard
+                      element={child}
+                      isActive={child.id === projectsStore.activeBoard?.id}
+                      key={child.id}
+                      handleClick={() => handleChildClick(child)}
+                      addNode={() => onAddOpen(child.id)}
+                      removeNode={() => removeNode(child.id)}
+                    />
+                  ))}
+                </div>
               </div>
             </DrawerBody>
           </DrawerContent>
