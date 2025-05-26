@@ -53,6 +53,11 @@ export class ProjectController {
           name: 'My Project',
           description: 'Project description',
           avatar: 'url',
+          settings: {
+            allowRequests: true,
+            isPublic: true,
+            memberListIsPublic: true,
+          },
         },
       },
     },
