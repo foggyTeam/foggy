@@ -20,10 +20,6 @@ export const projectError = {
       en: 'You do not have permission to perform this action',
       ru: 'У вас нет прав для выполнения этого действия',
     },
-    CannotDelete: {
-      en: 'Only project owner can delete the project',
-      ru: 'Только владелец проекта может удалить его',
-    },
     updateFailed: {
       en: 'Failed to update project',
       ru: 'Не удалось обновить проект',
