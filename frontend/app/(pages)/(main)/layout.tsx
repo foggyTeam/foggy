@@ -9,7 +9,6 @@ import { signOut } from '@/auth';
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 import { Project, Team } from '@/app/lib/types/definitions';
-import allProjects from '@/app/mockData/projects.json';
 import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 
@@ -46,8 +45,10 @@ async function getUserProjects(): Promise<Project[] | undefined> {
   }
 
   try {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(allProjects as Project[]), 300);
+    return await getRequest('projects', {
+      headers: {
+        'x-user-id': `${session.userId}`,
+      },
     });
   } catch (e) {
     console.error('User with this id does not exist.');

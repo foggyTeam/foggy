@@ -329,8 +329,16 @@ class ProjectsStore {
       (member) => member.id === userStore.user?.id,
     ).role;
   };
-  setAllProjects = (projects: Project[]) => {
-    this.allProjects = projects;
+  setAllProjects = (projects: any[]) => {
+    console.log(projects);
+    this.allProjects = projects.map((project) => {
+      return {
+        id: project._id,
+        lastChange: project.updatedAt,
+        members: [],
+        ...project,
+      } as Project;
+    }) as Project[];
   };
   updateProject = (id: string, newAttrs: Partial<Project>) => {
     const projectIndex = this.allProjects.findIndex(
@@ -342,8 +350,7 @@ class ProjectsStore {
     };
   };
 
-  addProject = (newProject: Project) => {
-    // TODO: make a post request and receive a project id
+  addProject = async (newProject: Project) => {
     this.allProjects.push(newProject);
   };
   addProjectChild = (

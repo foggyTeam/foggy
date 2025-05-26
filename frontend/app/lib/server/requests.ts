@@ -23,12 +23,18 @@ export const getRequest: any = async (
     .catch((e) => console.error(`error: ${e}`));
 
 // poster accepts relative request's url.
-export const postRequest: any = async (url: string, data: any) => {
+export const postRequest: any = async (
+  url: string,
+  data: any,
+  options: AxiosRequestConfig = {},
+) => {
   return await axios
     .post(`${apiUri}/${url}`, data, {
       headers: {
         'x-api-key': `${verificationKey}`,
+        ...options.headers,
       },
+      ...options,
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;
@@ -38,12 +44,18 @@ export const postRequest: any = async (url: string, data: any) => {
     });
 };
 
-export const patchRequest: any = async (url: string, data: any) => {
+export const patchRequest: any = async (
+  url: string,
+  data: any,
+  options: AxiosRequestConfig = {},
+) => {
   return await axios
     .patch(`${apiUri}/${url}`, data, {
       headers: {
         'x-api-key': `${verificationKey}`,
+        ...options.headers,
       },
+      ...options,
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;
@@ -53,12 +65,17 @@ export const patchRequest: any = async (url: string, data: any) => {
     });
 };
 
-export const deleteRequest: any = async (url: string) => {
+export const deleteRequest: any = async (
+  url: string,
+  options: AxiosRequestConfig = {},
+) => {
   return await axios
     .delete(`${apiUri}/${url}`, {
       headers: {
         'x-api-key': `${verificationKey}`,
+        ...options.headers,
       },
+      ...options,
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;

@@ -16,6 +16,9 @@ import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import { addNewProject } from '@/app/lib/server/actions/addNewProject';
+import userStore from '@/app/stores/userStore';
+import { uploadImage } from '@/app/lib/server/actions/handleImage';
 
 const ProjectSettingsModal = observer(
   ({
@@ -41,7 +44,9 @@ const ProjectSettingsModal = observer(
     const [checkboxes, setCheckboxes] = useState<ProjectSettings>(
       new ProjectSettings(),
     );
-    const [avatar, setAvatar] = useState<null | string | ArrayBuffer>(null);
+    const [avatar, setAvatar] = useState<string>(
+      isNewProject ? '' : projectsStore.activeProject?.avatar || '',
+    );
 
     useEffect(() => {
       if (!isNewProject && projectsStore.activeProject) {
@@ -60,11 +65,22 @@ const ProjectSettingsModal = observer(
     }, [name, description, setErrors]);
 
     const handleImageUpload = async (event: any) => {
-      const resizedImageURL = await HandleImageUpload(event);
-      if (resizedImageURL) setAvatar(resizedImageURL);
+      const imageBlob = await HandleImageUpload(event);
+      if (imageBlob) {
+        const response = await uploadImage(
+          userStore.user.id,
+          'projects_data',
+          imageBlob,
+        );
+
+        if ('url' in response) {
+          setAvatar(response.url);
+        } else console.error(response.error);
+      }
     };
 
     const deleteProject = () => {
+      // TODO: delete project
       console.log('delete');
     };
 
@@ -74,15 +90,14 @@ const ProjectSettingsModal = observer(
         const updatedData: Partial<Project> = {
           name: name,
           description: description,
-          settings: checkboxes,
+          settings: { ...checkboxes },
         };
         if (avatar) {
-          updatedData.avatar = avatar as any;
+          updatedData.avatar = avatar;
         }
 
         if (isNewProject) {
-          /*
-          await createProject(updatedData)
+          await addNewProject(updatedData)
             .then((result) => {
               if (
                 Object.keys(result).findIndex(
@@ -90,24 +105,27 @@ const ProjectSettingsModal = observer(
                 ) !== -1
               ) {
                 setErrors(result.errors);
-                console.error(result);
               } else {
-                const newProject = new Project({
-                  id: result.id,
-                  creator: {
-                    id: userStore.user?.id,
-                    nickname: userStore.user?.name,
-                    avatar: userStore.user?.image,
-                  },
+                const newProject = {
+                  id: result._id,
+                  members: [
+                    {
+                      id: userStore.user.id,
+                      nickname: userStore.user.nickname,
+                      avatar: userStore.user.avatar,
+                      role: 'owner',
+                    },
+                  ],
                   ...updatedData,
-                } as any);
+                } as Project;
 
                 projectsStore.addProject(newProject);
 
-                router.push(`projects/${newProject.id}`)
+                router.push(`/project/${newProject.id}`);
               }
             })
-            .finally(() => setIsSaving(false));*/
+            .catch((error) => console.error(error))
+            .finally(() => setIsSaving(false));
         } else {
           /*
           await updateProject(projectsStore.activeProject?.id, updatedData)
@@ -137,7 +155,7 @@ const ProjectSettingsModal = observer(
                     <UploadAvatarButton
                       handleImageUpload={handleImageUpload}
                       name={name}
-                      src={projectsStore.activeProject?.avatar}
+                      src={avatar}
                       classNames={{
                         icon: 'w-32 h-32',
                         avatar: 'w-32 h-32 border border-4 border-white',
