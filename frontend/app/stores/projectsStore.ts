@@ -290,32 +290,32 @@ class ProjectsStore {
     const searchId = childId || this.activeBoard?.id;
     if (!searchId) return [];
 
-    const parentList = [];
     function searchSection(
-      activeBoardId: string,
+      searchId: string,
       section: ProjectSection,
       path: string[],
-    ): string[] {
+    ): string[] | undefined {
+      if (searchId === section.id) return path;
       for (let child of section.children.values()) {
-        if ('type' in child && child.id === activeBoardId) {
+        if ('type' in child && child.id === searchId) {
           return [...path, section.id];
         }
         if (!('type' in child)) {
-          const result = searchSection(activeBoardId, child as ProjectSection, [
+          const result = searchSection(searchId, child as ProjectSection, [
             ...path,
             section.id,
           ]);
           if (result) return result;
         }
       }
-      return path;
+      return undefined;
     }
 
     for (const section of this.activeProject.sections.values()) {
       const result = searchSection(searchId, section, []);
       if (result) return result;
     }
-    return parentList;
+    throw new Error('Project child with this id not found!');
   };
 
   setActiveProject = (project: RawProject | null) => {
@@ -457,23 +457,23 @@ class ProjectsStore {
     // удаление с верхнего уровеня
     if (parentSections.length === 0)
       this.activeProject.sections.delete(childId);
+
+    if (childId === this.activeBoard?.id) this.setActiveBoard(undefined);
   };
   getProjectChild = (
-    childId: string,
+    childId: string | undefined,
     parentSections?: string[],
-  ): Board | ProjectSection => {
+  ): Board | ProjectSection | Map<string, ProjectSection> => {
     if (!this.activeProject) return;
+    if (childId === undefined && parentSections === undefined) return;
 
     parentSections =
       parentSections !== undefined
         ? parentSections
         : this.getProjectChildParentList(childId);
 
-    let currentSection: Map<
-      string,
-      | ProjectSection
-      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
-    > = this.activeProject.sections;
+    let currentSection: Map<string, ProjectSection> =
+      this.activeProject.sections;
 
     for (let i = 0; i < parentSections.length; i++) {
       const sectionId = parentSections[i];
@@ -481,8 +481,9 @@ class ProjectsStore {
 
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
-        console.error('Не удалось найти элемент');
-        return;
+        throw new Error(
+          'Project child with this id not found or parent list is invalid!',
+        );
       }
 
       if (i === parentSections.length - 1) {
@@ -493,10 +494,12 @@ class ProjectsStore {
     }
 
     // поиск на верхнем уровне
-    if (parentSections.length === 0)
-      return this.activeProject.sections[childId];
+    if (parentSections.length === 0) {
+      if (childId) return this.activeProject.sections[childId];
+      return currentSection;
+    }
 
-    return;
+    throw new Error('Project child with this id not found!');
   };
 
   updateProjectMember = (
