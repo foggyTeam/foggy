@@ -1,7 +1,12 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Project, ProjectDocument, Role } from './schemas/project.schema';
+import {
+  Project,
+  ProjectDocument,
+  ProjectListItem,
+  Role,
+} from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from '../users/users.service';
 import { BoardService } from '../board/board.service';
@@ -314,7 +319,7 @@ export class ProjectService {
     ]);
   }
 
-  async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectDocument[]> {
+  async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectListItem[]> {
     await this.validateUser(userId);
 
     if (!Types.ObjectId.isValid(userId)) {
@@ -323,12 +328,54 @@ export class ProjectService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    type ProjectWithPopulatedUsers = Omit<
+      ProjectDocument,
+      'accessControlUsers'
+    > & {
+      accessControlUsers: {
+        userId: {
+          _id: Types.ObjectId;
+          name: string;
+          avatar: string;
+        };
+        role: Role;
+      }[];
+      updatedAt: Date;
+    };
 
-    return this.projectModel
+    const projects = (await this.projectModel
       .find({ 'accessControlUsers.userId': userId })
-      .select('-__v')
-      .sort({ createdAt: -1 })
-      .exec();
+      .populate<{
+        'accessControlUsers.userId': {
+          _id: Types.ObjectId;
+          name: string;
+          avatar: string;
+        };
+      }>({
+        path: 'accessControlUsers.userId',
+        select: 'name avatar',
+      })
+      .select('_id name avatar description accessControlUsers updatedAt')
+      .sort({ updatedAt: -1 })
+      .lean()
+      .exec()) as unknown as ProjectWithPopulatedUsers[];
+
+    return projects.map((project) => ({
+      _id: project._id,
+      name: project.name,
+      avatar: project.avatar,
+      description: project.description,
+      updatedAt: project.updatedAt,
+      members: project.accessControlUsers.map((user) => ({
+        _id: user.userId._id,
+        name: user.userId.name,
+        avatar: user.userId.avatar,
+        role: user.role,
+        //TODO: team
+        team: undefined,
+        teamId: undefined,
+      })),
+    }));
   }
 
   async getProjectById(

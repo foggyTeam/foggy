@@ -21,7 +21,7 @@ import {
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { ProjectService } from './project.service';
-import { Project, Role } from './schemas/project.schema';
+import { Project, ProjectListItem, Role } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SectionDocument } from './schemas/section.schema';
@@ -76,11 +76,37 @@ export class ProjectController {
   @ApiResponse({
     status: 200,
     description: 'Returns an array of projects.',
-    type: [Project],
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          _id: { type: 'string' },
+          name: { type: 'string' },
+          avatar: { type: 'string' },
+          description: { type: 'string', nullable: true },
+          updatedAt: { type: 'string', format: 'date-time' },
+          members: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                _id: { type: 'string' },
+                name: { type: 'string' },
+                avatar: { type: 'string' },
+                role: { type: 'string' },
+                team: { type: 'string', nullable: true },
+                teamId: { type: 'string', nullable: true },
+              },
+            },
+          },
+        },
+      },
+    },
   })
   async findAll(
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project[]> {
+  ): Promise<ProjectListItem[]> {
     return this.projectService.getAllUserProjects(new Types.ObjectId(userId));
   }
 
