@@ -6,7 +6,7 @@ export type Role = (typeof ROLES)[number];
 
 interface MemberInfo {
   _id: Types.ObjectId;
-  name: string;
+  nickname: string;
   avatar: string;
   role: Role;
   team?: string;

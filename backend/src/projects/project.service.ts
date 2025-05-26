@@ -275,6 +275,7 @@ export class ProjectService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     type ProjectWithPopulatedUsers = Omit<
       ProjectDocument,
       'accessControlUsers'
@@ -282,7 +283,7 @@ export class ProjectService {
       accessControlUsers: {
         userId: {
           _id: Types.ObjectId;
-          name: string;
+          nickname: string;
           avatar: string;
         };
         role: Role;
@@ -295,12 +296,12 @@ export class ProjectService {
       .populate<{
         'accessControlUsers.userId': {
           _id: Types.ObjectId;
-          name: string;
+          nickname: string;
           avatar: string;
         };
       }>({
         path: 'accessControlUsers.userId',
-        select: 'name avatar',
+        select: 'nickname avatar',
       })
       .select('_id name avatar description accessControlUsers updatedAt')
       .sort({ updatedAt: -1 })
@@ -315,7 +316,7 @@ export class ProjectService {
       updatedAt: project.updatedAt,
       members: project.accessControlUsers.map((user) => ({
         _id: user.userId._id,
-        name: user.userId.name,
+        nickname: user.userId.nickname,
         avatar: user.userId.avatar,
         role: user.role,
         //TODO: team
