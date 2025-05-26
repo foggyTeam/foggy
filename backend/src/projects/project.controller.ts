@@ -41,7 +41,17 @@ export class ProjectController {
   @ApiResponse({
     status: 201,
     description: 'The project has been successfully created.',
-    type: Project,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            _id: { type: 'string' },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiBody({
@@ -65,8 +75,12 @@ export class ProjectController {
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Types.ObjectId> {
-    return this.projectService.createProject(createProjectDto, userId);
+  ): Promise<{ data: { _id: Types.ObjectId } }> {
+    const projectId = await this.projectService.createProject(
+      createProjectDto,
+      userId,
+    );
+    return { data: { _id: projectId } };
   }
 
   @Get()
