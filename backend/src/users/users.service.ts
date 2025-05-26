@@ -67,7 +67,7 @@ export class UsersService {
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new CustomException(
-        getErrorMessages({ id: 'notFound' }),
+        getErrorMessages({ user: 'notFound' }),
         HttpStatus.NOT_FOUND,
       );
     }

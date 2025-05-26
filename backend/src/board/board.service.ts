@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  forwardRef,
   HttpStatus,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -22,12 +24,15 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
+import { ProjectService } from '../projects/project.service';
 
 @Injectable()
 export class BoardService {
   constructor(
     @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
     @InjectModel(Layer.name) private layerModel: Model<LayerDocument>,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
   ) {}
 
   async createBoard(createBoardDto: CreateBoardDto): Promise<BoardDocument> {
@@ -38,6 +43,11 @@ export class BoardService {
       const layers = await this.createLayers(createdBoard._id);
       createdBoard.layers = layers.map((layer) => layer._id);
       await createdBoard.save();
+
+      await this.projectService.addBoardToSection(
+        createdBoard.sectionId,
+        createdBoard._id,
+      );
 
       return createdBoard;
     } catch {
@@ -83,9 +93,45 @@ export class BoardService {
       .exec();
   }
 
-  async deleteById(boardId: Types.ObjectId): Promise<void> {
-    const board = await this.findById(boardId);
+  async deleteByProject(projectId: Types.ObjectId): Promise<void> {
+    if (!Types.ObjectId.isValid(projectId)) {
+      throw new CustomException(
+        getErrorMessages({ board: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const boards = await this.boardModel.find({ projectId }).exec();
+    await Promise.all(
+      boards.map(async (board) => {
+        await this.layerModel.deleteMany({ boardId: board._id }).exec();
+        await this.projectService.removeBoardFromSection(
+          board.sectionId,
+          board._id,
+        );
+      }),
+    );
+    const result = await this.boardModel.deleteMany({ projectId }).exec();
 
+    if (result.deletedCount === 0) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async deleteById(
+    boardId: Types.ObjectId,
+    options?: { removeFromParent: boolean },
+  ): Promise<void> {
+    const board = await this.findById(boardId);
+    const shouldRemoveFromParent = options?.removeFromParent !== false;
+    if (shouldRemoveFromParent && board.sectionId) {
+      await this.projectService.removeBoardFromSection(
+        board.sectionId,
+        boardId,
+      );
+    }
     await this.layerModel.deleteMany({ boardId: board._id }).exec();
 
     const result = await this.boardModel.deleteOne({ _id: boardId }).exec();
@@ -186,6 +232,25 @@ export class BoardService {
     await this.updateAtBoard(boardId);
 
     return { message: 'Element successfully deleted' };
+  }
+
+  public async changeBoardSection(
+    boardId: Types.ObjectId,
+    newSectionId: Types.ObjectId,
+  ): Promise<void> {
+    const board = await this.findById(boardId);
+    const oldSectionId = board.sectionId;
+
+    if (!newSectionId || oldSectionId.toString() === newSectionId.toString()) {
+      return;
+    }
+    board.sectionId = newSectionId;
+    await board.save();
+
+    await Promise.all([
+      this.projectService.removeBoardFromSection(oldSectionId, boardId),
+      this.projectService.addBoardToSection(newSectionId, boardId),
+    ]);
   }
 
   public async updateElement(

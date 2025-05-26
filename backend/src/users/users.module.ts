@@ -12,5 +12,6 @@ import { Counter, CounterSchema } from './schemas/user-counter.schema';
   ],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}

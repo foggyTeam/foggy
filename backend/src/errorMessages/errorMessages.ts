@@ -1,4 +1,5 @@
 import { elementError } from './elementError';
+import { projectError } from './projectError';
 
 const errorMessages = {
   nickname: {
@@ -39,12 +40,6 @@ const errorMessages = {
     cannotChange: {
       en: 'User cannot change email',
       ru: 'Нельзя менять электронную почту',
-    },
-  },
-  id: {
-    notFound: {
-      en: 'User not found',
-      ru: 'Пользователь не найден',
     },
   },
   password: {
@@ -137,16 +132,6 @@ const errorMessages = {
       ru: 'ID проекта должен поддерживаться MongoDB',
     },
   },
-  section: {
-    required: {
-      en: 'Section is required',
-      ru: 'Раздел является обязательным',
-    },
-    invalidType: {
-      en: 'Section ID must be supported by MongoDB',
-      ru: 'ID раздела должен поддерживаться MongoDB',
-    },
-  },
   name: {
     required: {
       en: 'Name is required',
@@ -167,7 +152,30 @@ const errorMessages = {
       ru: 'Тип должен быть представлен строкой',
     },
   },
+  user: {
+    invalidIdType: {
+      en: 'Invalid user ID format',
+      ru: 'Неверный формат ID пользователя',
+    },
+    notFound: {
+      en: 'User not found',
+      ru: 'Пользователь не найден',
+    },
+  },
+  feature: {
+    notImplemented: {
+      en: 'Feature is not implemented yet',
+      ru: 'Функция пока не реализована',
+    },
+  },
+  settings: {
+    invalidType: {
+      en: 'Settings must be a boolean',
+      ru: 'Настройки должны иметь значение "да" или "нет"',
+    },
+  },
   ...elementError,
+  ...projectError,
 };
 
 type Field = keyof typeof errorMessages;
