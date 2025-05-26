@@ -16,7 +16,7 @@ import { BreadcrumbItem, Breadcrumbs } from '@heroui/breadcrumbs';
 import { Button } from '@heroui/button';
 import { SettingsIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
-import SideBarElementCard from '@/app/lib/components/menu/leftSideBar/sideBarElementCard';
+import LeftSideBarElementCard from '@/app/lib/components/menu/leftSideBar/leftSideBarElementCard';
 import { Board, ProjectSection } from '@/app/lib/types/definitions';
 import { useRouter } from 'next/navigation';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
@@ -175,7 +175,7 @@ const OpenedLeftSideBar = observer(
                       ? activeSection.children.values()
                       : activeSection.values(),
                   ).map((child: ProjectSection | Board) => (
-                    <SideBarElementCard
+                    <LeftSideBarElementCard
                       element={child}
                       isActive={child.id === projectsStore.activeBoard?.id}
                       key={child.id}

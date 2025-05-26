@@ -16,7 +16,7 @@ import { Avatar } from '@heroui/avatar';
 import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
 import projectsStore from '@/app/stores/projectsStore';
-import SideBardElementCard from '@/app/lib/components/menu/rightSideBar/sideBardElementCard';
+import RightSideBarElementCard from '@/app/lib/components/menu/rightSideBar/rightSideBarElementCard';
 import React from 'react';
 import teamsStore from '@/app/stores/teamsStore';
 
@@ -103,13 +103,13 @@ const OpenedRightSideBar = observer(
                     // TODO: show only recent projects / teams
                   }
                   {projectsStore.allProjects.slice(0, 4).map((project) => (
-                    <SideBardElementCard
+                    <RightSideBarElementCard
                       key={project.id}
                       element={project}
                       isActive={projectsStore.activeProject?.id === project.id}
                     />
                   ))}
-                  <SideBardElementCard
+                  <RightSideBarElementCard
                     link={{
                       href: '/',
                       text: settingsStore.t.menu.projects.seeAll,
@@ -121,13 +121,13 @@ const OpenedRightSideBar = observer(
               <Tab key="teams" title={settingsStore.t.menu.tabs.teams}>
                 <div className="flex flex-col gap-2">
                   {teamsStore.allTeams.slice(0, 4).map((team) => (
-                    <SideBardElementCard
+                    <RightSideBarElementCard
                       key={team.id}
                       element={team}
                       isActive={teamsStore.activeTeam?.id === team.id}
                     />
                   ))}
-                  <SideBardElementCard
+                  <RightSideBarElementCard
                     link={{
                       href: '/',
                       text: settingsStore.t.menu.teams.seeAll,

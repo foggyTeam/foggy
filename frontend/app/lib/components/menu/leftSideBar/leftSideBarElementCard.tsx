@@ -4,7 +4,7 @@ import { PlusIcon, TrashIcon } from 'lucide-react';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 
-export default function SideBarElementCard({
+export default function LeftSideBarElementCard({
   element,
   isActive,
   handleClick,
