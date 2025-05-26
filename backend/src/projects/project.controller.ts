@@ -60,7 +60,7 @@ export class ProjectController {
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
+  ): Promise<Types.ObjectId> {
     return this.projectService.createProject(createProjectDto, userId);
   }
 

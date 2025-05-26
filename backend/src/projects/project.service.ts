@@ -31,7 +31,7 @@ export class ProjectService {
   async createProject(
     createProjectDto: CreateProjectDto,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<Types.ObjectId> {
     try {
       await this.validateUser(userId);
       const newProject = new this.projectModel({
@@ -43,8 +43,8 @@ export class ProjectService {
           },
         ],
       });
-
-      return await newProject.save();
+      await newProject.save();
+      return newProject._id;
     } catch (error) {
       if (error instanceof CustomException) {
         throw error;
