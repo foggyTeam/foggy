@@ -170,10 +170,10 @@ export class ProjectController {
   @ApiResponse({ status: 404, description: 'Project not found' })
   @ApiResponse({ status: 403, description: 'Forbidden - not an owner' })
   async delete(
-    @Param('id') id: Types.ObjectId,
+    @Param('id') projectId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
-    return this.projectService.deleteProject(id, new Types.ObjectId(userId));
+    return this.projectService.deleteProject(projectId, userId);
   }
 
   @Post(':id/users')

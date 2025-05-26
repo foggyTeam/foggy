@@ -101,6 +101,9 @@ export class BoardService {
       );
     }
     const boards = await this.boardModel.find({ projectId }).exec();
+    if (boards.length === 0) {
+      return;
+    }
     await Promise.all(
       boards.map(async (board) => {
         await this.layerModel.deleteMany({ boardId: board._id }).exec();
