@@ -59,8 +59,9 @@ export class BoardController {
       },
     },
   })
-  async create(@Body() createBoardDto: CreateBoardDto): Promise<BoardDocument> {
-    return this.boardService.createBoard(createBoardDto);
+  async create(@Body() createBoardDto: CreateBoardDto): Promise<{ data: { id: Types.ObjectId } }> {
+    const boardId = await this.boardService.createBoard(createBoardDto);
+    return { data: { id: boardId } };
   }
 
   @Get('dev-only')

@@ -35,7 +35,7 @@ export class BoardService {
     private readonly projectService: ProjectService,
   ) {}
 
-  async createBoard(createBoardDto: CreateBoardDto): Promise<BoardDocument> {
+  async createBoard(createBoardDto: CreateBoardDto): Promise<Types.ObjectId> {
     await this.validateBoardData(createBoardDto);
     try {
       const createdBoard = await this.boardModel.create(createBoardDto);
@@ -49,7 +49,7 @@ export class BoardService {
         createdBoard._id,
       );
 
-      return createdBoard;
+      return createdBoard._id;
     } catch {
       throw new CustomException(
         getErrorMessages({ board: 'creationFailed' }),
