@@ -3,9 +3,11 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -16,6 +18,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiResponse,
+  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { BoardService } from './board.service';
@@ -59,7 +62,9 @@ export class BoardController {
       },
     },
   })
-  async create(@Body() createBoardDto: CreateBoardDto): Promise<{ data: { id: Types.ObjectId } }> {
+  async create(
+    @Body() createBoardDto: CreateBoardDto,
+  ): Promise<{ data: { id: Types.ObjectId } }> {
     const boardId = await this.boardService.createBoard(createBoardDto);
     return { data: { id: boardId } };
   }
@@ -111,9 +116,10 @@ export class BoardController {
     return await this.boardService.findById(id);
   }
 
-  @Put(':id/title')
+  @Patch(':id/title')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update the title of a board' })
+  @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
     description: 'ID of the board',
@@ -137,10 +143,17 @@ export class BoardController {
     },
   })
   async updateBoardTitle(
-    @Param('id') id: Types.ObjectId,
+    @Param('id') projectId: Types.ObjectId,
+    @Param('boardId') boardId: Types.ObjectId,
     @Body() updateBoardDto: UpdateBoardDto,
-  ): Promise<BoardDocument> {
-    return this.boardService.updateBoardTitle(id, updateBoardDto);
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.boardService.updateBoardTitle(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(boardId),
+      updateBoardDto,
+      new Types.ObjectId(userId),
+    );
   }
 
   @Delete(':id')

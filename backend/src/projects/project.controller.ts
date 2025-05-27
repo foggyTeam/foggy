@@ -33,6 +33,7 @@ import { SectionDocument } from './schemas/section.schema';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
+import { UpdateSectionDto } from './dto/update-section.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -518,6 +519,42 @@ export class ProjectController {
       },
     );
     return { data: { id: sectionId } };
+  }
+
+  @Patch(':id/sections/:sectionId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update section name' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'sectionId',
+    description: 'ID of the section to update',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Section name has been successfully updated',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  @ApiResponse({ status: 404, description: 'Project or section not found' })
+  @ApiBody({ type: UpdateSectionDto })
+  async updateSection(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('sectionId') sectionId: Types.ObjectId,
+    @Body() updateSectionDto: UpdateSectionDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.projectService.updateSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(sectionId),
+      updateSectionDto,
+      new Types.ObjectId(userId),
+    );
   }
 
   @Get(':id/sections/:sectionId')

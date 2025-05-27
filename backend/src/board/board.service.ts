@@ -378,9 +378,11 @@ export class BoardService {
   }
 
   async updateBoardTitle(
+    projectId: Types.ObjectId,
     boardId: Types.ObjectId,
     updateBoardTitleDto: UpdateBoardDto,
-  ): Promise<BoardDocument> {
+    userId: Types.ObjectId,
+  ): Promise<void> {
     const board = await this.boardModel.findById(boardId).exec();
     if (!board) {
       throw new NotFoundException(`Board with ID "${boardId}" not found`);
@@ -389,7 +391,6 @@ export class BoardService {
     board.name = updateBoardTitleDto.name;
     await board.save();
     await this.updateAtBoard(boardId);
-    return board;
   }
 
   private async findLayerByElement(

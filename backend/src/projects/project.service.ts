@@ -25,6 +25,7 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
+import { UpdateSectionDto } from './dto/update-section.dto';
 
 enum RoleLevel {
   reader = 0,
@@ -267,6 +268,30 @@ export class ProjectService {
         { $pull: { sections: sectionId } },
       ),
     ]);
+  }
+
+  async updateSection(
+    projectId: Types.ObjectId,
+    sectionId: Types.ObjectId,
+    updateSectionDto: UpdateSectionDto,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.validateUser(userId, projectId, 'editor');
+
+    await this.sectionModel
+      .findOneAndUpdate(
+        { _id: sectionId, projectId },
+        { name: updateSectionDto.name },
+        { new: true },
+      )
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ section: 'notFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
   }
 
   async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectListItem[]> {
