@@ -223,10 +223,13 @@ export class ProjectController {
   @ApiResponse({ status: 400, description: 'Invalid ID format' })
   @ApiResponse({ status: 404, description: 'Project not found' })
   async findById(
-    @Param('id') id: Types.ObjectId,
+    @Param('id') projectId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<ExtendedProjectListItem> {
-    return this.projectService.getProjectById(id, new Types.ObjectId(userId));
+    return this.projectService.getProjectById(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(userId),
+    );
   }
 
   @Patch(':id')
@@ -557,7 +560,11 @@ export class ProjectController {
     @Param('sectionId') sectionId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<any> {
-    return this.projectService.getSection(projectId, sectionId, userId);
+    return this.projectService.getSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(sectionId),
+      new Types.ObjectId(userId),
+    );
   }
 
   @Delete(':id/sections/:sectionId')

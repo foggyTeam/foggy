@@ -312,13 +312,13 @@ export class ProjectService {
       .exec()) as unknown as ProjectWithPopulatedUsers[];
 
     return projects.map((project) => ({
-      _id: project._id,
+      id: project._id,
       name: project.name,
       avatar: project.avatar,
       description: project.description,
       updatedAt: project.updatedAt,
       members: project.accessControlUsers.map((user) => ({
-        _id: user.userId._id,
+        id: user.userId._id,
         nickname: user.userId.nickname,
         avatar: user.userId.avatar,
         role: user.role,
@@ -353,7 +353,7 @@ export class ProjectService {
     const members = project.accessControlUsers.map((user) => {
       const userObj = user.userId as any;
       return {
-        _id: userObj._id,
+        id: userObj._id,
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: user.role,
@@ -408,7 +408,7 @@ export class ProjectService {
             const child = childSectionMap.get(item.itemId.toString());
             if (!child) return null;
             return {
-              _id: child._id,
+              id: child._id,
               parentId: child.parent,
               name: child.name,
               childrenNumber: child.items.length,
@@ -419,7 +419,7 @@ export class ProjectService {
             const board = boardMap.get(item.itemId.toString());
             if (!board) return null;
             return {
-              _id: board._id,
+              id: board._id,
               sectionId: board.sectionId,
               name: board.name,
               type: board.type,
@@ -432,7 +432,7 @@ export class ProjectService {
     }
 
     const sections: ChildSection[] = rootSections.map((section) => ({
-      _id: section._id,
+      id: section._id,
       parentId: section.parent,
       name: section.name,
       childrenNumber: section.items.length,
@@ -440,7 +440,7 @@ export class ProjectService {
     }));
 
     return {
-      _id: project._id,
+      id: project._id,
       name: project.name,
       avatar: project.avatar,
       description: project.description,

@@ -5,7 +5,7 @@ const ROLES = ['owner', 'admin', 'editor', 'reader'] as const;
 export type Role = (typeof ROLES)[number];
 
 interface MemberInfo {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   nickname: string;
   avatar: string;
   role: Role;
@@ -14,7 +14,7 @@ interface MemberInfo {
 }
 
 export interface ProjectListItem {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   name: string;
   avatar: string;
   description?: string;
@@ -23,7 +23,7 @@ export interface ProjectListItem {
 }
 
 export interface ChildBoard {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   sectionId: Types.ObjectId;
   name: string;
   type: string;
@@ -31,7 +31,7 @@ export interface ChildBoard {
 }
 
 export interface ChildSection {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   parentId: Types.ObjectId | null;
   name: string;
   childrenNumber: number;
