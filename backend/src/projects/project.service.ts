@@ -875,7 +875,7 @@ export class ProjectService {
     project: ProjectDocument,
     name: string,
   ): Promise<Types.ObjectId> {
-    const newSection = new this.sectionModel({ projectId: project.id, name });
+    const newSection = new this.sectionModel({ projectId: project._id, name });
     await newSection.save();
 
     project.sections.push(newSection._id);
