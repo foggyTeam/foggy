@@ -377,7 +377,7 @@ export class BoardService {
     await this.updateAtBoard(boardId);
   }
 
-  async updateBoardTitle(
+  async updateBoard(
     projectId: Types.ObjectId,
     boardId: Types.ObjectId,
     updateBoardTitleDto: UpdateBoardDto,

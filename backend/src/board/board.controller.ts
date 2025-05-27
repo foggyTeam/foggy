@@ -116,9 +116,9 @@ export class BoardController {
     return await this.boardService.findById(id);
   }
 
-  @Patch(':id/title')
+  @Patch(':id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update the title of a board' })
+  @ApiOperation({ summary: 'Update the name of a board' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
@@ -127,28 +127,28 @@ export class BoardController {
   })
   @ApiResponse({
     status: 200,
-    description: 'The board title has been successfully updated',
+    description: 'The board name has been successfully updated',
     type: Board,
   })
   @ApiResponse({ status: 404, description: 'Board not found' })
   @ApiBody({
-    description: 'Data for updating the board title',
+    description: 'Data for updating the board name',
     examples: {
-      updateTitle: {
-        summary: 'Update board title',
+      updateName: {
+        summary: 'Update board name',
         value: {
-          name: 'New Board Title',
+          name: 'New Board Name',
         },
       },
     },
   })
-  async updateBoardTitle(
+  async updateBoard(
     @Param('id') projectId: Types.ObjectId,
     @Param('boardId') boardId: Types.ObjectId,
     @Body() updateBoardDto: UpdateBoardDto,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
-    await this.boardService.updateBoardTitle(
+    await this.boardService.updateBoard(
       new Types.ObjectId(projectId),
       new Types.ObjectId(boardId),
       updateBoardDto,
