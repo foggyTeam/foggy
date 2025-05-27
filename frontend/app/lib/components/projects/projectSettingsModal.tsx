@@ -20,7 +20,7 @@ import {
   AddNewProject,
   DeleteProject,
   UpdateProject,
-} from '@/app/lib/server/actions/addNewProject';
+} from '@/app/lib/server/actions/projectServerActions';
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
@@ -127,7 +127,7 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
               } else {
                 const newProject = {
-                  id: result.data._id,
+                  id: result.data.id,
                   members: [
                     {
                       id: userStore.user.id,

@@ -67,6 +67,7 @@ class ProjectsStore {
     }
   }
 
+  // BOARD
   addElement = (newElement: BoardElement, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
@@ -95,7 +96,6 @@ class ProjectsStore {
         this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
   };
-
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
@@ -285,6 +285,42 @@ class ProjectsStore {
       this.connectSocket(board?.id || '');
     }
   };
+
+  // PROJECT
+  setActiveProject = (project: RawProject | null) => {
+    if (!project) {
+      this.activeProject = undefined;
+      this.myRole = undefined;
+      return;
+    }
+    this.activeProject = ConvertRawProject(project);
+    this.myRole = this.activeProject.members?.find(
+      (member) => member.id === userStore.user?.id,
+    ).role;
+  };
+  setAllProjects = (projects: any[]) => {
+    this.allProjects = projects.map((project) => {
+      return {
+        lastChange: project.updatedAt,
+        members: project.members.map((member) => member as ProjectMember),
+        ...project,
+      } as Project;
+    }) as Project[];
+  };
+  updateProject = (id: string, newAttrs: Partial<Project>) => {
+    const projectIndex = this.allProjects.findIndex(
+      (project) => project.id === id,
+    );
+    this.allProjects[projectIndex] = {
+      ...this.allProjects[projectIndex],
+      ...newAttrs,
+    };
+  };
+  addProject = async (newProject: Project) => {
+    this.allProjects.push(newProject);
+  };
+
+  // PROJECT STRUCTURE
   getProjectChildParentList = (childId?: string): string[] => {
     if (!this.activeProject) return [];
     const searchId = childId || this.activeBoard?.id;
@@ -317,40 +353,7 @@ class ProjectsStore {
     }
     throw new Error('Project child with this id not found!');
   };
-
-  setActiveProject = (project: RawProject | null) => {
-    if (!project) {
-      this.activeProject = undefined;
-      this.myRole = undefined;
-      return;
-    }
-    this.activeProject = ConvertRawProject(project);
-    this.myRole = this.activeProject.members?.find(
-      (member) => member.id === userStore.user?.id,
-    ).role;
-  };
-  setAllProjects = (projects: any[]) => {
-    this.allProjects = projects.map((project) => {
-      return {
-        lastChange: project.updatedAt,
-        members: project.members.map((member) => member as ProjectMember),
-        ...project,
-      } as Project;
-    }) as Project[];
-  };
-  updateProject = (id: string, newAttrs: Partial<Project>) => {
-    const projectIndex = this.allProjects.findIndex(
-      (project) => project.id === id,
-    );
-    this.allProjects[projectIndex] = {
-      ...this.allProjects[projectIndex],
-      ...newAttrs,
-    };
-  };
-
-  addProject = async (newProject: Project) => {
-    this.allProjects.push(newProject);
-  };
+  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
   addProjectChild = (
     parentSections: string[],
     child: ProjectSection | Board,
@@ -506,7 +509,22 @@ class ProjectsStore {
 
     throw new Error('Project child with this id not found!');
   };
+  insertProjectChild = (
+    parentSections: string[],
+    child: (
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    )[],
+    children?: Map<
+      string,
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    >,
+  ) => {
+    // TODO: insert sections
+  };
 
+  // PROJECT MEMBERS
   updateProjectMember = (
     memberId: string,
     newAttrs: Partial<ProjectMember>,
@@ -522,7 +540,6 @@ class ProjectsStore {
         };
     }
   };
-
   removeProjectMember = (memberId: string) => {
     if (this.activeProject) {
       this.activeProject.members = this.activeProject.members.filter(
@@ -530,8 +547,6 @@ class ProjectsStore {
       );
     }
   };
-
-  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
 }
 
 const projectsStore = new ProjectsStore();

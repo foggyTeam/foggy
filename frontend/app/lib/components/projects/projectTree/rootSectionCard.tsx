@@ -10,6 +10,7 @@ import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
 
 export default function RootSectionCard({
   section,
@@ -22,12 +23,20 @@ export default function RootSectionCard({
   const [sectionName, setSectionName] = useState(section.name);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const updateSectionName = () => {
+  const updateSectionName = async () => {
     setIsReadonly(true);
-    projectsStore.updateProjectChild([], section.id, {
+    if (!projectsStore.activeProject) return;
+    await UpdateSection(projectsStore.activeProject.id, section.id, {
       name: sectionName,
-      lastChange: new Date().toISOString(),
-    });
+    })
+      .catch((error) => console.error(error))
+      .then((result) => {
+        console.log(result);
+        projectsStore.updateProjectChild([], section.id, {
+          name: sectionName,
+          lastChange: new Date().toISOString(),
+        });
+      });
   };
 
   return (
@@ -97,7 +106,7 @@ export default function RootSectionCard({
               </Button>
               <Button
                 isIconOnly
-                onPress={() => removeNode(section.id, [])}
+                onPress={() => removeNode(section.id, [], true)}
                 variant="light"
                 color="danger"
                 size="sm"

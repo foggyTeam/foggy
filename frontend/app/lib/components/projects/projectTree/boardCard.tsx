@@ -9,6 +9,7 @@ import { Button } from '@heroui/button';
 import { TrashIcon } from 'lucide-react';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import { UpdateBoard } from '@/app/lib/server/actions/projectServerActions';
 
 export default function BoardCard({
   parentList,
@@ -22,12 +23,20 @@ export default function BoardCard({
   const [isReadonly, setIsReadonly] = useState(true);
   const [boardName, setBoardName] = useState(board.name);
 
-  const updateBoardName = () => {
+  const updateBoardName = async () => {
     setIsReadonly(true);
-    projectsStore.updateProjectChild(parentList, board.id, {
+    if (!projectsStore.activeProject) return;
+
+    await UpdateBoard(board.id, {
       name: boardName,
-      lastChange: new Date().toISOString(),
-    });
+    })
+      .catch((error) => console.error(error))
+      .then(() =>
+        projectsStore.updateProjectChild(parentList, board.id, {
+          name: boardName,
+          lastChange: new Date().toISOString(),
+        }),
+      );
   };
 
   return (

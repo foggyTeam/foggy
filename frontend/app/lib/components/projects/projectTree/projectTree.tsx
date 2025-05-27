@@ -13,11 +13,19 @@ import {
   ProjectSection,
 } from '@/app/lib/types/definitions';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import {
+  AddBoard,
+  AddSection,
+  DeleteBoard,
+  DeleteSection,
+  GetSectionById,
+} from '@/app/lib/server/actions/projectServerActions';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
   setActiveNodes: (nodes: { id: string; parentList: string[] }[]) => void;
-  removeNode: (id: string, parentList: string[]) => void;
+  loadSection: (id: string) => void;
+  removeNode: (id: string, parentList: string[], isSection?: boolean) => void;
   addNode: (parentList: string[]) => void;
 }
 const ActiveNodeContext = createContext<ActiveNodeContextType | null>(null);
@@ -47,12 +55,44 @@ const ProjectTree = observer(() => {
   const [nodeToRemove, setNodeToRemove] = useState<{
     id: string;
     parentList: string[];
+    isSection: boolean;
   } | null>(null);
   const [newNodeParentList, setNewNodeParentList] = useState<string[]>([]);
 
-  const removeNode = (id: string, parentList: string[]) => {
-    setNodeToRemove({ id: id, parentList: parentList });
+  const openRemoveNodeModal = (
+    id: string,
+    parentList: string[],
+    isSection?: boolean,
+  ) => {
+    setNodeToRemove({ id: id, parentList: parentList, isSection: !!isSection });
     onDeleteChildOpen();
+  };
+  const removeNode = async () => {
+    if (nodeToRemove && projectsStore.activeProject) {
+      if (nodeToRemove.isSection) {
+        await DeleteSection(projectsStore.activeProject.id, nodeToRemove.id)
+          .catch((error) => console.error(error))
+          .then(() => {
+            console.info('success');
+            projectsStore.deleteProjectChild(
+              nodeToRemove.id,
+              nodeToRemove.parentList,
+            );
+          });
+      } else {
+        await DeleteBoard(nodeToRemove.id)
+          .catch((error) => console.error(error))
+          .then(() => {
+            console.info('success');
+            projectsStore.deleteProjectChild(
+              nodeToRemove.id,
+              nodeToRemove.parentList,
+            );
+          });
+      }
+    }
+    setNodeToRemove(null);
+    onDeleteChildOpenChange();
   };
 
   const openAddNodeModal = (parentList: string[]) => {
@@ -60,30 +100,56 @@ const ProjectTree = observer(() => {
     onAddChildOpen();
   };
 
-  const addNode = (nodeName: string, nodeType: ProjectElementTypes) => {
-    // TODO: await for id
+  const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
+    if (!projectsStore.activeProject) return;
+
+    const parentSectionId = newNodeParentList[newNodeParentList.length - 1];
     switch (nodeType) {
       case 'SECTION':
-        const newSection: ProjectSection = {
-          children: new Map(),
-          childrenNumber: 0,
-          id: nodeName,
+        await AddSection(projectsStore.activeProject.id, {
           name: nodeName,
-        };
-        projectsStore.addProjectChild(newNodeParentList, newSection, true);
+          parentSectionId,
+        })
+          .catch((error) => console.error(error))
+          .then((response: { data: { id: string } }) => {
+            const newSection: ProjectSection = {
+              children: new Map(),
+              childrenNumber: 0,
+              id: response.data.id,
+              name: nodeName,
+            };
+            projectsStore.addProjectChild(newNodeParentList, newSection, true);
+          });
         break;
       default:
-        const newBoard: Board = {
-          id: nodeName,
+        await AddBoard(projectsStore.activeProject.id, {
           name: nodeName,
-          type: nodeType,
-          layers: [[], [], []],
-          sectionId: newNodeParentList[newNodeParentList.length - 1],
-          lastChange: new Date().toISOString(),
-        };
-        projectsStore.addProjectChild(newNodeParentList, newBoard, false);
+          type: nodeType.toLowerCase(),
+          sectionId: parentSectionId,
+        })
+          .catch((error) => console.error(error))
+          .then((response: { data: { id: string } }) => {
+            const newBoard: Board = {
+              id: response.data.id,
+              name: nodeName,
+              type: nodeType,
+              layers: [[], [], []],
+              sectionId: parentSectionId,
+              lastChange: new Date().toISOString(),
+            };
+            projectsStore.addProjectChild(newNodeParentList, newBoard, false);
+          });
     }
     onAddChildOpenChange();
+  };
+
+  const loadSection = async (id: string) => {
+    if (!projectsStore.activeProject) return;
+    await GetSectionById(projectsStore.activeProject.id, id)
+      .catch((error) => console.error(error))
+      .then((result) => {
+        // TODO: insert
+      });
   };
 
   return (
@@ -92,7 +158,8 @@ const ProjectTree = observer(() => {
         value={{
           activeNodes: activeNodes,
           setActiveNodes: setActiveNodes,
-          removeNode: removeNode,
+          loadSection: loadSection,
+          removeNode: openRemoveNodeModal,
           addNode: openAddNodeModal,
         }}
       >
@@ -115,16 +182,7 @@ const ProjectTree = observer(() => {
         <AreYouSureModal
           isOpen={isDeleteChildOpen}
           onOpenChange={onDeleteChildOpenChange}
-          action={() => {
-            if (nodeToRemove) {
-              projectsStore.deleteProjectChild(
-                nodeToRemove.id,
-                nodeToRemove.parentList,
-              );
-            }
-            setNodeToRemove(null);
-            onDeleteChildOpenChange();
-          }}
+          action={removeNode}
           header={settingsStore.t.projects.deleteProjectChild.modalHeader}
           sure={settingsStore.t.projects.deleteProjectChild.modalSure}
           dismiss={settingsStore.t.projects.deleteProjectChild.modalDismiss}
