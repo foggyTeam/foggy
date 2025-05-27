@@ -443,41 +443,6 @@ export class ProjectController {
     );
   }
 
-  @Get(':id/access-control')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get project access control list' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the project',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns access control list',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          nickname: { type: 'string' },
-          avatar: { type: 'string' },
-          role: { type: 'Role' },
-          team: { type: 'string' },
-          teamRole: { type: 'string' },
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  async getAccessControlList(
-    @Param('id') projectId: Types.ObjectId,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<any[]> {
-    return this.projectService.getAccessControlList(projectId, userId);
-  }
-
   @Post(':id/sections')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add section to project or to parent section' })

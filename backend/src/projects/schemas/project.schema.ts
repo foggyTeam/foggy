@@ -4,7 +4,7 @@ import { HydratedDocument, Types } from 'mongoose';
 const ROLES = ['owner', 'admin', 'editor', 'reader'] as const;
 export type Role = (typeof ROLES)[number];
 
-interface MemberInfo {
+export interface MemberInfo {
   id: Types.ObjectId;
   nickname: string;
   avatar: string;

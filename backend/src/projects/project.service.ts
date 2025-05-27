@@ -5,6 +5,7 @@ import {
   ChildBoard,
   ChildSection,
   ExtendedProjectListItem,
+  MemberInfo,
   Project,
   ProjectDocument,
   ProjectListItem,
@@ -293,61 +294,26 @@ export class ProjectService {
   async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectListItem[]> {
     await this.validateUser(userId);
 
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new CustomException(
-        getErrorMessages({ user: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
+    const projects = await this.projectModel
+      .find({ 'accessControlUsers.userId': userId })
+      .sort({ updatedAt: -1 })
+      .exec();
+
+    const result: ProjectListItem[] = [];
+
+    for (const project of projects) {
+      const members = await this.getMembers(project);
+      result.push({
+        id: project._id,
+        name: project.name,
+        avatar: project.avatar,
+        description: project.description,
+        updatedAt: project.updatedAt,
+        members,
+      });
     }
 
-    type ProjectWithPopulatedUsers = Omit<
-      ProjectDocument,
-      'accessControlUsers'
-    > & {
-      accessControlUsers: {
-        userId: {
-          _id: Types.ObjectId;
-          nickname: string;
-          avatar: string;
-        };
-        role: Role;
-      }[];
-      updatedAt: Date;
-    };
-
-    const projects = (await this.projectModel
-      .find({ 'accessControlUsers.userId': userId })
-      .populate<{
-        'accessControlUsers.userId': {
-          _id: Types.ObjectId;
-          nickname: string;
-          avatar: string;
-        };
-      }>({
-        path: 'accessControlUsers.userId',
-        select: 'nickname avatar',
-      })
-      .select('_id name avatar description accessControlUsers updatedAt')
-      .sort({ updatedAt: -1 })
-      .lean()
-      .exec()) as unknown as ProjectWithPopulatedUsers[];
-
-    return projects.map((project) => ({
-      id: project._id,
-      name: project.name,
-      avatar: project.avatar,
-      description: project.description,
-      updatedAt: project.updatedAt,
-      members: project.accessControlUsers.map((user) => ({
-        id: user.userId._id,
-        nickname: user.userId.nickname,
-        avatar: user.userId.avatar,
-        role: user.role,
-        //TODO: team
-        team: undefined,
-        teamId: undefined,
-      })),
-    }));
+    return result;
   }
 
   async getProjectById(
@@ -356,32 +322,9 @@ export class ProjectService {
   ): Promise<ExtendedProjectListItem> {
     await this.validateUser(userId, projectId, 'reader');
 
-    const project = await this.projectModel
-      .findById(projectId)
-      .populate({
-        path: 'accessControlUsers.userId',
-        select: 'nickname avatar',
-      })
-      .exec();
+    const project = await this.projectModel.findById(projectId).exec();
 
-    if (!project) {
-      throw new CustomException(
-        getErrorMessages({ project: 'idNotFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    const members = project.accessControlUsers.map((user) => {
-      const userObj = user.userId as any;
-      return {
-        id: userObj._id,
-        nickname: userObj.nickname,
-        avatar: userObj.avatar,
-        role: user.role,
-        team: undefined,
-        teamId: undefined,
-      };
-    });
+    const members = await this.getMembers(project);
 
     const rootSections = await this.sectionModel
       .find({ _id: { $in: project.sections }, parent: null })
@@ -596,34 +539,6 @@ export class ProjectService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  async getAccessControlList(
-    projectId: Types.ObjectId,
-    userId: Types.ObjectId,
-  ): Promise<
-    {
-      id: string;
-      nickname: string;
-      avatar: string;
-      role: Role;
-      team?: string;
-      teamRole?: string;
-    }[]
-  > {
-    const project = (await this.validateUser(
-      userId,
-      projectId,
-      'reader',
-    )) as ProjectDocument;
-
-    // TODO: Реализовать полную логику, когда будет сервис команд
-    return project.accessControlUsers.map((user) => ({
-      id: user.userId.toString(),
-      nickname: `User ${user.userId.toString().substring(0, 6)}`,
-      avatar: '',
-      role: user.role,
-    }));
   }
 
   async updateProjectInfo(
@@ -843,6 +758,35 @@ export class ProjectService {
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
+  }
+
+  private async getMembers(project: ProjectDocument): Promise<MemberInfo[]> {
+    // TODO: Реализовать полную логику с командами, когда будет сервис команд
+    const populatedProject = await this.projectModel
+      .findById(project._id)
+      .populate<{
+        'accessControlUsers.userId': {
+          _id: Types.ObjectId;
+          nickname: string;
+          avatar: string;
+        };
+      }>({
+        path: 'accessControlUsers.userId',
+        select: 'nickname avatar',
+      })
+      .exec();
+
+    return populatedProject.accessControlUsers.map((user) => {
+      const userObj = user.userId as any;
+      return {
+        id: userObj._id,
+        nickname: userObj.nickname,
+        avatar: userObj.avatar,
+        role: user.role,
+        team: undefined,
+        teamId: undefined,
+      };
+    });
   }
 
   private async getUserRole(
