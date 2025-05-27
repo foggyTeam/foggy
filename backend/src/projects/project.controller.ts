@@ -52,7 +52,7 @@ export class ProjectController {
         data: {
           type: 'object',
           properties: {
-            _id: { type: 'string' },
+            id: { type: 'string' },
           },
         },
       },
@@ -80,12 +80,12 @@ export class ProjectController {
   async create(
     @Body() createProjectDto: CreateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<{ data: { _id: Types.ObjectId } }> {
+  ): Promise<{ data: { id: Types.ObjectId } }> {
     const projectId = await this.projectService.createProject(
       createProjectDto,
       userId,
     );
-    return { data: { _id: projectId } };
+    return { data: { id: projectId } };
   }
 
   @Get()
@@ -100,7 +100,7 @@ export class ProjectController {
       items: {
         type: 'object',
         properties: {
-          _id: { type: 'string' },
+          id: { type: 'string' },
           name: { type: 'string' },
           avatar: { type: 'string' },
           description: { type: 'string', nullable: true },
@@ -110,7 +110,7 @@ export class ProjectController {
             items: {
               type: 'object',
               properties: {
-                _id: { type: 'string' },
+                id: { type: 'string' },
                 name: { type: 'string' },
                 avatar: { type: 'string' },
                 role: {
@@ -148,7 +148,7 @@ export class ProjectController {
     schema: {
       type: 'object',
       properties: {
-        _id: { type: 'string' },
+        id: { type: 'string' },
         name: { type: 'string' },
         avatar: { type: 'string' },
         description: { type: 'string', nullable: true },
@@ -166,7 +166,7 @@ export class ProjectController {
           items: {
             type: 'object',
             properties: {
-              _id: { type: 'string' },
+              id: { type: 'string' },
               nickname: { type: 'string' },
               avatar: { type: 'string' },
               role: {
@@ -183,7 +183,7 @@ export class ProjectController {
           items: {
             type: 'object',
             properties: {
-              _id: { type: 'string' },
+              id: { type: 'string' },
               parentId: { type: 'string', nullable: true },
               name: { type: 'string' },
               childrenNumber: { type: 'number' },
@@ -194,7 +194,7 @@ export class ProjectController {
                     {
                       type: 'object',
                       properties: {
-                        _id: { type: 'string' },
+                        id: { type: 'string' },
                         parentId: { type: 'string' },
                         name: { type: 'string' },
                         childrenNumber: { type: 'number' },
@@ -204,7 +204,7 @@ export class ProjectController {
                     {
                       type: 'object',
                       properties: {
-                        _id: { type: 'string' },
+                        id: { type: 'string' },
                         sectionId: { type: 'string' },
                         name: { type: 'string' },
                         type: { type: 'string' },
@@ -487,6 +487,17 @@ export class ProjectController {
   @ApiResponse({
     status: 201,
     description: 'Section has been successfully added',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
@@ -495,8 +506,8 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Body() createSectionDto: CreateSectionDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<SectionDocument> {
-    return this.projectService.addSection(
+  ): Promise<{ data: { id: Types.ObjectId } }> {
+    const sectionId = await this.projectService.addSection(
       new Types.ObjectId(projectId),
       new Types.ObjectId(userId),
       {
@@ -506,6 +517,7 @@ export class ProjectController {
           : undefined,
       },
     );
+    return { data: { id: sectionId } };
   }
 
   @Get(':id/sections/:sectionId')

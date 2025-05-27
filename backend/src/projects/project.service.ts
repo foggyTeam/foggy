@@ -739,7 +739,7 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
     createSectionDto: CreateSectionDto,
-  ): Promise<SectionDocument> {
+  ): Promise<Types.ObjectId> {
     const project = (await this.validateUser(
       userId,
       projectId,
@@ -849,21 +849,21 @@ export class ProjectService {
   private async addSectionToProject(
     project: ProjectDocument,
     name: string,
-  ): Promise<SectionDocument> {
+  ): Promise<Types.ObjectId> {
     const newSection = new this.sectionModel({ projectId: project.id, name });
     await newSection.save();
 
     project.sections.push(newSection._id);
     await project.save();
 
-    return newSection;
+    return newSection._id;
   }
 
   private async addSectionToSection(
     projectId: Types.ObjectId,
     parentSectionId: Types.ObjectId,
     name: string,
-  ): Promise<SectionDocument> {
+  ): Promise<Types.ObjectId> {
     const parentSection = await this.sectionModel
       .findById(parentSectionId)
       .orFail(
@@ -884,7 +884,7 @@ export class ProjectService {
     parentSection.items.push({ type: 'section', itemId: newSection._id });
     await parentSection.save();
 
-    return parentSection;
+    return newSection._id;
   }
 
   private async validateUser(
