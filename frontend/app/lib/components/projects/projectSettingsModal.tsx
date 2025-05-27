@@ -17,8 +17,9 @@ import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import {
-  addNewProject,
-  updateProject,
+  AddNewProject,
+  DeleteProject,
+  UpdateProject,
 } from '@/app/lib/server/actions/addNewProject';
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
@@ -68,6 +69,7 @@ const ProjectSettingsModal = observer(
     }, [name, description, setErrors]);
 
     const handleImageUpload = async (event: any) => {
+      if (!userStore.user) return;
       const imageBlob = await HandleImageUpload(event);
       if (imageBlob) {
         const response = await uploadImage(
@@ -86,9 +88,18 @@ const ProjectSettingsModal = observer(
       }
     };
 
-    const deleteProject = () => {
-      // TODO: delete project
-      console.log('delete');
+    const deleteProject = async () => {
+      if (projectsStore.activeProject) {
+        await DeleteProject(projectsStore.activeProject.id)
+          .catch((error) => console.error(error))
+          .then(() => {
+            projectsStore.setActiveProject(null);
+            console.info('successfully deleted');
+            router.push('/');
+          });
+      } else {
+        console.error('No active project!');
+      }
     };
 
     const onSubmit = async () => {
@@ -106,7 +117,7 @@ const ProjectSettingsModal = observer(
         }
 
         if (isNewProject) {
-          await addNewProject(updatedData)
+          await AddNewProject(updatedData)
             .then((result) => {
               if (
                 Object.keys(result).findIndex(
@@ -136,7 +147,7 @@ const ProjectSettingsModal = observer(
             .catch((error) => console.error(error))
             .finally(() => setIsSaving(false));
         } else if (projectsStore.activeProject) {
-          await updateProject(projectsStore.activeProject.id, updatedData)
+          await UpdateProject(projectsStore.activeProject.id, updatedData)
             .then((result) => {
               if (
                 Object.keys(result).findIndex(
@@ -255,6 +266,7 @@ const ProjectSettingsModal = observer(
                     {!isNewProject && CheckAccess(['owner']) && (
                       <FButton
                         onPress={onDeleteProjectOpen}
+                        isDisabled={isSaving}
                         variant="bordered"
                         color="danger"
                         size="md"
@@ -265,6 +277,7 @@ const ProjectSettingsModal = observer(
 
                     <FButton
                       isLoading={isSaving}
+                      isDisabled={!!Object.keys(errors).length}
                       onPress={onSubmit}
                       variant="solid"
                       color="primary"
