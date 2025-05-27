@@ -15,11 +15,7 @@ import { UsersService } from '../users/users.service';
 import { BoardService } from '../board/board.service';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
-import {
-  PopulatedSectionItem,
-  Section,
-  SectionDocument,
-} from './schemas/section.schema';
+import { Section, SectionDocument } from './schemas/section.schema';
 import { Board, BoardDocument } from '../board/schemas/board.schema';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
@@ -674,24 +670,11 @@ export class ProjectService {
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<{
-    id: string;
-    name: string;
-    childrenNumber: number;
-    children: Array<{
-      id: string;
-      name: string;
-      type: 'section' | 'board';
-      updatedAt: Date;
-    }>;
-  }> {
+  ): Promise<Array<ChildSection | ChildBoard>> {
     await this.validateUser(userId, projectId, 'reader');
+
     const section = await this.sectionModel
       .findById(sectionId)
-      .populate<{ items: PopulatedSectionItem[] }>({
-        path: 'items.itemId',
-        select: 'name updatedAt',
-      })
       .orFail(
         () =>
           new CustomException(
@@ -699,21 +682,66 @@ export class ProjectService {
             HttpStatus.NOT_FOUND,
           ),
       )
+      .lean()
       .exec();
 
-    const children = section.items.map((item) => ({
-      id: item.itemId._id.toString(),
-      name: item.itemId.name,
-      type: item.type,
-      updatedAt: item.itemId.updatedAt,
-    }));
+    const sectionItems = section.items.filter(
+      (item) => item.type === 'section',
+    );
+    const boardItems = section.items.filter((item) => item.type === 'board');
 
-    return {
-      id: section._id.toString(),
-      name: section.name,
-      childrenNumber: children.length,
-      children,
-    };
+    const childSections =
+      sectionItems.length > 0
+        ? await this.sectionModel
+            .find({
+              _id: { $in: sectionItems.map((item) => item.itemId) },
+            })
+            .lean()
+            .exec()
+        : [];
+
+    const boards =
+      boardItems.length > 0
+        ? await this.boardModel
+            .find({
+              _id: { $in: boardItems.map((item) => item.itemId) },
+            })
+            .lean()
+            .exec()
+        : [];
+
+    const sectionMap = new Map(childSections.map((s) => [s._id.toString(), s]));
+    const boardMap = new Map(boards.map((b) => [b._id.toString(), b]));
+
+    const result: Array<ChildSection | ChildBoard> = [];
+
+    for (const item of sectionItems) {
+      const childSection = sectionMap.get(item.itemId.toString());
+      if (childSection) {
+        result.push({
+          id: childSection._id,
+          parentId: section._id,
+          name: childSection.name,
+          childrenNumber: childSection.items?.length || 0,
+          children: [],
+        } as ChildSection);
+      }
+    }
+
+    for (const item of boardItems) {
+      const board = boardMap.get(item.itemId.toString());
+      if (board) {
+        result.push({
+          id: board._id,
+          sectionId: board.sectionId,
+          name: board.name,
+          type: board.type,
+          updatedAt: board.updatedAt,
+        } as ChildBoard);
+      }
+    }
+
+    return result;
   }
 
   public async addBoardToSection(

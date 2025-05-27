@@ -22,6 +22,8 @@ import {
 import { Types } from 'mongoose';
 import { ProjectService } from './project.service';
 import {
+  ChildBoard,
+  ChildSection,
   ExtendedProjectListItem,
   Project,
   ProjectListItem,
@@ -573,42 +575,14 @@ export class ProjectController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns section with children items',
-    schema: {
-      type: 'object',
-      properties: {
-        section: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            name: { type: 'string' },
-            description: { type: 'string', nullable: true },
-            parentId: { type: 'string', nullable: true },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' },
-          },
-        },
-        children: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              name: { type: 'string' },
-              type: { type: 'string', enum: ['board', 'section'] },
-              lastChange: { type: 'string', format: 'date-time' },
-            },
-          },
-        },
-      },
-    },
+    description: 'Returns section children items',
   })
   @ApiResponse({ status: 404, description: 'Project or section not found' })
   async getSection(
     @Param('id') projectId: Types.ObjectId,
     @Param('sectionId') sectionId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<any> {
+  ): Promise<Array<ChildSection | ChildBoard>> {
     return this.projectService.getSection(
       new Types.ObjectId(projectId),
       new Types.ObjectId(sectionId),
