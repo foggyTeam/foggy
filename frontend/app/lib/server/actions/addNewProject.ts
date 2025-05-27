@@ -1,6 +1,6 @@
 'use server';
 
-import { postRequest } from '@/app/lib/server/requests';
+import { patchRequest, postRequest } from '@/app/lib/server/requests';
 import { Project } from '@/app/lib/types/definitions';
 import getUserId from '@/app/lib/getUserId';
 
@@ -15,4 +15,10 @@ export async function addNewProject(data: Partial<Project>) {
     },
     { headers: { 'x-user-id': await getUserId() } },
   );
+}
+
+export async function updateProject(id: string, data: Partial<Project>) {
+  return await patchRequest(`projects/${id}`, data, {
+    headers: { 'x-user-id': await getUserId() },
+  });
 }

@@ -16,7 +16,10 @@ import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
-import { addNewProject } from '@/app/lib/server/actions/addNewProject';
+import {
+  addNewProject,
+  updateProject,
+} from '@/app/lib/server/actions/addNewProject';
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
@@ -89,6 +92,8 @@ const ProjectSettingsModal = observer(
     };
 
     const onSubmit = async () => {
+      if (!userStore.user) return;
+
       if (!Object.keys(errors as any).length) {
         setIsSaving(true);
         const updatedData: Partial<Project> = {
@@ -96,7 +101,7 @@ const ProjectSettingsModal = observer(
           description: description,
           settings: { ...checkboxes },
         };
-        if (avatar) {
+        if (avatar && projectsStore.activeProject?.avatar !== avatar) {
           updatedData.avatar = avatar;
         }
 
@@ -130,9 +135,8 @@ const ProjectSettingsModal = observer(
             })
             .catch((error) => console.error(error))
             .finally(() => setIsSaving(false));
-        } else {
-          /*
-          await updateProject(projectsStore.activeProject?.id, updatedData)
+        } else if (projectsStore.activeProject) {
+          await updateProject(projectsStore.activeProject.id, updatedData)
             .then((result) => {
               if (
                 Object.keys(result).findIndex(
@@ -141,9 +145,11 @@ const ProjectSettingsModal = observer(
               ) {
                 setErrors(result.errors);
                 console.error(result);
+              } else {
+                console.info('Success');
               }
             })
-            .finally(() => setIsSaving(false));*/
+            .finally(() => setIsSaving(false));
         }
       }
     };
