@@ -609,7 +609,7 @@ export class ProjectService {
     projectId: Types.ObjectId,
     updateData: UpdateProjectDto,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<void> {
     const project = (await this.validateUser(
       userId,
       projectId,
@@ -637,7 +637,6 @@ export class ProjectService {
 
     try {
       await project.save();
-      return project;
     } catch {
       throw new CustomException(
         getErrorMessages({ project: 'updateFailed' }),

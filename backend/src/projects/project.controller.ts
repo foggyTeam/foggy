@@ -272,7 +272,7 @@ export class ProjectController {
     @Param('id') id: Types.ObjectId,
     @Body() updateProjectDto: UpdateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
+  ): Promise<void> {
     return this.projectService.updateProjectInfo(id, updateProjectDto, userId);
   }
 
