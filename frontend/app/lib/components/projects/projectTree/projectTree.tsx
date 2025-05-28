@@ -24,7 +24,7 @@ import {
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
   setActiveNodes: (nodes: { id: string; parentList: string[] }[]) => void;
-  loadSection: (id: string) => void;
+  loadSection: (id: string, parentList: string[]) => void;
   removeNode: (id: string, parentList: string[], isSection?: boolean) => void;
   addNode: (parentList: string[]) => void;
 }
@@ -143,12 +143,13 @@ const ProjectTree = observer(() => {
     onAddChildOpenChange();
   };
 
-  const loadSection = async (id: string) => {
+  const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;
     await GetSectionById(projectsStore.activeProject.id, id)
       .catch((error) => console.error(error))
       .then((result) => {
-        // TODO: insert
+        // TODO: check result
+        projectsStore.insertProjectChild(parentList, result.data);
       });
   };
 

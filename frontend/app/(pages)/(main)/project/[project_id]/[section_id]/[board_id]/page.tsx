@@ -33,8 +33,7 @@ async function getSection(
 
 async function getBoard(board_id: string): Promise<Board | undefined> {
   try {
-    // TODO: add
-    return await getRequest(`projects/${board_id}`, {
+    return await getRequest(`boards/${board_id}`, {
       headers: {
         'x-user-id': await getUserId(),
       },

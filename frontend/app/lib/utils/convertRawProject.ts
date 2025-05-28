@@ -8,7 +8,7 @@ import { observable } from 'mobx';
 
 export default function ConvertRawProject(rawProject: RawProject): Project {
   function convertSection(
-    rawSection: Record<string, any>,
+    rawSections: any[],
   ): Map<
     string,
     | ProjectSection
@@ -22,9 +22,9 @@ export default function ConvertRawProject(rawProject: RawProject): Project {
       >(),
     );
 
-    Object.entries(rawSection).forEach(([key, value]) => {
-      if ('children' in value) {
-        const childrenMap = convertSection(value.children);
+    (rawSections || []).forEach((value: any) => {
+      if (value && 'children' in value) {
+        const childrenMap = convertSection(value.children || []);
 
         const projectSection: ProjectSection = {
           id: value.id,
@@ -34,8 +34,8 @@ export default function ConvertRawProject(rawProject: RawProject): Project {
           children: childrenMap,
         };
 
-        sectionMap.set(key, projectSection);
-      } else {
+        sectionMap.set(value.id, projectSection);
+      } else if (value) {
         const board: Pick<
           Board,
           'id' | 'name' | 'sectionId' | 'type' | 'lastChange'
@@ -43,11 +43,11 @@ export default function ConvertRawProject(rawProject: RawProject): Project {
           id: value.id,
           name: value.name,
           sectionId: value.sectionId,
-          type: value.type,
-          lastChange: value.lastChange,
+          type: value.type?.toUpperCase(),
+          lastChange: value.lastChange ?? value.updatedAt,
         };
 
-        sectionMap.set(key, board);
+        sectionMap.set(value.id, board);
       }
     });
 
@@ -55,18 +55,18 @@ export default function ConvertRawProject(rawProject: RawProject): Project {
   }
 
   const sections = new Map<string, ProjectSection>();
-  Object.entries(rawProject.sections).forEach(([key, value]) => {
-    const childrenMap = convertSection(value.children || {});
+  (rawProject.sections || []).forEach((section: any) => {
+    const childrenMap = convertSection(section.children || []);
 
     const projectSection: ProjectSection = {
-      id: value.id,
-      parentId: value.parentId || undefined,
-      name: value.name,
-      childrenNumber: value.childrenNumber || 0,
+      id: section.id,
+      parentId: section.parentId || undefined,
+      name: section.name,
+      childrenNumber: section.childrenNumber || 0,
       children: childrenMap,
     };
 
-    sections.set(key, projectSection);
+    sections.set(section.id, projectSection);
   });
 
   // TODO: parse via zod

@@ -16,7 +16,7 @@ export default function NameInput({
 }: {
   isReadonly: boolean;
   setIsReadonly: any;
-  onBlur: any;
+  onBlur: (newValue: string) => void;
   value: string;
   onValueChange: any;
   upperCase?: boolean;
@@ -32,7 +32,7 @@ export default function NameInput({
   const handleBlur = () => {
     if (Object.keys(error).length < 1) onValueChange(localValue);
     else setLocalValue(value);
-    onBlur();
+    onBlur(localValue);
   };
 
   return (

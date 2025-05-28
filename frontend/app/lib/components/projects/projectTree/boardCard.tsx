@@ -23,17 +23,17 @@ export default function BoardCard({
   const [isReadonly, setIsReadonly] = useState(true);
   const [boardName, setBoardName] = useState(board.name);
 
-  const updateBoardName = async () => {
+  const updateBoardName = async (newName: string) => {
     setIsReadonly(true);
     if (!projectsStore.activeProject) return;
 
     await UpdateBoard(board.id, {
-      name: boardName,
+      name: newName,
     })
       .catch((error) => console.error(error))
       .then(() =>
         projectsStore.updateProjectChild(parentList, board.id, {
-          name: boardName,
+          name: newName,
           lastChange: new Date().toISOString(),
         }),
       );

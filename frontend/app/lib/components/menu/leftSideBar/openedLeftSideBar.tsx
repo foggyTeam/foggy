@@ -174,16 +174,24 @@ const OpenedLeftSideBar = observer(
                     'children' in activeSection
                       ? activeSection.children.values()
                       : activeSection.values(),
-                  ).map((child: ProjectSection | Board) => (
-                    <LeftSideBarElementCard
-                      element={child}
-                      isActive={child.id === projectsStore.activeBoard?.id}
-                      key={child.id}
-                      handleClick={() => handleChildClick(child)}
-                      addNode={() => onAddOpen(child.id)}
-                      removeNode={() => removeNode(child.id)}
-                    />
-                  ))}
+                  ).map((child: ProjectSection | Board) => {
+                    if (
+                      'parentId' in child &&
+                      child.parentId &&
+                      !parentList.length
+                    )
+                      return null;
+                    return (
+                      <LeftSideBarElementCard
+                        element={child}
+                        isActive={child.id === projectsStore.activeBoard?.id}
+                        key={child.id}
+                        handleClick={() => handleChildClick(child)}
+                        addNode={() => onAddOpen(child.id)}
+                        removeNode={() => removeNode(child.id)}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </DrawerBody>

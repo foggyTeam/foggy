@@ -23,17 +23,16 @@ export default function RootSectionCard({
   const [sectionName, setSectionName] = useState(section.name);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const updateSectionName = async () => {
+  const updateSectionName = async (newName: string) => {
     setIsReadonly(true);
     if (!projectsStore.activeProject) return;
     await UpdateSection(projectsStore.activeProject.id, section.id, {
-      name: sectionName,
+      name: newName,
     })
       .catch((error) => console.error(error))
-      .then((result) => {
-        console.log(result);
+      .then(() => {
         projectsStore.updateProjectChild([], section.id, {
-          name: sectionName,
+          name: newName,
           lastChange: new Date().toISOString(),
         });
       });

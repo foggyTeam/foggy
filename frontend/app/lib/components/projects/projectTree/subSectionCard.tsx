@@ -9,6 +9,7 @@ import { useActiveSectionContext } from '@/app/lib/components/projects/projectTr
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
+import { Spinner } from '@heroui/spinner';
 
 export default function SubSectionCard({
   parentList,
@@ -17,22 +18,22 @@ export default function SubSectionCard({
   parentList: string[];
   subSection: ProjectSection;
 }) {
-  const { activeNodes, setActiveNodes, addNode, removeNode } =
+  const { activeNodes, setActiveNodes, addNode, removeNode, loadSection } =
     useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [subSectionName, setSubSectionName] = useState(subSection.name);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const updateSectionName = async () => {
+  const updateSectionName = async (newName: string) => {
     setIsReadonly(true);
     if (!projectsStore.activeProject) return;
     await UpdateSection(projectsStore.activeProject.id, subSection.id, {
-      name: subSectionName,
+      name: newName,
     })
       .catch((error) => console.error(error))
       .then(() => {
         projectsStore.updateProjectChild(parentList, subSection.id, {
-          name: subSectionName,
+          name: newName,
           lastChange: new Date().toISOString(),
         });
       });
@@ -63,7 +64,11 @@ export default function SubSectionCard({
         <div className="flex h-full w-full items-center">
           <Button
             isIconOnly
-            onPress={() => setIsExpanded(!isExpanded)}
+            onPress={() => {
+              if (subSection.childrenNumber !== subSection.children.size)
+                loadSection(subSection.id, parentList);
+              setIsExpanded(!isExpanded);
+            }}
             variant="light"
             size="sm"
           >
@@ -79,9 +84,9 @@ export default function SubSectionCard({
               isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
             }
             setIsReadonly={setIsReadonly}
-            onBlur={updateSectionName}
             value={subSectionName}
             onValueChange={setSubSectionName}
+            onBlur={updateSectionName}
           />
         </div>
         {CheckAccess(['admin', 'owner', 'editor']) && (
@@ -107,21 +112,25 @@ export default function SubSectionCard({
         )}
       </div>
       {isExpanded &&
-        Array.from(subSection.children.values()).map((child) => {
-          return 'type' in child ? (
-            <BoardCard
-              key={child.id}
-              parentList={[...parentList, subSection.id]}
-              board={child}
-            />
-          ) : (
-            <SubSectionCard
-              key={child.id}
-              parentList={[...parentList, subSection.id]}
-              subSection={child}
-            />
-          );
-        })}
+        (subSection.childrenNumber !== subSection.children.size ? (
+          <Spinner className="w-full p-1" size="sm" />
+        ) : (
+          Array.from(subSection.children.values()).map((child) => {
+            return 'type' in child ? (
+              <BoardCard
+                key={child.id}
+                parentList={[...parentList, subSection.id]}
+                board={child}
+              />
+            ) : (
+              <SubSectionCard
+                key={child.id}
+                parentList={[...parentList, subSection.id]}
+                subSection={child}
+              />
+            );
+          })
+        ))}
     </div>
   );
 }

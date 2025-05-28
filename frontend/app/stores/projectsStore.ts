@@ -2,6 +2,7 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import {
   Board,
   BoardElement,
+  BoardTypes,
   Project,
   ProjectMember,
   ProjectSection,
@@ -273,16 +274,21 @@ class ProjectsStore {
     };
   };
 
-  setActiveBoard = (board: Board | undefined) => {
+  setActiveBoard = (board: any | undefined) => {
     if (!board) {
       this.activeBoard = board;
       this.disconnectSocket();
     } else {
       this.activeBoard = {
         ...board,
-        layers: board.layers.map((layer) => observable.array(layer)),
-      };
-      this.connectSocket(board?.id || '');
+        // TODO: uncomment
+        // layers: board.layers.map((layer) => observable.array(layer)),
+        layers: [[], [], []],
+        id: board._id,
+        lastChange: board.updatedAt,
+        type: board.type.toUpperCase() as BoardTypes,
+      } as Board;
+      this.connectSocket(this.activeBoard.id || '');
     }
   };
 
@@ -381,6 +387,7 @@ class ProjectsStore {
         if (!nextSection.children) nextSection.children = new Map();
 
         nextSection.children.set(child.id, child);
+        nextSection.childrenNumber += 1;
         if (isSection && 'parentId' in child)
           child.parentId = parentSections[parentSections.length - 1];
       } else currentSection = nextSection.children;
@@ -509,19 +516,80 @@ class ProjectsStore {
 
     throw new Error('Project child with this id not found!');
   };
-  insertProjectChild = (
-    parentSections: string[],
-    child: (
+  insertProjectChild = (parentSections: string[], child: ProjectSection) => {
+    if (!this.activeProject) {
+      console.error('Select a project!');
+      return;
+    }
+    // 1. Если parentSections пустой — вставляем в корень
+    if (parentSections.length === 0) {
+      // Перенос старых детей, если секция уже была в корне
+      const oldSection = this.activeProject.sections.get(child.id) as
+        | ProjectSection
+        | undefined;
+      if (oldSection && oldSection.children) {
+        for (const [kidId, kid] of oldSection.children.entries()) {
+          if (!child.children.has(kidId)) {
+            child.children.set(kidId, kid);
+          }
+        }
+      }
+      // Вставляем или обновляем секцию в корне
+      this.activeProject.sections.set(child.id, child);
+
+      // Забрать "потеряшек" с корня, у которых parentId === child.id
+      for (const [id, maybeChild] of Array.from(
+        this.activeProject.sections.entries(),
+      )) {
+        if ('parentId' in maybeChild && maybeChild.parentId === child.id) {
+          child.children.set(id, maybeChild);
+          this.activeProject.sections.delete(id);
+        }
+      }
+      return;
+    }
+
+    // 2. Иначе ищем родителя по parentSections (проходим путь)
+    let current = this.activeProject.sections;
+    let parentSection: ProjectSection | undefined = undefined;
+
+    for (const sectionId of parentSections) {
+      const found = current.get(sectionId);
+      if (!found || !('children' in found)) {
+        // Родитель не найден — ошибка структуры, можно обработать по ситуации
+        return;
+      }
+      parentSection = found;
+      current = found.children as Map<string, ProjectSection | Board>;
+    }
+
+    if (!parentSection) {
+      console.error('Section not found!');
+      return;
+    }
+
+    // 3. Переносим детей из старой версии секции (если была)
+    const oldSection = parentSection.children.get(child.id) as
       | ProjectSection
-      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
-    )[],
-    children?: Map<
-      string,
-      | ProjectSection
-      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
-    >,
-  ) => {
-    // TODO: insert sections
+      | undefined;
+    if (oldSection && oldSection.children) {
+      for (const [kidId, kid] of oldSection.children.entries()) {
+        if (!child.children.has(kidId)) {
+          child.children.set(kidId, kid);
+        }
+      }
+    }
+
+    // 4. Вставляем или обновляем секцию у родителя
+    parentSection.children.set(child.id, child);
+
+    // 5. Забираем "потеряшек" с текущего уровня, у которых parentId === child.id
+    for (const [id, maybeChild] of Array.from(current.entries())) {
+      if ('parentId' in maybeChild && maybeChild.parentId === child.id) {
+        child.children.set(id as string, maybeChild);
+        current.delete(id);
+      }
+    }
   };
 
   // PROJECT MEMBERS
