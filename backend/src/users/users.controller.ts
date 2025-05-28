@@ -15,6 +15,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { GoogleUserDto } from './dto/login-google.dto';
 import { User } from './schemas/user.schema';
+import { Types } from 'mongoose';
 
 @ApiTags('users')
 @Controller('users')
@@ -155,5 +156,53 @@ export class UsersController {
   })
   async deleteAllUsers(): Promise<void> {
     return this.usersService.deleteAllUsers();
+  }
+
+  @Post('search')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Search users for adding to project' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of users matching the search criteria',
+  })
+  @ApiBody({
+    description: 'Search parameters',
+    schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Search query for nickname',
+          example: 'hoggy',
+        },
+        projectId: {
+          type: 'string',
+          description: 'Project ID to exclude its members',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of results (1-100)',
+          example: 20,
+        },
+        cursor: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+      },
+    },
+  })
+  async searchUsers(
+    @Body('query') query: string = '',
+    @Body('projectId') projectId?: string,
+    @Body('limit') limit: number = 20,
+    @Body('cursor') cursor?: string,
+  ) {
+    const parsedProjectId = projectId
+      ? new Types.ObjectId(projectId)
+      : undefined;
+
+    return this.usersService.searchUsers(query, parsedProjectId, limit, cursor);
   }
 }

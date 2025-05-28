@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
@@ -38,6 +38,7 @@ export class ProjectService {
     @InjectModel(Section.name) private sectionModel: Model<SectionDocument>,
     @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
     private readonly boardService: BoardService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
@@ -758,6 +759,14 @@ export class ProjectService {
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
+  }
+
+  async getProjectMemberIds(
+    projectId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    const project = await this.findProjectById(projectId);
+    const members = await this.getMembers(project);
+    return members.map((m) => m.id);
   }
 
   private async getMembers(project: ProjectDocument): Promise<MemberInfo[]> {

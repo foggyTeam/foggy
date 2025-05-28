@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { transliterate } from 'transliteration';
 import { User } from './schemas/user.schema';
@@ -11,12 +11,14 @@ import { GoogleUserDto } from './dto/login-google.dto';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 import { isURL } from 'class-validator';
+import { ProjectService } from '../projects/project.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
+    private readonly projectService: ProjectService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
@@ -123,6 +125,50 @@ export class UsersService {
     await user.save();
 
     return user;
+  }
+
+  async searchUsers(
+    query: string,
+    projectId?: Types.ObjectId,
+    limit = 20,
+    cursor?: string,
+  ) {
+    const validatedLimit = Math.min(Math.max(limit, 1), 100);
+
+    const excludeIds = projectId
+      ? await this.projectService.getProjectMemberIds(projectId)
+      : [];
+
+    const filter: any = {};
+    if (query) {
+      filter.nickname = { $regex: query, $options: 'i' };
+    }
+    filter._id = {
+      ...(cursor && { $gt: new Types.ObjectId(cursor) }),
+      ...(excludeIds.length && {
+        $nin: excludeIds.map((id) => new Types.ObjectId(id)),
+      }),
+    };
+
+    const users = await this.userModel
+      .find(filter)
+      .sort({ _id: 1 })
+      .limit(validatedLimit)
+      .select('nickname avatar _id')
+      .exec();
+
+    const nextCursor =
+      users.length === validatedLimit ? users[users.length - 1]._id : null;
+
+    return {
+      users: users.map((u) => ({
+        id: u._id,
+        nickname: u.nickname,
+        avatar: u.avatar,
+      })),
+      nextCursor,
+      hasNextPage: Boolean(nextCursor),
+    };
   }
 
   private async generateNickname(): Promise<string> {
