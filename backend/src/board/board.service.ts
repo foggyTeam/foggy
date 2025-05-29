@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model, Types } from 'mongoose';
-import { Board, BoardDocument } from './schemas/board.schema';
+import { Board, BoardDocument, BoardResponse } from './schemas/board.schema';
 import { Layer, LayerDocument } from './schemas/layer.schema';
 import {
   BaseElementModel,
@@ -74,23 +74,24 @@ export class BoardService {
       .exec();
   }
 
-  async findById(boardId: Types.ObjectId): Promise<BoardDocument> {
-    if (!Types.ObjectId.isValid(boardId)) {
-      throw new CustomException(
-        getErrorMessages({ board: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return await this.boardModel
-      .findById(boardId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ board: 'idNotFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
+  async getBoard(boardId: Types.ObjectId): Promise<BoardResponse> {
+    const board = await this.findById(boardId);
+    const layers = await this.getBoardLayers(boardId);
+    const parentPath = await this.projectService.getSectionPath(
+      board.sectionId,
+    );
+    return {
+      id: board._id,
+      projectId: board.projectId,
+      sectionIds: parentPath,
+      name: board.name,
+      type: board.type,
+      layers: layers.map((layer) => ({
+        layerNumber: layer.layerNumber,
+        elements: layer.elements,
+      })),
+      updatedAt: board.updatedAt,
+    };
   }
 
   async deleteByProject(projectId: Types.ObjectId): Promise<void> {
@@ -295,29 +296,6 @@ export class BoardService {
     );
   }
 
-  async getBoardLayers(boardId: Types.ObjectId): Promise<LayerDocument[]> {
-    if (!Types.ObjectId.isValid(boardId)) {
-      throw new CustomException(
-        getErrorMessages({ board: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const board = await this.boardModel
-      .findById(boardId)
-      .populate<{ layers: LayerDocument[] }>('layers')
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ board: 'idNotFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
-
-    return board.layers as LayerDocument[];
-  }
-
   async deleteAll(): Promise<void> {
     if (process.env.NODE_ENV !== 'development') {
       throw new CustomException(
@@ -391,6 +369,35 @@ export class BoardService {
     board.name = updateBoardTitleDto.name;
     await board.save();
     await this.updateAtBoard(boardId);
+  }
+
+  private async findById(boardId: Types.ObjectId): Promise<BoardDocument> {
+    if (!Types.ObjectId.isValid(boardId)) {
+      throw new CustomException(
+        getErrorMessages({ board: 'invalidIdType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return await this.boardModel
+      .findById(boardId)
+      .orFail(
+        () =>
+          new CustomException(
+            getErrorMessages({ board: 'idNotFound' }),
+            HttpStatus.NOT_FOUND,
+          ),
+      )
+      .exec();
+  }
+
+  private async getBoardLayers(
+    boardId: Types.ObjectId,
+  ): Promise<LayerDocument[]> {
+    const board = await this.findById(boardId);
+    const populatedBoard = await board.populate<{ layers: LayerDocument[] }>(
+      'layers',
+    );
+    return populatedBoard.layers as LayerDocument[];
   }
 
   private async findLayerByElement(

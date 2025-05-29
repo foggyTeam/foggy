@@ -1,5 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { LayerResponse } from './layer.schema';
+
+export interface BoardResponse {
+  id: Types.ObjectId;
+  projectId: Types.ObjectId;
+  sectionIds: Types.ObjectId[];
+  name: string;
+  type: string;
+  layers: LayerResponse[];
+  updatedAt: Date;
+}
 
 @Schema({ timestamps: true })
 export class Board {

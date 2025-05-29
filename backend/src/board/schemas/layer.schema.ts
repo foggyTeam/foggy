@@ -2,6 +2,11 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { BaseElement, BaseElementSchema } from './element.schema';
 
+export interface LayerResponse {
+  layerNumber: number;
+  elements: Array<Types.Subdocument & BaseElement>;
+}
+
 @Schema()
 export class Layer {
   @Prop({ required: true })

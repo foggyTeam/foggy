@@ -22,13 +22,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { BoardService } from './board.service';
-import { Board, BoardDocument } from './schemas/board.schema';
+import { Board, BoardDocument, BoardResponse } from './schemas/board.schema';
 import { BaseElement } from './schemas/element.schema';
 import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { Layer, LayerDocument } from './schemas/layer.schema';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -65,7 +64,11 @@ export class BoardController {
   async create(
     @Body() createBoardDto: CreateBoardDto,
   ): Promise<{ data: { id: Types.ObjectId } }> {
-    const boardId = await this.boardService.createBoard(createBoardDto);
+    const boardId = await this.boardService.createBoard({
+      ...createBoardDto,
+      projectId: new Types.ObjectId(createBoardDto.projectId),
+      sectionId: new Types.ObjectId(createBoardDto.sectionId),
+    });
     return { data: { id: boardId } };
   }
 
@@ -101,8 +104,7 @@ export class BoardController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns the full board document',
-    type: Board,
+    description: 'Returns the full board document with layers',
   })
   @ApiResponse({
     status: 400,
@@ -112,8 +114,8 @@ export class BoardController {
     status: 404,
     description: 'Board not found',
   })
-  async findById(@Param('id') id: Types.ObjectId): Promise<BoardDocument> {
-    return await this.boardService.findById(id);
+  async findById(@Param('id') id: Types.ObjectId): Promise<BoardResponse> {
+    return await this.boardService.getBoard(id);
   }
 
   @Patch(':id')
@@ -467,35 +469,6 @@ export class BoardController {
       positions.prevPosition,
       positions.newPosition,
     );
-  }
-
-  @Get(':id/layers')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all layers from a board' })
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Valid MongoDB ObjectID',
-    type: String,
-    example: '68155ed60664ac3e46713d58',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns all layers from the board',
-    type: [Layer],
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid ID format',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Board not found',
-  })
-  async getBoardLayers(
-    @Param('id') id: Types.ObjectId,
-  ): Promise<LayerDocument[]> {
-    return await this.boardService.getBoardLayers(id);
   }
 
   @Delete('dev-only/all')

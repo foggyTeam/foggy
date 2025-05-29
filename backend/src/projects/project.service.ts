@@ -292,6 +292,38 @@ export class ProjectService {
       .exec();
   }
 
+  public async getSectionPath(
+    sectionId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    if (!sectionId) return [];
+    if (!(sectionId instanceof Types.ObjectId)) {
+      sectionId = new Types.ObjectId(sectionId);
+    }
+    const result = await this.sectionModel.aggregate([
+      { $match: { _id: sectionId } },
+      {
+        $graphLookup: {
+          from: this.sectionModel.collection.name,
+          startWith: '$parent',
+          connectFromField: 'parent',
+          connectToField: '_id',
+          as: 'ancestors',
+        },
+      },
+      {
+        $project: {
+          path: {
+            $concatArrays: [
+              { $map: { input: '$ancestors', as: 'a', in: '$$a._id' } },
+              ['$_id'],
+            ],
+          },
+        },
+      },
+    ]);
+    return result[0]?.path || [sectionId];
+  }
+
   async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectListItem[]> {
     await this.validateUser(userId);
 
