@@ -4,17 +4,13 @@ export const projectError = {
       en: 'Failed to create project',
       ru: 'Не удалось создать проект',
     },
-    invalidIdType: {
+    invalidType: {
       en: 'Invalid project ID format',
       ru: 'Неверный формат ID проекта',
     },
-    idNotFound: {
+    notFound: {
       en: 'Project not found',
       ru: 'Проект не найден',
-    },
-    idNotFoundOrNoAccess: {
-      en: "Project not found or you don't have access",
-      ru: 'Проект не найден или у вас нет доступа',
     },
     noPermission: {
       en: 'You do not have permission to perform this action',

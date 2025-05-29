@@ -413,11 +413,6 @@ export class ProjectController {
     description: 'ID of the project',
     type: String,
   })
-  @ApiParam({
-    name: 'userId',
-    description: 'ID of the user to update',
-    type: String,
-  })
   @ApiResponse({
     status: 200,
     description: 'User role has been successfully updated',
