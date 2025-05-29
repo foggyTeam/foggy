@@ -86,10 +86,7 @@ export class BoardService {
       sectionIds: parentPath,
       name: board.name,
       type: board.type,
-      layers: layers.map((layer) => ({
-        layerNumber: layer.layerNumber,
-        elements: layer.elements,
-      })),
+      layers: layers.map((layer) => layer.elements),
       updatedAt: board.updatedAt,
     };
   }
@@ -394,10 +391,10 @@ export class BoardService {
     boardId: Types.ObjectId,
   ): Promise<LayerDocument[]> {
     const board = await this.findById(boardId);
-    const populatedBoard = await board.populate<{ layers: LayerDocument[] }>(
-      'layers',
-    );
-    return populatedBoard.layers as LayerDocument[];
+    return await this.layerModel
+      .find({ _id: { $in: board.layers } })
+      .sort({ layerNumber: 1 })
+      .exec();
   }
 
   private async findLayerByElement(

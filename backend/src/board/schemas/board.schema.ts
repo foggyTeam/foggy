@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { LayerResponse } from './layer.schema';
+import { BaseElement } from './element.schema';
 
 export interface BoardResponse {
   id: Types.ObjectId;
@@ -8,7 +8,7 @@ export interface BoardResponse {
   sectionIds: Types.ObjectId[];
   name: string;
   type: string;
-  layers: LayerResponse[];
+  layers: Array<Array<Types.Subdocument & BaseElement>>;
   updatedAt: Date;
 }
 
