@@ -2,9 +2,13 @@ import { ProjectMember, Team, TeamMember } from '@/app/lib/types/definitions';
 import { Avatar } from '@heroui/avatar';
 import React from 'react';
 
-export default function SmallMemberCard(
-  member: ProjectMember | TeamMember | Team,
-) {
+export default function SmallMemberCard({
+  member,
+  teamLabel,
+}: {
+  member: ProjectMember | TeamMember | Team;
+  teamLabel?: boolean;
+}) {
   return (
     <div className="flex h-fit w-full items-center justify-start gap-1 pl-0 pr-1">
       <Avatar

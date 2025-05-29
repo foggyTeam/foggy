@@ -155,6 +155,14 @@
   },
 
   "members": {
+    "addMember": {
+      "modalHeader": "Invite members",
+      "searchPlaceholder": "Find by nickname or team name...",
+      "rolePlaceholder": "Choose a role...",
+      "expiresIn": "Expires in",
+      "modalCopyLink": "Copy invite link",
+      "modalSure": "Send invitation"
+    },
     "removeTeamMember": {
       "modalHeader": "Remove team _ member",
       "breakup": {
@@ -214,7 +222,11 @@
 
   "time": {
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "hours": "Hours",
+    "days": "Days",
+    "months": "Months",
+    "never": "Never"
   },
 
   "toolBar": {

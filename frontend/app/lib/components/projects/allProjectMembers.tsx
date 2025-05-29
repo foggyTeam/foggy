@@ -5,11 +5,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import projectsStore from '@/app/stores/projectsStore';
 import { observer } from 'mobx-react-lite';
 import { useDisclosure } from '@heroui/modal';
-import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
 import MemberCard from '@/app/lib/components/members/memberCard';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 import { createContext, useContext } from 'react';
 import { Role } from '@/app/lib/types/definitions';
+import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 
 interface MembersContextType {
   memberType: 'team' | 'project';
@@ -49,6 +49,7 @@ const AllProjectMembers = observer(() => {
     newOwnerId?: string | null,
     removeType?: 'breakup' | 'entire' | null,
   ) => {
+    // TODO: add request
     projectsStore.removeProjectMember(id);
   };
   const handleUpdateMemberRole = (
@@ -56,6 +57,7 @@ const AllProjectMembers = observer(() => {
     newRole: Role,
     changeType?: 'override' | 'updateMax' | null,
   ) => {
+    // TODO: add request
     projectsStore.updateProjectMember(id, { role: newRole });
   };
 
@@ -80,7 +82,7 @@ const AllProjectMembers = observer(() => {
         />
       </MembersContext.Provider>
       {isAddMemberOpen && (
-        <ProjectSettingsModal
+        <AddMembersModal
           isOpen={isAddMemberOpen}
           onOpenChange={onAddMemberOpenChange}
         />

@@ -75,7 +75,7 @@ export default function SelectOwnerModal({
                     (member) =>
                       (
                         <SelectItem key={member.id} textValue={member.nickname}>
-                          <SmallMemberCard {...member} />
+                          <SmallMemberCard member={member} />
                         </SelectItem>
                       ) as any,
                   )}

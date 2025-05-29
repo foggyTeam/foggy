@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@heroui/alert": "^2.2.19",
+    "@heroui/autocomplete": "^2.3.20",
     "@heroui/avatar": "^2.2.13",
     "@heroui/badge": "^2.2.10",
     "@heroui/breadcrumbs": "^2.2.15",
