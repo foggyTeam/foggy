@@ -356,7 +356,6 @@ export class ProjectService {
     await this.validateUser(userId, projectId, 'reader');
 
     const project = await this.projectModel.findById(projectId).exec();
-
     const members = await this.getMembers(project);
 
     const rootSections = await this.sectionModel
@@ -364,77 +363,24 @@ export class ProjectService {
       .lean()
       .exec();
 
-    const rootSectionIds = rootSections.map((s) => s._id);
-    const childSections = await this.sectionModel
-      .find({ parent: { $in: rootSectionIds } })
-      .lean()
-      .exec();
-
-    const allBoardIds: Types.ObjectId[] = [];
-    rootSections.forEach((section) => {
-      section.items.forEach((item) => {
-        if (item.type === 'board') {
-          allBoardIds.push(item.itemId);
-        }
-      });
-    });
-    childSections.forEach((section) => {
-      section.items.forEach((item) => {
-        if (item.type === 'board') {
-          allBoardIds.push(item.itemId);
-        }
-      });
-    });
-
-    const boards = allBoardIds.length
-      ? await this.boardModel
-          .find({ _id: { $in: allBoardIds } })
-          .lean()
-          .exec()
-      : [];
-
-    const boardMap = new Map(boards.map((b) => [b._id.toString(), b]));
-    const childSectionMap = new Map(
-      childSections.map((s) => [s._id.toString(), s]),
+    const sections: ChildSection[] = await Promise.all(
+      rootSections.map(async (section) => {
+        const fullSection = await this.getSection(
+          projectId,
+          section._id,
+          userId,
+        );
+        return {
+          ...fullSection,
+          children: fullSection.children.map((child) => {
+            if ('children' in child) {
+              return { ...child, children: [] };
+            }
+            return child;
+          }),
+        };
+      }),
     );
-
-    function buildSectionChildren(section): Array<ChildSection | ChildBoard> {
-      return section.items
-        .map((item) => {
-          if (item.type === 'section') {
-            const child = childSectionMap.get(item.itemId.toString());
-            if (!child) return null;
-            return {
-              id: child._id,
-              parentId: child.parent,
-              name: child.name,
-              childrenNumber: child.items.length,
-              // Дальше детей НЕ включаем (children: [])
-              children: [],
-            } as ChildSection;
-          } else if (item.type === 'board') {
-            const board = boardMap.get(item.itemId.toString());
-            if (!board) return null;
-            return {
-              id: board._id,
-              sectionId: board.sectionId,
-              name: board.name,
-              type: board.type,
-              updatedAt: board.updatedAt,
-            } as ChildBoard;
-          }
-          return null;
-        })
-        .filter(Boolean);
-    }
-
-    const sections: ChildSection[] = rootSections.map((section) => ({
-      id: section._id,
-      parentId: section.parent,
-      name: section.name,
-      childrenNumber: section.items.length,
-      children: buildSectionChildren(section),
-    }));
 
     return {
       id: project._id,
