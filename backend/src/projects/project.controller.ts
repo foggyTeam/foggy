@@ -22,7 +22,6 @@ import {
 import { Types } from 'mongoose';
 import { ProjectService } from './project.service';
 import {
-  ChildBoard,
   ChildSection,
   ExtendedProjectListItem,
   Project,
@@ -353,7 +352,7 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Param('sectionId') sectionId: Types.ObjectId,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Array<ChildSection | ChildBoard>> {
+  ): Promise<ChildSection> {
     return this.projectService.getSection(
       new Types.ObjectId(projectId),
       new Types.ObjectId(sectionId),

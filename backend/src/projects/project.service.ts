@@ -618,7 +618,7 @@ export class ProjectService {
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<Array<ChildSection | ChildBoard>> {
+  ): Promise<ChildSection> {
     await this.validateUser(userId, projectId, 'reader');
 
     const section = await this.sectionModel
@@ -661,12 +661,12 @@ export class ProjectService {
     const sectionMap = new Map(childSections.map((s) => [s._id.toString(), s]));
     const boardMap = new Map(boards.map((b) => [b._id.toString(), b]));
 
-    const result: Array<ChildSection | ChildBoard> = [];
+    const children: Array<ChildSection | ChildBoard> = [];
 
     for (const item of sectionItems) {
       const childSection = sectionMap.get(item.itemId.toString());
       if (childSection) {
-        result.push({
+        children.push({
           id: childSection._id,
           parentId: section._id,
           name: childSection.name,
@@ -679,7 +679,7 @@ export class ProjectService {
     for (const item of boardItems) {
       const board = boardMap.get(item.itemId.toString());
       if (board) {
-        result.push({
+        children.push({
           id: board._id,
           sectionId: board.sectionId,
           name: board.name,
@@ -689,7 +689,13 @@ export class ProjectService {
       }
     }
 
-    return result;
+    return {
+      id: section._id,
+      parentId: section.parent,
+      name: section.name,
+      childrenNumber: section.items.length,
+      children,
+    };
   }
 
   public async addBoardToSection(
