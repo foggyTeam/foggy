@@ -35,6 +35,7 @@
     "@heroui/spinner": "^2.2.16",
     "@heroui/tabs": "^2.2.14",
     "@heroui/tooltip": "^2.2.14",
+    "@heroui/use-infinite-scroll": "^2.2.9",
     "@internationalized/date": "3.7.0",
     "@next/env": "^15.3.0",
     "@tailwindcss/line-clamp": "^0.4.4",

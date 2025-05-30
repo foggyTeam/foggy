@@ -8,15 +8,14 @@ import {
 import settingsStore from '@/app/stores/settingsStore';
 import React, { useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import { ProjectMember, Role } from '@/app/lib/types/definitions';
+import { Role } from '@/app/lib/types/definitions';
 import { Select, SelectItem } from '@heroui/select';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
-import { HistoryIcon, SearchIcon } from 'lucide-react';
-import { Autocomplete, AutocompleteItem } from '@heroui/autocomplete';
+import { HistoryIcon } from 'lucide-react';
 import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { Button } from '@heroui/button';
+import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
 
 const AddMembersModal = observer(
   ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: () => void }) => {
@@ -29,14 +28,19 @@ const AddMembersModal = observer(
       '12m': `12 ${settingsStore.t.time.months.toLowerCase()}`,
       never: settingsStore.t.time.never.toLowerCase(),
     } as const;
-    const [membersList, setMembersList] = useState<Array<ProjectMember>>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const [searchValue, setSearchValue] = useState('');
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const [role, setRole] = useState<Role[]>([]);
     const [expirationTime, setExpirationTime] = useState<
       (keyof typeof expirationTimes)[]
     >(['24h']);
+
+    const handleAddMembers = async () => {
+      setIsLoading(true);
+      // TODO: post request
+      onOpenChange();
+    };
 
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
@@ -47,43 +51,8 @@ const AddMembersModal = observer(
                 {settingsStore.t.members.addMember.modalHeader}
               </ModalHeader>
 
-              <ModalBody className="flex h-fit max-h-40 w-full max-w-lg flex-col flex-wrap gap-2 p-0">
-                <Autocomplete
-                  selectedKeys={selectedMembers}
-                  onSelectionChange={(keys) =>
-                    setSelectedMembers(Array.from(keys) as string[])
-                  }
-                  selectionMode="multiple"
-                  allowsCustomValue
-                  radius="full"
-                  size="sm"
-                  variant="flat"
-                  type="text"
-                  className="w-full"
-                  classNames={{
-                    popoverContent: clsx(
-                      bg_container_no_padding,
-                      'p-2 sm:p-3 bg-opacity-100',
-                    ),
-                  }}
-                  placeholder={
-                    settingsStore.t.members.addMember.searchPlaceholder
-                  }
-                  startContent={<SearchIcon className="stroke-default-500" />}
-                  aria-label="select-members"
-                >
-                  {membersList.map(
-                    (member) =>
-                      (
-                        <AutocompleteItem
-                          key={member.id}
-                          textValue={member.nickname}
-                        >
-                          <SmallMemberCard member={member} teamLabel={true} />
-                        </AutocompleteItem>
-                      ) as any,
-                  )}
-                </Autocomplete>
+              <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
+                <MemberAutocomplete setSelectedId={setSelectedMembers} />
                 <div className="flex w-full flex-nowrap justify-between gap-2">
                   <Select
                     radius="full"
@@ -166,11 +135,14 @@ const AddMembersModal = observer(
                 </div>
               </ModalBody>
               <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
+                {/*TODO: add link*/}
                 <Button isDisabled={!role.length} size="md" variant="light">
                   {settingsStore.t.members.addMember.modalCopyLink}
                 </Button>
                 <Button
                   isDisabled={!selectedMembers.length || !role.length}
+                  isLoading={isLoading}
+                  onPress={handleAddMembers}
                   size="md"
                   color="primary"
                 >

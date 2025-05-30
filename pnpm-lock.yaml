@@ -213,6 +213,9 @@ importers:
       '@heroui/tooltip':
         specifier: ^2.2.14
         version: 2.2.16(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/use-infinite-scroll':
+        specifier: ^2.2.9
+        version: 2.2.9(react@18.3.1)
       '@internationalized/date':
         specifier: 3.7.0
         version: 3.7.0
@@ -1525,6 +1528,11 @@ packages:
 
   '@heroui/use-image@2.1.9':
     resolution: {integrity: sha512-rHfPv4PkRN6mUG3eoBZBi8P8FnM37Kb/lOUM5M5kWtPMRpdfpgDxGQjf24K2lwSQM5xVG1H8WlF1Wipcd0kpmA==}
+    peerDependencies:
+      react: '>=18 || >=19.0.0-rc.0'
+
+  '@heroui/use-infinite-scroll@2.2.9':
+    resolution: {integrity: sha512-PCd8Gx5/c6tOj1gy9hApT9y0N1LOdeFM6632fPZC8bk9xSOp02uphY2mdjNjzpMD6lz3qIKly/wzB2D2YkWgnA==}
     peerDependencies:
       react: '>=18 || >=19.0.0-rc.0'
 
@@ -9270,6 +9278,11 @@ snapshots:
     dependencies:
       '@heroui/react-utils': 2.1.10(react@18.3.1)
       '@heroui/use-safe-layout-effect': 2.1.7(react@18.3.1)
+      react: 18.3.1
+
+  '@heroui/use-infinite-scroll@2.2.9(react@18.3.1)':
+    dependencies:
+      '@heroui/shared-utils': 2.1.9
       react: 18.3.1
 
   '@heroui/use-intersection-observer@2.2.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
