@@ -57,14 +57,10 @@ const ProfileForm = observer((userData: ProfileData) => {
 
     const imageBlob = await HandleImageUpload(event);
     if (imageBlob && userStore.user) {
-      const response = await uploadImage(
-        userStore.user.id,
-        'avatar',
-        imageBlob,
-      );
+      const response = await uploadImage('avatar', imageBlob);
 
       if ('url' in response) {
-        await updateUserData(userStore.user.id, {
+        await updateUserData({
           avatar: response.url,
         }).then((result) => {
           if (
@@ -105,7 +101,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         },
       };
 
-      await updateUserData(userStore.user?.id as string, updatedData)
+      await updateUserData(updatedData)
         .then((result) => {
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
@@ -124,7 +120,7 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   const deleteAccount = async () => {
-    await deleteUserById(userStore.user?.id as string).then((result) => {
+    await deleteUserById().then((result) => {
       if (
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
       ) {

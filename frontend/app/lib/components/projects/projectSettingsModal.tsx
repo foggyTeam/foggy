@@ -72,11 +72,7 @@ const ProjectSettingsModal = observer(
       if (!userStore.user) return;
       const imageBlob = await HandleImageUpload(event);
       if (imageBlob) {
-        const response = await uploadImage(
-          userStore.user.id,
-          'projects_data',
-          imageBlob,
-        );
+        const response = await uploadImage('projects_data', imageBlob);
 
         if ('url' in response) {
           if (avatar)

@@ -1,7 +1,8 @@
 'use server';
 
 import { patchRequest } from '@/app/lib/server/requests';
+import getUserId from '@/app/lib/getUserId';
 
-export async function updateUserData(id: string, data: any) {
-  return await patchRequest(`users/update/${id}`, data);
+export async function updateUserData(data: any) {
+  return await patchRequest(`users/update/${await getUserId()}`, data);
 }
