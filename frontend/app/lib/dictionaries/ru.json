@@ -154,6 +154,14 @@
   },
 
   "members": {
+    "addMember": {
+      "modalHeader": "Пригласить участников",
+      "searchPlaceholder": "Поиск по имени пользователя или команды...",
+      "rolePlaceholder": "Выберите роль...",
+      "expiresIn": "Истекает через",
+      "modalCopyLink": "Копировать ссылку",
+      "modalSure": "Отправить приглашения"
+    },
     "removeTeamMember": {
       "modalHeader": "Удалить участника команды _",
       "breakup": {
@@ -213,7 +221,11 @@
 
   "time": {
     "today": "Сегодня",
-    "yesterday": "Вчера"
+    "yesterday": "Вчера",
+    "hours": "Часа",
+    "days": "Дней",
+    "months": "Месяцев",
+    "never": "Никогда"
   },
 
   "toolBar": {

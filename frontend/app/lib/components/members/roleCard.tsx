@@ -1,6 +1,8 @@
 import { danger, info, primary, success, warning } from '@/tailwind.config';
 import { Role } from '@/app/lib/types/definitions';
 
+export const rolesList: Role[] = ['admin', 'editor', 'reader', 'owner'];
+
 export default function RoleCard({ role }: { role: Role | string }) {
   const colorMap: any = {
     owner: info.DEFAULT,
