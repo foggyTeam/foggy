@@ -4,47 +4,50 @@ const limit = 20;
 
 export function useMembersList({ inputValue }: { inputValue: string }) {
   const [membersList, setMembersList] = useState<any[]>([]);
-  const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
 
   const lastQuery = useRef<string>('');
 
   const loadMembers = async (
-    currentOffset: number,
+    cursor: string | null,
     search: string,
     append = false,
   ) => {
     setIsLoading(true);
 
-    // TODO: Здесь делай реальный запрос на бэкенд
-    // Например:
-    // const res = await fetch(`/api/members?search=${search}&offset=${currentOffset}&limit=${limit}`);
-    // const data = await res.json();
-    const data = Array.from({ length: limit }, (_, i) => ({
-      id: `user-${currentOffset + i}`,
-      nickname: `User ${currentOffset + i}`,
-      avatar: 'https://i.pravatar.cc/40?img=' + ((currentOffset + i) % 70),
-    }));
+    /*
+    const body = {
+      query: search,
+      limit,
+      cursor: cursor || undefined,
+    };
 
-    setMembersList((prev) => (append ? [...prev, ...data] : data));
-    setHasMore(data.length === limit); // Если меньше limit, значит всё загрузили
+    // TODO: get request
+    const data: any = await res.json();
+
+    setMembersList((prev) => (append ? [...prev, ...data.users] : data.users));
+    setNextCursor(data.nextCursor || null);
+    setHasMore(Boolean(data.hasNextPage));*/
     setIsLoading(false);
   };
 
   useEffect(() => {
     if (inputValue.length >= 3 || !inputValue.length) {
-      setOffset(0);
       lastQuery.current = inputValue;
-      loadMembers(0, inputValue, false).catch((error) => console.error(error));
+      setNextCursor(null);
+      loadMembers(null, inputValue, false).catch(console.error);
+    } else {
+      setMembersList([]);
+      setHasMore(false);
+      setNextCursor(null);
     }
   }, [inputValue]);
 
   const onLoadMore = async () => {
-    if (isLoading || !hasMore) return;
-    const newOffset = offset + limit;
-    setOffset(newOffset);
-    await loadMembers(newOffset, lastQuery.current, true);
+    if (isLoading || !hasMore || !nextCursor) return;
+    await loadMembers(nextCursor, lastQuery.current, true);
   };
 
   return { membersList, isLoading, hasMore, onLoadMore };
