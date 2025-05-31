@@ -11,7 +11,9 @@ import {
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
-import ConvertRawProject from '@/app/lib/utils/convertRawProject';
+import ConvertRawProject, {
+  ConvertRawSection,
+} from '@/app/lib/utils/convertRawProject';
 import userStore from '@/app/stores/userStore';
 import { Socket } from 'socket.io-client';
 import openBoardSocketConnection, {
@@ -40,6 +42,7 @@ class ProjectsStore {
       setActiveProject: action,
       setAllProjects: action,
       addProjectChild: action,
+      insertProjectChild: action,
       addProject: action,
       updateProject: action,
       updateProjectChild: action,
@@ -504,23 +507,28 @@ class ProjectsStore {
       if (i === parentSections.length - 1) {
         if (nextSection.id === childId) return nextSection;
 
-        if (nextSection.children) return nextSection.children[childId];
+        if (nextSection.children) return nextSection.children.get(childId);
       } else currentSection = nextSection.children;
     }
 
     // поиск на верхнем уровне
     if (parentSections.length === 0) {
-      if (childId) return this.activeProject.sections[childId];
+      if (childId) return this.activeProject.sections.get(childId);
       return currentSection;
     }
 
     throw new Error('Project child with this id not found!');
   };
-  insertProjectChild = (parentSections: string[], child: ProjectSection) => {
+  insertProjectChild = (
+    parentSections: string[],
+    rawSection: any,
+    createParents: boolean = false,
+  ) => {
     if (!this.activeProject) {
       console.error('Select a project!');
       return;
     }
+    const child = ConvertRawSection(rawSection);
     // 1. Если parentSections пустой — вставляем в корень
     if (parentSections.length === 0) {
       // Перенос старых детей, если секция уже была в корне
@@ -553,14 +561,30 @@ class ProjectsStore {
     let current = this.activeProject.sections;
     let parentSection: ProjectSection | undefined = undefined;
 
-    for (const sectionId of parentSections) {
-      const found = current.get(sectionId);
+    for (let idx = 0; idx < parentSections.length; ++idx) {
+      const sectionId = parentSections[idx];
+      let found = current.get(sectionId);
+
       if (!found || !('children' in found)) {
-        // Родитель не найден — ошибка структуры, можно обработать по ситуации
-        return;
+        if (createParents) {
+          // Создаем новую "пустую" секцию
+          const newParent: ProjectSection = {
+            id: sectionId,
+            parentId: idx === 0 ? undefined : parentSections[idx - 1],
+            name: '—',
+            childrenNumber: 0,
+            children: observable.map(),
+          };
+          current.set(sectionId, newParent);
+          found = newParent;
+        } else {
+          console.error('Родитель не найден');
+          return;
+        }
       }
-      parentSection = found;
-      current = found.children as Map<string, ProjectSection | Board>;
+
+      parentSection = found as ProjectSection;
+      current = parentSection.children as Map<string, ProjectSection | Board>;
     }
 
     if (!parentSection) {

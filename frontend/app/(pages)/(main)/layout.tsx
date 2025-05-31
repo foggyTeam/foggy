@@ -11,7 +11,7 @@ import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 import { Project, Team } from '@/app/lib/types/definitions';
 import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
-import getUserId from '@/app/lib/getUserId';
+import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 
 async function getUser() {
   const cookie = (await cookies()).get('session' as any)?.value;
@@ -39,11 +39,7 @@ async function getUser() {
 
 async function getUserProjects(): Promise<Project[] | undefined> {
   try {
-    return await getRequest('projects', {
-      headers: {
-        'x-user-id': await getUserId(),
-      },
-    });
+    return GetAllProjects();
   } catch (e) {
     console.error('User with this id does not exist.');
     await signOut();

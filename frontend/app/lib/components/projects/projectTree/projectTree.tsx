@@ -18,7 +18,7 @@ import {
   AddSection,
   DeleteBoard,
   DeleteSection,
-  GetSectionById,
+  GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
 
 interface ActiveNodeContextType {
@@ -145,11 +145,10 @@ const ProjectTree = observer(() => {
 
   const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;
-    await GetSectionById(projectsStore.activeProject.id, id)
+    await GetSection(projectsStore.activeProject.id, id)
       .catch((error) => console.error(error))
       .then((result) => {
-        // TODO: check result
-        projectsStore.insertProjectChild(parentList, result.data);
+        projectsStore.insertProjectChild(parentList, result);
       });
   };
 
@@ -173,9 +172,7 @@ const ProjectTree = observer(() => {
           )}
           {projectsStore.activeProject?.sections &&
             Array.from(projectsStore.activeProject?.sections?.values()).map(
-              (section) => (
-                <RootSectionCard key={section.id} section={section} />
-              ),
+              (section) => <RootSectionCard key={section.id} id={section.id} />,
             )}
         </div>
       </ActiveNodeContext.Provider>

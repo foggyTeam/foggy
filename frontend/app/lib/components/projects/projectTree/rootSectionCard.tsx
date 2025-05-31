@@ -11,12 +11,10 @@ import { useActiveSectionContext } from '@/app/lib/components/projects/projectTr
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
+import { observer } from 'mobx-react-lite';
 
-export default function RootSectionCard({
-  section,
-}: {
-  section: ProjectSection;
-}) {
+const RootSectionCard = observer(({ id }: { id: string }) => {
+  const section = projectsStore.getProjectChild(id, []) as ProjectSection;
   const { activeNodes, setActiveNodes, removeNode, addNode } =
     useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
@@ -124,10 +122,12 @@ export default function RootSectionCard({
             <SubSectionCard
               key={child.id}
               parentList={[section.id]}
-              subSection={child}
+              id={child.id}
             />
           );
         })}
     </div>
   );
-}
+});
+
+export default RootSectionCard;
