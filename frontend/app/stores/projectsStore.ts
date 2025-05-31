@@ -284,10 +284,7 @@ class ProjectsStore {
     } else {
       this.activeBoard = {
         ...board,
-        // TODO: uncomment
-        // layers: board.layers.map((layer) => observable.array(layer)),
-        layers: [[], [], []],
-        id: board._id,
+        layers: board.layers.map((layer) => observable.array(layer)),
         lastChange: board.updatedAt,
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
@@ -572,7 +569,7 @@ class ProjectsStore {
             id: sectionId,
             parentId: idx === 0 ? undefined : parentSections[idx - 1],
             name: '—',
-            childrenNumber: 0,
+            childrenNumber: -1,
             children: observable.map(),
           };
           current.set(sectionId, newParent);

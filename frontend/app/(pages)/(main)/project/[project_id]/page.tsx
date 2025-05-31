@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import React from 'react';
-import AllProjectMembers from '@/app/lib/components/projects/allProjectMembers';
 import ProjectStructure from '@/app/lib/components/projects/projectStructure';
+import AllProjectMembers from '@/app/lib/components/projects/allProjectMembers';
 
 export default async function ProjectPage() {
   return (

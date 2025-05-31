@@ -1,6 +1,5 @@
 import BoardStage from '@/app/lib/components/board/boardStage';
 import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
-import { Board, ProjectSection } from '@/app/lib/types/definitions';
 import { BoardProvider } from '@/app/lib/components/board/boardContext';
 import Cursors from '@/app/lib/components/board/cursors';
 import React from 'react';
@@ -18,7 +17,7 @@ interface BoardPageProps {
 async function getSection(
   project_id: string,
   section_id: string,
-): Promise<ProjectSection | undefined> {
+): Promise<any | undefined> {
   try {
     return await GetSection(project_id, section_id);
   } catch (e) {
@@ -27,7 +26,7 @@ async function getSection(
   }
 }
 
-async function getBoard(board_id: string): Promise<Board | undefined> {
+async function getBoard(board_id: string): Promise<any | undefined> {
   try {
     return await GetBoard(board_id);
   } catch (e) {
@@ -42,7 +41,6 @@ export default async function BoardPage({
   params: Promise<BoardPageProps>;
 }) {
   const { project_id, section_id, board_id } = await params;
-  // TODO: load section data
   const sectionData = await getSection(project_id, section_id);
   const boardData = await getBoard(board_id);
 
@@ -52,7 +50,7 @@ export default async function BoardPage({
         <BoardStage />
         <Cursors />
       </BoardProvider>
-      <BoardLoader boardData={boardData} />
+      <BoardLoader boardData={boardData} sectionData={sectionData} />
     </>
   );
 }

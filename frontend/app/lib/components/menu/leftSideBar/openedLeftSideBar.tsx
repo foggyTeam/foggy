@@ -22,6 +22,12 @@ import { useRouter } from 'next/navigation';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDisclosure } from '@heroui/modal';
+import {
+  DeleteBoard,
+  DeleteSection,
+  GetSection,
+} from '@/app/lib/server/actions/projectServerActions';
+import { Spinner } from '@heroui/spinner';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -48,7 +54,10 @@ const OpenedLeftSideBar = observer(
     const [nodeToRemove, setNodeToRemove] = useState<{
       id: string;
       parentList: string[];
+      isSection: boolean;
     } | null>(null);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const activeSection = useMemo(
       () =>
@@ -56,29 +65,68 @@ const OpenedLeftSideBar = observer(
           parentList[parentList.length - 1],
           parentList,
         ),
-      [parentList],
+      [parentList, isLoading],
     );
 
     useEffect(() => {
       setParentList(projectsStore.getProjectChildParentList());
     }, []);
 
+    useEffect(() => {
+      if (
+        'children' in activeSection &&
+        projectsStore.activeProject &&
+        (activeSection.childrenNumber < 0 ||
+          activeSection.children.size < activeSection.childrenNumber)
+      ) {
+        setIsLoading(true);
+        GetSection(projectsStore.activeProject.id, activeSection.id)
+          .then((result) => {
+            projectsStore.insertProjectChild(
+              parentList.slice(0, parentList.length - 1),
+              result,
+            );
+          })
+          .catch((error) => console.error(error))
+          .finally(() => setIsLoading(false));
+      }
+    }, [activeSection, parentList]);
+
     const handleOpenRoot = () => {
       setParentList([]);
     };
-    const handleOpenParent = () => {
-      if (!('id' in activeSection)) return;
-      let newParentList: string[] = [];
+
+    const handleOpenParent = async () => {
+      if (!('id' in activeSection) || !projectsStore.activeProject) return;
       try {
-        newParentList = projectsStore.getProjectChildParentList(
+        const newParentList = projectsStore.getProjectChildParentList(
           activeSection.id,
         );
+        setParentList(newParentList);
       } catch (e) {
-        // TODO: get request for this section
-        // put a new section into the project
-        // receive a parent list for a node
+        if ('parentId' in activeSection && activeSection.parentId) {
+          const parentId = activeSection.parentId;
+          setIsLoading(true);
+          try {
+            const result = await GetSection(
+              projectsStore.activeProject.id,
+              parentId,
+            );
+            projectsStore.insertProjectChild(
+              parentList.slice(0, parentList.length - 2), // путь до родителя родителя
+              result,
+            );
+            const newParentList = projectsStore.getProjectChildParentList(
+              activeSection.id,
+            );
+            setParentList(newParentList);
+          } catch (error) {
+            console.error(error);
+          } finally {
+            setIsLoading(false);
+          }
+        }
       }
-      setParentList(newParentList);
     };
 
     const handleChildClick = (child: ProjectSection | Board) => {
@@ -88,9 +136,38 @@ const OpenedLeftSideBar = observer(
           `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
         );
     };
-    const removeNode = (id: string) => {
-      setNodeToRemove({ id: id, parentList: parentList });
+    const removeNode = (id: string, isSection: boolean) => {
+      setNodeToRemove({ id: id, parentList: parentList, isSection });
       onDeleteChildOpen();
+    };
+    const handleRemoveNode = async () => {
+      if (!projectsStore.activeProject) return;
+      if (nodeToRemove) {
+        if (nodeToRemove.id === projectsStore.activeBoard?.id)
+          router.push(`/project/${projectsStore.activeProject?.id}`);
+
+        try {
+          setIsLoading(true);
+          if (nodeToRemove.isSection) {
+            await DeleteSection(
+              projectsStore.activeProject.id,
+              nodeToRemove.id,
+            );
+          } else {
+            await DeleteBoard(nodeToRemove.id);
+            console.info('success');
+            projectsStore.deleteProjectChild(
+              nodeToRemove.id,
+              nodeToRemove.parentList,
+            );
+          }
+        } catch (error) {
+          console.error(error);
+        }
+        setIsLoading(false);
+      }
+      setNodeToRemove(null);
+      onDeleteChildOpenChange();
     };
 
     return (
@@ -170,28 +247,34 @@ const OpenedLeftSideBar = observer(
                 )}
               >
                 <div className="flex flex-col pr-1">
-                  {Array.from(
-                    'children' in activeSection
-                      ? activeSection.children.values()
-                      : activeSection.values(),
-                  ).map((child: ProjectSection | Board) => {
-                    if (
-                      'parentId' in child &&
-                      child.parentId &&
-                      !parentList.length
-                    )
-                      return null;
-                    return (
-                      <LeftSideBarElementCard
-                        element={child}
-                        isActive={child.id === projectsStore.activeBoard?.id}
-                        key={child.id}
-                        handleClick={() => handleChildClick(child)}
-                        addNode={() => onAddOpen(child.id)}
-                        removeNode={() => removeNode(child.id)}
-                      />
-                    );
-                  })}
+                  {isLoading ? (
+                    <Spinner className="w-full p-1" size="sm" />
+                  ) : (
+                    Array.from(
+                      'children' in activeSection
+                        ? activeSection.children.values()
+                        : activeSection.values(),
+                    ).map((child: ProjectSection | Board) => {
+                      if (
+                        'parentId' in child &&
+                        child.parentId &&
+                        !parentList.length
+                      )
+                        return null;
+                      return (
+                        <LeftSideBarElementCard
+                          element={child}
+                          isActive={child.id === projectsStore.activeBoard?.id}
+                          key={child.id}
+                          handleClick={() => handleChildClick(child)}
+                          addNode={() => onAddOpen(child.id)}
+                          removeNode={() =>
+                            removeNode(child.id, 'children' in child)
+                          }
+                        />
+                      );
+                    })
+                  )}
                 </div>
               </div>
             </DrawerBody>
@@ -201,19 +284,7 @@ const OpenedLeftSideBar = observer(
           <AreYouSureModal
             isOpen={isDeleteChildOpen}
             onOpenChange={onDeleteChildOpenChange}
-            action={() => {
-              if (nodeToRemove) {
-                if (nodeToRemove.id === projectsStore.activeBoard?.id)
-                  router.push(`/project/${projectsStore.activeProject?.id}`);
-
-                projectsStore.deleteProjectChild(
-                  nodeToRemove.id,
-                  nodeToRemove.parentList,
-                );
-              }
-              setNodeToRemove(null);
-              onDeleteChildOpenChange();
-            }}
+            action={handleRemoveNode}
             header={settingsStore.t.projects.deleteProjectChild.modalHeader}
             sure={settingsStore.t.projects.deleteProjectChild.modalSure}
             dismiss={settingsStore.t.projects.deleteProjectChild.modalDismiss}
