@@ -6,6 +6,7 @@ import {
   postRequest,
 } from '@/app/lib/server/requests';
 import getUserId from '@/app/lib/getUserId';
+import { Role } from 'aws-sdk/clients/s3';
 
 export async function SearchUsers(data: {
   query: string;
@@ -20,7 +21,7 @@ export async function SearchUsers(data: {
 
 export async function AddProjectMember(
   projectId: string,
-  data: { userId: string; role: 'admin' | 'editor' | 'reader' },
+  data: { userId: string; role: Omit<Role, 'owner'> },
 ) {
   return await postRequest(`projects/${projectId}/users`, data, {
     headers: { 'x-user-id': await getUserId() },
@@ -29,15 +30,20 @@ export async function AddProjectMember(
 
 export async function UpdateProjectMemberRole(
   projectId: string,
-  data: { userId: string; role: 'admin' | 'editor' | 'reader' | 'owner' },
+  data: { userId: string; role: Role },
 ) {
-  return await patchRequest(`projects/${projectId}/users/role`, data, {
-    headers: { 'x-user-id': await getUserId() },
-  });
+  // TODO: update url when ready
+  return await patchRequest(
+    `projects/${projectId}/users/${data.userId}/role`,
+    data,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
 }
 
-export async function DeleteProjectMember(projectId: string) {
-  return await deleteRequest(
-    `projects/${projectId}/users/${await getUserId()}`,
-  );
+export async function DeleteProjectMember(projectId: string, userId: string) {
+  return await deleteRequest(`projects/${projectId}/users/${userId}`, {
+    headers: { 'x-user-id': await getUserId() },
+  });
 }

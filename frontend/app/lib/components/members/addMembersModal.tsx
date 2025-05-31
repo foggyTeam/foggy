@@ -16,6 +16,8 @@ import { HistoryIcon } from 'lucide-react';
 import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { Button } from '@heroui/button';
 import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
+import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions';
+import projectsStore from '@/app/stores/projectsStore';
 
 const AddMembersModal = observer(
   ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: () => void }) => {
@@ -31,14 +33,21 @@ const AddMembersModal = observer(
     const [isLoading, setIsLoading] = useState(false);
 
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    const [role, setRole] = useState<Role[]>([]);
+    const [role, setRole] = useState<Omit<Role, 'owner'>[]>([]);
     const [expirationTime, setExpirationTime] = useState<
       (keyof typeof expirationTimes)[]
     >(['24h']);
 
-    const handleAddMembers = async () => {
+    const handleAddMembers = () => {
       setIsLoading(true);
-      // TODO: post request
+      selectedMembers.forEach(async (id) => {
+        if (!projectsStore.activeProject) return;
+        await AddProjectMember(projectsStore.activeProject.id, {
+          userId: id,
+          role: role[0],
+        }).catch((error) => console.error(error));
+      });
+      setIsLoading(false);
       onOpenChange();
     };
 
@@ -86,14 +95,16 @@ const AddMembersModal = observer(
                       );
                     }}
                   >
-                    {rolesList.map(
-                      (role) =>
-                        (
-                          <SelectItem key={role} textValue={role}>
-                            <RoleCard role={role} />
-                          </SelectItem>
-                        ) as any,
-                    )}
+                    {rolesList
+                      .filter((role) => role !== 'owner')
+                      .map(
+                        (role) =>
+                          (
+                            <SelectItem key={role} textValue={role}>
+                              <RoleCard role={role} />
+                            </SelectItem>
+                          ) as any,
+                      )}
                   </Select>
                   <div className="flex w-fit items-center gap-1">
                     <div className="flex items-center gap-1">

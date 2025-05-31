@@ -10,6 +10,10 @@ import CompareByRole from '@/app/lib/utils/compareByRole';
 import { createContext, useContext } from 'react';
 import { Role } from '@/app/lib/types/definitions';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
+import {
+  DeleteProjectMember,
+  UpdateProjectMemberRole,
+} from '@/app/lib/server/actions/membersServerActions';
 
 interface MembersContextType {
   memberType: 'team' | 'project';
@@ -44,21 +48,30 @@ const AllProjectMembers = observer(() => {
     onOpenChange: onAddMemberOpenChange,
   } = useDisclosure();
 
-  const handleRemoveMember = (
+  const handleRemoveMember = async (
     id: string,
     newOwnerId?: string | null,
     removeType?: 'breakup' | 'entire' | null,
   ) => {
-    // TODO: add request
-    projectsStore.removeProjectMember(id);
+    if (!projectsStore.activeProject) return;
+    // TODO: add new owner if needed
+    if (newOwnerId) return;
+    await DeleteProjectMember(projectsStore.activeProject.id, id)
+      .catch((error) => console.error(error))
+      .then(() => projectsStore.removeProjectMember(id));
   };
-  const handleUpdateMemberRole = (
+  const handleUpdateMemberRole = async (
     id: string,
     newRole: Role,
     changeType?: 'override' | 'updateMax' | null,
   ) => {
-    // TODO: add request
-    projectsStore.updateProjectMember(id, { role: newRole });
+    if (!projectsStore.activeProject) return;
+    await UpdateProjectMemberRole(projectsStore.activeProject.id, {
+      userId: id,
+      role: newRole,
+    })
+      .catch((error) => console.error(error))
+      .then(() => projectsStore.updateProjectMember(id, { role: newRole }));
   };
 
   return (

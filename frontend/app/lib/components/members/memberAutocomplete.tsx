@@ -46,13 +46,13 @@ export default function MemberAutocomplete({
           ...prev,
           membersList.find((member) => member.id === key),
         ]);
-      setInputValue('');
       setIsOpen(true);
     }
   };
 
   useEffect(() => {
     setSelectedId(selectedMembers.map((member) => member.id));
+    setInputValue('');
   }, [selectedMembers]);
 
   return (
@@ -61,6 +61,7 @@ export default function MemberAutocomplete({
         inputValue={inputValue}
         onInputChange={setInputValue}
         items={membersList}
+        onSelectionChange={handleSelectionChange}
         selectedKeys={selectedMembers.map((member) => member.id)}
         radius="full"
         size="sm"
@@ -76,7 +77,6 @@ export default function MemberAutocomplete({
         listboxProps={{
           selectionMode: 'multiple',
           hideSelectedIcon: true,
-          onSelectionChange: handleSelectionChange,
         }}
         placeholder={settingsStore.t.members.addMember.searchPlaceholder}
         selectorIcon={<SearchIcon className="stroke-default-500" />}
