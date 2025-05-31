@@ -9,7 +9,6 @@ import {
   Project,
   ProjectDocument,
   ProjectListItem,
-  Role,
 } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from '../users/users.service';
@@ -23,13 +22,7 @@ import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
-
-enum RoleLevel {
-  reader = 0,
-  editor = 1,
-  admin = 2,
-  owner = 3,
-}
+import { Role, RoleLevel, ROLES } from '../shared/types/enums';
 
 @Injectable()
 export class ProjectService {
@@ -53,7 +46,7 @@ export class ProjectService {
         accessControlUsers: [
           {
             userId,
-            role: 'owner',
+            role: Role.OWNER,
           },
         ],
       });
@@ -77,7 +70,7 @@ export class ProjectService {
     const project = (await this.validateUser(
       userId,
       projectId,
-      'owner',
+      Role.OWNER,
     )) as ProjectDocument;
 
     await this.boardService.deleteByProject(projectId);
@@ -100,7 +93,7 @@ export class ProjectService {
     changeBoardParentDto: ChangeBoardSectionDto,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'editor');
+    await this.validateUser(userId, projectId, Role.EDITOR);
 
     const newSectionId = changeBoardParentDto.newSectionId;
     this.validateObjectId(changeBoardParentDto.newSectionId, 'section');
@@ -116,7 +109,7 @@ export class ProjectService {
     const project = (await this.validateUser(
       userId,
       projectId,
-      'editor',
+      Role.EDITOR,
     )) as ProjectDocument;
 
     const section = await this.findSection(sectionId);
@@ -151,7 +144,7 @@ export class ProjectService {
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'editor');
+    await this.validateUser(userId, projectId, Role.EDITOR);
     const targetSection = await this.findSection(sectionId);
     if (targetSection.parent) {
       await this.sectionModel.updateOne(
@@ -250,7 +243,7 @@ export class ProjectService {
     updateSectionDto: UpdateSectionDto,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'editor');
+    await this.validateUser(userId, projectId, Role.EDITOR);
 
     await this.sectionModel
       .findOneAndUpdate(
@@ -323,7 +316,7 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<ExtendedProjectListItem> {
-    await this.validateUser(userId, projectId, 'reader');
+    await this.validateUser(userId, projectId, Role.READER);
 
     const project = await this.projectModel.findById(projectId).exec();
     const members = await this.getMembers(project);
@@ -373,7 +366,7 @@ export class ProjectService {
     const project = (await this.validateUser(
       requestingUserId,
       projectId,
-      'admin',
+      Role.ADMIN,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
     const userExists = project.accessControlUsers.some((user) =>
@@ -386,7 +379,7 @@ export class ProjectService {
         HttpStatus.CONFLICT,
       );
     }
-    if (!['admin', 'editor', 'reader'].includes(role)) {
+    if (!ROLES.includes(role)) {
       throw new CustomException(
         getErrorMessages({ project: 'invalidRole' }),
         HttpStatus.BAD_REQUEST,
@@ -405,11 +398,11 @@ export class ProjectService {
     const project = (await this.validateUser(
       requestingUserId,
       projectId,
-      'admin',
+      Role.ADMIN,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
     const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === 'owner',
+      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
     );
 
     if (isOwner) {
@@ -434,11 +427,11 @@ export class ProjectService {
     const project = (await this.validateUser(
       requestingUserId,
       projectId,
-      'admin',
+      Role.ADMIN,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
     const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === 'owner',
+      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
     );
 
     if (isOwner) {
@@ -471,7 +464,7 @@ export class ProjectService {
     const project = (await this.validateUser(
       userId,
       projectId,
-      'admin',
+      Role.ADMIN,
     )) as ProjectDocument;
 
     if (updateData.name) {
@@ -501,7 +494,7 @@ export class ProjectService {
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<ChildSection> {
-    await this.validateUser(userId, projectId, 'reader');
+    await this.validateUser(userId, projectId, Role.READER);
 
     const section = await this.findSection(sectionId);
 
@@ -616,7 +609,7 @@ export class ProjectService {
     const project = (await this.validateUser(
       userId,
       projectId,
-      'editor',
+      Role.EDITOR,
     )) as ProjectDocument;
 
     const { parentSectionId, name } = createSectionDto;
@@ -633,7 +626,7 @@ export class ProjectService {
     role: Role,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'admin');
+    await this.validateUser(userId, projectId, Role.ADMIN);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -645,7 +638,7 @@ export class ProjectService {
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'admin');
+    await this.validateUser(userId, projectId, Role.ADMIN);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -658,7 +651,7 @@ export class ProjectService {
     newRole: Role,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, 'admin');
+    await this.validateUser(userId, projectId, Role.ADMIN);
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -744,7 +737,7 @@ export class ProjectService {
   private async getUserRole(
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<string | null> {
+  ): Promise<Role | null> {
     const project = await this.findProjectById(projectId);
     const userAccess = project.accessControlUsers.find((user) =>
       user.userId.equals(userId),

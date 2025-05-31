@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-
-const ROLES = ['owner', 'admin', 'editor', 'reader'] as const;
-export type Role = (typeof ROLES)[number];
+import { Role, ROLES } from '../../shared/types/enums';
 
 export interface MemberInfo {
   id: Types.ObjectId;

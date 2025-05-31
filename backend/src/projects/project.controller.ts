@@ -26,7 +26,6 @@ import {
   ExtendedProjectListItem,
   Project,
   ProjectListItem,
-  Role,
 } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -35,6 +34,7 @@ import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
+import { Role } from '../shared/types/enums';
 
 @ApiTags('projects')
 @Controller('projects')
