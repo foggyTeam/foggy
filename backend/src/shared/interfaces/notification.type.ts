@@ -67,7 +67,6 @@ export interface InviteMetadata extends BaseMetadata {
 export interface JoinResponseMetadata extends BaseMetadata {
   role: Role;
   inviterId: Types.ObjectId;
-  source: 'invite' | 'request';
 }
 
 export type NotificationMetadata =

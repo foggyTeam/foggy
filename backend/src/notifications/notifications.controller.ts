@@ -21,6 +21,7 @@ import { Types } from 'mongoose';
 import { NotificationService } from './notifications.service';
 import { Role } from '../shared/types/enums';
 import { NotificationResponse } from '../shared/interfaces/notification.type';
+import { JoinRequestDto } from './dto/join-request.dto';
 
 @ApiTags('notifications')
 @Controller('notifications')
@@ -141,6 +142,80 @@ export class NotificationController {
       role,
       expiresAt,
     );
+  }
+
+  @Post('project-join-request')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create project join request notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'ID of the user requesting to join',
+    required: true,
+  })
+  @ApiBody({
+    description: 'Project join request data',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Project join request notification created',
+  })
+  async createProjectJoinRequest(
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Body() joinRequestDto: JoinRequestDto,
+  ): Promise<void> {
+    return this.notificationService.createProjectJoinRequest(
+      userId,
+      joinRequestDto,
+    );
+  }
+
+  @Post('team-join-request')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create team join request notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'ID of the user requesting to join',
+    required: true,
+  })
+  @ApiBody({
+    description: 'Project join request data',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Project join request notification created',
+  })
+  async createTeamJoinRequest(
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Body() joinRequestDto: JoinRequestDto,
+  ): Promise<void> {
+    return this.notificationService.createTeamJoinRequest(
+      userId,
+      joinRequestDto,
+    );
+  }
+
+  @Post(':id/accept')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Accept notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'Current user ID',
+    required: true,
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID of the notification to accept',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Notification accepted',
+  })
+  async acceptNotification(
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Param('id') notificationId: Types.ObjectId,
+  ): Promise<void> {
+    return this.notificationService.acceptNotification(notificationId, userId);
   }
 
   @Delete(':id')

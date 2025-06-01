@@ -18,6 +18,7 @@ import {
 import { ProjectService } from '../projects/project.service';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
+import { JoinRequestDto } from './dto/join-request.dto';
 
 @Injectable()
 export class NotificationService {
@@ -158,21 +159,26 @@ export class NotificationService {
     );
   }
 
-  async deleteNotification(
-    notificationId: Types.ObjectId,
+  async createProjectJoinRequest(
     userId: Types.ObjectId,
+    joinRequestDto: JoinRequestDto,
   ): Promise<void> {
-    const notification = await this.findNotificationById(notificationId);
-    this.validateRecipient(notification, userId);
+    await this.createJoinRequest(
+      userId,
+      joinRequestDto,
+      NotificationType.PROJECT_JOIN_REQUEST,
+    );
+  }
 
-    if (notification.recipients.length === 1) {
-      await this.notificationModel.findByIdAndDelete(notificationId);
-    } else {
-      await this.notificationModel.updateOne(
-        { _id: notificationId },
-        { $pull: { recipients: { userId } } },
-      );
-    }
+  async createTeamJoinRequest(
+    userId: Types.ObjectId,
+    joinRequestDto: JoinRequestDto,
+  ): Promise<void> {
+    await this.createJoinRequest(
+      userId,
+      joinRequestDto,
+      NotificationType.TEAM_JOIN_REQUEST,
+    );
   }
 
   async acceptNotification(
@@ -205,20 +211,71 @@ export class NotificationService {
     await this.deleteNotification(notificationId, userId);
   }
 
-  async createProjectJoinRequest(
+  async deleteNotification(
+    notificationId: Types.ObjectId,
     userId: Types.ObjectId,
-    projectId: Types.ObjectId,
-    role: Role,
-    customMessage?: string,
   ): Promise<void> {
-    const projectAdmins =
-      await this.projectService.getProjectAdminIds(projectId);
+    const notification = await this.findNotificationById(notificationId);
+    this.validateRecipient(notification, userId);
+
+    if (notification.recipients.length === 1) {
+      await this.notificationModel.findByIdAndDelete(notificationId);
+    } else {
+      await this.notificationModel.updateOne(
+        { _id: notificationId },
+        { $pull: { recipients: { userId } } },
+      );
+    }
+  }
+
+  private async createInvite(
+    recipientId: Types.ObjectId,
+    entityId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+    role: Role,
+    inviteType: NotificationType.PROJECT_INVITE | NotificationType.TEAM_INVITE,
+    expiresAt?: Date,
+  ): Promise<void> {
+    const entityType =
+      inviteType === NotificationType.PROJECT_INVITE
+        ? EntityType.PROJECT
+        : EntityType.TEAM;
 
     await new this.notificationModel({
-      type: NotificationType.PROJECT_JOIN_REQUEST,
-      recipients: projectAdmins.map((adminId) => ({ userId: adminId })),
+      type: inviteType,
+      recipients: [{ userId: recipientId }],
+      initiator: { type: EntityType.USER, id: inviterId },
+      target: { type: entityType, id: entityId },
+      metadata: {
+        role,
+        expiresAt: expiresAt || this.getDefaultExpiryDate(),
+      } as InviteMetadata,
+    }).save();
+  }
+
+  private async createJoinRequest(
+    userId: Types.ObjectId,
+    joinRequestDto: JoinRequestDto,
+    joinType:
+      | NotificationType.PROJECT_JOIN_REQUEST
+      | NotificationType.TEAM_JOIN_REQUEST,
+  ): Promise<void> {
+    const { entityId, role, customMessage } = joinRequestDto;
+    const entityType =
+      joinType === NotificationType.PROJECT_JOIN_REQUEST
+        ? EntityType.PROJECT
+        : EntityType.TEAM;
+
+    const adminIds =
+      entityType === EntityType.PROJECT
+        ? await this.projectService.getProjectAdminIds(entityId)
+        : []; //TODO: team admins
+
+    await new this.notificationModel({
+      type: joinType,
+      recipients: adminIds.map((adminId) => ({ userId: adminId })),
       initiator: { type: EntityType.USER, id: userId },
-      target: { type: EntityType.PROJECT, id: projectId },
+      target: { type: entityType, id: entityId },
       metadata: {
         role,
         customMessage,
@@ -226,18 +283,35 @@ export class NotificationService {
     }).save();
   }
 
-  private async handleProjectJoinRequest(
+  private async handleProjectInvite(
     notification: NotificationDocument,
-    inviterId: Types.ObjectId,
+    userId: Types.ObjectId,
   ) {
-    const userId = notification.initiator.id;
+    const metadata = notification.metadata as InviteMetadata;
+    const inviterId = notification.initiator.id;
     const projectId = notification.target.id;
-
     await this.projectService.addUser(
       projectId,
       inviterId,
       userId,
-      notification.metadata.role,
+      metadata.role,
+    );
+
+    await this.notifyProjectOnJoin(projectId, userId, inviterId, metadata.role);
+  }
+
+  private async handleProjectJoinRequest(
+    notification: NotificationDocument,
+    inviterId: Types.ObjectId,
+  ) {
+    const metadata = notification.metadata as JoinRequestMetadata;
+    const userId = notification.initiator.id;
+    const projectId = notification.target.id;
+    await this.projectService.addUser(
+      projectId,
+      inviterId,
+      userId,
+      metadata.role,
     );
 
     await this.notificationModel.create({
@@ -246,9 +320,8 @@ export class NotificationService {
       initiator: { type: EntityType.USER, id: inviterId },
       target: { type: EntityType.PROJECT, id: projectId },
       metadata: {
-        role: notification.metadata.role,
+        role: metadata.role,
         inviterId: inviterId,
-        source: 'request',
       } as JoinResponseMetadata,
     });
 
@@ -257,7 +330,17 @@ export class NotificationService {
       userId,
       inviterId,
       notification.metadata.role,
-      'request',
+    );
+  }
+
+  private async handleTeamInvite(
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+  ) {
+    //TODO: team notification
+    throw new CustomException(
+      getErrorMessages({ feature: 'notImplemented' }),
+      HttpStatus.NOT_IMPLEMENTED,
     );
   }
 
@@ -303,78 +386,18 @@ export class NotificationService {
     return notification;
   }
 
-  private async handleProjectInvite(
-    notification: NotificationDocument,
-    userId: Types.ObjectId,
-  ) {
-    const metadata = notification.metadata as InviteMetadata;
-    const inviterId = notification.initiator.id;
-    const projectId = notification.target.id;
-    await this.projectService.addUser(
-      projectId,
-      inviterId,
-      userId,
-      metadata.role,
-    );
-
-    await this.notifyProjectOnJoin(
-      projectId,
-      userId,
-      inviterId,
-      metadata.role,
-      'invite',
-    );
-  }
-
-  private async handleTeamInvite(
-    notification: NotificationDocument,
-    userId: Types.ObjectId,
-  ) {
-    //TODO: team notification
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
-    );
-  }
-
-  private async createInvite(
-    recipientId: Types.ObjectId,
-    entityId: Types.ObjectId,
-    inviterId: Types.ObjectId,
-    role: Role,
-    inviteType: NotificationType.PROJECT_INVITE | NotificationType.TEAM_INVITE,
-    expiresAt?: Date,
-  ): Promise<void> {
-    const entityType =
-      inviteType === NotificationType.PROJECT_INVITE
-        ? EntityType.PROJECT
-        : EntityType.TEAM;
-
-    await new this.notificationModel({
-      type: inviteType,
-      recipients: [{ userId: recipientId }],
-      initiator: { type: EntityType.USER, id: inviterId },
-      target: { type: entityType, id: entityId },
-      metadata: {
-        role,
-        expiresAt: expiresAt || this.getDefaultExpiryDate(),
-      } as InviteMetadata,
-    }).save();
-  }
-
   private async notifyProjectOnJoin(
     projectId: Types.ObjectId,
     newMemberId: Types.ObjectId,
     inviterId: Types.ObjectId,
     role: Role,
-    source: 'invite' | 'request',
   ) {
     const projectMembers =
       await this.projectService.getProjectMemberIds(projectId);
     const recipients = projectMembers.filter((id) => !id.equals(newMemberId));
 
     await this.notificationModel.create({
-      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      type: NotificationType.PROJECT_MEMBER_ADDED,
       recipients: recipients.map((memberId) => ({
         userId: memberId,
       })),
@@ -383,7 +406,6 @@ export class NotificationService {
       metadata: {
         inviterId,
         role,
-        source,
       } as JoinResponseMetadata,
     });
   }
