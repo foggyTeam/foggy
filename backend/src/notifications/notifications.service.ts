@@ -151,6 +151,28 @@ export class NotificationService {
     );
   }
 
+  async deleteNotification(
+    notificationId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    const notification = await this.notificationModel
+      .findById(notificationId)
+      .exec();
+
+    if (!notification) {
+      return;
+    }
+
+    if (notification.recipients.length === 1) {
+      await this.notificationModel.findByIdAndDelete(notificationId);
+    } else {
+      await this.notificationModel.updateOne(
+        { _id: notificationId },
+        { $pull: { recipients: { userId } } },
+      );
+    }
+  }
+
   private async createInvite(
     recipientId: Types.ObjectId,
     entityId: Types.ObjectId,

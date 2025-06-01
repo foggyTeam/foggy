@@ -1,16 +1,19 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiHeader,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -138,5 +141,29 @@ export class NotificationController {
       role,
       expiresAt,
     );
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete notification for current user' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'Current user ID',
+    required: true,
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID of the notification to delete',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Notification deleted for user',
+  })
+  async deleteNotification(
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Param('id') notificationId: Types.ObjectId,
+  ): Promise<void> {
+    return this.notificationService.deleteNotification(notificationId, userId);
   }
 }
