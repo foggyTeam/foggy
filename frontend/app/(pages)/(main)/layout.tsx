@@ -28,7 +28,7 @@ async function getUser() {
 
 async function getUserProjects(): Promise<Project[] | undefined> {
   try {
-    return GetAllProjects();
+    return await GetAllProjects();
   } catch (e) {
     console.error('User with this id does not exist.');
     return undefined;

@@ -31,6 +31,7 @@ async function getUserData() {
     return userData ? userData : null;
   } catch (error) {
     console.error('Произошла ошибка!', error);
+    return null;
   }
 }
 

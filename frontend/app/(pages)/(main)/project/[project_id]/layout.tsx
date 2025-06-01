@@ -9,7 +9,7 @@ interface ProjectPageProps {
 
 async function getProject(id: string): Promise<RawProject | undefined> {
   try {
-    return GetProject(id);
+    return await GetProject(id);
   } catch (e) {
     console.error('Project with this id does not exist.', e);
     return undefined;
