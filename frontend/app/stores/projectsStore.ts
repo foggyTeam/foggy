@@ -2,6 +2,7 @@ import { action, makeAutoObservable, observable } from 'mobx';
 import {
   Board,
   BoardElement,
+  BoardTypes,
   Project,
   ProjectMember,
   ProjectSection,
@@ -10,7 +11,9 @@ import {
   TextElement,
 } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
-import ConvertRawProject from '@/app/lib/utils/convertRawProject';
+import ConvertRawProject, {
+  ConvertRawSection,
+} from '@/app/lib/utils/convertRawProject';
 import userStore from '@/app/stores/userStore';
 import { Socket } from 'socket.io-client';
 import openBoardSocketConnection, {
@@ -37,8 +40,10 @@ class ProjectsStore {
       removeElement: action,
       setActiveBoard: action,
       setActiveProject: action,
+      revalidateActiveProject: action,
       setAllProjects: action,
       addProjectChild: action,
+      insertProjectChild: action,
       addProject: action,
       updateProject: action,
       updateProjectChild: action,
@@ -67,6 +72,7 @@ class ProjectsStore {
     }
   }
 
+  // BOARD
   addElement = (newElement: BoardElement, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
       this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
@@ -95,7 +101,6 @@ class ProjectsStore {
         this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
   };
-
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
@@ -273,7 +278,7 @@ class ProjectsStore {
     };
   };
 
-  setActiveBoard = (board: Board | undefined) => {
+  setActiveBoard = (board: any | undefined) => {
     if (!board) {
       this.activeBoard = board;
       this.disconnectSocket();
@@ -281,10 +286,60 @@ class ProjectsStore {
       this.activeBoard = {
         ...board,
         layers: board.layers.map((layer) => observable.array(layer)),
-      };
-      this.connectSocket(board?.id || '');
+        lastChange: board.updatedAt,
+        type: board.type.toUpperCase() as BoardTypes,
+      } as Board;
+      this.connectSocket(this.activeBoard.id || '');
     }
   };
+
+  // PROJECT
+  setActiveProject = (project: RawProject | null) => {
+    if (!project) {
+      this.activeProject = undefined;
+      this.myRole = undefined;
+      return;
+    }
+    this.activeProject = ConvertRawProject(project);
+    this.myRole = this.activeProject.members?.find(
+      (member) => member.id === userStore.user?.id,
+    ).role;
+  };
+  revalidateActiveProject = (rawRevalidatedData: RawProject) => {
+    if (!this.activeProject) return;
+    const revalidatedData: Omit<Project, 'id' | 'sections' | 'favorite'> = {
+      name: rawRevalidatedData.name,
+      avatar: rawRevalidatedData.avatar,
+      description: rawRevalidatedData.description,
+      settings: rawRevalidatedData.settings,
+      lastChange: rawRevalidatedData.updatedAt,
+      members: rawRevalidatedData.members,
+    };
+    Object.assign(this.activeProject, revalidatedData);
+  };
+  setAllProjects = (projects: any[]) => {
+    this.allProjects = projects.map((project) => {
+      return {
+        lastChange: project.updatedAt,
+        members: project.members.map((member) => member as ProjectMember),
+        ...project,
+      } as Project;
+    }) as Project[];
+  };
+  updateProject = (id: string, newAttrs: Partial<Project>) => {
+    const projectIndex = this.allProjects.findIndex(
+      (project) => project.id === id,
+    );
+    this.allProjects[projectIndex] = {
+      ...this.allProjects[projectIndex],
+      ...newAttrs,
+    };
+  };
+  addProject = async (newProject: Project) => {
+    this.allProjects.push(newProject);
+  };
+
+  // PROJECT STRUCTURE
   getProjectChildParentList = (childId?: string): string[] => {
     if (!this.activeProject) return [];
     const searchId = childId || this.activeBoard?.id;
@@ -317,35 +372,7 @@ class ProjectsStore {
     }
     throw new Error('Project child with this id not found!');
   };
-
-  setActiveProject = (project: RawProject | null) => {
-    if (!project) {
-      this.activeProject = undefined;
-      this.myRole = undefined;
-      return;
-    }
-    this.activeProject = ConvertRawProject(project);
-    this.myRole = this.activeProject.members?.find(
-      (member) => member.id === userStore.user?.id,
-    ).role;
-  };
-  setAllProjects = (projects: Project[]) => {
-    this.allProjects = projects;
-  };
-  updateProject = (id: string, newAttrs: Partial<Project>) => {
-    const projectIndex = this.allProjects.findIndex(
-      (project) => project.id === id,
-    );
-    this.allProjects[projectIndex] = {
-      ...this.allProjects[projectIndex],
-      ...newAttrs,
-    };
-  };
-
-  addProject = (newProject: Project) => {
-    // TODO: make a post request and receive a project id
-    this.allProjects.push(newProject);
-  };
+  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
   addProjectChild = (
     parentSections: string[],
     child: ProjectSection | Board,
@@ -373,6 +400,7 @@ class ProjectsStore {
         if (!nextSection.children) nextSection.children = new Map();
 
         nextSection.children.set(child.id, child);
+        nextSection.childrenNumber += 1;
         if (isSection && 'parentId' in child)
           child.parentId = parentSections[parentSections.length - 1];
       } else currentSection = nextSection.children;
@@ -489,19 +517,116 @@ class ProjectsStore {
       if (i === parentSections.length - 1) {
         if (nextSection.id === childId) return nextSection;
 
-        if (nextSection.children) return nextSection.children[childId];
+        if (nextSection.children) return nextSection.children.get(childId);
       } else currentSection = nextSection.children;
     }
 
     // поиск на верхнем уровне
     if (parentSections.length === 0) {
-      if (childId) return this.activeProject.sections[childId];
+      if (childId) return this.activeProject.sections.get(childId);
       return currentSection;
     }
 
     throw new Error('Project child with this id not found!');
   };
+  insertProjectChild = (
+    parentSections: string[],
+    rawSection: any,
+    createParents: boolean = false,
+  ) => {
+    if (!this.activeProject) {
+      console.error('Select a project!');
+      return;
+    }
+    const child = ConvertRawSection(rawSection);
+    // 1. Если parentSections пустой — вставляем в корень
+    if (parentSections.length === 0) {
+      // Перенос старых детей, если секция уже была в корне
+      const oldSection = this.activeProject.sections.get(child.id) as
+        | ProjectSection
+        | undefined;
+      if (oldSection && oldSection.children) {
+        for (const [kidId, kid] of oldSection.children.entries()) {
+          if (!child.children.has(kidId)) {
+            child.children.set(kidId, kid);
+          }
+        }
+      }
+      // Вставляем или обновляем секцию в корне
+      this.activeProject.sections.set(child.id, child);
 
+      // Забрать "потеряшек" с корня, у которых parentId === child.id
+      for (const [id, maybeChild] of Array.from(
+        this.activeProject.sections.entries(),
+      )) {
+        if ('parentId' in maybeChild && maybeChild.parentId === child.id) {
+          child.children.set(id, maybeChild);
+          this.activeProject.sections.delete(id);
+        }
+      }
+      return;
+    }
+
+    // 2. Иначе ищем родителя по parentSections (проходим путь)
+    let current = this.activeProject.sections;
+    let parentSection: ProjectSection | undefined = undefined;
+
+    for (let idx = 0; idx < parentSections.length; ++idx) {
+      const sectionId = parentSections[idx];
+      let found = current.get(sectionId);
+
+      if (!found || !('children' in found)) {
+        if (createParents) {
+          // Создаем новую "пустую" секцию
+          const newParent: ProjectSection = {
+            id: sectionId,
+            parentId: idx === 0 ? undefined : parentSections[idx - 1],
+            name: '—',
+            childrenNumber: -1,
+            children: observable.map(),
+          };
+          current.set(sectionId, newParent);
+          found = newParent;
+        } else {
+          console.error('Родитель не найден');
+          return;
+        }
+      }
+
+      parentSection = found as ProjectSection;
+      current = parentSection.children as Map<string, ProjectSection | Board>;
+    }
+
+    if (!parentSection) {
+      console.error('Section not found!');
+      return;
+    }
+
+    // 3. Переносим детей из старой версии секции (если была)
+    const oldSection = parentSection.children.get(child.id) as
+      | ProjectSection
+      | undefined;
+    if (oldSection && oldSection.children) {
+      for (const [kidId, kid] of oldSection.children.entries()) {
+        if (!child.children.has(kidId)) {
+          child.children.set(kidId, kid);
+        }
+      }
+    }
+
+    // 4. Вставляем или обновляем секцию у родителя
+    parentSection.children.set(child.id, child);
+
+    // 5. Забираем "потеряшек" с текущего уровня, у которых parentId === child.id
+    for (const [id, maybeChild] of Array.from(current.entries())) {
+      if ('parentId' in maybeChild && maybeChild.parentId === child.id) {
+        child.children.set(id as string, maybeChild);
+        current.delete(id);
+      }
+    }
+  };
+
+  // PROJECT MEMBERS
   updateProjectMember = (
     memberId: string,
     newAttrs: Partial<ProjectMember>,
@@ -517,7 +642,6 @@ class ProjectsStore {
         };
     }
   };
-
   removeProjectMember = (memberId: string) => {
     if (this.activeProject) {
       this.activeProject.members = this.activeProject.members.filter(
@@ -525,8 +649,6 @@ class ProjectsStore {
       );
     }
   };
-
-  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
 }
 
 const projectsStore = new ProjectsStore();

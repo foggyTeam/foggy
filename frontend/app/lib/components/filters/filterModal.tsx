@@ -175,7 +175,7 @@ export default function FilterModal({
                             key={member.nickname}
                             textValue={member.nickname}
                           >
-                            <SmallMemberCard {...member} />
+                            <SmallMemberCard member={member} />
                           </SelectItem>
                         ) as any,
                     )}

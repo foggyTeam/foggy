@@ -6,71 +6,58 @@ import {
 } from '@/app/lib/types/definitions';
 import { observable } from 'mobx';
 
-export default function ConvertRawProject(rawProject: RawProject): Project {
-  function convertSection(
-    rawSection: Record<string, any>,
+export function ConvertRawSection(rawSection: any): ProjectSection {
+  function convertChildren(
+    rawChildren: any[],
   ): Map<
     string,
     | ProjectSection
     | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
   > {
-    const sectionMap = observable.map(
-      new Map<
-        string,
-        | ProjectSection
-        | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
-      >(),
-    );
+    const childMap = observable.map<
+      string,
+      | ProjectSection
+      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    >();
 
-    Object.entries(rawSection).forEach(([key, value]) => {
-      if ('children' in value) {
-        const childrenMap = convertSection(value.children);
-
-        const projectSection: ProjectSection = {
-          id: value.id,
-          parentId: value.parentId || undefined,
-          name: value.name,
-          childrenNumber: value.childrenNumber || 0,
-          children: childrenMap,
-        };
-
-        sectionMap.set(key, projectSection);
-      } else {
-        const board: Pick<
-          Board,
-          'id' | 'name' | 'sectionId' | 'type' | 'lastChange'
-        > = {
-          id: value.id,
-          name: value.name,
-          sectionId: value.sectionId,
-          type: value.type,
-          lastChange: value.lastChange,
-        };
-
-        sectionMap.set(key, board);
+    (rawChildren || []).forEach((child: any) => {
+      if (child && 'children' in child) {
+        // Рекурсивно парсим вложенную секцию
+        childMap.set(child.id, ConvertRawSection(child));
+      } else if (child) {
+        // Это доска
+        childMap.set(child.id, {
+          id: child.id,
+          name: child.name,
+          sectionId: child.sectionId,
+          type: child.type?.toUpperCase(),
+          lastChange: child.lastChange ?? child.updatedAt,
+        });
       }
     });
 
-    return sectionMap;
+    return childMap;
   }
 
+  return {
+    id: rawSection.id,
+    parentId: rawSection.parentId || undefined,
+    name: rawSection.name,
+    childrenNumber: rawSection.childrenNumber || 0,
+    children: convertChildren(rawSection.children || []),
+  };
+}
+
+export default function ConvertRawProject(rawProject: RawProject): Project {
   const sections = new Map<string, ProjectSection>();
-  Object.entries(rawProject.sections).forEach(([key, value]) => {
-    const childrenMap = convertSection(value.children || {});
-
-    const projectSection: ProjectSection = {
-      id: value.id,
-      parentId: value.parentId || undefined,
-      name: value.name,
-      childrenNumber: value.childrenNumber || 0,
-      children: childrenMap,
-    };
-
-    sections.set(key, projectSection);
+  (rawProject.sections || []).forEach((section: any) => {
+    sections.set(section.id, ConvertRawSection(section));
   });
 
+  // TODO: parse via zod
   return {
     ...rawProject,
+    lastChange: rawProject.updatedAt,
     sections,
-  };
+  } as Project;
 }

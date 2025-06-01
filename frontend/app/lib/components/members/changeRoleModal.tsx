@@ -9,7 +9,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { ProjectMember, Role, TeamMember } from '@/app/lib/types/definitions';
 import { Select, SelectItem } from '@heroui/select';
-import RoleCard from '@/app/lib/components/members/roleCard';
+import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -40,7 +40,6 @@ export default function ({
   const [changeType, setChangeType] = useState<('override' | 'updateMax')[]>([
     'override',
   ]);
-  const rolesList: Role[] = ['admin', 'editor', 'reader', 'owner'];
 
   useEffect(() => {
     submitRole(newRole[0]);

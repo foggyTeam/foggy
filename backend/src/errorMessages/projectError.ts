@@ -4,25 +4,17 @@ export const projectError = {
       en: 'Failed to create project',
       ru: 'Не удалось создать проект',
     },
-    invalidIdType: {
+    invalidType: {
       en: 'Invalid project ID format',
       ru: 'Неверный формат ID проекта',
     },
-    idNotFound: {
+    notFound: {
       en: 'Project not found',
       ru: 'Проект не найден',
-    },
-    idNotFoundOrNoAccess: {
-      en: "Project not found or you don't have access",
-      ru: 'Проект не найден или у вас нет доступа',
     },
     noPermission: {
       en: 'You do not have permission to perform this action',
       ru: 'У вас нет прав для выполнения этого действия',
-    },
-    CannotDelete: {
-      en: 'Only project owner can delete the project',
-      ru: 'Только владелец проекта может удалить его',
     },
     updateFailed: {
       en: 'Failed to update project',

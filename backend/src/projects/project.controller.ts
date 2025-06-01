@@ -21,13 +21,20 @@ import {
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { ProjectService } from './project.service';
-import { Project, Role } from './schemas/project.schema';
+import {
+  ChildSection,
+  ExtendedProjectListItem,
+  Project,
+  ProjectListItem,
+  Role,
+} from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { SectionDocument } from './schemas/section.schema';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
+import { UpdateSectionDto } from './dto/update-section.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -41,7 +48,17 @@ export class ProjectController {
   @ApiResponse({
     status: 201,
     description: 'The project has been successfully created.',
-    type: Project,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+      },
+    },
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiBody({
@@ -53,85 +70,8 @@ export class ProjectController {
           name: 'My Project',
           description: 'Project description',
           avatar: 'url',
-        },
-      },
-    },
-  })
-  async create(
-    @Body() createProjectDto: CreateProjectDto,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.createProject(createProjectDto, userId);
-  }
-
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get all projects for current user' })
-  @ApiSecurity('x-user-id')
-  @ApiResponse({
-    status: 200,
-    description: 'Returns an array of projects.',
-    type: [Project],
-  })
-  async findAll(
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project[]> {
-    return this.projectService.getAllUserProjects(new Types.ObjectId(userId));
-  }
-
-  @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get project by ID' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Valid MongoDB ObjectID',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns the project document',
-    type: Project,
-  })
-  @ApiResponse({ status: 400, description: 'Invalid ID format' })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  async findById(
-    @Param('id') id: Types.ObjectId,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.getProjectById(id, new Types.ObjectId(userId));
-  }
-
-  @Patch(':id')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Partially update project information' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the project',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'The project has been successfully updated',
-    type: Project,
-  })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  @ApiBody({
-    description: 'Data to update the project',
-    examples: {
-      example1: {
-        summary: 'Update name and description',
-        value: {
-          name: 'Updated Project Name',
-          description: 'Updated project description',
-        },
-      },
-      example2: {
-        summary: 'Update settings',
-        value: {
           settings: {
+            allowRequests: true,
             isPublic: true,
             memberListIsPublic: true,
           },
@@ -139,36 +79,15 @@ export class ProjectController {
       },
     },
   })
-  async update(
-    @Param('id') id: Types.ObjectId,
-    @Body() updateProjectDto: UpdateProjectDto,
+  async create(
+    @Body() createProjectDto: CreateProjectDto,
     @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.updateProjectInfo(id, updateProjectDto, userId);
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a project' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    required: true,
-    description: 'Valid MongoDB ObjectID',
-    type: String,
-  })
-  @ApiResponse({
-    status: 204,
-    description: 'The project was successfully deleted',
-  })
-  @ApiResponse({ status: 400, description: 'Invalid ID format' })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  @ApiResponse({ status: 403, description: 'Forbidden - not an owner' })
-  async delete(
-    @Param('id') id: Types.ObjectId,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<void> {
-    return this.projectService.deleteProject(id, new Types.ObjectId(userId));
+  ): Promise<{ data: { id: Types.ObjectId } }> {
+    const projectId = await this.projectService.createProject(
+      createProjectDto,
+      userId,
+    );
+    return { data: { id: projectId } };
   }
 
   @Post(':id/users')
@@ -221,9 +140,198 @@ export class ProjectController {
     );
   }
 
-  @Delete(':id/users/:userId')
+  @Post(':id/sections')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Add section to project or to parent section' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Section has been successfully added',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  @ApiBody({ type: CreateSectionDto })
+  async addSection(
+    @Param('id') projectId: Types.ObjectId,
+    @Body() createSectionDto: CreateSectionDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<{ data: { id: Types.ObjectId } }> {
+    const sectionId = await this.projectService.addSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(userId),
+      {
+        ...createSectionDto,
+        parentSectionId: createSectionDto.parentSectionId
+          ? new Types.ObjectId(createSectionDto.parentSectionId)
+          : undefined,
+      },
+    );
+    return { data: { id: sectionId } };
+  }
+
+  @Get()
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Remove user from project' })
+  @ApiOperation({ summary: 'Get all projects for current user' })
+  @ApiSecurity('x-user-id')
+  @ApiResponse({
+    status: 200,
+    description: 'Returns an array of projects.',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          avatar: { type: 'string' },
+          description: { type: 'string', nullable: true },
+          updatedAt: { type: 'string', format: 'date-time' },
+          members: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                name: { type: 'string' },
+                avatar: { type: 'string' },
+                role: {
+                  type: 'string',
+                  enum: ['owner', 'admin', 'editor', 'reader'],
+                },
+                team: { type: 'string', nullable: true },
+                teamId: { type: 'string', nullable: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  async findAll(
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<ProjectListItem[]> {
+    return this.projectService.getAllUserProjects(new Types.ObjectId(userId));
+  }
+
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get project by ID with sections hierarchy' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the project with sections hierarchy',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+        avatar: { type: 'string' },
+        description: { type: 'string', nullable: true },
+        updatedAt: { type: 'string', format: 'date-time' },
+        settings: {
+          type: 'object',
+          properties: {
+            allowRequests: { type: 'boolean' },
+            isPublic: { type: 'boolean' },
+            memberListIsPublic: { type: 'boolean' },
+          },
+        },
+        members: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              nickname: { type: 'string' },
+              avatar: { type: 'string' },
+              role: {
+                type: 'string',
+                enum: ['owner', 'admin', 'editor', 'reader'],
+              },
+              team: { type: 'string', nullable: true },
+              teamId: { type: 'string', nullable: true },
+            },
+          },
+        },
+        sections: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              parentId: { type: 'string', nullable: true },
+              name: { type: 'string' },
+              childrenNumber: { type: 'number' },
+              children: {
+                type: 'array',
+                items: {
+                  oneOf: [
+                    {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        parentId: { type: 'string' },
+                        name: { type: 'string' },
+                        childrenNumber: { type: 'number' },
+                        children: { type: 'array', items: {} },
+                      },
+                    },
+                    {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string' },
+                        sectionId: { type: 'string' },
+                        name: { type: 'string' },
+                        type: { type: 'string' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  async findById(
+    @Param('id') projectId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<ExtendedProjectListItem> {
+    return this.projectService.getProjectById(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(userId),
+    );
+  }
+
+  @Get(':id/sections/:sectionId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get section with children' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
@@ -231,27 +339,69 @@ export class ProjectController {
     type: String,
   })
   @ApiParam({
-    name: 'userId',
-    description: 'ID of the user to remove',
+    name: 'sectionId',
+    description: 'ID of the section',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'User has been successfully removed from project',
+    description: 'Returns section children items',
+  })
+  @ApiResponse({ status: 404, description: 'Project or section not found' })
+  async getSection(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('sectionId') sectionId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<ChildSection> {
+    return this.projectService.getSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(sectionId),
+      new Types.ObjectId(userId),
+    );
+  }
+
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Partially update project information' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The project has been successfully updated',
     type: Project,
   })
-  @ApiResponse({ status: 404, description: 'Project or user not found' })
-  @ApiResponse({ status: 403, description: 'Forbidden - cannot remove owner' })
-  async removeUser(
-    @Param('id') projectId: Types.ObjectId,
-    @Param('userId') targetUserId: Types.ObjectId,
-    @Headers('x-user-id') requestingUserId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.removeUser(
-      projectId,
-      requestingUserId,
-      targetUserId,
-    );
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  @ApiBody({
+    description: 'Data to update the project',
+    examples: {
+      example1: {
+        summary: 'Update name and description',
+        value: {
+          name: 'Updated Project Name',
+          description: 'Updated project description',
+        },
+      },
+      example2: {
+        summary: 'Update settings',
+        value: {
+          settings: {
+            isPublic: true,
+            memberListIsPublic: true,
+          },
+        },
+      },
+    },
+  })
+  async update(
+    @Param('id') id: Types.ObjectId,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.projectService.updateProjectInfo(id, updateProjectDto, userId);
   }
 
   @Patch(':id/users/:userId/role')
@@ -261,11 +411,6 @@ export class ProjectController {
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
-    type: String,
-  })
-  @ApiParam({
-    name: 'userId',
-    description: 'ID of the user to update',
     type: String,
   })
   @ApiResponse({
@@ -311,157 +456,39 @@ export class ProjectController {
     );
   }
 
-  @Get(':id/access-control')
+  @Patch(':id/sections/:sectionId')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get project access control list' })
+  @ApiOperation({ summary: 'Update section name' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
     description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'sectionId',
+    description: 'ID of the section to update',
     type: String,
   })
   @ApiResponse({
     status: 200,
-    description: 'Returns access control list',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          nickname: { type: 'string' },
-          avatar: { type: 'string' },
-          role: { type: 'Role' },
-          team: { type: 'string' },
-          teamRole: { type: 'string' },
-        },
-      },
-    },
-  })
-  @ApiResponse({ status: 404, description: 'Project not found' })
-  async getAccessControlList(
-    @Param('id') projectId: Types.ObjectId,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<any[]> {
-    return this.projectService.getAccessControlList(projectId, userId);
-  }
-
-  @Post(':id/sections')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Add section to project or to parent section' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the project',
-    type: String,
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Section has been successfully added',
+    description: 'Section name has been successfully updated',
   })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
-  @ApiBody({ type: CreateSectionDto })
-  async addSection(
-    @Param('id') projectId: Types.ObjectId,
-    @Body() createSectionDto: CreateSectionDto,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<SectionDocument> {
-    return this.projectService.addSection(
-      new Types.ObjectId(projectId),
-      new Types.ObjectId(userId),
-      {
-        ...createSectionDto,
-        parentSectionId: createSectionDto.parentSectionId
-          ? new Types.ObjectId(createSectionDto.parentSectionId)
-          : undefined,
-      },
-    );
-  }
-
-  @Get(':id/sections/:sectionId')
-  @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Get section with children' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the project',
-    type: String,
-  })
-  @ApiParam({
-    name: 'sectionId',
-    description: 'ID of the section',
-    type: String,
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Returns section with children items',
-    schema: {
-      type: 'object',
-      properties: {
-        section: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            name: { type: 'string' },
-            description: { type: 'string', nullable: true },
-            parentId: { type: 'string', nullable: true },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' },
-          },
-        },
-        children: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              id: { type: 'string' },
-              name: { type: 'string' },
-              type: { type: 'string', enum: ['board', 'section'] },
-              lastChange: { type: 'string', format: 'date-time' },
-            },
-          },
-        },
-      },
-    },
-  })
   @ApiResponse({ status: 404, description: 'Project or section not found' })
-  async getSection(
+  @ApiBody({ type: UpdateSectionDto })
+  async updateSection(
     @Param('id') projectId: Types.ObjectId,
     @Param('sectionId') sectionId: Types.ObjectId,
-    @Headers('x-user-id') userId: Types.ObjectId,
-  ): Promise<any> {
-    return this.projectService.getSection(projectId, sectionId, userId);
-  }
-
-  @Delete(':id/sections/:sectionId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete section' })
-  @ApiSecurity('x-user-id')
-  @ApiParam({
-    name: 'id',
-    description: 'ID of the project',
-    type: String,
-  })
-  @ApiParam({
-    name: 'sectionId',
-    description: 'ID of the section to remove',
-    type: String,
-  })
-  @ApiResponse({
-    status: 204,
-    description: 'Section has been successfully removed',
-  })
-  @ApiResponse({ status: 404, description: 'Project or section not found' })
-  async removeSection(
-    @Param('id') projectId: Types.ObjectId,
-    @Param('sectionId') sectionId: Types.ObjectId,
+    @Body() updateSectionDto: UpdateSectionDto,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
-    await this.projectService.removeSection(
+    await this.projectService.updateSection(
       new Types.ObjectId(projectId),
       new Types.ObjectId(sectionId),
-      userId,
+      updateSectionDto,
+      new Types.ObjectId(userId),
     );
   }
 
@@ -534,6 +561,94 @@ export class ProjectController {
       projectId,
       sectionId,
       changeSectionParentDto,
+      userId,
+    );
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'The project was successfully deleted',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid ID format' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - not an owner' })
+  async delete(
+    @Param('id') projectId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.projectService.deleteProject(projectId, userId);
+  }
+
+  @Delete(':id/users/:userId')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove user from project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'userId',
+    description: 'ID of the user to remove',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User has been successfully removed from project',
+    type: Project,
+  })
+  @ApiResponse({ status: 404, description: 'Project or user not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - cannot remove owner' })
+  async removeUser(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('userId') targetUserId: Types.ObjectId,
+    @Headers('x-user-id') requestingUserId: Types.ObjectId,
+  ): Promise<Project> {
+    return this.projectService.removeUser(
+      projectId,
+      requestingUserId,
+      targetUserId,
+    );
+  }
+
+  @Delete(':id/sections/:sectionId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete section' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'sectionId',
+    description: 'ID of the section to remove',
+    type: String,
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Section has been successfully removed',
+  })
+  @ApiResponse({ status: 404, description: 'Project or section not found' })
+  async removeSection(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('sectionId') sectionId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.projectService.removeSection(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(sectionId),
       userId,
     );
   }

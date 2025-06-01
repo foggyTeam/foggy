@@ -1,22 +1,35 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Project, ProjectDocument, Role } from './schemas/project.schema';
+import {
+  ChildBoard,
+  ChildSection,
+  ExtendedProjectListItem,
+  MemberInfo,
+  Project,
+  ProjectDocument,
+  ProjectListItem,
+  Role,
+} from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from '../users/users.service';
 import { BoardService } from '../board/board.service';
-import { getErrorMessages } from '../errorMessages/errorMessages';
+import { Field, getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
-import {
-  PopulatedSectionItem,
-  Section,
-  SectionDocument,
-} from './schemas/section.schema';
+import { Section, SectionDocument } from './schemas/section.schema';
 import { Board, BoardDocument } from '../board/schemas/board.schema';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
+import { UpdateSectionDto } from './dto/update-section.dto';
+
+enum RoleLevel {
+  reader = 0,
+  editor = 1,
+  admin = 2,
+  owner = 3,
+}
 
 @Injectable()
 export class ProjectService {
@@ -25,13 +38,14 @@ export class ProjectService {
     @InjectModel(Section.name) private sectionModel: Model<SectionDocument>,
     @InjectModel(Board.name) private boardModel: Model<BoardDocument>,
     private readonly boardService: BoardService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
   async createProject(
     createProjectDto: CreateProjectDto,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+  ): Promise<Types.ObjectId> {
     try {
       await this.validateUser(userId);
       const newProject = new this.projectModel({
@@ -43,8 +57,8 @@ export class ProjectService {
           },
         ],
       });
-
-      return await newProject.save();
+      await this.saveProject(newProject);
+      return newProject._id;
     } catch (error) {
       if (error instanceof CustomException) {
         throw error;
@@ -56,80 +70,15 @@ export class ProjectService {
     }
   }
 
-  async findProjectById(
-    projectId: Types.ObjectId,
-    userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
-    await this.validateUser(userId);
-
-    if (!Types.ObjectId.isValid(projectId)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    return await this.projectModel
-      .findById(projectId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ project: 'idNotFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
-  }
-
-  async getUserRole(
-    projectId: Types.ObjectId,
-    userId: Types.ObjectId,
-  ): Promise<string | null> {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-    const userAccess = project.accessControlUsers.find((user) =>
-      user.userId.equals(userId),
-    );
-
-    if (userAccess) {
-      return userAccess.role;
-    }
-
-    for (const teamAccess of project.accessControlTeams) {
-      const individualOverride = teamAccess.individualOverrides.find(
-        (override) => override.userId.equals(userId),
-      );
-
-      if (individualOverride) {
-        return individualOverride.role;
-      }
-
-      // TODO: Заменить на реальную проверку, когда будет сервис команд
-      const isUserInTeam = await this.isUserInTeam(teamAccess.teamId, userId);
-      if (isUserInTeam) {
-        return teamAccess.role;
-      }
-    }
-
-    return null;
-  }
-
   async deleteProject(
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-    const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(userId) && user.role === 'owner',
-    );
-
-    if (!isOwner) {
-      throw new CustomException(
-        getErrorMessages({ project: 'CannotDelete' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      'owner',
+    )) as ProjectDocument;
 
     await this.boardService.deleteByProject(projectId);
     await this.sectionModel.deleteMany({
@@ -151,22 +100,10 @@ export class ProjectService {
     changeBoardParentDto: ChangeBoardSectionDto,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
-    const userRole = await this.getUserRole(projectId, userId);
+    await this.validateUser(userId, projectId, 'editor');
 
-    if (!['owner', 'admin', 'editor'].includes(userRole)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'noPermission' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
     const newSectionId = changeBoardParentDto.newSectionId;
-    if (!Types.ObjectId.isValid(newSectionId)) {
-      throw new CustomException(
-        getErrorMessages({ section: 'invalidType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    this.validateObjectId(changeBoardParentDto.newSectionId, 'section');
     await this.boardService.changeBoardSection(boardId, newSectionId);
   }
 
@@ -176,34 +113,20 @@ export class ProjectService {
     changeSectionParentDto: ChangeSectionParentDto,
     userId: Types.ObjectId,
   ): Promise<SectionDocument> {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-    const userRole = await this.getUserRole(projectId, userId);
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      'editor',
+    )) as ProjectDocument;
 
-    if (!['owner', 'admin', 'editor'].includes(userRole)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'noPermission' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    const section = await this.sectionModel
-      .findById(sectionId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ section: 'notFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
+    const section = await this.findSection(sectionId);
     const newParentSectionId = changeSectionParentDto.newParent;
     if (section.parent === null && newParentSectionId !== null) {
       project.sections = project.sections.filter((id) => id !== sectionId);
-      await project.save();
+      await this.saveProject(project);
     } else if (section.parent !== null && newParentSectionId === null) {
       project.sections.push(sectionId);
-      await project.save();
+      await this.saveProject(project);
     }
     if (section.parent) {
       await this.sectionModel.updateOne(
@@ -228,22 +151,8 @@ export class ProjectService {
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
-    await this.findProjectById(projectId, userId);
-    const userRole = await this.getUserRole(projectId, userId);
-    if (!['owner', 'admin', 'editor'].includes(userRole)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'noPermission' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
-    const targetSection = await this.sectionModel.findById(sectionId).exec();
-    if (!targetSection) {
-      throw new CustomException(
-        getErrorMessages({ section: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
+    await this.validateUser(userId, projectId, 'editor');
+    const targetSection = await this.findSection(sectionId);
     if (targetSection.parent) {
       await this.sectionModel.updateOne(
         { _id: targetSection.parent },
@@ -289,12 +198,8 @@ export class ProjectService {
         },
       ])
       .exec();
-    console.log('2', sectionsToDelete);
     if (sectionsToDelete.length === 0) {
-      throw new CustomException(
-        getErrorMessages({ section: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
+      this.notFoundError('section');
     }
     const sectionIds = sectionsToDelete[0].sectionIds;
 
@@ -339,41 +244,124 @@ export class ProjectService {
     ]);
   }
 
-  async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectDocument[]> {
+  async updateSection(
+    projectId: Types.ObjectId,
+    sectionId: Types.ObjectId,
+    updateSectionDto: UpdateSectionDto,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.validateUser(userId, projectId, 'editor');
+
+    await this.sectionModel
+      .findOneAndUpdate(
+        { _id: sectionId, projectId },
+        { name: updateSectionDto.name },
+        { new: true },
+      )
+      .orFail(() => this.notFoundError('section'))
+      .exec();
+  }
+
+  public async getSectionPath(
+    sectionId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    if (!sectionId) return [];
+    if (!(sectionId instanceof Types.ObjectId)) {
+      sectionId = new Types.ObjectId(sectionId);
+    }
+    const result = await this.sectionModel.aggregate([
+      { $match: { _id: sectionId } },
+      {
+        $graphLookup: {
+          from: this.sectionModel.collection.name,
+          startWith: '$parent',
+          connectFromField: 'parent',
+          connectToField: '_id',
+          as: 'ancestors',
+        },
+      },
+      {
+        $project: {
+          path: {
+            $concatArrays: [
+              { $map: { input: '$ancestors', as: 'a', in: '$$a._id' } },
+              ['$_id'],
+            ],
+          },
+        },
+      },
+    ]);
+    return result[0]?.path || [sectionId];
+  }
+
+  async getAllUserProjects(userId: Types.ObjectId): Promise<ProjectListItem[]> {
     await this.validateUser(userId);
 
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new CustomException(
-        getErrorMessages({ user: 'invalidIdType' }),
-        HttpStatus.BAD_REQUEST,
-      );
+    const projects = await this.projectModel
+      .find({ 'accessControlUsers.userId': userId })
+      .sort({ updatedAt: -1 })
+      .exec();
+
+    const result: ProjectListItem[] = [];
+
+    for (const project of projects) {
+      const members = await this.getMembers(project);
+      result.push({
+        id: project._id,
+        name: project.name,
+        avatar: project.avatar,
+        description: project.description,
+        updatedAt: project.updatedAt,
+        members,
+      });
     }
 
-    return this.projectModel
-      .find({ 'accessControlUsers.userId': userId })
-      .select('-__v')
-      .sort({ createdAt: -1 })
-      .exec();
+    return result;
   }
 
   async getProjectById(
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
-    await this.validateUser(userId);
-    return await this.projectModel
-      .findOne({
-        _id: projectId,
-        'accessControlUsers.userId': userId,
-      })
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ project: 'idNotFoundOrNoAccess' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
+  ): Promise<ExtendedProjectListItem> {
+    await this.validateUser(userId, projectId, 'reader');
+
+    const project = await this.projectModel.findById(projectId).exec();
+    const members = await this.getMembers(project);
+
+    const rootSections = await this.sectionModel
+      .find({ _id: { $in: project.sections }, parent: null })
+      .lean()
       .exec();
+
+    const sections: ChildSection[] = await Promise.all(
+      rootSections.map(async (section) => {
+        const fullSection = await this.getSection(
+          projectId,
+          section._id,
+          userId,
+        );
+        return {
+          ...fullSection,
+          children: fullSection.children.map((child) => {
+            if ('children' in child) {
+              return { ...child, children: [] };
+            }
+            return child;
+          }),
+        };
+      }),
+    );
+
+    return {
+      id: project._id,
+      name: project.name,
+      avatar: project.avatar,
+      description: project.description,
+      updatedAt: project.updatedAt,
+      members,
+      settings: project.settings,
+      sections,
+    };
   }
 
   async addUser(
@@ -382,9 +370,12 @@ export class ProjectService {
     targetUserId: Types.ObjectId,
     role: Role,
   ): Promise<ProjectDocument> {
-    await this.validateUser(requestingUserId);
+    const project = (await this.validateUser(
+      requestingUserId,
+      projectId,
+      'admin',
+    )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const project = await this.findProjectById(projectId, requestingUserId);
     const userExists = project.accessControlUsers.some((user) =>
       user.userId.equals(targetUserId),
     );
@@ -403,16 +394,7 @@ export class ProjectService {
     }
 
     project.accessControlUsers.push({ userId: targetUserId, role });
-
-    try {
-      await project.save();
-      return project;
-    } catch {
-      throw new CustomException(
-        getErrorMessages({ project: 'updateFailed' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.saveProject(project);
   }
 
   async removeUser(
@@ -420,9 +402,12 @@ export class ProjectService {
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
   ): Promise<ProjectDocument> {
-    await this.validateUser(requestingUserId);
+    const project = (await this.validateUser(
+      requestingUserId,
+      projectId,
+      'admin',
+    )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const project = await this.findProjectById(projectId, requestingUserId);
     const isOwner = project.accessControlUsers.some(
       (user) => user.userId.equals(targetUserId) && user.role === 'owner',
     );
@@ -437,16 +422,7 @@ export class ProjectService {
     project.accessControlUsers = project.accessControlUsers.filter(
       (user) => !user.userId.equals(targetUserId),
     );
-
-    try {
-      await project.save();
-      return project;
-    } catch {
-      throw new CustomException(
-        getErrorMessages({ project: 'updateFailed' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    return await this.saveProject(project);
   }
 
   async updateUserRole(
@@ -455,9 +431,12 @@ export class ProjectService {
     targetUserId: Types.ObjectId,
     newRole: Role,
   ): Promise<ProjectDocument> {
-    await this.validateUser(requestingUserId);
+    const project = (await this.validateUser(
+      requestingUserId,
+      projectId,
+      'admin',
+    )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const project = await this.findProjectById(projectId, requestingUserId);
     const isOwner = project.accessControlUsers.some(
       (user) => user.userId.equals(targetUserId) && user.role === 'owner',
     );
@@ -481,50 +460,19 @@ export class ProjectService {
     }
 
     project.accessControlUsers[userIndex].role = newRole;
-
-    try {
-      await project.save();
-      return project;
-    } catch {
-      throw new CustomException(
-        getErrorMessages({ project: 'updateFailed' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async getAccessControlList(
-    projectId: Types.ObjectId,
-    userId: Types.ObjectId,
-  ): Promise<
-    {
-      id: string;
-      nickname: string;
-      avatar: string;
-      role: Role;
-      team?: string;
-      teamRole?: string;
-    }[]
-  > {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-
-    // TODO: Реализовать полную логику, когда будет сервис команд
-    return project.accessControlUsers.map((user) => ({
-      id: user.userId.toString(),
-      nickname: `User ${user.userId.toString().substring(0, 6)}`,
-      avatar: '',
-      role: user.role,
-    }));
+    return await this.saveProject(project);
   }
 
   async updateProjectInfo(
     projectId: Types.ObjectId,
     updateData: UpdateProjectDto,
     userId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
+  ): Promise<void> {
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      'admin',
+    )) as ProjectDocument;
 
     if (updateData.name) {
       project.name = updateData.name;
@@ -545,59 +493,79 @@ export class ProjectService {
       };
     }
 
-    try {
-      await project.save();
-      return project;
-    } catch {
-      throw new CustomException(
-        getErrorMessages({ project: 'updateFailed' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.saveProject(project);
   }
 
   async getSection(
     projectId: Types.ObjectId,
     sectionId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<{
-    id: string;
-    name: string;
-    childrenNumber: number;
-    children: Array<{
-      id: string;
-      name: string;
-      type: 'section' | 'board';
-      updatedAt: Date;
-    }>;
-  }> {
-    await this.validateUser(userId);
-    const section = await this.sectionModel
-      .findById(sectionId)
-      .populate<{ items: PopulatedSectionItem[] }>({
-        path: 'items.itemId',
-        select: 'name updatedAt',
-      })
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ section: 'notFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
+  ): Promise<ChildSection> {
+    await this.validateUser(userId, projectId, 'reader');
 
-    const children = section.items.map((item) => ({
-      id: item.itemId._id.toString(),
-      name: item.itemId.name,
-      type: item.type,
-      updatedAt: item.itemId.updatedAt,
-    }));
+    const section = await this.findSection(sectionId);
+
+    const sectionItems = section.items.filter(
+      (item) => item.type === 'section',
+    );
+    const boardItems = section.items.filter((item) => item.type === 'board');
+
+    const childSections =
+      sectionItems.length > 0
+        ? await this.sectionModel
+            .find({
+              _id: { $in: sectionItems.map((item) => item.itemId) },
+            })
+            .lean()
+            .exec()
+        : [];
+
+    const boards =
+      boardItems.length > 0
+        ? await this.boardModel
+            .find({
+              _id: { $in: boardItems.map((item) => item.itemId) },
+            })
+            .lean()
+            .exec()
+        : [];
+
+    const sectionMap = new Map(childSections.map((s) => [s._id.toString(), s]));
+    const boardMap = new Map(boards.map((b) => [b._id.toString(), b]));
+
+    const children: Array<ChildSection | ChildBoard> = [];
+
+    for (const item of sectionItems) {
+      const childSection = sectionMap.get(item.itemId.toString());
+      if (childSection) {
+        children.push({
+          id: childSection._id,
+          parentId: section._id,
+          name: childSection.name,
+          childrenNumber: childSection.items?.length || 0,
+          children: [],
+        } as ChildSection);
+      }
+    }
+
+    for (const item of boardItems) {
+      const board = boardMap.get(item.itemId.toString());
+      if (board) {
+        children.push({
+          id: board._id,
+          sectionId: board.sectionId,
+          name: board.name,
+          type: board.type,
+          updatedAt: board.updatedAt,
+        } as ChildBoard);
+      }
+    }
 
     return {
-      id: section._id.toString(),
+      id: section._id,
+      parentId: section.parent,
       name: section.name,
-      childrenNumber: children.length,
+      childrenNumber: section.items.length,
       children,
     };
   }
@@ -606,13 +574,7 @@ export class ProjectService {
     sectionId: Types.ObjectId,
     boardId: Types.ObjectId,
   ): Promise<void> {
-    const section = await this.sectionModel.findById(sectionId).exec();
-    if (!section) {
-      throw new CustomException(
-        getErrorMessages({ section: 'notFound' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
+    const section = await this.findSection(sectionId);
     section.items.push({ type: 'board', itemId: boardId });
     await section.save();
   }
@@ -650,16 +612,12 @@ export class ProjectService {
     projectId: Types.ObjectId,
     userId: Types.ObjectId,
     createSectionDto: CreateSectionDto,
-  ): Promise<SectionDocument> {
-    await this.validateUser(userId);
-    const project = await this.findProjectById(projectId, userId);
-    const userRole = await this.getUserRole(projectId, userId);
-    if (!['owner', 'admin', 'editor'].includes(userRole)) {
-      throw new CustomException(
-        getErrorMessages({ project: 'noPermission' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
+  ): Promise<Types.ObjectId> {
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      'editor',
+    )) as ProjectDocument;
 
     const { parentSectionId, name } = createSectionDto;
     if (parentSectionId) {
@@ -675,7 +633,7 @@ export class ProjectService {
     role: Role,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
+    await this.validateUser(userId, projectId, 'admin');
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -687,7 +645,7 @@ export class ProjectService {
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
+    await this.validateUser(userId, projectId, 'admin');
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
@@ -700,41 +658,151 @@ export class ProjectService {
     newRole: Role,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId);
+    await this.validateUser(userId, projectId, 'admin');
     throw new CustomException(
       getErrorMessages({ feature: 'notImplemented' }),
       HttpStatus.NOT_IMPLEMENTED,
     );
   }
 
+  async getProjectMemberIds(
+    projectId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    const project = await this.findProjectById(projectId);
+    const members = await this.getMembers(project);
+    return members.map((m) => m.id);
+  }
+
+  private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new CustomException(
+        getErrorMessages({ [errorKey]: 'invalidType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  private notFoundError(errorKey: Field): NativeError {
+    throw new CustomException(
+      getErrorMessages({ [errorKey]: 'notFound' }),
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  private async findSection(
+    sectionId: Types.ObjectId,
+  ): Promise<SectionDocument> {
+    return await this.sectionModel
+      .findById(sectionId)
+      .orFail(() => this.notFoundError('section'))
+      .exec();
+  }
+
+  private async saveProject(
+    project: ProjectDocument,
+  ): Promise<ProjectDocument> {
+    try {
+      await project.save();
+      return project;
+    } catch {
+      throw new CustomException(
+        getErrorMessages({ project: 'updateFailed' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async getMembers(project: ProjectDocument): Promise<MemberInfo[]> {
+    // TODO: Реализовать полную логику с командами, когда будет сервис команд
+    const populatedProject = await this.projectModel
+      .findById(project._id)
+      .populate<{
+        'accessControlUsers.userId': {
+          _id: Types.ObjectId;
+          nickname: string;
+          avatar: string;
+        };
+      }>({
+        path: 'accessControlUsers.userId',
+        select: 'nickname avatar',
+      })
+      .exec();
+
+    return populatedProject.accessControlUsers.map((user) => {
+      const userObj = user.userId as any;
+      return {
+        id: userObj._id,
+        nickname: userObj.nickname,
+        avatar: userObj.avatar,
+        role: user.role,
+        team: undefined,
+        teamId: undefined,
+      };
+    });
+  }
+
+  private async getUserRole(
+    projectId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<string | null> {
+    const project = await this.findProjectById(projectId);
+    const userAccess = project.accessControlUsers.find((user) =>
+      user.userId.equals(userId),
+    );
+
+    if (userAccess) {
+      return userAccess.role;
+    }
+
+    for (const teamAccess of project.accessControlTeams) {
+      const individualOverride = teamAccess.individualOverrides.find(
+        (override) => override.userId.equals(userId),
+      );
+
+      if (individualOverride) {
+        return individualOverride.role;
+      }
+
+      // TODO: Заменить на реальную проверку, когда будет сервис команд
+      const isUserInTeam = await this.isUserInTeam(teamAccess.teamId, userId);
+      if (isUserInTeam) {
+        return teamAccess.role;
+      }
+    }
+
+    return null;
+  }
+
+  private async findProjectById(
+    projectId: Types.ObjectId,
+  ): Promise<ProjectDocument> {
+    this.validateObjectId(projectId, 'project');
+
+    return await this.projectModel
+      .findById(projectId)
+      .orFail(() => this.notFoundError('project'))
+      .exec();
+  }
+
   private async addSectionToProject(
     project: ProjectDocument,
     name: string,
-  ): Promise<SectionDocument> {
-    const newSection = new this.sectionModel({ projectId: project.id, name });
+  ): Promise<Types.ObjectId> {
+    const newSection = new this.sectionModel({ projectId: project._id, name });
     await newSection.save();
 
     project.sections.push(newSection._id);
-    await project.save();
+    await this.saveProject(project);
 
-    return newSection;
+    return newSection._id;
   }
 
   private async addSectionToSection(
     projectId: Types.ObjectId,
     parentSectionId: Types.ObjectId,
     name: string,
-  ): Promise<SectionDocument> {
-    const parentSection = await this.sectionModel
-      .findById(parentSectionId)
-      .orFail(
-        () =>
-          new CustomException(
-            getErrorMessages({ section: 'notFound' }),
-            HttpStatus.NOT_FOUND,
-          ),
-      )
-      .exec();
+  ): Promise<Types.ObjectId> {
+    const parentSection = await this.findSection(parentSectionId);
     const newSection = new this.sectionModel({
       projectId,
       name,
@@ -745,21 +813,31 @@ export class ProjectService {
     parentSection.items.push({ type: 'section', itemId: newSection._id });
     await parentSection.save();
 
-    return parentSection;
+    return newSection._id;
   }
 
-  private async validateUser(userId: Types.ObjectId): Promise<void> {
-    try {
-      await this.usersService.findUserById(userId.toString());
-    } catch (error) {
-      if (error instanceof CustomException) {
-        throw error;
+  private async validateUser(
+    userId: Types.ObjectId,
+    projectId?: Types.ObjectId,
+    requiredRole?: Role,
+  ): Promise<ProjectDocument | void> {
+    await this.usersService.findUserById(userId.toString());
+    if (projectId) {
+      const project = await this.findProjectById(projectId);
+
+      if (requiredRole) {
+        const userRole = await this.getUserRole(projectId, userId);
+        if (!userRole || RoleLevel[userRole] < RoleLevel[requiredRole]) {
+          throw new CustomException(
+            getErrorMessages({ project: 'noPermission' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
       }
-      throw new CustomException(
-        getErrorMessages({ user: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
+
+      return project;
     }
+    return;
   }
 
   private async isUserInTeam(

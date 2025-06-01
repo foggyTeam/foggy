@@ -13,7 +13,7 @@ import { BoardModule } from '../board/board.module';
       { name: Project.name, schema: ProjectSchema },
       { name: Section.name, schema: SectionSchema },
     ]),
-    UsersModule,
+    forwardRef(() => UsersModule),
     forwardRef(() => BoardModule),
   ],
   controllers: [ProjectController],

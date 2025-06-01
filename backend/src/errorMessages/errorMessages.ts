@@ -178,7 +178,7 @@ const errorMessages = {
   ...projectError,
 };
 
-type Field = keyof typeof errorMessages;
+export type Field = keyof typeof errorMessages;
 type ErrorType<T extends Field> = keyof (typeof errorMessages)[T];
 
 type ErrorMessages = { [key: string]: string | null };

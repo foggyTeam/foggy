@@ -11,15 +11,17 @@ import { Input, Textarea } from '@heroui/input';
 import { ProfileData } from '@/app/(pages)/(main)/profile/page';
 import { Checkbox } from '@heroui/checkbox';
 import { profileFormSchema } from '@/app/lib/types/schemas';
-import { updateUserData } from '@/app/lib/server/actions/updateUserData';
-import { deleteUserById } from '@/app/lib/server/actions/deleteUserById';
-import { signUserOut } from '@/app/lib/server/actions/signUserOut';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import { useDisclosure } from '@heroui/modal';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
 import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
+import {
+  DeleteUserById,
+  SignUserOut,
+  UpdateUserData,
+} from '@/app/lib/server/actions/userServerActions';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -57,14 +59,10 @@ const ProfileForm = observer((userData: ProfileData) => {
 
     const imageBlob = await HandleImageUpload(event);
     if (imageBlob && userStore.user) {
-      const response = await uploadImage(
-        userStore.user.id,
-        'avatar',
-        imageBlob,
-      );
+      const response = await uploadImage('avatar', imageBlob);
 
       if ('url' in response) {
-        await updateUserData(userStore.user.id, {
+        await UpdateUserData({
           avatar: response.url,
         }).then((result) => {
           if (
@@ -105,7 +103,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         },
       };
 
-      await updateUserData(userStore.user?.id as string, updatedData)
+      await UpdateUserData(updatedData)
         .then((result) => {
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
@@ -120,11 +118,11 @@ const ProfileForm = observer((userData: ProfileData) => {
   };
 
   const onSignOut = async () => {
-    await signUserOut();
+    await SignUserOut();
   };
 
   const deleteAccount = async () => {
-    await deleteUserById(userStore.user?.id as string).then((result) => {
+    await DeleteUserById().then((result) => {
       if (
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
       ) {

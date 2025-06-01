@@ -16,6 +16,13 @@ import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import {
+  AddNewProject,
+  DeleteProject,
+  UpdateProject,
+} from '@/app/lib/server/actions/projectServerActions';
+import userStore from '@/app/stores/userStore';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 
 const ProjectSettingsModal = observer(
   ({
@@ -41,7 +48,9 @@ const ProjectSettingsModal = observer(
     const [checkboxes, setCheckboxes] = useState<ProjectSettings>(
       new ProjectSettings(),
     );
-    const [avatar, setAvatar] = useState<null | string | ArrayBuffer>(null);
+    const [avatar, setAvatar] = useState<string>(
+      isNewProject ? '' : projectsStore.activeProject?.avatar || '',
+    );
 
     useEffect(() => {
       if (!isNewProject && projectsStore.activeProject) {
@@ -60,29 +69,81 @@ const ProjectSettingsModal = observer(
     }, [name, description, setErrors]);
 
     const handleImageUpload = async (event: any) => {
-      const resizedImageURL = await HandleImageUpload(event);
-      if (resizedImageURL) setAvatar(resizedImageURL);
+      if (!userStore.user) return;
+      const imageBlob = await HandleImageUpload(event);
+      if (imageBlob) {
+        const response = await uploadImage('projects_data', imageBlob);
+
+        if ('url' in response) {
+          if (avatar)
+            await deleteImage(avatar).then((response) => {
+              if ('error' in response) console.error(response.error);
+            });
+          setAvatar(response.url);
+        } else console.error(response.error);
+      }
     };
 
-    const deleteProject = () => {
-      console.log('delete');
+    const deleteProject = async () => {
+      if (projectsStore.activeProject) {
+        await DeleteProject(projectsStore.activeProject.id)
+          .catch((error) => console.error(error))
+          .then(() => {
+            projectsStore.setActiveProject(null);
+            console.info('successfully deleted');
+            router.push('/');
+          });
+      } else {
+        console.error('No active project!');
+      }
     };
 
     const onSubmit = async () => {
+      if (!userStore.user) return;
+
       if (!Object.keys(errors as any).length) {
         setIsSaving(true);
         const updatedData: Partial<Project> = {
           name: name,
           description: description,
-          settings: checkboxes,
+          settings: { ...checkboxes },
         };
-        if (avatar) {
-          updatedData.avatar = avatar as any;
+        if (avatar && projectsStore.activeProject?.avatar !== avatar) {
+          updatedData.avatar = avatar;
         }
 
         if (isNewProject) {
-          /*
-          await createProject(updatedData)
+          await AddNewProject(updatedData)
+            .then((result) => {
+              if (
+                Object.keys(result).findIndex(
+                  (element) => element === 'errors',
+                ) !== -1
+              ) {
+                setErrors(result.errors);
+              } else {
+                const newProject = {
+                  id: result.data.id,
+                  members: [
+                    {
+                      id: userStore.user.id,
+                      nickname: userStore.user.nickname,
+                      avatar: userStore.user.avatar,
+                      role: 'owner',
+                    },
+                  ],
+                  ...updatedData,
+                } as Project;
+
+                projectsStore.addProject(newProject);
+
+                router.push(`/project/${newProject.id}`);
+              }
+            })
+            .catch((error) => console.error(error))
+            .finally(() => setIsSaving(false));
+        } else if (projectsStore.activeProject) {
+          await UpdateProject(projectsStore.activeProject.id, updatedData)
             .then((result) => {
               if (
                 Object.keys(result).findIndex(
@@ -92,36 +153,10 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
                 console.error(result);
               } else {
-                const newProject = new Project({
-                  id: result.id,
-                  creator: {
-                    id: userStore.user?.id,
-                    nickname: userStore.user?.name,
-                    avatar: userStore.user?.image,
-                  },
-                  ...updatedData,
-                } as any);
-
-                projectsStore.addProject(newProject);
-
-                router.push(`projects/${newProject.id}`)
+                console.info('Success');
               }
             })
-            .finally(() => setIsSaving(false));*/
-        } else {
-          /*
-          await updateProject(projectsStore.activeProject?.id, updatedData)
-            .then((result) => {
-              if (
-                Object.keys(result).findIndex(
-                  (element) => element === 'errors',
-                ) !== -1
-              ) {
-                setErrors(result.errors);
-                console.error(result);
-              }
-            })
-            .finally(() => setIsSaving(false));*/
+            .finally(() => setIsSaving(false));
         }
       }
     };
@@ -137,7 +172,7 @@ const ProjectSettingsModal = observer(
                     <UploadAvatarButton
                       handleImageUpload={handleImageUpload}
                       name={name}
-                      src={projectsStore.activeProject?.avatar}
+                      src={avatar}
                       classNames={{
                         icon: 'w-32 h-32',
                         avatar: 'w-32 h-32 border border-4 border-white',
@@ -227,6 +262,7 @@ const ProjectSettingsModal = observer(
                     {!isNewProject && CheckAccess(['owner']) && (
                       <FButton
                         onPress={onDeleteProjectOpen}
+                        isDisabled={isSaving}
                         variant="bordered"
                         color="danger"
                         size="md"
@@ -237,6 +273,7 @@ const ProjectSettingsModal = observer(
 
                     <FButton
                       isLoading={isSaving}
+                      isDisabled={!!Object.keys(errors).length}
                       onPress={onSubmit}
                       variant="solid"
                       color="primary"

@@ -10,24 +10,30 @@ import BoardCard from '@/app/lib/components/projects/projectTree/boardCard';
 import { useActiveSectionContext } from '@/app/lib/components/projects/projectTree/projectTree';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
+import { observer } from 'mobx-react-lite';
 
-export default function RootSectionCard({
-  section,
-}: {
-  section: ProjectSection;
-}) {
+const RootSectionCard = observer(({ id }: { id: string }) => {
+  const section = projectsStore.getProjectChild(id, []) as ProjectSection;
   const { activeNodes, setActiveNodes, removeNode, addNode } =
     useActiveSectionContext();
   const [isReadonly, setIsReadonly] = useState(true);
   const [sectionName, setSectionName] = useState(section.name);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const updateSectionName = () => {
+  const updateSectionName = async (newName: string) => {
     setIsReadonly(true);
-    projectsStore.updateProjectChild([], section.id, {
-      name: sectionName,
-      lastChange: new Date().toISOString(),
-    });
+    if (!projectsStore.activeProject) return;
+    await UpdateSection(projectsStore.activeProject.id, section.id, {
+      name: newName,
+    })
+      .catch((error) => console.error(error))
+      .then(() => {
+        projectsStore.updateProjectChild([], section.id, {
+          name: newName,
+          lastChange: new Date().toISOString(),
+        });
+      });
   };
 
   return (
@@ -97,7 +103,7 @@ export default function RootSectionCard({
               </Button>
               <Button
                 isIconOnly
-                onPress={() => removeNode(section.id, [])}
+                onPress={() => removeNode(section.id, [], true)}
                 variant="light"
                 color="danger"
                 size="sm"
@@ -116,10 +122,12 @@ export default function RootSectionCard({
             <SubSectionCard
               key={child.id}
               parentList={[section.id]}
-              subSection={child}
+              id={child.id}
             />
           );
         })}
     </div>
   );
-}
+});
+
+export default RootSectionCard;

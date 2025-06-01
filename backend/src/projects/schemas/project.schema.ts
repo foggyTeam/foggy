@@ -4,6 +4,45 @@ import { HydratedDocument, Types } from 'mongoose';
 const ROLES = ['owner', 'admin', 'editor', 'reader'] as const;
 export type Role = (typeof ROLES)[number];
 
+export interface MemberInfo {
+  id: Types.ObjectId;
+  nickname: string;
+  avatar: string;
+  role: Role;
+  team?: string;
+  teamId?: Types.ObjectId;
+}
+
+export interface ProjectListItem {
+  id: Types.ObjectId;
+  name: string;
+  avatar: string;
+  description?: string;
+  members: MemberInfo[];
+  updatedAt: Date;
+}
+
+export interface ChildBoard {
+  id: Types.ObjectId;
+  sectionId: Types.ObjectId;
+  name: string;
+  type: string;
+  updatedAt: Date;
+}
+
+export interface ChildSection {
+  id: Types.ObjectId;
+  parentId: Types.ObjectId | null;
+  name: string;
+  childrenNumber: number;
+  children: Array<ChildSection | ChildBoard>;
+}
+
+export interface ExtendedProjectListItem extends ProjectListItem {
+  settings: ProjectSettings;
+  sections: ChildSection[];
+}
+
 interface AccessControlUser {
   userId: Types.ObjectId;
   role: Role;
@@ -79,6 +118,9 @@ export class Project {
   changeLogs: Types.ObjectId[];
 }
 
-export type ProjectDocument = HydratedDocument<Project>;
+export type ProjectDocument = HydratedDocument<Project> & {
+  updatedAt: Date;
+  createdAt: Date;
+};
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);

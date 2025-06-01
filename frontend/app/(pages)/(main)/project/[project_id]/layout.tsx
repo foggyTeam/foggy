@@ -1,16 +1,19 @@
 import React from 'react';
 import { RawProject } from '@/app/lib/types/definitions';
-import project from '@/app/mockData/project.json';
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
+import { GetProject } from '@/app/lib/server/actions/projectServerActions';
 
 interface ProjectPageProps {
   project_id: string;
 }
 
 async function getProject(id: string): Promise<RawProject | undefined> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(project as RawProject), 300);
-  });
+  try {
+    return await GetProject(id);
+  } catch (e) {
+    console.error('Project with this id does not exist.', e);
+    return undefined;
+  }
 }
 export default async function ProjectLayout({
   params,

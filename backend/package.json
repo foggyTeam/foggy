@@ -27,7 +27,7 @@
     "@nestjs/mongoose": "^10.1.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/platform-socket.io": "^11.0.8",
-    "@nestjs/swagger": "^8.1.0",
+    "@nestjs/swagger": "^11.2.0",
     "@nestjs/websockets": "^11.0.8",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",

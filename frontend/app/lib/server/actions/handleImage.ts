@@ -5,14 +5,11 @@ import {
   getPublicFileURL,
 } from '@/app/lib/server/objectStorage/awsRequests';
 import getHash from '@/app/lib/utils/getStringHash';
+import getUserId from '@/app/lib/getUserId';
 
-export async function uploadImage(
-  id: string,
-  directoryName: string,
-  image: Blob,
-) {
+export async function uploadImage(directoryName: string, image: Blob) {
   return await getPublicFileURL(
-    getHash(id + Date().toString()),
+    getHash((await getUserId()) + Date().toString()),
     directoryName,
     image,
   );

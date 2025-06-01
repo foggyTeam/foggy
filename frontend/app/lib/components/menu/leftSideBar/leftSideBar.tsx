@@ -14,6 +14,10 @@ import {
   ProjectElementTypes,
   ProjectSection,
 } from '@/app/lib/types/definitions';
+import {
+  AddBoard,
+  AddSection,
+} from '@/app/lib/server/actions/projectServerActions';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
@@ -41,31 +45,46 @@ const LeftSideBar = observer(() => {
   useEffect(() => {
     if (!isOpened) setParentList(projectsStore.activeBoardParentList);
   }, [isOpened]);
-  const addNode = (nodeName: string, nodeType: ProjectElementTypes) => {
-    // TODO: await for id
+  const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
+    if (!projectsStore.activeProject) return;
     const fullParentList = parentSectionId
       ? [...parentList, parentSectionId]
       : parentList;
     switch (nodeType) {
       case 'SECTION':
-        const newSection: ProjectSection = {
-          children: new Map(),
-          childrenNumber: 0,
-          id: nodeName,
+        await AddSection(projectsStore.activeProject.id, {
           name: nodeName,
-        };
-        projectsStore.addProjectChild(fullParentList, newSection, true);
+          parentSectionId,
+        })
+          .catch((error) => console.error(error))
+          .then((response: { data: { id: string } }) => {
+            const newSection: ProjectSection = {
+              children: new Map(),
+              childrenNumber: 0,
+              id: response.data.id,
+              name: nodeName,
+            };
+            projectsStore.addProjectChild(fullParentList, newSection, true);
+          });
         break;
       default:
-        const newBoard: Board = {
-          id: nodeName,
+        await AddBoard(projectsStore.activeProject.id, {
           name: nodeName,
-          type: nodeType,
-          layers: [[], [], []],
-          sectionId: projectsStore.activeBoard?.sectionId || '',
-          lastChange: new Date().toISOString(),
-        };
-        projectsStore.addProjectChild(fullParentList, newBoard, false);
+          type: nodeType.toLowerCase(),
+          sectionId: parentSectionId,
+        })
+          .catch((error) => console.error(error))
+          .then((response: { data: { id: string } }) => {
+            const newBoard: Board = {
+              id: response.data.id,
+              name: nodeName,
+              type: nodeType,
+              layers: [[], [], []],
+              sectionId: projectsStore.activeBoard?.sectionId || '',
+              lastChange: new Date().toISOString(),
+            };
+            projectsStore.addProjectChild(fullParentList, newBoard, false);
+          });
     }
     onAddChildOpenChange();
   };

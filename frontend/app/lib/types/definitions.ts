@@ -95,8 +95,11 @@ export interface Project {
   lastChange: string;
 }
 
-export interface RawProject extends Omit<Project, 'sections'> {
-  sections: Record<string, any>;
+export interface RawProject
+  extends Omit<Project, 'sections' | 'members' | 'lastChange'> {
+  members: any[];
+  updatedAt: string;
+  sections: any[];
 }
 
 export interface ProjectSection {
