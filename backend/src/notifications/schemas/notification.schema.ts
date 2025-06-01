@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { EntityType, NotificationType } from '../../shared/types/enums';
+import { NotificationType } from '../../shared/types/enums';
 import {
   EntityReference,
   NotificationMetadata,
@@ -38,35 +38,15 @@ export class Notification {
   })
   recipients: Recipient[];
 
-  @Prop({
-    type: {
-      type: { type: String, enum: EntityType, required: true },
-      id: { type: Types.ObjectId, required: true, refPath: 'initiator.type' },
-    },
-    required: true,
-    _id: false,
-  })
+  @Prop({ type: Object, required: true })
   initiator: EntityReference;
 
-  @Prop({
-    type: {
-      type: { type: String, enum: EntityType, required: true },
-      id: { type: Types.ObjectId, required: true, refPath: 'target.type' },
-    },
-    required: true,
-    _id: false,
-  })
+  @Prop({ type: Object, required: true })
   target: EntityReference;
 
   @Prop({
     type: Object,
     required: true,
-    validate: {
-      validator: function (metadata: any) {
-        return true;
-      },
-      message: 'Invalid metadata for notification type',
-    },
   })
   metadata: NotificationMetadata;
 }
@@ -79,6 +59,6 @@ NotificationSchema.index({
   createdAt: -1,
 });
 NotificationSchema.index(
-  { createdAt: 1 },
-  { expireAfterSeconds: 366 * 24 * 3600 },
+  { 'metadata.expiresAt': 1 },
+  { expireAfterSeconds: 0 },
 );

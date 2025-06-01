@@ -1,5 +1,44 @@
 import { Types } from 'mongoose';
-import { EntityType, NotificationType } from '../types/enums';
+import { EntityType, NotificationType, Role } from '../types/enums';
+
+export interface NotificationResponse {
+  id: Types.ObjectId;
+  type: NotificationType;
+  initiator:
+    | {
+        type: EntityType.USER;
+        id: Types.ObjectId;
+        nickname: string;
+      }
+    | {
+        type: EntityType.PROJECT;
+        id: Types.ObjectId;
+        name: string;
+      }
+    | {
+        type: Exclude<EntityType, EntityType.USER | EntityType.PROJECT>;
+        id: Types.ObjectId;
+      }
+    | null;
+  target:
+    | {
+        type: EntityType.USER;
+        id: Types.ObjectId;
+        nickname: string;
+      }
+    | {
+        type: EntityType.PROJECT;
+        id: Types.ObjectId;
+        name: string;
+      }
+    | {
+        type: Exclude<EntityType, EntityType.USER | EntityType.PROJECT>;
+        id: Types.ObjectId;
+      }
+    | null;
+  metadata: NotificationMetadata;
+  isRead: boolean;
+}
 
 export interface Recipient {
   userId: Types.ObjectId;
@@ -13,39 +52,24 @@ export interface EntityReference {
 }
 
 interface BaseMetadata {
-  message?: string;
-  createdAt: Date;
+  expiresAt: Date;
 }
 
-interface JoinRequestMetadata extends BaseMetadata {
-  role: string;
+export interface JoinRequestMetadata extends BaseMetadata {
+  role: Role;
   customMessage?: string;
 }
 
-interface InviteMetadata extends BaseMetadata {
-  role: string;
-  expiresAt: Date;
-  inviteToken?: string;
+export interface InviteMetadata extends BaseMetadata {
+  role: Role;
 }
 
-interface JoinResponseMetadata extends BaseMetadata {
+export interface JoinResponseMetadata extends BaseMetadata {
   responseMessage?: string;
   originalRequestId?: Types.ObjectId;
 }
 
 export type NotificationMetadata =
-  | ({
-      type:
-        | NotificationType.PROJECT_JOIN_REQUEST
-        | NotificationType.TEAM_JOIN_REQUEST;
-    } & JoinRequestMetadata)
-  | ({
-      type: NotificationType.PROJECT_INVITE | NotificationType.TEAM_INVITE;
-    } & InviteMetadata)
-  | ({
-      type:
-        | NotificationType.PROJECT_JOIN_ACCEPTED
-        | NotificationType.TEAM_JOIN_ACCEPTED
-        | NotificationType.PROJECT_JOIN_REJECTED
-        | NotificationType.TEAM_JOIN_REJECTED;
-    } & JoinResponseMetadata);
+  | JoinRequestMetadata
+  | InviteMetadata
+  | JoinResponseMetadata;

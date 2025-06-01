@@ -18,6 +18,6 @@ import { BoardModule } from '../board/board.module';
   ],
   controllers: [ProjectController],
   providers: [ProjectService],
-  exports: [ProjectService],
+  exports: [ProjectService, MongooseModule],
 })
 export class ProjectModule {}

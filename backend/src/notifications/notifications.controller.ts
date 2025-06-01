@@ -1,0 +1,142 @@
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiHeader,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Types } from 'mongoose';
+import { NotificationService } from './notifications.service';
+import { Role } from '../shared/types/enums';
+import { NotificationResponse } from '../shared/interfaces/notification.type';
+
+@ApiTags('notifications')
+@Controller('notifications')
+export class NotificationController {
+  constructor(private readonly notificationService: NotificationService) {}
+
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get user notifications' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'Current user ID',
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns user notifications',
+  })
+  async getUserNotifications(
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<NotificationResponse[]> {
+    return this.notificationService.getUserNotifications(userId);
+  }
+
+  @Post('project-invite')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create project invite notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'ID of the user who initiates the invite',
+    required: true,
+  })
+  @ApiBody({
+    description: 'Project invite data',
+    schema: {
+      type: 'object',
+      properties: {
+        recipientId: { type: 'string', description: 'ID of the recipient' },
+        projectId: { type: 'string', description: 'ID of the project' },
+        role: {
+          type: 'string',
+          enum: Object.values(Role),
+          description: 'Role to assign',
+        },
+        expiresAt: {
+          type: 'string',
+          format: 'date-time',
+          description: 'Expiration date of the invite',
+        },
+      },
+      required: ['recipientId', 'projectId', 'role'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Project invite notification created',
+  })
+  async createProjectInvite(
+    @Headers('x-user-id') inviterId: Types.ObjectId,
+    @Body('recipientId') recipientId: Types.ObjectId,
+    @Body('projectId') projectId: Types.ObjectId,
+    @Body('role') role: Role,
+    @Body('expiresAt') expiresAt?: Date,
+  ) {
+    return this.notificationService.createProjectInvite(
+      recipientId,
+      projectId,
+      inviterId,
+      role,
+      expiresAt,
+    );
+  }
+
+  @Post('team-invite')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create team invite notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'ID of the user who initiates the invite',
+    required: true,
+  })
+  @ApiBody({
+    description: 'Team invite data',
+    schema: {
+      type: 'object',
+      properties: {
+        recipientId: { type: 'string', description: 'ID of the recipient' },
+        teamId: { type: 'string', description: 'ID of the team' },
+        role: {
+          type: 'string',
+          enum: Object.values(Role),
+          description: 'Role to assign',
+        },
+        expiresAt: {
+          type: 'string',
+          format: 'date-time',
+          description: 'Expiration date of the invite',
+        },
+      },
+      required: ['recipientId', 'teamId', 'role'],
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Team invite notification created',
+  })
+  async createTeamInvite(
+    @Headers('x-user-id') inviterId: Types.ObjectId,
+    @Body('recipientId') recipientId: Types.ObjectId,
+    @Body('teamId') teamId: Types.ObjectId,
+    @Body('role') role: Role,
+    @Body('expiresAt') expiresAt?: Date,
+  ) {
+    return this.notificationService.createTeamInvite(
+      recipientId,
+      teamId,
+      inviterId,
+      role,
+      expiresAt,
+    );
+  }
+}

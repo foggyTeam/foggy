@@ -14,6 +14,6 @@ import { ProjectModule } from '../projects/projects.module';
   ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [UsersService],
+  exports: [UsersService, MongooseModule],
 })
 export class UsersModule {}
