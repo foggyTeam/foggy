@@ -181,29 +181,30 @@ export class NotificationService {
     );
   }
 
-  async acceptNotification(
+  async handleNotification(
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
+    isAccept: boolean,
   ): Promise<void> {
     const notification = await this.findNotificationById(notificationId);
     this.validateRecipient(notification, userId);
 
     switch (notification.type) {
       case NotificationType.PROJECT_INVITE:
-        await this.handleProjectInvite(notification, userId);
+        await this.handleProjectInvite(notification, userId, isAccept);
         break;
       case NotificationType.TEAM_INVITE:
-        await this.handleTeamInvite(notification, userId);
+        await this.handleTeamInvite(notification, userId, isAccept);
         break;
       case NotificationType.PROJECT_JOIN_REQUEST:
-        await this.handleProjectJoinRequest(notification, userId);
+        await this.handleProjectJoinRequest(notification, userId, isAccept);
         break;
       case NotificationType.TEAM_JOIN_REQUEST:
-        await this.handleTeamJoinRequest(notification, userId);
+        await this.handleTeamJoinRequest(notification, userId, isAccept);
         break;
       default:
         throw new CustomException(
-          getErrorMessages({ notification: 'unsupportedAcceptType' }),
+          getErrorMessages({ notification: 'unsupportedResponseType' }),
           HttpStatus.BAD_REQUEST,
         );
     }
@@ -286,36 +287,67 @@ export class NotificationService {
   private async handleProjectInvite(
     notification: NotificationDocument,
     userId: Types.ObjectId,
+    isAccept: boolean,
   ) {
     const metadata = notification.metadata as InviteMetadata;
     const inviterId = notification.initiator.id;
     const projectId = notification.target.id;
-    await this.projectService.addUser(
-      projectId,
-      inviterId,
-      userId,
-      metadata.role,
-    );
 
-    await this.notifyProjectOnJoin(projectId, userId, inviterId, metadata.role);
+    if (isAccept) {
+      await this.projectService.addUser(
+        projectId,
+        inviterId,
+        userId,
+        metadata.role,
+      );
+      await this.notifyProjectOnJoin(
+        projectId,
+        userId,
+        inviterId,
+        metadata.role,
+      );
+    } else {
+      await this.notificationModel.create({
+        type: NotificationType.PROJECT_JOIN_REJECTED,
+        recipients: [{ userId: inviterId }],
+        initiator: { type: EntityType.USER, id: userId },
+        target: { type: EntityType.PROJECT, id: projectId },
+        metadata: {
+          role: metadata.role,
+          inviterId: inviterId,
+        } as JoinResponseMetadata,
+      });
+    }
   }
 
   private async handleProjectJoinRequest(
     notification: NotificationDocument,
     inviterId: Types.ObjectId,
+    isAccept: boolean,
   ) {
     const metadata = notification.metadata as JoinRequestMetadata;
     const userId = notification.initiator.id;
     const projectId = notification.target.id;
-    await this.projectService.addUser(
-      projectId,
-      inviterId,
-      userId,
-      metadata.role,
-    );
+
+    if (isAccept) {
+      await this.projectService.addUser(
+        projectId,
+        inviterId,
+        userId,
+        metadata.role,
+      );
+      await this.notifyProjectOnJoin(
+        projectId,
+        userId,
+        inviterId,
+        metadata.role,
+      );
+    }
 
     await this.notificationModel.create({
-      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      type: isAccept
+        ? NotificationType.PROJECT_JOIN_ACCEPTED
+        : NotificationType.PROJECT_JOIN_REJECTED,
       recipients: [{ userId }],
       initiator: { type: EntityType.USER, id: inviterId },
       target: { type: EntityType.PROJECT, id: projectId },
@@ -324,18 +356,12 @@ export class NotificationService {
         inviterId: inviterId,
       } as JoinResponseMetadata,
     });
-
-    await this.notifyProjectOnJoin(
-      projectId,
-      userId,
-      inviterId,
-      notification.metadata.role,
-    );
   }
 
   private async handleTeamInvite(
     notification: NotificationDocument,
     userId: Types.ObjectId,
+    isAccept: boolean,
   ) {
     //TODO: team notification
     throw new CustomException(
@@ -347,6 +373,7 @@ export class NotificationService {
   private async handleTeamJoinRequest(
     notification: NotificationDocument,
     inviterId: Types.ObjectId,
+    isAccept: boolean,
   ) {
     //TODO: team notification
     throw new CustomException(

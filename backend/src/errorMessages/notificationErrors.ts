@@ -4,9 +4,9 @@ export const notificationErrors = {
       en: 'Notification not found',
       ru: 'Уведомление не найдено',
     },
-    unsupportedAcceptType: {
-      en: 'Failed to accept notification',
-      ru: 'Не удалось принять уведомление',
+    unsupportedResponseType: {
+      en: 'Failed to response notification',
+      ru: 'Не удалось ответить на уведомление',
     },
     notRecipient: {
       en: 'Access denied',

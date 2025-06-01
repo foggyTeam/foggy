@@ -215,7 +215,39 @@ export class NotificationController {
     @Headers('x-user-id') userId: Types.ObjectId,
     @Param('id') notificationId: Types.ObjectId,
   ): Promise<void> {
-    return this.notificationService.acceptNotification(notificationId, userId);
+    return this.notificationService.handleNotification(
+      notificationId,
+      userId,
+      true,
+    );
+  }
+
+  @Post(':id/reject')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Reject notification' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'Current user ID',
+    required: true,
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'ID of the notification to reject',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Notification accepted',
+  })
+  async rejectNotification(
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Param('id') notificationId: Types.ObjectId,
+  ): Promise<void> {
+    return this.notificationService.handleNotification(
+      notificationId,
+      userId,
+      false,
+    );
   }
 
   @Delete(':id')
