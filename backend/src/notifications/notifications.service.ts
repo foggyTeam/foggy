@@ -161,13 +161,8 @@ export class NotificationService {
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    const notification = await this.notificationModel
-      .findById(notificationId)
-      .exec();
-
-    if (!notification) {
-      return;
-    }
+    const notification = await this.findNotificationById(notificationId);
+    this.validateRecipient(notification, userId);
 
     if (notification.recipients.length === 1) {
       await this.notificationModel.findByIdAndDelete(notificationId);
@@ -183,6 +178,44 @@ export class NotificationService {
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
+    const notification = await this.findNotificationById(notificationId);
+    this.validateRecipient(notification, userId);
+
+    switch (notification.type) {
+      case NotificationType.PROJECT_INVITE:
+        await this.handleProjectInvite(notification, userId);
+        break;
+      case NotificationType.TEAM_INVITE:
+        await this.handleTeamInvite(notification, userId);
+        break;
+      default:
+        throw new CustomException(
+          getErrorMessages({ notification: 'notInviteType' }),
+          HttpStatus.BAD_REQUEST,
+        );
+    }
+
+    await this.deleteNotification(notificationId, userId);
+  }
+
+  private validateRecipient(
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+  ): void {
+    const isRecipient = notification.recipients.some((r) =>
+      r.userId.equals(userId),
+    );
+    if (!isRecipient) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'notRecipient' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  private async findNotificationById(
+    notificationId: Types.ObjectId,
+  ): Promise<NotificationDocument> {
     const notification = await this.notificationModel
       .findById(notificationId)
       .exec();
@@ -193,36 +226,7 @@ export class NotificationService {
         HttpStatus.NOT_FOUND,
       );
     }
-
-    const validInviteTypes = [
-      NotificationType.PROJECT_INVITE,
-      NotificationType.TEAM_INVITE,
-    ];
-
-    if (!validInviteTypes.includes(notification.type)) {
-      throw new CustomException(
-        getErrorMessages({ notification: 'notInviteType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    const isRecipient = notification.recipients.some((r) =>
-      r.userId.equals(userId),
-    );
-    if (!isRecipient) {
-      throw new CustomException(
-        getErrorMessages({ notification: 'notRecipient' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (notification.type === NotificationType.PROJECT_INVITE) {
-      await this.handleProjectInvite(notification, userId);
-    } else if (notification.type === NotificationType.TEAM_INVITE) {
-      await this.handleTeamInvite(notification, userId);
-    }
-
-    await this.deleteNotification(notificationId, userId);
+    return notification;
   }
 
   private async handleProjectInvite(
