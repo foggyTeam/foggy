@@ -34,6 +34,7 @@
     "@heroui/slider": "^2.4.14",
     "@heroui/spinner": "^2.2.16",
     "@heroui/tabs": "^2.2.14",
+    "@heroui/toast": "^2.0.9",
     "@heroui/tooltip": "^2.2.14",
     "@heroui/use-infinite-scroll": "^2.2.9",
     "@internationalized/date": "3.7.0",

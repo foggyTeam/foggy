@@ -19,6 +19,8 @@ import { Socket } from 'socket.io-client';
 import openBoardSocketConnection, {
   socketAddEventListeners,
 } from '@/app/lib/utils/boardSocketConnection';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 class ProjectsStore {
   myRole: Role | undefined = undefined;
@@ -63,7 +65,12 @@ class ProjectsStore {
       );
 
       if (this.boardWebsocket) socketAddEventListeners(this.boardWebsocket);
-    } else console.error('Failed to connect to websocket.');
+    } else
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.socketConnectionError.title,
+        description: settingsStore.t.toasts.socketConnectionError.description,
+      });
   }
   disconnectSocket() {
     if (this.boardWebsocket) {
@@ -111,7 +118,11 @@ class ProjectsStore {
     const layers = this.activeBoard.layers;
     const position = this.getElementLayer(id);
     if (position.index < 0 || position.layer < 0) {
-      console.error("Element wasn't found");
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.boardElementNotFound,
+      });
       return { layer: -1, index: -1 };
     }
 
@@ -204,7 +215,10 @@ class ProjectsStore {
     newPosition: { layer: number; index: number },
   ) => {
     if (!this.activeBoard) {
-      console.error('An error occured!');
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.globalError,
+      });
       return;
     }
     if (

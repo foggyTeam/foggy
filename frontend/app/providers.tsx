@@ -3,6 +3,7 @@ import { HeroUIProvider } from '@heroui/react';
 import React from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { Session } from 'next-auth';
+import { ToastProvider } from '@heroui/toast';
 
 export function Providers({
   children,
@@ -13,6 +14,12 @@ export function Providers({
 }) {
   return (
     <SessionProvider session={session}>
+      <ToastProvider
+        toastOffset={4}
+        toastProps={{
+          variant: 'flat',
+        }}
+      />
       <HeroUIProvider>{children}</HeroUIProvider>
     </SessionProvider>
   );

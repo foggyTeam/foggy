@@ -12,6 +12,7 @@ import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandlers';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { addToast } from '@heroui/toast';
 
 export default function StrokeTool() {
   const { selectedElement, updateElement } = useBoardContext();
@@ -47,7 +48,12 @@ export default function StrokeTool() {
               ? strokeColor
               : primary.DEFAULT,
         } as BoardElement);
-      else console.error('Element is invisible!');
+      else
+        addToast({
+          color: 'warning',
+          severity: 'warning',
+          title: settingsStore.t.toasts.boardElementInvisible,
+        });
     } else {
       if (
         isElementVisible(

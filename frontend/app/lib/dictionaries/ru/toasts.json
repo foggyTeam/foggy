@@ -1,0 +1,35 @@
+{
+  "toasts": {
+    "globalError": "Произошла ошибка",
+    "localeError": "Не удалось изменить язык",
+    "signOutError": "Произошла ошибка",
+    "updateUserDataError": "Не удалось обновить данные пользователя",
+    "deleteUserImageError": "Не удалось удалить фото профиля",
+    "deleteUserSuccess": "Аккаунт удален",
+    "socketConnectionError": {
+      "title": "Ошибка подключения",
+      "description": "Невозможно подключиться к доске. Обновите страницу."
+    },
+    "socketError": {
+      "title": "Ошибка подключения",
+      "description": "Ошибка при передаче данных."
+    },
+    "copyError": "Не удалось скопировать в буфер обмена.",
+    "copySuccess": "Скопировано в буфер обмена!",
+    "filtersError": {
+      "title": "Произошла ошибка",
+      "description": "Фильтры очищены."
+    },
+    "addMemberError": "Не удалось добавить участника",
+    "deleteMemberError": "Не удалось удалить участника",
+    "updateMemberRoleError": "Не удалось обновить роль участника",
+    "addSectionError": "Не удалось добавить раздел",
+    "addBoardError": "Не удалось добавить доску",
+    "updateProjectError": "Не удалось обновить данные проекта",
+    "updateProjectsError": "Не удалось обновить данные проектов",
+    "deleteBoardError": "Не удалось удалить доску",
+    "deleteBoardSuccess": "Доска удалена",
+    "boardElementInvisible": "Элемент не виден!",
+    "boardElementNotFound": "Элемент не найден!"
+  }
+}

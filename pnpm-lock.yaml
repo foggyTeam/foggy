@@ -210,6 +210,9 @@ importers:
       '@heroui/tabs':
         specifier: ^2.2.14
         version: 2.2.16(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/toast':
+        specifier: ^2.0.9
+        version: 2.0.9(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroui/tooltip':
         specifier: ^2.2.14
         version: 2.2.16(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1409,6 +1412,15 @@ packages:
       react: '>=18 || >=19.0.0-rc.0'
       react-dom: '>=18 || >=19.0.0-rc.0'
 
+  '@heroui/toast@2.0.9':
+    resolution: {integrity: sha512-V/x7bkRRS5BabF3Oe4sJWiKygkGtN9/mwFw0phJwx7PYV2Q6WuOvOvq+Zbt8bEz21j58glg4u+eLFBChNPYn7A==}
+    peerDependencies:
+      '@heroui/system': '>=2.4.10'
+      '@heroui/theme': '>=2.4.12'
+      framer-motion: '>=11.5.6 || >=12.0.0-alpha.1'
+      react: '>=18 || >=19.0.0-rc.0'
+      react-dom: '>=18 || >=19.0.0-rc.0'
+
   '@heroui/tooltip@2.2.11':
     resolution: {integrity: sha512-kyRhbCzjKRR1FlDQ8L3NIKLU//VHzDGbpYCLYxfoYEyYkzr4JpRycvAx78dgjVxmbdphUtvFlgcDq033rjI9Tw==}
     peerDependencies:
@@ -2316,6 +2328,12 @@ packages:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
+  '@react-aria/landmark@3.0.3':
+    resolution: {integrity: sha512-mcmHijInDZZY3W9r0SeRuXsHW8Km9rBWKB3eoBz+PVuyJYMuabhQ2mUB5xTbqbnV++Srr7j/59g+Lbw5gAN4lw==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+
   '@react-aria/link@3.7.8':
     resolution: {integrity: sha512-oiXUPQLZmf9Q9Xehb/sG1QRxfo28NFKdh9w+unD12sHI6NdLMETl5MA4CYyTgI0dfMtTjtfrF68GCnWfc7JvXQ==}
     peerDependencies:
@@ -2505,6 +2523,12 @@ packages:
 
   '@react-aria/toast@3.0.0-beta.19':
     resolution: {integrity: sha512-LCMTcmSmum5CzBk+DIec66q6pJGEl+InQPJdsby7QG/row0ka6wHPvul78HVseN7dzg6G3xVjvHtVPOixkuegA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+      react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+
+  '@react-aria/toast@3.0.2':
+    resolution: {integrity: sha512-iaiHDE1CKYM3BbNEp3A2Ed8YAlpXUGyY6vesKISdHEZ2lJ7r+1hbcFoTNdG8HfbB8Lz5vw8Wd2o+ZmQ2tnDY9Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
@@ -2765,6 +2789,11 @@ packages:
 
   '@react-stately/toast@3.0.0-beta.7':
     resolution: {integrity: sha512-+KDkaOS5Y4ApOfiP0HHij4ySwAd1VM9/pI4rVTyHrzkp0R2Q0eBxZ74MpWMpVfJa2lSjb/qEm60tqJ3A+4R/cQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
+
+  '@react-stately/toast@3.1.0':
+    resolution: {integrity: sha512-9W2+evz+EARrjkR1QPLlOL5lcNpVo6PjMAIygRSaCPJ6ftQAZ6B+7xTFGPFabWh83gwXQDUgoSwC3/vosvxZaQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
@@ -9053,6 +9082,24 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  '@heroui/toast@2.0.9(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@heroui/react-utils': 2.1.10(react@18.3.1)
+      '@heroui/shared-icons': 2.1.7(react@18.3.1)
+      '@heroui/shared-utils': 2.1.9
+      '@heroui/spinner': 2.2.16(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/system': 2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/theme': 2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3)))
+      '@heroui/use-is-mobile': 2.2.9(react@18.3.1)
+      '@react-aria/interactions': 3.25.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/toast': 3.0.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.28.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-stately/toast': 3.1.0(react@18.3.1)
+      '@react-stately/utils': 3.10.6(react@18.3.1)
+      framer-motion: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@heroui/tooltip@2.2.11(@heroui/system@2.4.10(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@heroui/aria-utils': 2.2.11(@heroui/theme@2.4.9(tailwindcss@3.4.17(ts-node@10.9.2(@types/node@20.17.52)(typescript@5.8.3))))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -10390,6 +10437,15 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       use-sync-external-store: 1.5.0(react@18.3.1)
 
+  '@react-aria/landmark@3.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@react-aria/utils': 3.29.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-types/shared': 3.29.1(react@18.3.1)
+      '@swc/helpers': 0.5.17
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      use-sync-external-store: 1.5.0(react@18.3.1)
+
   '@react-aria/link@3.7.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@react-aria/focus': 3.20.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -10768,7 +10824,7 @@ snapshots:
       '@react-aria/label': 3.7.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-aria/utils': 3.29.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-stately/form': 3.1.4(react@18.3.1)
-      '@react-stately/utils': 3.10.5(react@18.3.1)
+      '@react-stately/utils': 3.10.6(react@18.3.1)
       '@react-types/shared': 3.29.1(react@18.3.1)
       '@react-types/textfield': 3.10.0(react@18.3.1)
       '@swc/helpers': 0.5.17
@@ -10825,6 +10881,19 @@ snapshots:
       '@react-aria/landmark': 3.0.0-beta.18(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-aria/utils': 3.29.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@react-stately/toast': 3.0.0-beta.7(react@18.3.1)
+      '@react-types/button': 3.12.1(react@18.3.1)
+      '@react-types/shared': 3.29.1(react@18.3.1)
+      '@swc/helpers': 0.5.17
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@react-aria/toast@3.0.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@react-aria/i18n': 3.12.9(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/interactions': 3.25.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/landmark': 3.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-aria/utils': 3.29.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-stately/toast': 3.1.0(react@18.3.1)
       '@react-types/button': 3.12.1(react@18.3.1)
       '@react-types/shared': 3.29.1(react@18.3.1)
       '@swc/helpers': 0.5.17
@@ -11268,6 +11337,12 @@ snapshots:
       react: 18.3.1
 
   '@react-stately/toast@3.0.0-beta.7(react@18.3.1)':
+    dependencies:
+      '@swc/helpers': 0.5.17
+      react: 18.3.1
+      use-sync-external-store: 1.5.0(react@18.3.1)
+
+  '@react-stately/toast@3.1.0(react@18.3.1)':
     dependencies:
       '@swc/helpers': 0.5.17
       react: 18.3.1

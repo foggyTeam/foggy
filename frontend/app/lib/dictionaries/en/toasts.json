@@ -1,0 +1,35 @@
+{
+  "toasts": {
+    "globalError": "An error occurred",
+    "localeError": "Couldn't change locale",
+    "signOutError": "An error occurred",
+    "updateUserDataError": "Failed to update user data",
+    "deleteUserImageError": "Failed to delete user avatar",
+    "deleteUserSuccess": "Account deleted",
+    "socketConnectionError": {
+      "title": "Connection error",
+      "description": "Couldn't connect to the board. Reload the page."
+    },
+    "socketError": {
+      "title": "Connection error",
+      "description": "Data transmission error."
+    },
+    "copyError": "Failed to copy to clipboard",
+    "copySuccess": "Copied to clipboard!",
+    "filtersError": {
+      "title": "An error occurred",
+      "description": "Resetting filters."
+    },
+    "addMemberError": "Failed to add member",
+    "deleteMemberError": "Failed to delete member",
+    "updateMemberRoleError": "Failed to update member's role",
+    "addSectionError": "Failed to add section",
+    "addBoardError": "Failed to add board",
+    "updateProjectError": "Failed to update project data",
+    "updateProjectsError": "Failed to update projects data",
+    "deleteBoardError": "Failed to delete board",
+    "deleteBoardSuccess": "Board deleted",
+    "boardElementInvisible": "Element is invisible!",
+    "boardElementNotFound": "Element wasn't found!"
+  }
+}

@@ -5,10 +5,11 @@ import {
   observable,
   reaction,
 } from 'mobx';
-import en from '../lib/dictionaries/en.json';
-import ru from '../lib/dictionaries/ru.json';
+import en from '../lib/dictionaries/en/dictionary';
+import ru from '../lib/dictionaries/ru/dictionary';
 import { AvailableLocales } from '@/app/lib/types/definitions';
 import { getLocale, updateLocale } from '@/app/lib/locale';
+import { addToast } from '@heroui/toast';
 
 class SettingsStore {
   locale: AvailableLocales = 'en';
@@ -25,7 +26,11 @@ class SettingsStore {
         this.setLocale(l);
       });
     } catch (e: any) {
-      console.error(e.message);
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: this.t.toasts.localeError,
+      });
     }
 
     reaction(
@@ -34,7 +39,11 @@ class SettingsStore {
         try {
           await updateLocale(locale);
         } catch (e: any) {
-          console.error(e.message);
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: this.t.toasts.localeError,
+          });
         }
       },
     );

@@ -22,6 +22,7 @@ import {
   SignUserOut,
   UpdateUserData,
 } from '@/app/lib/server/actions/userServerActions';
+import { addToast } from '@heroui/toast';
 
 const ProfileForm = observer((userData: ProfileData) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -69,10 +70,17 @@ const ProfileForm = observer((userData: ProfileData) => {
             Object.keys(result).findIndex((element) => element === 'errors') !==
             -1
           )
-            console.error(result);
+            addToast({
+              severity: 'danger',
+              title: settingsStore.t.toasts.globalError,
+            });
           else userStore.updateUserData({ image: response.url });
         });
-      } else console.error(response.error);
+      } else
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.globalError,
+        });
     }
     setIsAvatarLoading(false);
 
@@ -110,7 +118,10 @@ const ProfileForm = observer((userData: ProfileData) => {
             -1
           ) {
             setErrors(result.errors);
-            console.error(result);
+            addToast({
+              severity: 'danger',
+              title: settingsStore.t.toasts.updateUserDataError,
+            });
           }
         })
         .finally(() => setIsSaving(false));
@@ -125,9 +136,11 @@ const ProfileForm = observer((userData: ProfileData) => {
     await DeleteUserById().then((result) => {
       if (
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
-      ) {
-        console.error(result);
-      }
+      )
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.deleteUserSuccess,
+        });
     });
     await onSignOut();
   };
@@ -135,7 +148,11 @@ const ProfileForm = observer((userData: ProfileData) => {
   const clearImage = async (initialURL: string | null | undefined) => {
     if (userStore.user?.image !== initialURL && initialURL)
       await deleteImage(initialURL).then((response) => {
-        if ('error' in response) console.error(response.error);
+        if ('error' in response)
+          addToast({
+            severity: 'danger',
+            title: settingsStore.t.toasts.deleteUserImageError,
+          });
       });
   };
 
