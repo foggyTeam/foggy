@@ -175,7 +175,7 @@ export class NotificationService {
     }
   }
 
-  async acceptInvite(
+  async acceptNotification(
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
@@ -189,9 +189,15 @@ export class NotificationService {
       case NotificationType.TEAM_INVITE:
         await this.handleTeamInvite(notification, userId);
         break;
+      case NotificationType.PROJECT_JOIN_REQUEST:
+        await this.handleProjectJoinRequest(notification, userId);
+        break;
+      case NotificationType.TEAM_JOIN_REQUEST:
+        await this.handleTeamJoinRequest(notification, userId);
+        break;
       default:
         throw new CustomException(
-          getErrorMessages({ notification: 'notInviteType' }),
+          getErrorMessages({ notification: 'unsupportedAcceptType' }),
           HttpStatus.BAD_REQUEST,
         );
     }
@@ -220,20 +226,10 @@ export class NotificationService {
     }).save();
   }
 
-  async acceptJoinRequest(
-    notificationId: Types.ObjectId,
+  private async handleProjectJoinRequest(
+    notification: NotificationDocument,
     inviterId: Types.ObjectId,
-  ): Promise<void> {
-    const notification = await this.findNotificationById(notificationId);
-    this.validateRecipient(notification, inviterId);
-
-    if (notification.type !== NotificationType.PROJECT_JOIN_REQUEST) {
-      throw new CustomException(
-        getErrorMessages({ notification: 'notJoinRequestType' }),
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
+  ) {
     const userId = notification.initiator.id;
     const projectId = notification.target.id;
 
@@ -256,22 +252,24 @@ export class NotificationService {
       } as JoinResponseMetadata,
     });
 
-    const projectMembers =
-      await this.projectService.getProjectMemberIds(projectId);
-    const recipients = projectMembers.filter((id) => !id.equals(userId));
+    await this.notifyProjectOnJoin(
+      projectId,
+      userId,
+      inviterId,
+      notification.metadata.role,
+      'request',
+    );
+  }
 
-    await this.notificationModel.create({
-      type: NotificationType.PROJECT_JOIN_ACCEPTED,
-      recipients: recipients.map((id) => ({ userId: id })),
-      initiator: { type: EntityType.USER, id: userId },
-      target: { type: EntityType.PROJECT, id: projectId },
-      metadata: {
-        role: notification.metadata.role,
-        inviterId: inviterId,
-      } as JoinResponseMetadata,
-    });
-
-    await this.deleteNotification(notificationId, inviterId);
+  private async handleTeamJoinRequest(
+    notification: NotificationDocument,
+    inviterId: Types.ObjectId,
+  ) {
+    //TODO: team notification
+    throw new CustomException(
+      getErrorMessages({ feature: 'notImplemented' }),
+      HttpStatus.NOT_IMPLEMENTED,
+    );
   }
 
   private validateRecipient(
@@ -311,33 +309,21 @@ export class NotificationService {
   ) {
     const metadata = notification.metadata as InviteMetadata;
     const inviterId = notification.initiator.id;
-    const entityId = notification.target.id;
+    const projectId = notification.target.id;
     await this.projectService.addUser(
-      entityId,
+      projectId,
       inviterId,
       userId,
       metadata.role,
     );
 
-    const projectMembers =
-      await this.projectService.getProjectMemberIds(entityId);
-    const recipients = projectMembers.filter(
-      (memberId) => !memberId.equals(userId),
+    await this.notifyProjectOnJoin(
+      projectId,
+      userId,
+      inviterId,
+      metadata.role,
+      'invite',
     );
-
-    await this.notificationModel.create({
-      type: NotificationType.PROJECT_JOIN_ACCEPTED,
-      recipients: recipients.map((memberId) => ({
-        userId: memberId,
-      })),
-      initiator: { type: EntityType.USER, id: userId },
-      target: { type: EntityType.PROJECT, id: entityId },
-      metadata: {
-        inviterId: notification.initiator.id,
-        role: metadata.role,
-        source: 'invite',
-      } as JoinResponseMetadata,
-    });
   }
 
   private async handleTeamInvite(
@@ -374,6 +360,32 @@ export class NotificationService {
         expiresAt: expiresAt || this.getDefaultExpiryDate(),
       } as InviteMetadata,
     }).save();
+  }
+
+  private async notifyProjectOnJoin(
+    projectId: Types.ObjectId,
+    newMemberId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+    role: Role,
+    source: 'invite' | 'request',
+  ) {
+    const projectMembers =
+      await this.projectService.getProjectMemberIds(projectId);
+    const recipients = projectMembers.filter((id) => !id.equals(newMemberId));
+
+    await this.notificationModel.create({
+      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      recipients: recipients.map((memberId) => ({
+        userId: memberId,
+      })),
+      initiator: { type: EntityType.USER, id: newMemberId },
+      target: { type: EntityType.PROJECT, id: projectId },
+      metadata: {
+        inviterId,
+        role,
+        source,
+      } as JoinResponseMetadata,
+    });
   }
 
   private getDefaultExpiryDate(): Date {

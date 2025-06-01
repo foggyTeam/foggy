@@ -4,13 +4,9 @@ export const notificationErrors = {
       en: 'Notification not found',
       ru: 'Уведомление не найдено',
     },
-    notInviteType: {
-      en: 'Notification is not an invitation',
-      ru: 'Уведомление не является приглашением',
-    },
-    notJoinRequestType: {
-      en: 'Notification is not a request',
-      ru: 'Уведомление не является запросом',
+    unsupportedAcceptType: {
+      en: 'Failed to accept notification',
+      ru: 'Не удалось принять уведомление',
     },
     notRecipient: {
       en: 'Access denied',
