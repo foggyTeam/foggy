@@ -38,8 +38,8 @@ export class Notification {
   })
   recipients: Recipient[];
 
-  @Prop({ type: Object, required: true })
-  initiator: EntityReference;
+  @Prop({ type: Types.ObjectId, required: true })
+  initiator: Types.ObjectId;
 
   @Prop({ type: Object, required: true })
   target: EntityReference;

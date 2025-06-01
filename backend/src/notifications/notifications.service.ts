@@ -117,7 +117,7 @@ export class NotificationService {
       return {
         id: notif._id,
         type: notif.type,
-        initiator: mapEntity(notif.initiator),
+        initiator: notif.initiator,
         target: mapEntity(notif.target),
         metadata: notif.metadata as NotificationMetadata,
         isRead: !!recipient?.isRead,
@@ -243,10 +243,17 @@ export class NotificationService {
         ? EntityType.PROJECT
         : EntityType.TEAM;
 
+    await this.checkInviteDuplicate(
+      inviteType,
+      inviterId,
+      { type: entityType, id: entityId },
+      recipientId,
+    );
+
     await new this.notificationModel({
       type: inviteType,
       recipients: [{ userId: recipientId }],
-      initiator: { type: EntityType.USER, id: inviterId },
+      initiator: inviterId,
       target: { type: entityType, id: entityId },
       metadata: {
         role,
@@ -268,6 +275,10 @@ export class NotificationService {
         ? EntityType.PROJECT
         : EntityType.TEAM;
 
+    await this.checkJoinDuplicate(joinType, userId, {
+      type: entityType,
+      id: entityId,
+    });
     const adminIds =
       entityType === EntityType.PROJECT
         ? await this.projectService.getProjectAdminIds(entityId)
@@ -276,7 +287,7 @@ export class NotificationService {
     await new this.notificationModel({
       type: joinType,
       recipients: adminIds.map((adminId) => ({ userId: adminId })),
-      initiator: { type: EntityType.USER, id: userId },
+      initiator: userId,
       target: { type: entityType, id: entityId },
       metadata: {
         role,
@@ -292,7 +303,7 @@ export class NotificationService {
     isAccept: boolean,
   ) {
     const metadata = notification.metadata as InviteMetadata;
-    const inviterId = notification.initiator.id;
+    const inviterId = notification.initiator;
     const projectId = notification.target.id;
 
     if (isAccept) {
@@ -312,7 +323,7 @@ export class NotificationService {
       await this.notificationModel.create({
         type: NotificationType.PROJECT_JOIN_REJECTED,
         recipients: [{ userId: inviterId }],
-        initiator: { type: EntityType.USER, id: userId },
+        initiator: userId,
         target: { type: EntityType.PROJECT, id: projectId },
         metadata: {
           role: metadata.role,
@@ -329,7 +340,7 @@ export class NotificationService {
     isAccept: boolean,
   ) {
     const metadata = notification.metadata as JoinRequestMetadata;
-    const userId = notification.initiator.id;
+    const userId = notification.initiator;
     const projectId = notification.target.id;
 
     if (isAccept) {
@@ -352,7 +363,7 @@ export class NotificationService {
         ? NotificationType.PROJECT_JOIN_ACCEPTED
         : NotificationType.PROJECT_JOIN_REJECTED,
       recipients: [{ userId }],
-      initiator: { type: EntityType.USER, id: inviterId },
+      initiator: inviterId,
       target: { type: EntityType.PROJECT, id: projectId },
       metadata: {
         role: metadata.role,
@@ -432,7 +443,7 @@ export class NotificationService {
       recipients: recipients.map((memberId) => ({
         userId: memberId,
       })),
-      initiator: { type: EntityType.USER, id: newMemberId },
+      initiator: newMemberId,
       target: { type: EntityType.PROJECT, id: projectId },
       metadata: {
         inviterId,
@@ -440,6 +451,58 @@ export class NotificationService {
         expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
     });
+  }
+
+  private async checkInviteDuplicate(
+    type: NotificationType,
+    initiator: Types.ObjectId,
+    target: { type: EntityType; id: Types.ObjectId },
+    recipientId: Types.ObjectId,
+  ): Promise<void> {
+    const exists = await this.notificationModel.findOne({
+      type,
+      initiator: initiator,
+      'target.type': target.type,
+      'target.id': target.id,
+      'recipients.userId': recipientId,
+    });
+
+    if (exists) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'inviteDuplicateExists' }),
+        HttpStatus.CONFLICT,
+      );
+    }
+  }
+
+  private async checkJoinDuplicate(
+    type: NotificationType,
+    initiator: Types.ObjectId,
+    target: { type: EntityType; id: Types.ObjectId },
+  ): Promise<void> {
+    const existingNotification = await this.notificationModel
+      .findOne({
+        type,
+        initiator: initiator,
+        'target.type': target.type,
+        'target.id': target.id,
+      })
+      .exec();
+    if (existingNotification) {
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+      const now = new Date();
+      const notificationDate = existingNotification.createdAt;
+      const timeDiff = now.getTime() - notificationDate.getTime();
+
+      if (timeDiff < oneDayInMs) {
+        throw new CustomException(
+          getErrorMessages({ notification: 'joinDuplicateExists' }),
+          HttpStatus.CONFLICT,
+        );
+      } else {
+        await this.notificationModel.findOneAndDelete(existingNotification._id);
+      }
+    }
   }
 
   private getDefaultExpiryDate(): Date {

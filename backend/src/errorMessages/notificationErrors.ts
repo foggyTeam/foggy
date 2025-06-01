@@ -32,5 +32,13 @@ export const notificationErrors = {
       en: 'Failed to delete notification',
       ru: 'Не удалось удалить уведомление',
     },
+    inviteDuplicateExists: {
+      en: 'Invitation has already been sent',
+      ru: 'Приглашение уже отправлено',
+    },
+    joinDuplicateExists: {
+      en: 'Join request has already been sent',
+      ru: 'Запрос на вступление уже отправлен',
+    },
   },
 };
