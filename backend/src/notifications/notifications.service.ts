@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
@@ -9,9 +9,14 @@ import { EntityType, NotificationType, Role } from '../shared/types/enums';
 import { User } from '../users/schemas/user.schema';
 import { Project } from '../projects/schemas/project.schema';
 import {
+  InviteMetadata,
+  JoinResponseMetadata,
   NotificationMetadata,
   NotificationResponse,
 } from '../shared/interfaces/notification.type';
+import { ProjectService } from '../projects/project.service';
+import { CustomException } from '../exceptions/custom-exception';
+import { getErrorMessages } from '../errorMessages/errorMessages';
 
 @Injectable()
 export class NotificationService {
@@ -20,6 +25,7 @@ export class NotificationService {
     private notificationModel: Model<NotificationDocument>,
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Project.name) private projectModel: Model<Project>,
+    private readonly projectService: ProjectService,
   ) {}
 
   async getUserNotifications(
@@ -171,6 +177,107 @@ export class NotificationService {
         { $pull: { recipients: { userId } } },
       );
     }
+  }
+
+  async acceptInvite(
+    notificationId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<void> {
+    const notification = await this.notificationModel
+      .findById(notificationId)
+      .exec();
+
+    if (!notification) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const validInviteTypes = [
+      NotificationType.PROJECT_INVITE,
+      NotificationType.TEAM_INVITE,
+    ];
+
+    if (!validInviteTypes.includes(notification.type)) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'notInviteType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const isRecipient = notification.recipients.some((r) =>
+      r.userId.equals(userId),
+    );
+    if (!isRecipient) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'notRecipient' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (notification.type === NotificationType.PROJECT_INVITE) {
+      await this.handleProjectInvite(notification, userId);
+    } else if (notification.type === NotificationType.TEAM_INVITE) {
+      await this.handleTeamInvite(notification, userId);
+    }
+
+    await this.deleteNotification(notificationId, userId);
+  }
+
+  private async handleProjectInvite(
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+  ) {
+    const metadata = notification.metadata as InviteMetadata;
+    const inviterId = notification.initiator.id;
+    const entityId = notification.target.id;
+
+    try {
+      await this.projectService.addUser(
+        entityId,
+        inviterId,
+        userId,
+        metadata.role,
+      );
+
+      const projectMembers =
+        await this.projectService.getProjectMemberIds(entityId);
+      const recipients = projectMembers.filter(
+        (memberId) => !memberId.equals(userId),
+      );
+
+      await this.notificationModel.create({
+        type: NotificationType.PROJECT_JOIN_ACCEPTED,
+        recipients: recipients.map((memberId) => ({
+          userId: memberId,
+          isRead: false,
+        })),
+        initiator: { type: EntityType.USER, id: userId },
+        target: { type: EntityType.PROJECT, id: entityId },
+        metadata: {
+          responseMessage: 'has joined the project',
+          originalRequestId: notification._id,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as JoinResponseMetadata,
+      });
+    } catch {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async handleTeamInvite(
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+  ) {
+    //TODO: team notification
+    throw new CustomException(
+      getErrorMessages({ feature: 'notImplemented' }),
+      HttpStatus.NOT_IMPLEMENTED,
+    );
   }
 
   private async createInvite(

@@ -1,4 +1,4 @@
-export const projectError = {
+export const projectErrors = {
   project: {
     creationFailed: {
       en: 'Failed to create project',

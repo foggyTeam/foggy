@@ -1,5 +1,6 @@
-import { elementError } from './elementError';
-import { projectError } from './projectError';
+import { elementErrors } from './elementErrors';
+import { projectErrors } from './projectErrors';
+import { notificationErrors } from './notificationErrors';
 
 const errorMessages = {
   nickname: {
@@ -174,8 +175,9 @@ const errorMessages = {
       ru: 'Настройки должны иметь значение "да" или "нет"',
     },
   },
-  ...elementError,
-  ...projectError,
+  ...elementErrors,
+  ...projectErrors,
+  ...notificationErrors,
 };
 
 export type Field = keyof typeof errorMessages;
