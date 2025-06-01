@@ -459,15 +459,15 @@ export class NotificationService {
     target: { type: EntityType; id: Types.ObjectId },
     recipientId: Types.ObjectId,
   ): Promise<void> {
-    const exists = await this.notificationModel.findOne({
+    const existingNotification = await this.notificationModel.findOne({
       type,
-      initiator: initiator,
+      initiator,
       'target.type': target.type,
       'target.id': target.id,
       'recipients.userId': recipientId,
     });
 
-    if (exists) {
+    if (existingNotification) {
       throw new CustomException(
         getErrorMessages({ notification: 'inviteDuplicateExists' }),
         HttpStatus.CONFLICT,
@@ -483,24 +483,26 @@ export class NotificationService {
     const existingNotification = await this.notificationModel
       .findOne({
         type,
-        initiator: initiator,
+        initiator,
         'target.type': target.type,
         'target.id': target.id,
       })
       .exec();
-    if (existingNotification) {
-      const oneDayInMs = 24 * 60 * 60 * 1000;
-      const now = new Date();
-      const notificationDate = existingNotification.createdAt;
-      const timeDiff = now.getTime() - notificationDate.getTime();
 
-      if (timeDiff < oneDayInMs) {
+    if (existingNotification) {
+      const notificationDate = existingNotification.createdAt.getTime();
+      const now = Date.now();
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+
+      if (now - notificationDate < oneDayInMs) {
         throw new CustomException(
           getErrorMessages({ notification: 'joinDuplicateExists' }),
           HttpStatus.CONFLICT,
         );
       } else {
-        await this.notificationModel.findOneAndDelete(existingNotification._id);
+        await this.notificationModel.findByIdAndDelete(
+          existingNotification._id,
+        );
       }
     }
   }
