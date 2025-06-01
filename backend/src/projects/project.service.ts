@@ -678,6 +678,15 @@ export class ProjectService {
       .map((m) => m.id);
   }
 
+  async findProjectById(projectId: Types.ObjectId): Promise<ProjectDocument> {
+    this.validateObjectId(projectId, 'project');
+
+    return await this.projectModel
+      .findById(projectId)
+      .orFail(() => this.notFoundError('project'))
+      .exec();
+  }
+
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
     if (!Types.ObjectId.isValid(id)) {
       throw new CustomException(
@@ -776,17 +785,6 @@ export class ProjectService {
     }
 
     return null;
-  }
-
-  private async findProjectById(
-    projectId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
-    this.validateObjectId(projectId, 'project');
-
-    return await this.projectModel
-      .findById(projectId)
-      .orFail(() => this.notFoundError('project'))
-      .exec();
   }
 
   private async addSectionToProject(

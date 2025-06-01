@@ -87,9 +87,9 @@ export class NotificationController {
     @Body('expiresAt') expiresAt?: Date,
   ) {
     return this.notificationService.createProjectInvite(
-      recipientId,
-      projectId,
-      inviterId,
+      new Types.ObjectId(recipientId),
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(inviterId),
       role,
       expiresAt,
     );
@@ -136,9 +136,9 @@ export class NotificationController {
     @Body('expiresAt') expiresAt?: Date,
   ) {
     return this.notificationService.createTeamInvite(
-      recipientId,
-      teamId,
-      inviterId,
+      new Types.ObjectId(recipientId),
+      new Types.ObjectId(teamId),
+      new Types.ObjectId(inviterId),
       role,
       expiresAt,
     );
@@ -152,13 +152,11 @@ export class NotificationController {
     description: 'ID of the user requesting to join',
     required: true,
   })
-  @ApiBody({
-    description: 'Project join request data',
-  })
   @ApiResponse({
     status: 201,
     description: 'Project join request notification created',
   })
+  @ApiBody({ type: JoinRequestDto })
   async createProjectJoinRequest(
     @Headers('x-user-id') userId: Types.ObjectId,
     @Body() joinRequestDto: JoinRequestDto,
@@ -177,13 +175,11 @@ export class NotificationController {
     description: 'ID of the user requesting to join',
     required: true,
   })
-  @ApiBody({
-    description: 'Project join request data',
-  })
   @ApiResponse({
     status: 201,
     description: 'Project join request notification created',
   })
+  @ApiBody({ type: JoinRequestDto })
   async createTeamJoinRequest(
     @Headers('x-user-id') userId: Types.ObjectId,
     @Body() joinRequestDto: JoinRequestDto,
@@ -216,8 +212,8 @@ export class NotificationController {
     @Param('id') notificationId: Types.ObjectId,
   ): Promise<void> {
     return this.notificationService.handleNotification(
-      notificationId,
-      userId,
+      new Types.ObjectId(notificationId),
+      new Types.ObjectId(userId),
       true,
     );
   }
@@ -244,8 +240,8 @@ export class NotificationController {
     @Param('id') notificationId: Types.ObjectId,
   ): Promise<void> {
     return this.notificationService.handleNotification(
-      notificationId,
-      userId,
+      new Types.ObjectId(notificationId),
+      new Types.ObjectId(userId),
       false,
     );
   }

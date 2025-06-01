@@ -132,6 +132,7 @@ export class NotificationService {
     role: Role,
     expiresAt?: Date,
   ): Promise<void> {
+    await this.projectService.findProjectById(entityId);
     await this.createInvite(
       recipientId,
       entityId,
@@ -149,6 +150,7 @@ export class NotificationService {
     role: Role,
     expiresAt?: Date,
   ): Promise<void> {
+    //TODO: await this.teamService.findTeamById(entityId);
     await this.createInvite(
       recipientId,
       entityId,
@@ -188,7 +190,6 @@ export class NotificationService {
   ): Promise<void> {
     const notification = await this.findNotificationById(notificationId);
     this.validateRecipient(notification, userId);
-
     switch (notification.type) {
       case NotificationType.PROJECT_INVITE:
         await this.handleProjectInvite(notification, userId, isAccept);
@@ -280,6 +281,7 @@ export class NotificationService {
       metadata: {
         role,
         customMessage,
+        expiresAt: this.getDefaultExpiryDate(),
       } as JoinRequestMetadata,
     }).save();
   }
@@ -315,6 +317,7 @@ export class NotificationService {
         metadata: {
           role: metadata.role,
           inviterId: inviterId,
+          expiresAt: this.getDefaultExpiryDate(),
         } as JoinResponseMetadata,
       });
     }
@@ -354,6 +357,7 @@ export class NotificationService {
       metadata: {
         role: metadata.role,
         inviterId: inviterId,
+        expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
     });
   }
@@ -433,6 +437,7 @@ export class NotificationService {
       metadata: {
         inviterId,
         role,
+        expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
     });
   }
