@@ -661,9 +661,21 @@ export class ProjectService {
   async getProjectMemberIds(
     projectId: Types.ObjectId,
   ): Promise<Types.ObjectId[]> {
-    const project = await this.findProjectById(projectId);
-    const members = await this.getMembers(project);
+    const members = await this.getMembers(
+      await this.findProjectById(projectId),
+    );
     return members.map((m) => m.id);
+  }
+
+  async getProjectAdminIds(
+    projectId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    const members = await this.getMembers(
+      await this.findProjectById(projectId),
+    );
+    return members
+      .filter((m) => m.role === Role.ADMIN || m.role === Role.OWNER)
+      .map((m) => m.id);
   }
 
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {

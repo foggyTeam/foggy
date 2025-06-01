@@ -10,6 +10,7 @@ import { User } from '../users/schemas/user.schema';
 import { Project } from '../projects/schemas/project.schema';
 import {
   InviteMetadata,
+  JoinRequestMetadata,
   JoinResponseMetadata,
   NotificationMetadata,
   NotificationResponse,
@@ -198,6 +199,81 @@ export class NotificationService {
     await this.deleteNotification(notificationId, userId);
   }
 
+  async createProjectJoinRequest(
+    userId: Types.ObjectId,
+    projectId: Types.ObjectId,
+    role: Role,
+    customMessage?: string,
+  ): Promise<void> {
+    const projectAdmins =
+      await this.projectService.getProjectAdminIds(projectId);
+
+    await new this.notificationModel({
+      type: NotificationType.PROJECT_JOIN_REQUEST,
+      recipients: projectAdmins.map((adminId) => ({ userId: adminId })),
+      initiator: { type: EntityType.USER, id: userId },
+      target: { type: EntityType.PROJECT, id: projectId },
+      metadata: {
+        role,
+        customMessage,
+      } as JoinRequestMetadata,
+    }).save();
+  }
+
+  async acceptJoinRequest(
+    notificationId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+  ): Promise<void> {
+    const notification = await this.findNotificationById(notificationId);
+    this.validateRecipient(notification, inviterId);
+
+    if (notification.type !== NotificationType.PROJECT_JOIN_REQUEST) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'notJoinRequestType' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const userId = notification.initiator.id;
+    const projectId = notification.target.id;
+
+    await this.projectService.addUser(
+      projectId,
+      inviterId,
+      userId,
+      notification.metadata.role,
+    );
+
+    await this.notificationModel.create({
+      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      recipients: [{ userId }],
+      initiator: { type: EntityType.USER, id: inviterId },
+      target: { type: EntityType.PROJECT, id: projectId },
+      metadata: {
+        role: notification.metadata.role,
+        inviterId: inviterId,
+        source: 'request',
+      } as JoinResponseMetadata,
+    });
+
+    const projectMembers =
+      await this.projectService.getProjectMemberIds(projectId);
+    const recipients = projectMembers.filter((id) => !id.equals(userId));
+
+    await this.notificationModel.create({
+      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      recipients: recipients.map((id) => ({ userId: id })),
+      initiator: { type: EntityType.USER, id: userId },
+      target: { type: EntityType.PROJECT, id: projectId },
+      metadata: {
+        role: notification.metadata.role,
+        inviterId: inviterId,
+      } as JoinResponseMetadata,
+    });
+
+    await this.deleteNotification(notificationId, inviterId);
+  }
+
   private validateRecipient(
     notification: NotificationDocument,
     userId: Types.ObjectId,
@@ -259,6 +335,7 @@ export class NotificationService {
       metadata: {
         inviterId: notification.initiator.id,
         role: metadata.role,
+        source: 'invite',
       } as JoinResponseMetadata,
     });
   }
@@ -287,17 +364,16 @@ export class NotificationService {
         ? EntityType.PROJECT
         : EntityType.TEAM;
 
-    const notif = await new this.notificationModel({
+    await new this.notificationModel({
       type: inviteType,
-      recipients: [{ userId: recipientId, isRead: false }],
+      recipients: [{ userId: recipientId }],
       initiator: { type: EntityType.USER, id: inviterId },
       target: { type: entityType, id: entityId },
       metadata: {
         role,
         expiresAt: expiresAt || this.getDefaultExpiryDate(),
-      },
+      } as InviteMetadata,
     }).save();
-    console.log(notif);
   }
 
   private getDefaultExpiryDate(): Date {

@@ -8,6 +8,10 @@ export const notificationErrors = {
       en: 'Notification is not an invitation',
       ru: 'Уведомление не является приглашением',
     },
+    notJoinRequestType: {
+      en: 'Notification is not a request',
+      ru: 'Уведомление не является запросом',
+    },
     notRecipient: {
       en: 'Access denied',
       ru: 'Доступ запрещён',
