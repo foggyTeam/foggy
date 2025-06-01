@@ -7,8 +7,6 @@ import { Eye, EyeClosed, X } from 'lucide-react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
-import { signUserIn } from '@/app/lib/server/actions/signUserIn';
-import { signUserViaProviders } from '@/app/lib/server/actions/signUserViaProviders';
 import { AvailableProviders } from '@/app/lib/types/definitions';
 import { loginFormSchema } from '@/app/lib/types/schemas';
 import z from 'zod';
@@ -17,6 +15,10 @@ import settingsStore from '../../stores/settingsStore';
 import GoogleIcon from '@/app/lib/components/svg/GoogleIcon';
 import YandexIcon from '@/app/lib/components/svg/YandexIcon';
 import { primary } from '@/tailwind.config';
+import {
+  SignUserIn,
+  SignUserViaProviders,
+} from '@/app/lib/server/actions/userServerActions';
 
 enum ButtonAction {
   UNDEFINED,
@@ -68,7 +70,7 @@ const LoginForm = observer(() => {
       if (action === ButtonAction.SIGNIN) {
         setSigninButtonLoading(true);
 
-        await signUserIn(
+        await SignUserIn(
           {
             email: data.email,
             password: data.password,
@@ -80,7 +82,7 @@ const LoginForm = observer(() => {
       } else if (action === ButtonAction.LOGIN) {
         setLoginButtonLoading(true);
 
-        await signUserIn({
+        await SignUserIn({
           email: data.email,
           password: data.password,
         }).finally(() => {
@@ -205,7 +207,7 @@ const LoginForm = observer(() => {
 
       <div className="mt-1 flex w-full items-center justify-center gap-3">
         <Button
-          onPress={() => signUserViaProviders(AvailableProviders.GOOGLE)}
+          onPress={() => SignUserViaProviders(AvailableProviders.GOOGLE)}
           isIconOnly
           variant="light"
           color="secondary"
@@ -220,7 +222,7 @@ const LoginForm = observer(() => {
         </Button>
 
         <Button
-          onPress={() => signUserViaProviders(AvailableProviders.YANDEX)}
+          onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
           isIconOnly
           variant="light"
           color="secondary"

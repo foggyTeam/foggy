@@ -40,6 +40,7 @@ class ProjectsStore {
       removeElement: action,
       setActiveBoard: action,
       setActiveProject: action,
+      revalidateActiveProject: action,
       setAllProjects: action,
       addProjectChild: action,
       insertProjectChild: action,
@@ -303,6 +304,18 @@ class ProjectsStore {
     this.myRole = this.activeProject.members?.find(
       (member) => member.id === userStore.user?.id,
     ).role;
+  };
+  revalidateActiveProject = (rawRevalidatedData: RawProject) => {
+    if (!this.activeProject) return;
+    const revalidatedData: Omit<Project, 'id' | 'sections' | 'favorite'> = {
+      name: rawRevalidatedData.name,
+      avatar: rawRevalidatedData.avatar,
+      description: rawRevalidatedData.description,
+      settings: rawRevalidatedData.settings,
+      lastChange: rawRevalidatedData.updatedAt,
+      members: rawRevalidatedData.members,
+    };
+    Object.assign(this.activeProject, revalidatedData);
   };
   setAllProjects = (projects: any[]) => {
     this.allProjects = projects.map((project) => {
