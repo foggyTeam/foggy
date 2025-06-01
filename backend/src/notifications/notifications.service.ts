@@ -236,41 +236,31 @@ export class NotificationService {
     const metadata = notification.metadata as InviteMetadata;
     const inviterId = notification.initiator.id;
     const entityId = notification.target.id;
+    await this.projectService.addUser(
+      entityId,
+      inviterId,
+      userId,
+      metadata.role,
+    );
 
-    try {
-      await this.projectService.addUser(
-        entityId,
-        inviterId,
-        userId,
-        metadata.role,
-      );
+    const projectMembers =
+      await this.projectService.getProjectMemberIds(entityId);
+    const recipients = projectMembers.filter(
+      (memberId) => !memberId.equals(userId),
+    );
 
-      const projectMembers =
-        await this.projectService.getProjectMemberIds(entityId);
-      const recipients = projectMembers.filter(
-        (memberId) => !memberId.equals(userId),
-      );
-
-      await this.notificationModel.create({
-        type: NotificationType.PROJECT_JOIN_ACCEPTED,
-        recipients: recipients.map((memberId) => ({
-          userId: memberId,
-          isRead: false,
-        })),
-        initiator: { type: EntityType.USER, id: userId },
-        target: { type: EntityType.PROJECT, id: entityId },
-        metadata: {
-          responseMessage: 'has joined the project',
-          originalRequestId: notification._id,
-          expiresAt: this.getDefaultExpiryDate(),
-        } as JoinResponseMetadata,
-      });
-    } catch {
-      throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.notificationModel.create({
+      type: NotificationType.PROJECT_JOIN_ACCEPTED,
+      recipients: recipients.map((memberId) => ({
+        userId: memberId,
+      })),
+      initiator: { type: EntityType.USER, id: userId },
+      target: { type: EntityType.PROJECT, id: entityId },
+      metadata: {
+        inviterId: notification.initiator.id,
+        role: metadata.role,
+      } as JoinResponseMetadata,
+    });
   }
 
   private async handleTeamInvite(
