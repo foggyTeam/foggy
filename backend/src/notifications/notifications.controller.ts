@@ -46,6 +46,33 @@ export class NotificationController {
     return this.notificationService.getUserNotifications(userId);
   }
 
+  @Get('unread-count')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get count of unread notifications for user' })
+  @ApiHeader({
+    name: 'x-user-id',
+    description: 'Current user ID',
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns count of unread notifications',
+    schema: {
+      type: 'object',
+      properties: {
+        notificationCount: { type: 'number' },
+      },
+    },
+  })
+  async getUnreadNotificationCount(
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<{ notificationCount: number }> {
+    const count = await this.notificationService.getUnreadNotificationCount(
+      new Types.ObjectId(userId),
+    );
+    return { notificationCount: count };
+  }
+
   @Post('project-invite')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create project invite notification' })

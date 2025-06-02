@@ -125,6 +125,13 @@ export class NotificationService {
     });
   }
 
+  async getUnreadNotificationCount(userId: Types.ObjectId): Promise<number> {
+    return this.notificationModel.countDocuments({
+      'recipients.userId': userId,
+      'recipients.isRead': false,
+    });
+  }
+
   async createProjectInvite(
     recipientId: Types.ObjectId,
     entityId: Types.ObjectId,
