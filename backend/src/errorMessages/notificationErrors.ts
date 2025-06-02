@@ -33,12 +33,12 @@ export const notificationErrors = {
       ru: 'Не удалось удалить уведомление',
     },
     inviteDuplicateExists: {
-      en: 'Invitation has already been sent',
-      ru: 'Приглашение уже отправлено',
+      en: 'An invitation has already been sent to this user',
+      ru: 'Приглашение этому пользователю уже отправлено',
     },
     joinDuplicateExists: {
-      en: 'Join request has already been sent',
-      ru: 'Запрос на вступление уже отправлен',
+      en: 'The request to join this project has already been sent',
+      ru: 'Запрос на вступление в этот проект уже отправлен',
     },
   },
 };
