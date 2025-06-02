@@ -115,6 +115,7 @@ export class ProjectController {
         value: {
           userId: '507f1f77bcf86cd799439011',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
       example2: {
@@ -131,6 +132,7 @@ export class ProjectController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') role: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Body('expiresAt') expiresAt?: Date,
   ): Promise<void> {
     return this.projectService.manageProjectUser(
       projectId,
@@ -138,6 +140,7 @@ export class ProjectController {
       targetUserId,
       role,
       false,
+      expiresAt,
     );
   }
 

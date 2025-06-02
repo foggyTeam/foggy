@@ -376,6 +376,7 @@ export class ProjectService {
     targetUserId: Types.ObjectId,
     role: Role,
     addUser: boolean = false,
+    expiresAt?: Date,
   ): Promise<void> {
     const project = (await this.validateUser(
       requestingUserId,
@@ -405,6 +406,7 @@ export class ProjectService {
         projectId,
         requestingUserId,
         role,
+        expiresAt,
       );
       return;
     } else {
