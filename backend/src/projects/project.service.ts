@@ -23,6 +23,7 @@ import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { Role, RoleLevel, ROLES } from '../shared/types/enums';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ProjectService {
@@ -33,6 +34,8 @@ export class ProjectService {
     private readonly boardService: BoardService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
   ) {}
 
   async createProject(
@@ -357,12 +360,23 @@ export class ProjectService {
     };
   }
 
-  async addUser(
+  async getProjectNames(
+    projectIds: Types.ObjectId[],
+  ): Promise<{ _id: Types.ObjectId; name: string }[]> {
+    return this.projectModel
+      .find({ _id: { $in: projectIds } })
+      .select('_id name')
+      .lean()
+      .exec();
+  }
+
+  async manageProjectUser(
     projectId: Types.ObjectId,
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     role: Role,
-  ): Promise<ProjectDocument> {
+    addUser: boolean = false,
+  ): Promise<void> {
     const project = (await this.validateUser(
       requestingUserId,
       projectId,
@@ -372,7 +386,6 @@ export class ProjectService {
     const userExists = project.accessControlUsers.some((user) =>
       user.userId.equals(targetUserId),
     );
-
     if (userExists) {
       throw new CustomException(
         getErrorMessages({ project: 'userAlreadyAdded' }),
@@ -386,8 +399,18 @@ export class ProjectService {
       );
     }
 
-    project.accessControlUsers.push({ userId: targetUserId, role });
-    return await this.saveProject(project);
+    if (!addUser) {
+      await this.notificationService.createProjectInvite(
+        targetUserId,
+        projectId,
+        requestingUserId,
+        role,
+      );
+      return;
+    } else {
+      project.accessControlUsers.push({ userId: targetUserId, role });
+      await this.saveProject(project);
+    }
   }
 
   async removeUser(

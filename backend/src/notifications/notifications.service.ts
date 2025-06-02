@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import {
@@ -6,8 +6,6 @@ import {
   NotificationDocument,
 } from './schemas/notification.schema';
 import { EntityType, NotificationType, Role } from '../shared/types/enums';
-import { User } from '../users/schemas/user.schema';
-import { Project } from '../projects/schemas/project.schema';
 import {
   InviteMetadata,
   JoinRequestMetadata,
@@ -19,14 +17,16 @@ import { ProjectService } from '../projects/project.service';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { JoinRequestDto } from './dto/join-request.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectModel(Notification.name)
     private notificationModel: Model<NotificationDocument>,
-    @InjectModel(User.name) private userModel: Model<User>,
-    @InjectModel(Project.name) private projectModel: Model<Project>,
+    @Inject(forwardRef(() => UsersService))
+    private readonly usersService: UsersService,
+    @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
   ) {}
 
@@ -75,16 +75,15 @@ export class NotificationService {
       });
     }
 
-    const users = await this.userModel
-      .find({ _id: { $in: Array.from(entityIds[EntityType.USER]) } })
-      .select('_id nickname')
-      .lean()
-      .exec();
-    const projects = await this.projectModel
-      .find({ _id: { $in: Array.from(entityIds[EntityType.PROJECT]) } })
-      .select('_id name')
-      .lean()
-      .exec();
+    const users = await this.usersService.getUserNicknames(
+      Array.from(entityIds[EntityType.USER]).map(
+        (id) => new Types.ObjectId(id),
+      ),
+    );
+    const projectIds = Array.from(entityIds[EntityType.PROJECT]).map(
+      (id) => new Types.ObjectId(id),
+    );
+    const projects = await this.projectService.getProjectNames(projectIds);
 
     const userMap = new Map(users.map((u) => [u._id.toString(), u.nickname]));
     const projectMap = new Map(projects.map((p) => [p._id.toString(), p.name]));
@@ -323,11 +322,12 @@ export class NotificationService {
     const projectId = notification.target.id;
 
     if (isAccept) {
-      await this.projectService.addUser(
+      await this.projectService.manageProjectUser(
         projectId,
         inviterId,
         userId,
         metadata.role,
+        true,
       );
       await this.notifyProjectOnJoin(
         projectId,
@@ -360,11 +360,12 @@ export class NotificationService {
     const projectId = notification.target.id;
 
     if (isAccept) {
-      await this.projectService.addUser(
+      await this.projectService.manageProjectUser(
         projectId,
         inviterId,
         userId,
         metadata.role,
+        true,
       );
       await this.notifyProjectOnJoin(
         projectId,
@@ -452,16 +453,9 @@ export class NotificationService {
   ) {
     const projectMembers =
       await this.projectService.getProjectMemberIds(projectId);
-    const membersWithSettings = await this.userModel
-      .find(
-        {
-          _id: { $in: projectMembers.filter((id) => !id.equals(newMemberId)) },
-        },
-        { _id: 1, settings: 1 },
-      )
-      .lean()
-      .exec();
-
+    const membersWithSettings = await this.usersService.getUsersWithSettings(
+      projectMembers.filter((id) => !id.equals(newMemberId)),
+    );
     const recipients = membersWithSettings
       .filter((user) => user.settings?.projectNotifications !== false)
       .map((user) => ({ userId: user._id }));

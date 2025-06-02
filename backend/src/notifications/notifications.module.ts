@@ -8,6 +8,7 @@ import {
 } from './schemas/notification.schema';
 import { ProjectModule } from '../projects/projects.module';
 import { UsersModule } from '../users/users.module';
+import { Project, ProjectSchema } from '../projects/schemas/project.schema';
 
 @Module({
   imports: [
@@ -16,9 +17,10 @@ import { UsersModule } from '../users/users.module';
     ]),
     forwardRef(() => ProjectModule),
     forwardRef(() => UsersModule),
+    MongooseModule.forFeature([{ name: Project.name, schema: ProjectSchema }]),
   ],
   controllers: [NotificationController],
   providers: [NotificationService],
-  exports: [NotificationService],
+  exports: [NotificationService, MongooseModule],
 })
 export class NotificationsModule {}

@@ -131,12 +131,13 @@ export class ProjectController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') role: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.addUser(
+  ): Promise<void> {
+    return this.projectService.manageProjectUser(
       projectId,
       requestingUserId,
       targetUserId,
       role,
+      false,
     );
   }
 
