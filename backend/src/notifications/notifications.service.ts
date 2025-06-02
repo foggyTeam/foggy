@@ -252,7 +252,6 @@ export class NotificationService {
 
     await this.checkInviteDuplicate(
       inviteType,
-      inviterId,
       { type: entityType, id: entityId },
       recipientId,
     );
@@ -462,13 +461,11 @@ export class NotificationService {
 
   private async checkInviteDuplicate(
     type: NotificationType,
-    initiator: Types.ObjectId,
     target: { type: EntityType; id: Types.ObjectId },
     recipientId: Types.ObjectId,
   ): Promise<void> {
     const existingNotification = await this.notificationModel.findOne({
       type,
-      initiator,
       'target.type': target.type,
       'target.id': target.id,
       'recipients.userId': recipientId,
