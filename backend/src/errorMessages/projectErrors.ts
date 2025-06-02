@@ -44,6 +44,10 @@ export const projectErrors = {
       en: 'Invalid description format',
       ru: 'Недопустимый формат описания',
     },
+    joinRequestsDisabled: {
+      en: 'Join requests are disabled for this project',
+      ru: 'Запросы на присоединение в данный проект отключены',
+    },
   },
   section: {
     required: {

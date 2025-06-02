@@ -281,6 +281,16 @@ export class NotificationService {
         ? EntityType.PROJECT
         : EntityType.TEAM;
 
+    if (entityType === EntityType.PROJECT) {
+      const project = await this.projectService.findProjectById(entityId);
+      if (!project?.settings?.allowRequests) {
+        throw new CustomException(
+          getErrorMessages({ project: 'joinRequestsDisabled' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+    }
+
     await this.checkJoinDuplicate(joinType, userId, {
       type: entityType,
       id: entityId,
@@ -442,21 +452,33 @@ export class NotificationService {
   ) {
     const projectMembers =
       await this.projectService.getProjectMemberIds(projectId);
-    const recipients = projectMembers.filter((id) => !id.equals(newMemberId));
+    const membersWithSettings = await this.userModel
+      .find(
+        {
+          _id: { $in: projectMembers.filter((id) => !id.equals(newMemberId)) },
+        },
+        { _id: 1, settings: 1 },
+      )
+      .lean()
+      .exec();
 
-    await this.notificationModel.create({
-      type: NotificationType.PROJECT_MEMBER_ADDED,
-      recipients: recipients.map((memberId) => ({
-        userId: memberId,
-      })),
-      initiator: newMemberId,
-      target: { type: EntityType.PROJECT, id: projectId },
-      metadata: {
-        inviterId,
-        role,
-        expiresAt: this.getDefaultExpiryDate(),
-      } as JoinResponseMetadata,
-    });
+    const recipients = membersWithSettings
+      .filter((user) => user.settings?.projectNotifications !== false)
+      .map((user) => ({ userId: user._id }));
+
+    if (recipients.length > 0) {
+      await this.notificationModel.create({
+        type: NotificationType.PROJECT_MEMBER_ADDED,
+        recipients,
+        initiator: newMemberId,
+        target: { type: EntityType.PROJECT, id: projectId },
+        metadata: {
+          inviterId,
+          role,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as JoinResponseMetadata,
+      });
+    }
   }
 
   private async checkInviteDuplicate(
