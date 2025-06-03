@@ -15,6 +15,7 @@ const LocaleSwitcher = observer(() => {
       });
     } catch (e: any) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.localeError,
       });

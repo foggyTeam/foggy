@@ -34,6 +34,7 @@ export default function ProjectLoader({
       projectsStore.revalidateActiveProject(revalidatedData);
     else
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.project.updateProjectError,
       });

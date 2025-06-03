@@ -34,6 +34,7 @@ export default function BoardCard({
     })
       .catch(() =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.board.updateBoardError,
         }),

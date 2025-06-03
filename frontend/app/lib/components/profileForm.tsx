@@ -71,6 +71,7 @@ const ProfileForm = observer((userData: ProfileData) => {
             -1
           )
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.globalError,
             });
@@ -78,6 +79,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         });
       } else
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.globalError,
         });
@@ -119,6 +121,7 @@ const ProfileForm = observer((userData: ProfileData) => {
           ) {
             setErrors(result.errors);
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.user.updateUserDataError,
             });
@@ -138,6 +141,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         Object.keys(result).findIndex((element) => element === 'errors') !== -1
       )
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.user.deleteUserSuccess,
         });
@@ -150,6 +154,7 @@ const ProfileForm = observer((userData: ProfileData) => {
       await deleteImage(initialURL).then((response) => {
         if ('error' in response)
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.user.deleteUserImageError,
           });

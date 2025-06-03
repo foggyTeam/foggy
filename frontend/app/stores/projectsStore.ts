@@ -67,6 +67,7 @@ class ProjectsStore {
       if (this.boardWebsocket) socketAddEventListeners(this.boardWebsocket);
     } else
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.socket.socketConnectionError.title,
         description:
@@ -217,6 +218,7 @@ class ProjectsStore {
   ) => {
     if (!this.activeBoard) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.globalError,
       });
@@ -245,6 +247,7 @@ class ProjectsStore {
       ];
     } catch (error) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.socket.socketDataError.title,
         description: settingsStore.t.toasts.socket.socketDataError.description,
@@ -412,6 +415,7 @@ class ProjectsStore {
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.noParent,
         });
@@ -454,6 +458,7 @@ class ProjectsStore {
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.updateSectionError,
         });
@@ -464,6 +469,7 @@ class ProjectsStore {
         const targetItem = nextSection.children.get(id);
         if (!targetItem) {
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.project.noParent,
           });
@@ -478,6 +484,7 @@ class ProjectsStore {
       const targetItem = this.activeProject.sections.get(id);
       if (!targetItem) {
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.sectionNotFound,
         });
@@ -503,6 +510,7 @@ class ProjectsStore {
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.deleteSectionError,
         });
@@ -570,6 +578,7 @@ class ProjectsStore {
   ) => {
     if (!this.activeProject) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.project.noActive,
       });
@@ -626,6 +635,7 @@ class ProjectsStore {
           found = newParent;
         } else {
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.project.noParent,
           });
@@ -639,6 +649,7 @@ class ProjectsStore {
 
     if (!parentSection) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.project.sectionNotFound,
       });

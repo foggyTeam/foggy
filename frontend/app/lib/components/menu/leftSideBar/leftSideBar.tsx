@@ -83,6 +83,7 @@ const LeftSideBar = observer(() => {
         })
           .catch(() =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.board.addBoardError,
             }),

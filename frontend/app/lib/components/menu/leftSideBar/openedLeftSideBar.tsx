@@ -90,6 +90,7 @@ const OpenedLeftSideBar = observer(
           })
           .catch((error) =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.globalError,
               description: error,
@@ -129,6 +130,7 @@ const OpenedLeftSideBar = observer(
             setParentList(newParentList);
           } catch (error) {
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.globalError,
             });
@@ -166,6 +168,7 @@ const OpenedLeftSideBar = observer(
           } else {
             await DeleteBoard(nodeToRemove.id);
             addToast({
+              color: 'success',
               severity: 'success',
               title: settingsStore.t.toasts.board.deleteBoardSuccess,
             });
@@ -176,6 +179,7 @@ const OpenedLeftSideBar = observer(
           }
         } catch (error) {
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.board.deleteBoardError,
             description: error,

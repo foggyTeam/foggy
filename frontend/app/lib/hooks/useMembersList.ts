@@ -39,6 +39,7 @@ export function useMembersList({ inputValue }: { inputValue: string }) {
       )
       .catch((error) =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.user.loadMoreError,
           description: error,
@@ -53,6 +54,7 @@ export function useMembersList({ inputValue }: { inputValue: string }) {
       setNextCursor('');
       loadMembers('', inputValue, false).catch((error) =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.user.loadMoreError,
           description: error,

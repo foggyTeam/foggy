@@ -15,6 +15,7 @@ const UserLoader = ({ userData }: { userData: User | undefined }) => {
     } else if (userData && !userData?.id) {
       signOut({ redirectTo: '/login' }).catch(() =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.user.signOutError,
         }),
@@ -22,6 +23,7 @@ const UserLoader = ({ userData }: { userData: User | undefined }) => {
       userStore.clearUser();
       ClearUserSession().catch(() =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.user.signOutError,
         }),

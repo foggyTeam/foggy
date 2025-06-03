@@ -48,6 +48,7 @@ const AddMembersModal = observer(
           role: role[0],
         }).catch((error: any) =>
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.members.addMemberError,
             description: error,

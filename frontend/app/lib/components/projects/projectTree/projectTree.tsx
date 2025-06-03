@@ -74,6 +74,7 @@ const ProjectTree = observer(() => {
         await DeleteSection(projectsStore.activeProject.id, nodeToRemove.id)
           .catch(() =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.project.deleteSectionError,
             }),
@@ -88,6 +89,7 @@ const ProjectTree = observer(() => {
         await DeleteBoard(nodeToRemove.id)
           .catch(() =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.board.deleteBoardError,
             }),
@@ -98,6 +100,7 @@ const ProjectTree = observer(() => {
               nodeToRemove.parentList,
             );
             addToast({
+              color: 'success',
               severity: 'success',
               title: settingsStore.t.toasts.board.deleteBoardSuccess,
             });
@@ -125,6 +128,7 @@ const ProjectTree = observer(() => {
         })
           .catch(() =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.project.addSectionError,
             }),
@@ -147,6 +151,7 @@ const ProjectTree = observer(() => {
         })
           .catch(() =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.board.addBoardError,
             }),
@@ -169,8 +174,9 @@ const ProjectTree = observer(() => {
   const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;
     await GetSection(projectsStore.activeProject.id, id)
-      .catch((error) =>
+      .catch(() =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.getSectionError,
         }),

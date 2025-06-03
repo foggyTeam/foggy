@@ -31,6 +31,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
     })
       .catch(() =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.updateSectionError,
         }),

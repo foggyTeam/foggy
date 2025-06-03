@@ -54,6 +54,7 @@ export default async function HandleImageUpload(event: any, minSize = 288) {
   if (image) {
     if (!image.type.startsWith('image/')) {
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.image.notImage,
       });
@@ -62,6 +63,7 @@ export default async function HandleImageUpload(event: any, minSize = 288) {
 
     const resizedImage = await handleImageUpload(image, minSize).catch(() =>
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.image.resizeImageError,
       }),

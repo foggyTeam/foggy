@@ -62,6 +62,7 @@ const ProjectSettingsModal = observer(
         );
       } else if (!isNewProject)
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.noActive,
         });
@@ -82,6 +83,7 @@ const ProjectSettingsModal = observer(
             await deleteImage(avatar).then((response) => {
               if ('error' in response)
                 addToast({
+                  color: 'warning',
                   severity: 'warning',
                   title: settingsStore.t.toasts.image.deleteImageWarning,
                 });
@@ -89,6 +91,7 @@ const ProjectSettingsModal = observer(
           setAvatar(response.url);
         } else
           addToast({
+            color: 'danger',
             severity: 'danger',
             title: settingsStore.t.toasts.image.uploadImageError,
             description: response.error,
@@ -101,6 +104,7 @@ const ProjectSettingsModal = observer(
         await DeleteProject(projectsStore.activeProject.id)
           .catch((error) =>
             addToast({
+              color: 'danger',
               severity: 'danger',
               title: settingsStore.t.toasts.project.deleteProjectError,
               description: error,
@@ -109,6 +113,7 @@ const ProjectSettingsModal = observer(
           .then(() => {
             projectsStore.setActiveProject(null);
             addToast({
+              color: 'success',
               severity: 'success',
               title: settingsStore.t.toasts.project.deleteProjectSuccess,
             });
@@ -116,6 +121,7 @@ const ProjectSettingsModal = observer(
           });
       } else {
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.project.noActive,
         });
@@ -166,6 +172,7 @@ const ProjectSettingsModal = observer(
             })
             .catch((error) =>
               addToast({
+                color: 'danger',
                 severity: 'danger',
                 title: settingsStore.t.toasts.project.addProjectError,
                 description: error,
@@ -182,11 +189,13 @@ const ProjectSettingsModal = observer(
               ) {
                 setErrors(result.errors);
                 addToast({
+                  color: 'danger',
                   severity: 'danger',
                   title: settingsStore.t.toasts.project.updateProjectError,
                 });
               } else {
                 addToast({
+                  color: 'success',
                   severity: 'success',
                   title: settingsStore.t.toasts.project.updateProjectSuccess,
                 });

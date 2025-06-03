@@ -60,6 +60,7 @@ const AllProjectMembers = observer(() => {
     await DeleteProjectMember(projectsStore.activeProject.id, id)
       .catch((error: string) =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.members.deleteMemberError,
           description: error,
@@ -79,6 +80,7 @@ const AllProjectMembers = observer(() => {
     })
       .catch((error) =>
         addToast({
+          color: 'danger',
           severity: 'danger',
           title: settingsStore.t.toasts.members.updateMemberRoleError,
           description: error,

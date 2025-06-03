@@ -35,6 +35,7 @@ const ProjectsLoader = ({
       projectsStore.setAllProjects(revalidatedData);
     else
       addToast({
+        color: 'danger',
         severity: 'danger',
         title: settingsStore.t.toasts.updateProjectsError,
       });
