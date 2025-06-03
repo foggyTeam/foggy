@@ -14,6 +14,7 @@ import {
   DeleteProjectMember,
   UpdateProjectMemberRole,
 } from '@/app/lib/server/actions/membersServerActions';
+import { addToast } from '@heroui/toast';
 
 interface MembersContextType {
   memberType: 'team' | 'project';
@@ -57,7 +58,14 @@ const AllProjectMembers = observer(() => {
     // TODO: add new owner if needed
     if (newOwnerId) return;
     await DeleteProjectMember(projectsStore.activeProject.id, id)
-      .catch((error) => console.error(error))
+      .catch((error: string) =>
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.members.deleteMemberError,
+          description: error,
+        }),
+      )
       .then(() => projectsStore.removeProjectMember(id));
   };
   const handleUpdateMemberRole = async (
@@ -70,7 +78,14 @@ const AllProjectMembers = observer(() => {
       userId: id,
       role: newRole,
     })
-      .catch((error) => console.error(error))
+      .catch((error) =>
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.members.updateMemberRoleError,
+          description: error,
+        }),
+      )
       .then(() => projectsStore.updateProjectMember(id, { role: newRole }));
   };
 

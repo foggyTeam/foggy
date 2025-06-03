@@ -1,0 +1,79 @@
+{
+  "toasts": {
+    "user": {
+      "deleteUserImageError": "Не удалось удалить фото профиля",
+      "deleteUserSuccess": "Аккаунт удалён",
+      "loadMoreError": "Не удалось загрузить пользователей",
+      "sessionError": "Не удалось проверить сессию",
+      "signOutError": "Ошибка выхода из аккаунта",
+      "updateUserDataError": "Не удалось обновить данные пользователя",
+      "updateUserDataSuccess": "Данные пользователя обновлены",
+      "userNotExist": "Пользователь с этим ID не найден"
+    },
+    "members": {
+      "addMemberError": "Не удалось добавить участника",
+      "deleteMemberError": "Не удалось удалить участника",
+      "updateMemberRoleError": "Не удалось обновить роль участника"
+    },
+    "project": {
+      "addProjectError": "Не удалось создать проект",
+      "addProjectSuccess": "Проект создан",
+      "addSectionError": "Не удалось добавить раздел",
+      "deleteProjectError": "Не удалось удалить проект",
+      "deleteProjectSuccess": "Проект удалён",
+      "deleteSectionError": "Не удалось удалить раздел",
+      "getSectionError": "Не удалось загрузить данные раздела",
+      "noActive": "Нет активного проекта",
+      "noParent": "Родительский элемент не найден",
+      "projectNotExist": "Проект с этим ID не найден",
+      "sectionNotExist": "Раздел с этим ID не найден",
+      "sectionNotFound": "Раздел не найден",
+      "updateProjectError": "Не удалось обновить данные проекта",
+      "updateProjectSuccess": "Данные проекта обновлены",
+      "updateSectionError": "Не удалось обновить название раздела",
+      "updateSectionSuccess": "Название раздела обновлено"
+    },
+    "board": {
+      "addBoardError": "Не удалось создать доску",
+      "boardElementAddError": "Не удалось добавить элемент на доску",
+      "boardElementDeleteError": "Не удалось удалить элемент с доски",
+      "boardElementInvisible": "Элемент не виден",
+      "boardElementNotFound": "Элемент не найден",
+      "boardElementUpdateError": "Не удалось обновить элемент на доске",
+      "boardNotExist": "Доска с этим ID не найдена",
+      "deleteBoardError": "Не удалось удалить доску",
+      "deleteBoardSuccess": "Доска удалена",
+      "updateBoardError": "Не удалось обновить название доски",
+      "updateBoardSuccess": "Название доски обновлено"
+    },
+    "image": {
+      "deleteImageWarning": "Не удалось удалить изображение",
+      "notImage": "Файл не является изображением",
+      "resizeImageError": "Не удалось обработать изображение",
+      "uploadImageError": "Не удалось загрузить изображение"
+    },
+    "socket": {
+      "socketConnectionError": {
+        "title": "Ошибка подключения",
+        "description": "Невозможно подключиться к доске. Пожалуйста, перезагрузите страницу."
+      },
+      "socketDataError": {
+        "title": "Ошибка",
+        "description": "Не удалось обработать обновлённые данные. Пожалуйста, перезагрузите страницу."
+      },
+      "socketError": {
+        "title": "Ошибка подключения",
+        "description": "Произошла ошибка передачи данных."
+      }
+    },
+    "filtersError": {
+      "title": "Ошибка",
+      "description": "Фильтры были сброшены."
+    },
+    "copyError": "Не удалось скопировать в буфер обмена",
+    "copySuccess": "Скопировано в буфер обмена",
+    "globalError": "Произошла непредвиденная ошибка",
+    "localeError": "Не удалось изменить язык",
+    "updateProjectsError": "Не удалось обновить список проектов"
+  }
+}

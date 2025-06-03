@@ -18,6 +18,8 @@ import userStore from '@/app/stores/userStore';
 import { useDisclosure } from '@heroui/modal';
 import FilterModal from '@/app/lib/components/filters/filterModal';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 interface ContentSectionProps {
   sectionTitle: string;
@@ -66,7 +68,12 @@ function filtersReducer(state: FilterSet, action: FilterReducerAction) {
     case 'RESET':
       return new FilterSet();
     default:
-      console.error('An error occurred while setting filters. Resetting...');
+      addToast({
+        color: 'warning',
+        severity: 'warning',
+        title: settingsStore.t.toasts.filtersError.title,
+        description: settingsStore.t.toasts.filtersError.description,
+      });
       return new FilterSet();
   }
 }

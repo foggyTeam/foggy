@@ -11,6 +11,7 @@ import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandle
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { addToast } from '@heroui/toast';
 
 export default function FillTool() {
   const { selectedElement, updateElement } = useBoardContext();
@@ -35,7 +36,12 @@ export default function FillTool() {
         updateElement(selectedElement.attrs.id, {
           fill: fillColor,
         } as BoardElement);
-      else console.error('Element is invisible!');
+      else
+        addToast({
+          color: 'warning',
+          severity: 'warning',
+          title: settingsStore.t.toasts.board.boardElementInvisible,
+        });
     } else
       updateElement(selectedElement.attrs.id, {
         fill: isElementVisible(

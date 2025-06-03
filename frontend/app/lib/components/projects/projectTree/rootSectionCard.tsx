@@ -12,6 +12,8 @@ import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
 import { observer } from 'mobx-react-lite';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 const RootSectionCard = observer(({ id }: { id: string }) => {
   const section = projectsStore.getProjectChild(id, []) as ProjectSection;
@@ -27,7 +29,13 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
     await UpdateSection(projectsStore.activeProject.id, section.id, {
       name: newName,
     })
-      .catch((error) => console.error(error))
+      .catch(() =>
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.updateSectionError,
+        }),
+      )
       .then(() => {
         projectsStore.updateProjectChild([], section.id, {
           name: newName,

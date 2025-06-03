@@ -5,6 +5,8 @@ import { RawProject } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 import useSWR from 'swr';
 import { GetProject } from '@/app/lib/server/actions/projectServerActions';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 export default function ProjectLoader({
   projectData,
@@ -30,7 +32,12 @@ export default function ProjectLoader({
     if (revalidatedData.id !== projectsStore.activeProject?.id) return;
     if (!error && revalidatedData)
       projectsStore.revalidateActiveProject(revalidatedData);
-    else console.error('Не удалось обновить данные проекта');
+    else
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.project.updateProjectError,
+      });
   }, [projectData, revalidatedData, error]);
 
   return null;

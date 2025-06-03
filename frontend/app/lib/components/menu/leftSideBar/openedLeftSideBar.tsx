@@ -28,6 +28,7 @@ import {
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
+import { addToast } from '@heroui/toast';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -87,7 +88,14 @@ const OpenedLeftSideBar = observer(
               result,
             );
           })
-          .catch((error) => console.error(error))
+          .catch((error) =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.globalError,
+              description: error,
+            }),
+          )
           .finally(() => setIsLoading(false));
       }
     }, [activeSection, parentList]);
@@ -121,7 +129,11 @@ const OpenedLeftSideBar = observer(
             );
             setParentList(newParentList);
           } catch (error) {
-            console.error(error);
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.globalError,
+            });
           } finally {
             setIsLoading(false);
           }
@@ -155,14 +167,23 @@ const OpenedLeftSideBar = observer(
             );
           } else {
             await DeleteBoard(nodeToRemove.id);
-            console.info('success');
+            addToast({
+              color: 'success',
+              severity: 'success',
+              title: settingsStore.t.toasts.board.deleteBoardSuccess,
+            });
             projectsStore.deleteProjectChild(
               nodeToRemove.id,
               nodeToRemove.parentList,
             );
           }
         } catch (error) {
-          console.error(error);
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.board.deleteBoardError,
+            description: error,
+          });
         }
         setIsLoading(false);
       }

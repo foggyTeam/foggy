@@ -6,6 +6,8 @@ import { Project } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import useSWR from 'swr';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 const ProjectsLoader = ({
   projectsData,
@@ -31,7 +33,12 @@ const ProjectsLoader = ({
   useEffect(() => {
     if (revalidatedData && !error)
       projectsStore.setAllProjects(revalidatedData);
-    else console.error('Не удалось обновить проекты');
+    else
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.updateProjectsError,
+      });
   }, [projectsData, revalidatedData]);
 
   return null;

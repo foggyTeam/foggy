@@ -1,12 +1,11 @@
-import BoardStage from '@/app/lib/components/board/boardStage';
 import BoardLoader from '@/app/lib/components/dataLoaders/boardLoader';
-import { BoardProvider } from '@/app/lib/components/board/boardContext';
-import Cursors from '@/app/lib/components/board/cursors';
 import React from 'react';
 import {
   GetBoard,
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
+import BoardClientWrapper from '@/app/lib/components/board/boardClientWrapper';
+import { notFound } from 'next/navigation';
 
 interface BoardPageProps {
   project_id: string;
@@ -18,21 +17,15 @@ async function getSection(
   project_id: string,
   section_id: string,
 ): Promise<any | undefined> {
-  try {
-    return await GetSection(project_id, section_id);
-  } catch (e) {
-    console.error('Section with this id does not exist.', e);
-    return undefined;
-  }
+  const section = await GetSection(project_id, section_id);
+  if (!section) notFound();
+  return section;
 }
 
 async function getBoard(board_id: string): Promise<any | undefined> {
-  try {
-    return await GetBoard(board_id);
-  } catch (e) {
-    console.error('Board with this id does not exist.', e);
-    return undefined;
-  }
+  const board = await GetBoard(board_id);
+  if (!board) notFound();
+  return board;
 }
 
 export default async function BoardPage({
@@ -46,10 +39,7 @@ export default async function BoardPage({
 
   return (
     <>
-      <BoardProvider>
-        <BoardStage />
-        <Cursors />
-      </BoardProvider>
+      <BoardClientWrapper />
       <BoardLoader boardData={boardData} sectionData={sectionData} />
     </>
   );

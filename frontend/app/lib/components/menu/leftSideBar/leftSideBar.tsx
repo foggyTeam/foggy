@@ -18,6 +18,8 @@ import {
   AddBoard,
   AddSection,
 } from '@/app/lib/server/actions/projectServerActions';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
@@ -56,7 +58,13 @@ const LeftSideBar = observer(() => {
           name: nodeName,
           parentSectionId,
         })
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.project.project.addSectionError,
+            }),
+          )
           .then((response: { data: { id: string } }) => {
             const newSection: ProjectSection = {
               children: new Map(),
@@ -73,7 +81,13 @@ const LeftSideBar = observer(() => {
           type: nodeType.toLowerCase(),
           sectionId: parentSectionId,
         })
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.board.addBoardError,
+            }),
+          )
           .then((response: { data: { id: string } }) => {
             const newBoard: Board = {
               id: response.data.id,
