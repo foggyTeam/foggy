@@ -11,7 +11,7 @@ async function getProject(id: string): Promise<RawProject | undefined> {
   try {
     return await GetProject(id);
   } catch (e) {
-    console.error('Project with this id does not exist.', e);
+    console.error(e);
     return undefined;
   }
 }

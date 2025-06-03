@@ -40,7 +40,7 @@ export default function FillTool() {
         addToast({
           color: 'warning',
           severity: 'warning',
-          title: settingsStore.t.toasts.boardElementInvisible,
+          title: settingsStore.t.toasts.board.boardElementInvisible,
         });
     } else
       updateElement(selectedElement.attrs.id, {

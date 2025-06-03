@@ -61,7 +61,7 @@ const AllProjectMembers = observer(() => {
       .catch((error: string) =>
         addToast({
           severity: 'danger',
-          title: settingsStore.t.toasts.deleteMemberError,
+          title: settingsStore.t.toasts.members.deleteMemberError,
           description: error,
         }),
       )
@@ -80,7 +80,7 @@ const AllProjectMembers = observer(() => {
       .catch((error) =>
         addToast({
           severity: 'danger',
-          title: settingsStore.t.toasts.updateMemberRoleError,
+          title: settingsStore.t.toasts.members.updateMemberRoleError,
           description: error,
         }),
       )

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { SearchUsers } from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 const limit = 20;
 
@@ -35,7 +37,13 @@ export function useMembersList({ inputValue }: { inputValue: string }) {
           setHasMore(data.hasNextPage);
         },
       )
-      .catch((error) => console.error(error))
+      .catch((error) =>
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.user.loadMoreError,
+          description: error,
+        }),
+      )
       .finally(() => setIsLoading(false));
   };
 
@@ -43,7 +51,13 @@ export function useMembersList({ inputValue }: { inputValue: string }) {
     if (inputValue.length >= 3 || !inputValue.length) {
       lastQuery.current = inputValue;
       setNextCursor('');
-      loadMembers('', inputValue, false).catch((error) => console.error(error));
+      loadMembers('', inputValue, false).catch((error) =>
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.user.loadMoreError,
+          description: error,
+        }),
+      );
     } else {
       setHasMore(false);
       setNextCursor('');

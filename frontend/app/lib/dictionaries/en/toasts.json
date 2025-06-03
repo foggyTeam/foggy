@@ -1,35 +1,79 @@
 {
   "toasts": {
-    "globalError": "An error occurred",
-    "localeError": "Couldn't change locale",
-    "signOutError": "An error occurred",
-    "updateUserDataError": "Failed to update user data",
-    "deleteUserImageError": "Failed to delete user avatar",
-    "deleteUserSuccess": "Account deleted",
-    "socketConnectionError": {
-      "title": "Connection error",
-      "description": "Couldn't connect to the board. Reload the page."
+    "user": {
+      "deleteUserImageError": "Failed to delete user avatar",
+      "deleteUserSuccess": "Account deleted",
+      "loadMoreError": "Failed to load users",
+      "sessionError": "Failed to verify the session",
+      "signOutError": "Sign out failed",
+      "updateUserDataError": "Failed to update user data",
+      "updateUserDataSuccess": "User data updated",
+      "userNotExist": "A user with this ID does not exist"
     },
-    "socketError": {
-      "title": "Connection error",
-      "description": "Data transmission error."
+    "members": {
+      "addMemberError": "Failed to add member",
+      "deleteMemberError": "Failed to remove member",
+      "updateMemberRoleError": "Failed to update member role"
+    },
+    "project": {
+      "addProjectError": "Failed to create the project",
+      "addProjectSuccess": "Project created",
+      "addSectionError": "Failed to add section",
+      "deleteProjectError": "Failed to delete the project",
+      "deleteProjectSuccess": "Project deleted",
+      "deleteSectionError": "Failed to delete section",
+      "getSectionError": "Failed to load section data",
+      "noActive": "No active project",
+      "noParent": "Parent not found",
+      "projectNotExist": "A project with this ID does not exist",
+      "sectionNotExist": "A section with this ID does not exist",
+      "sectionNotFound": "Section not found",
+      "updateProjectError": "Failed to update project data",
+      "updateProjectSuccess": "Project data updated",
+      "updateSectionError": "Failed to update section name",
+      "updateSectionSuccess": "Section name updated"
+    },
+    "board": {
+      "addBoardError": "Failed to create board",
+      "boardElementAddError": "Failed to add board element",
+      "boardElementDeleteError": "Failed to remove board element",
+      "boardElementInvisible": "This element is invisible",
+      "boardElementNotFound": "Element not found",
+      "boardElementUpdateError": "Failed to update board element",
+      "boardNotExist": "A board with this ID does not exist",
+      "deleteBoardError": "Failed to delete board",
+      "deleteBoardSuccess": "Board deleted",
+      "updateBoardError": "Failed to update board name",
+      "updateBoardSuccess": "Board name updated"
+    },
+    "image": {
+      "deleteImageWarning": "Failed to delete the image",
+      "notImage": "The file is not a valid image",
+      "resizeImageError": "Failed to process the image",
+      "uploadImageError": "Failed to upload the image"
+    },
+    "socket": {
+      "socketConnectionError": {
+        "title": "Connection error",
+        "description": "Could not connect to the board. Please reload the page."
+      },
+      "socketDataError": {
+        "title": "Error",
+        "description": "Failed to process updated data. Please reload the page."
+      },
+      "socketError": {
+        "title": "Connection error",
+        "description": "A data transmission error occurred."
+      }
+    },
+    "filtersError": {
+      "title": "Error",
+      "description": "Filters have been reset."
     },
     "copyError": "Failed to copy to clipboard",
-    "copySuccess": "Copied to clipboard!",
-    "filtersError": {
-      "title": "An error occurred",
-      "description": "Resetting filters."
-    },
-    "addMemberError": "Failed to add member",
-    "deleteMemberError": "Failed to delete member",
-    "updateMemberRoleError": "Failed to update member's role",
-    "addSectionError": "Failed to add section",
-    "addBoardError": "Failed to add board",
-    "updateProjectError": "Failed to update project data",
-    "updateProjectsError": "Failed to update projects data",
-    "deleteBoardError": "Failed to delete board",
-    "deleteBoardSuccess": "Board deleted",
-    "boardElementInvisible": "Element is invisible!",
-    "boardElementNotFound": "Element wasn't found!"
+    "copySuccess": "Copied to clipboard",
+    "globalError": "An unexpected error occurred",
+    "localeError": "Failed to change language",
+    "updateProjectsError": "Failed to update project list"
   }
 }

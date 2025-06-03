@@ -16,21 +16,22 @@ export default function openBoardSocketConnection(boardId, userId) {
     reconnectionDelay: 1000,
   });
 
-  socket.on('custom_error', (error) => {
+  socket.on('custom_error', () => {
     addToast({
       color: 'danger',
       severity: 'danger',
-      title: settingsStore.t.toasts.socketError.title,
-      description: settingsStore.t.toasts.socketError.description,
+      title: settingsStore.t.toasts.socket.socketError.title,
+      description: settingsStore.t.toasts.socket.socketError.description,
     });
   });
 
-  socket.on('connect_error', (error) => {
+  socket.on('connect_error', () => {
     addToast({
       color: 'danger',
       severity: 'danger',
-      title: settingsStore.t.toasts.socketConnectionError.title,
-      description: settingsStore.t.toasts.socketConnectionError.description,
+      title: settingsStore.t.toasts.socket.socketConnectionError.title,
+      description:
+        settingsStore.t.toasts.socket.socketConnectionError.description,
     });
   });
 

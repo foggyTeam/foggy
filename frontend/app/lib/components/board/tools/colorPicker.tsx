@@ -36,7 +36,6 @@ export default function ColorPicker({
                 .writeText(value)
                 .catch(() =>
                   addToast({
-                    color: 'danger',
                     severity: 'danger',
                     title: settingsStore.t.toasts.copyError,
                   }),

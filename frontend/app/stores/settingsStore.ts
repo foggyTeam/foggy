@@ -27,7 +27,6 @@ class SettingsStore {
       });
     } catch (e: any) {
       addToast({
-        color: 'danger',
         severity: 'danger',
         title: this.t.toasts.localeError,
       });
@@ -40,7 +39,6 @@ class SettingsStore {
           await updateLocale(locale);
         } catch (e: any) {
           addToast({
-            color: 'danger',
             severity: 'danger',
             title: this.t.toasts.localeError,
           });

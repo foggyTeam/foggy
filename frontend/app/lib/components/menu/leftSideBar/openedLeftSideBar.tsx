@@ -167,7 +167,7 @@ const OpenedLeftSideBar = observer(
             await DeleteBoard(nodeToRemove.id);
             addToast({
               severity: 'success',
-              title: settingsStore.t.toasts.deleteBoardSuccess,
+              title: settingsStore.t.toasts.board.deleteBoardSuccess,
             });
             projectsStore.deleteProjectChild(
               nodeToRemove.id,
@@ -177,7 +177,7 @@ const OpenedLeftSideBar = observer(
         } catch (error) {
           addToast({
             severity: 'danger',
-            title: settingsStore.t.toasts.deleteBoardError,
+            title: settingsStore.t.toasts.board.deleteBoardError,
             description: error,
           });
         }

@@ -68,8 +68,9 @@ class ProjectsStore {
     } else
       addToast({
         severity: 'danger',
-        title: settingsStore.t.toasts.socketConnectionError.title,
-        description: settingsStore.t.toasts.socketConnectionError.description,
+        title: settingsStore.t.toasts.socket.socketConnectionError.title,
+        description:
+          settingsStore.t.toasts.socket.socketConnectionError.description,
       });
   }
   disconnectSocket() {
@@ -121,7 +122,7 @@ class ProjectsStore {
       addToast({
         color: 'danger',
         severity: 'danger',
-        title: settingsStore.t.toasts.boardElementNotFound,
+        title: settingsStore.t.toasts.board.boardElementNotFound,
       });
       return { layer: -1, index: -1 };
     }
@@ -243,7 +244,11 @@ class ProjectsStore {
         ...this.activeBoard.layers[newPosition.layer],
       ];
     } catch (error) {
-      console.error('An error occured!');
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.socket.socketDataError.title,
+        description: settingsStore.t.toasts.socket.socketDataError.description,
+      });
     }
   };
   removeElement = (id: string, external?: boolean) => {
@@ -406,7 +411,10 @@ class ProjectsStore {
 
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
-        console.error('Не удалось добавить элемент');
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.noParent,
+        });
         return;
       }
 
@@ -445,14 +453,20 @@ class ProjectsStore {
 
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
-        console.error('Не удалось обновить элемент');
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.updateSectionError,
+        });
         return;
       }
 
       if (i === parentSections.length - 1) {
         const targetItem = nextSection.children.get(id);
         if (!targetItem) {
-          console.error('Элемент не найден');
+          addToast({
+            severity: 'danger',
+            title: settingsStore.t.toasts.project.noParent,
+          });
           return;
         }
 
@@ -463,7 +477,10 @@ class ProjectsStore {
     if (parentSections.length === 0) {
       const targetItem = this.activeProject.sections.get(id);
       if (!targetItem) {
-        console.error('Элемент не найден');
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.sectionNotFound,
+        });
         return;
       }
 
@@ -485,7 +502,10 @@ class ProjectsStore {
 
       // если секция не найдена или структура некорректна
       if (!nextSection || !('children' in nextSection)) {
-        console.error('Не удалось удалить элемент');
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.deleteSectionError,
+        });
         return;
       }
 
@@ -549,7 +569,10 @@ class ProjectsStore {
     createParents: boolean = false,
   ) => {
     if (!this.activeProject) {
-      console.error('Select a project!');
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.project.noActive,
+      });
       return;
     }
     const child = ConvertRawSection(rawSection);
@@ -602,7 +625,10 @@ class ProjectsStore {
           current.set(sectionId, newParent);
           found = newParent;
         } else {
-          console.error('Родитель не найден');
+          addToast({
+            severity: 'danger',
+            title: settingsStore.t.toasts.project.noParent,
+          });
           return;
         }
       }
@@ -612,7 +638,10 @@ class ProjectsStore {
     }
 
     if (!parentSection) {
-      console.error('Section not found!');
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.project.sectionNotFound,
+      });
       return;
     }
 

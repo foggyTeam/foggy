@@ -52,7 +52,7 @@ export default function StrokeTool() {
         addToast({
           color: 'warning',
           severity: 'warning',
-          title: settingsStore.t.toasts.boardElementInvisible,
+          title: settingsStore.t.toasts.board.boardElementInvisible,
         });
     } else {
       if (

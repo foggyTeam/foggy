@@ -35,7 +35,7 @@ export default function ProjectLoader({
     else
       addToast({
         severity: 'danger',
-        title: settingsStore.t.toasts.updateProjectError,
+        title: settingsStore.t.toasts.project.updateProjectError,
       });
   }, [projectData, revalidatedData, error]);
 

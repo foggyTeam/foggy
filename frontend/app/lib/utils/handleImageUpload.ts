@@ -1,3 +1,6 @@
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
+
 function handleImageUpload(image: File, minSize: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -50,12 +53,18 @@ export default async function HandleImageUpload(event: any, minSize = 288) {
   const image = event.target.files[0];
   if (image) {
     if (!image.type.startsWith('image/')) {
-      console.error('File is not an image');
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.image.notImage,
+      });
       return null;
     }
 
-    const resizedImage = await handleImageUpload(image, minSize).catch(
-      (error) => console.error(error),
+    const resizedImage = await handleImageUpload(image, minSize).catch(() =>
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.image.resizeImageError,
+      }),
     );
     if (!resizedImage) return null;
 

@@ -23,6 +23,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
+import { addToast } from '@heroui/toast';
 
 const ProjectSettingsModal = observer(
   ({
@@ -59,9 +60,11 @@ const ProjectSettingsModal = observer(
         setCheckboxes(
           projectsStore.activeProject.settings || new ProjectSettings(),
         );
-      } else if (!isNewProject) {
-        console.error('No active project!');
-      }
+      } else if (!isNewProject)
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.noActive,
+        });
     }, [isNewProject]);
 
     useEffect(() => {
@@ -77,24 +80,45 @@ const ProjectSettingsModal = observer(
         if ('url' in response) {
           if (avatar)
             await deleteImage(avatar).then((response) => {
-              if ('error' in response) console.error(response.error);
+              if ('error' in response)
+                addToast({
+                  severity: 'warning',
+                  title: settingsStore.t.toasts.image.deleteImageWarning,
+                });
             });
           setAvatar(response.url);
-        } else console.error(response.error);
+        } else
+          addToast({
+            severity: 'danger',
+            title: settingsStore.t.toasts.image.uploadImageError,
+            description: response.error,
+          });
       }
     };
 
     const deleteProject = async () => {
       if (projectsStore.activeProject) {
         await DeleteProject(projectsStore.activeProject.id)
-          .catch((error) => console.error(error))
+          .catch((error) =>
+            addToast({
+              severity: 'danger',
+              title: settingsStore.t.toasts.project.deleteProjectError,
+              description: error,
+            }),
+          )
           .then(() => {
             projectsStore.setActiveProject(null);
-            console.info('successfully deleted');
+            addToast({
+              severity: 'success',
+              title: settingsStore.t.toasts.project.deleteProjectSuccess,
+            });
             router.push('/');
           });
       } else {
-        console.error('No active project!');
+        addToast({
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.noActive,
+        });
       }
     };
 
@@ -140,7 +164,13 @@ const ProjectSettingsModal = observer(
                 router.push(`/project/${newProject.id}`);
               }
             })
-            .catch((error) => console.error(error))
+            .catch((error) =>
+              addToast({
+                severity: 'danger',
+                title: settingsStore.t.toasts.project.addProjectError,
+                description: error,
+              }),
+            )
             .finally(() => setIsSaving(false));
         } else if (projectsStore.activeProject) {
           await UpdateProject(projectsStore.activeProject.id, updatedData)
@@ -151,9 +181,15 @@ const ProjectSettingsModal = observer(
                 ) !== -1
               ) {
                 setErrors(result.errors);
-                console.error(result);
+                addToast({
+                  severity: 'danger',
+                  title: settingsStore.t.toasts.project.updateProjectError,
+                });
               } else {
-                console.info('Success');
+                addToast({
+                  severity: 'success',
+                  title: settingsStore.t.toasts.project.updateProjectSuccess,
+                });
               }
             })
             .finally(() => setIsSaving(false));

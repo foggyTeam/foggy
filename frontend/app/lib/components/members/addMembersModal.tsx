@@ -49,7 +49,7 @@ const AddMembersModal = observer(
         }).catch((error: any) =>
           addToast({
             severity: 'danger',
-            title: settingsStore.t.toasts.signOutError,
+            title: settingsStore.t.toasts.members.addMemberError,
             description: error,
           }),
         );

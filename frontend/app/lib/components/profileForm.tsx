@@ -120,7 +120,7 @@ const ProfileForm = observer((userData: ProfileData) => {
             setErrors(result.errors);
             addToast({
               severity: 'danger',
-              title: settingsStore.t.toasts.updateUserDataError,
+              title: settingsStore.t.toasts.user.updateUserDataError,
             });
           }
         })
@@ -139,7 +139,7 @@ const ProfileForm = observer((userData: ProfileData) => {
       )
         addToast({
           severity: 'danger',
-          title: settingsStore.t.toasts.deleteUserSuccess,
+          title: settingsStore.t.toasts.user.deleteUserSuccess,
         });
     });
     await onSignOut();
@@ -151,7 +151,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         if ('error' in response)
           addToast({
             severity: 'danger',
-            title: settingsStore.t.toasts.deleteUserImageError,
+            title: settingsStore.t.toasts.user.deleteUserImageError,
           });
       });
   };

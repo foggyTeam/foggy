@@ -16,14 +16,14 @@ const UserLoader = ({ userData }: { userData: User | undefined }) => {
       signOut({ redirectTo: '/login' }).catch(() =>
         addToast({
           severity: 'danger',
-          title: settingsStore.t.toasts.signOutError,
+          title: settingsStore.t.toasts.user.signOutError,
         }),
       );
       userStore.clearUser();
       ClearUserSession().catch(() =>
         addToast({
           severity: 'danger',
-          title: settingsStore.t.toasts.signOutError,
+          title: settingsStore.t.toasts.user.signOutError,
         }),
       );
     }
