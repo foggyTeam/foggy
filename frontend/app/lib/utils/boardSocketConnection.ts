@@ -1,6 +1,8 @@
 import io, { Socket } from 'socket.io-client';
 import { BoardElement } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 export default function openBoardSocketConnection(boardId, userId) {
   const socket = io(`${process.env.NEXT_PUBLIC_API_URI}/elements`, {
@@ -14,20 +16,23 @@ export default function openBoardSocketConnection(boardId, userId) {
     reconnectionDelay: 1000,
   });
 
-  socket.on('connect', () => {
-    console.log('Socket connected');
+  socket.on('custom_error', () => {
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.socket.socketError.title,
+      description: settingsStore.t.toasts.socket.socketError.description,
+    });
   });
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected');
-  });
-
-  socket.on('custom_error', (error) => {
-    console.error('Socket error:', error);
-  });
-
-  socket.on('connect_error', (error) => {
-    console.error('Socket connection error:', error);
+  socket.on('connect_error', () => {
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.socket.socketConnectionError.title,
+      description:
+        settingsStore.t.toasts.socket.socketConnectionError.description,
+    });
   });
 
   return socket;

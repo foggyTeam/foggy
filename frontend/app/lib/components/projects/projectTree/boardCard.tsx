@@ -10,6 +10,8 @@ import { TrashIcon } from 'lucide-react';
 import NameInput from '@/app/lib/components/projects/projectTree/nameInput';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateBoard } from '@/app/lib/server/actions/projectServerActions';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 export default function BoardCard({
   parentList,
@@ -30,7 +32,13 @@ export default function BoardCard({
     await UpdateBoard(board.id, {
       name: newName,
     })
-      .catch((error) => console.error(error))
+      .catch(() =>
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.board.updateBoardError,
+        }),
+      )
       .then(() =>
         projectsStore.updateProjectChild(parentList, board.id, {
           name: newName,

@@ -18,6 +18,7 @@ import { Button } from '@heroui/button';
 import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
 import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
+import { addToast } from '@heroui/toast';
 
 const AddMembersModal = observer(
   ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: () => void }) => {
@@ -45,7 +46,14 @@ const AddMembersModal = observer(
         await AddProjectMember(projectsStore.activeProject.id, {
           userId: id,
           role: role[0],
-        }).catch((error) => console.error(error));
+        }).catch((error: any) =>
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.members.addMemberError,
+            description: error,
+          }),
+        );
       });
       setIsLoading(false);
       onOpenChange();

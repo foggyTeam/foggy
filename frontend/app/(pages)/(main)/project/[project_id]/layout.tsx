@@ -2,18 +2,16 @@ import React from 'react';
 import { RawProject } from '@/app/lib/types/definitions';
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
 import { GetProject } from '@/app/lib/server/actions/projectServerActions';
+import { notFound } from 'next/navigation';
 
 interface ProjectPageProps {
   project_id: string;
 }
 
 async function getProject(id: string): Promise<RawProject | undefined> {
-  try {
-    return GetProject(id);
-  } catch (e) {
-    console.error('Project with this id does not exist.', e);
-    return undefined;
-  }
+  const project = await GetProject(id);
+  if (!project) notFound();
+  return project;
 }
 export default async function ProjectLayout({
   params,

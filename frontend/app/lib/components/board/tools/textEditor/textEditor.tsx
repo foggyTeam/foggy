@@ -1,9 +1,11 @@
+'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
 import 'quill/dist/quill.core.css';
 import '@/app/lib/components/board/tools/textEditor/quillOverrides.css';
-import Quill from 'quill';
 import settingsStore from '@/app/stores/settingsStore';
 import TextEditorToolBar from '@/app/lib/components/board/tools/textEditor/textEditorToolBar';
+import type QuillType from 'quill';
 
 export default function CustomTextEditor({
   top,
@@ -22,7 +24,7 @@ export default function CustomTextEditor({
   setHeight: any;
   width?: number;
 }) {
-  const quillRef = useRef<Quill | null>(null);
+  const quillRef = useRef<QuillType | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
 
   const [selectionFormat, setSelectionFormat] = useState({} as any);
@@ -32,27 +34,31 @@ export default function CustomTextEditor({
     if (editorContainerRef.current) {
       editorContainerRef.current.innerHTML = content || '';
 
-      const quill: Quill = new Quill(editorContainerRef.current, {
-        theme: 'snow',
-        modules: {
-          toolbar: false,
-        },
-        placeholder: settingsStore.t.toolBar.textToolPlaceholder,
-      });
+      import('quill').then((QuillModule) => {
+        const Quill = QuillModule.default ?? QuillModule;
 
-      quillRef.current = quill;
+        const quill = new Quill(editorContainerRef.current, {
+          theme: 'snow',
+          modules: {
+            toolbar: false,
+          },
+          placeholder: settingsStore.t.toolBar.textToolPlaceholder,
+        });
 
-      quill.on('selection-change', () => {
-        if (quill.getSelection()) {
-          const format = quill.getFormat();
-          setSelectionFormat(format);
-        }
-      });
+        quillRef.current = quill;
 
-      quill.on('text-change', () => {
-        const content = quill.root.innerHTML;
-        setHeight(editorContainerRef.current?.clientHeight);
-        setContent(content);
+        quill.on('selection-change', () => {
+          if (quill.getSelection()) {
+            const format = quill.getFormat();
+            setSelectionFormat(format);
+          }
+        });
+
+        quill.on('text-change', () => {
+          const content = quill.root.innerHTML;
+          setHeight(editorContainerRef.current?.clientHeight);
+          setContent(content);
+        });
       });
     }
   }, [setContent]);

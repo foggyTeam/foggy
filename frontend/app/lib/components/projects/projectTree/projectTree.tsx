@@ -20,6 +20,7 @@ import {
   DeleteSection,
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
+import { addToast } from '@heroui/toast';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
@@ -71,9 +72,14 @@ const ProjectTree = observer(() => {
     if (nodeToRemove && projectsStore.activeProject) {
       if (nodeToRemove.isSection) {
         await DeleteSection(projectsStore.activeProject.id, nodeToRemove.id)
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.project.deleteSectionError,
+            }),
+          )
           .then(() => {
-            console.info('success');
             projectsStore.deleteProjectChild(
               nodeToRemove.id,
               nodeToRemove.parentList,
@@ -81,13 +87,23 @@ const ProjectTree = observer(() => {
           });
       } else {
         await DeleteBoard(nodeToRemove.id)
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.board.deleteBoardError,
+            }),
+          )
           .then(() => {
-            console.info('success');
             projectsStore.deleteProjectChild(
               nodeToRemove.id,
               nodeToRemove.parentList,
             );
+            addToast({
+              color: 'success',
+              severity: 'success',
+              title: settingsStore.t.toasts.board.deleteBoardSuccess,
+            });
           });
       }
     }
@@ -110,7 +126,13 @@ const ProjectTree = observer(() => {
           name: nodeName,
           parentSectionId,
         })
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.project.addSectionError,
+            }),
+          )
           .then((response: { data: { id: string } }) => {
             const newSection: ProjectSection = {
               children: new Map(),
@@ -127,7 +149,13 @@ const ProjectTree = observer(() => {
           type: nodeType.toLowerCase(),
           sectionId: parentSectionId,
         })
-          .catch((error) => console.error(error))
+          .catch(() =>
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.board.addBoardError,
+            }),
+          )
           .then((response: { data: { id: string } }) => {
             const newBoard: Board = {
               id: response.data.id,
@@ -146,7 +174,13 @@ const ProjectTree = observer(() => {
   const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;
     await GetSection(projectsStore.activeProject.id, id)
-      .catch((error) => console.error(error))
+      .catch(() =>
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.getSectionError,
+        }),
+      )
       .then((result) => {
         projectsStore.insertProjectChild(parentList, result);
       });

@@ -11,6 +11,8 @@ import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
 import { observer } from 'mobx-react-lite';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 const SubSectionCard = observer(
   ({ parentList, id }: { parentList: string[]; id: string }) => {
@@ -30,7 +32,13 @@ const SubSectionCard = observer(
       await UpdateSection(projectsStore.activeProject.id, subSection.id, {
         name: newName,
       })
-        .catch((error) => console.error(error))
+        .catch(() =>
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.project.updateSectionError,
+          }),
+        )
         .then(() => {
           projectsStore.updateProjectChild(parentList, subSection.id, {
             name: newName,
