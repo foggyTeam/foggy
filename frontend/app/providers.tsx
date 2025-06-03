@@ -14,12 +14,7 @@ export function Providers({
 }) {
   return (
     <SessionProvider session={session}>
-      <ToastProvider
-        toastOffset={4}
-        toastProps={{
-          variant: 'flat',
-        }}
-      />
+      <ToastProvider toastOffset={4} />
       <HeroUIProvider>{children}</HeroUIProvider>
     </SessionProvider>
   );

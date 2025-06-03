@@ -1,3 +1,5 @@
+'use client';
+
 import { Layer } from 'react-konva';
 import { useEffect, useState } from 'react';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';

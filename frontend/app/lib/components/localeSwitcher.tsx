@@ -1,17 +1,32 @@
 'use client';
 
 import { Button } from '@heroui/button';
-import SettingsStore from '@/app/stores/settingsStore';
+import settingsStore from '@/app/stores/settingsStore';
 import { observer } from 'mobx-react-lite';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { getLocale } from '@/app/lib/locale';
+import { addToast } from '@heroui/toast';
 
 const LocaleSwitcher = observer(() => {
+  useEffect(() => {
+    try {
+      getLocale().then((l) => {
+        settingsStore.setLocale(l);
+      });
+    } catch (e: any) {
+      addToast({
+        severity: 'danger',
+        title: settingsStore.t.toasts.localeError,
+      });
+    }
+  }, []);
+
   return (
     <div className="invisible absolute bottom-4 right-4 z-50 sm:visible">
       <Button
         onPress={() => {
-          if (SettingsStore.locale == 'en') SettingsStore.setLocale('ru');
-          else SettingsStore.setLocale('en');
+          if (settingsStore.locale == 'en') settingsStore.setLocale('ru');
+          else settingsStore.setLocale('en');
         }}
         isIconOnly
         color="secondary"
@@ -19,7 +34,7 @@ const LocaleSwitcher = observer(() => {
         size="md"
         className="font-semibold"
       >
-        {SettingsStore.locale.toUpperCase()}
+        {settingsStore.locale.toUpperCase()}
       </Button>
     </div>
   );

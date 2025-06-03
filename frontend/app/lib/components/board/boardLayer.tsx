@@ -1,3 +1,5 @@
+'use client';
+
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';

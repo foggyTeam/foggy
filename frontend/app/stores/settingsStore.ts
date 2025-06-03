@@ -8,7 +8,7 @@ import {
 import en from '../lib/dictionaries/en/dictionary';
 import ru from '../lib/dictionaries/ru/dictionary';
 import { AvailableLocales } from '@/app/lib/types/definitions';
-import { getLocale, updateLocale } from '@/app/lib/locale';
+import { updateLocale } from '@/app/lib/locale';
 import { addToast } from '@heroui/toast';
 
 class SettingsStore {
@@ -20,17 +20,6 @@ class SettingsStore {
       t: computed,
       setLocale: action,
     });
-
-    try {
-      getLocale().then((l) => {
-        this.setLocale(l);
-      });
-    } catch (e: any) {
-      addToast({
-        severity: 'danger',
-        title: this.t.toasts.localeError,
-      });
-    }
 
     reaction(
       () => this.locale,
