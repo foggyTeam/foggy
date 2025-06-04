@@ -176,11 +176,11 @@ export class UsersService {
     };
   }
 
-  async getUserNicknames(
+  async getUserDetails(
     userIds: Types.ObjectId[],
-  ): Promise<{ _id: Types.ObjectId; nickname: string }[]> {
+  ): Promise<{ _id: Types.ObjectId; nickname: string; avatar: string }[]> {
     return this.userModel
-      .find({ _id: { $in: userIds } }, { _id: 1, nickname: 1 })
+      .find({ _id: { $in: userIds } }, { _id: 1, nickname: 1, avatar: 1 })
       .lean()
       .exec();
   }

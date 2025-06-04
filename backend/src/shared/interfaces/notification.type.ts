@@ -4,17 +4,23 @@ import { EntityType, NotificationType, Role } from '../types/enums';
 export interface NotificationResponse {
   id: Types.ObjectId;
   type: NotificationType;
-  initiator: Types.ObjectId;
+  initiator: {
+    id: Types.ObjectId;
+    nickname: string;
+    avatar: string;
+  };
   target:
     | {
         type: EntityType.USER;
         id: Types.ObjectId;
         nickname: string;
+        avatar: string;
       }
     | {
         type: EntityType.PROJECT;
         id: Types.ObjectId;
         name: string;
+        avatar: string;
       }
     | {
         type: Exclude<EntityType, EntityType.USER | EntityType.PROJECT>;
@@ -22,6 +28,7 @@ export interface NotificationResponse {
       }
     | null;
   metadata: NotificationMetadata;
+  createdAt: Date;
   isRead: boolean;
 }
 

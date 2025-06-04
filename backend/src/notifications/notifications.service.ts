@@ -64,29 +64,46 @@ export class NotificationService {
     };
 
     for (const notif of notifications) {
-      ['initiator', 'target'].forEach((field) => {
-        const ref = notif[field];
-        if (ref?.type === EntityType.USER) {
-          entityIds[EntityType.USER].add(ref.id.toString());
-        }
-        if (ref?.type === EntityType.PROJECT) {
-          entityIds[EntityType.PROJECT].add(ref.id.toString());
-        }
-      });
+      entityIds[EntityType.USER].add(notif.initiator.toString());
+
+      if (notif.target?.type === EntityType.USER) {
+        entityIds[EntityType.USER].add(notif.target.id.toString());
+      }
+
+      if (notif.target?.type === EntityType.PROJECT) {
+        entityIds[EntityType.PROJECT].add(notif.target.id.toString());
+      }
     }
 
-    const users = await this.usersService.getUserNicknames(
+    const users = await this.usersService.getUserDetails(
       Array.from(entityIds[EntityType.USER]).map(
         (id) => new Types.ObjectId(id),
       ),
     );
-    const projectIds = Array.from(entityIds[EntityType.PROJECT]).map(
-      (id) => new Types.ObjectId(id),
+    const projects = await this.projectService.getProjectDetails(
+      Array.from(entityIds[EntityType.PROJECT]).map(
+        (id) => new Types.ObjectId(id),
+      ),
     );
-    const projects = await this.projectService.getProjectNames(projectIds);
 
-    const userMap = new Map(users.map((u) => [u._id.toString(), u.nickname]));
-    const projectMap = new Map(projects.map((p) => [p._id.toString(), p.name]));
+    const userMap = new Map(
+      users.map((u) => [
+        u._id.toString(),
+        {
+          nickname: u.nickname,
+          avatar: u.avatar,
+        },
+      ]),
+    );
+    const projectMap = new Map(
+      projects.map((p) => [
+        p._id.toString(),
+        {
+          name: p.name,
+          avatar: p.avatar,
+        },
+      ]),
+    );
 
     return notifications.map((notif) => {
       const recipient = notif.recipients.find((r) => r.userId.equals(userId));
@@ -94,17 +111,21 @@ export class NotificationService {
       const mapEntity = (ref: any) => {
         if (!ref) return null;
         if (ref.type === EntityType.USER) {
+          const userInfo = userMap.get(ref.id.toString());
           return {
             type: EntityType.USER,
             id: ref.id,
-            nickname: userMap.get(ref.id.toString()),
+            nickname: userInfo?.nickname,
+            avatar: userInfo?.avatar,
           };
         }
         if (ref.type === EntityType.PROJECT) {
+          const projectInfo = projectMap.get(ref.id.toString());
           return {
             type: EntityType.PROJECT,
             id: ref.id,
-            name: projectMap.get(ref.id.toString()),
+            name: projectInfo?.name,
+            avatar: projectInfo?.avatar,
           };
         }
         return {
@@ -112,13 +133,19 @@ export class NotificationService {
           id: ref.id,
         };
       };
+      const initiatorInfo = userMap.get(notif.initiator.toString());
 
       return {
         id: notif._id,
         type: notif.type,
-        initiator: notif.initiator,
+        initiator: {
+          id: notif.initiator,
+          nickname: initiatorInfo?.nickname,
+          avatar: initiatorInfo?.avatar,
+        },
         target: mapEntity(notif.target),
         metadata: notif.metadata as NotificationMetadata,
+        createdAt: notif.createdAt,
         isRead: !!recipient?.isRead,
       } as NotificationResponse;
     });
