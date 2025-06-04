@@ -58,7 +58,12 @@ export default function ProjectCard(project: Project) {
               !isExpanded && 'max-w-40',
             )}
           >
-            <a href={`project/${project.id}`}>{project.name}</a>
+            <a
+              onClick={(event) => event.stopPropagation()}
+              href={`project/${project.id}`}
+            >
+              {project.name}
+            </a>
           </h1>
         </div>
         <Button
