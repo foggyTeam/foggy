@@ -152,3 +152,35 @@ export class FilterSet {
   role: Set<Role> = new Set();
   lastChange: string = '';
 }
+
+// NOTIFICATIONS
+export type NotificationTarget = {
+  type: 'PROJECT' | 'TEAM';
+  id: string;
+  name: string;
+  avatar?: string;
+};
+export type NotificationType =
+  | 'PROJECT_INVITE'
+  | 'TEAM_INVITE'
+  | 'PROJECT_JOIN_REQUEST'
+  | 'PROJECT_JOIN_ACCEPTED'
+  | 'PROJECT_JOIN_REJECTED'
+  | 'TEAM_JOIN_REQUEST'
+  | 'TEAM_JOIN_ACCEPTED'
+  | 'TEAM_JOIN_REJECTED'
+  | 'PROJECT_MEMBER_ADDED'
+  | 'TEAM_MEMBER_ADDED';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  initiator: {
+    id: string;
+    nickname: string;
+    avatar?: string;
+  };
+  target: NotificationTarget;
+  metadata: { role: Role; customMessage?: string; expiresAt?: string };
+  createdAt: string;
+}

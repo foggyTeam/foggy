@@ -8,6 +8,7 @@ import { Button } from '@heroui/button';
 import { bg_container, right_sidebar_layout } from '@/app/lib/types/styles';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
+import notificationsStore from '@/app/stores/notificationsStore';
 
 const ClosedRightSideBar = observer(
   ({
@@ -44,14 +45,16 @@ const ClosedRightSideBar = observer(
             color="default"
           />
         </Button>
-        {
-          // TODO: add real notifications number
-        }
         <Badge
           showOutline={false}
+          isInvisible={!notificationsStore.unreadNumber}
           size="sm"
           color="success"
-          content={15 < 100 ? 15 : '99+'}
+          content={
+            notificationsStore.unreadNumber < 100
+              ? notificationsStore.unreadNumber
+              : '99+'
+          }
           variant="flat"
           shape="circle"
         >

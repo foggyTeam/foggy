@@ -360,12 +360,11 @@ export class ProjectService {
     };
   }
 
-  async getProjectNames(
+  async getProjectDetails(
     projectIds: Types.ObjectId[],
-  ): Promise<{ _id: Types.ObjectId; name: string }[]> {
+  ): Promise<{ _id: Types.ObjectId; name: string; avatar: string }[]> {
     return this.projectModel
-      .find({ _id: { $in: projectIds } })
-      .select('_id name')
+      .find({ _id: { $in: projectIds } }, { _id: 1, name: 1, avatar: 1 })
       .lean()
       .exec();
   }
