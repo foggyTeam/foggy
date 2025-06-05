@@ -40,7 +40,7 @@ class NotificationsStore {
   };
   deleteNotification = (id: string) => {
     this.notifications = [
-      ...this.notifications.filter((notification) => notification.id === id),
+      ...this.notifications.filter((notification) => notification.id !== id),
     ];
   };
 }
