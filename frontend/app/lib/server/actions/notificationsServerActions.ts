@@ -26,39 +26,6 @@ export async function DeleteNotification(notificationId: string) {
   });
 }
 
-const expirationTimesMap: Record<string, number | null> = {
-  '24h': 24 * 60 * 60 * 1000,
-  '7d': 7 * 24 * 60 * 60 * 1000,
-  '30d': 30 * 24 * 60 * 60 * 1000,
-  '3m': 3 * 31 * 24 * 60 * 60 * 1000,
-  '6m': 6 * 31 * 24 * 60 * 60 * 1000,
-  '12m': 12 * 31 * 24 * 60 * 60 * 1000,
-  never: 10 * 12 * 31 * 24 * 60 * 60 * 1000,
-};
-function getExpiresAt(term: keyof typeof expirationTimesMap) {
-  const ms = expirationTimesMap[term];
-  return new Date(Date.now() + ms).toISOString();
-}
-export async function InviteInProject(
-  memberId: string,
-  projectId: string,
-  role: Role,
-  expirationTime: keyof typeof expirationTimesMap,
-) {
-  return postRequest(
-    `notifications/project-invite`,
-    {
-      recipientId: memberId,
-      projectId,
-      role,
-      expiresAt: getExpiresAt(expirationTime),
-    },
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
-}
-
 export async function JoinProjectRequest(
   projectId: string,
   role: Role,

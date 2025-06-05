@@ -19,13 +19,34 @@ export async function SearchUsers(data: {
   });
 }
 
+const expirationTimesMap: Record<string, number | null> = {
+  '24h': 24 * 60 * 60 * 1000,
+  '7d': 7 * 24 * 60 * 60 * 1000,
+  '30d': 30 * 24 * 60 * 60 * 1000,
+  '3m': 3 * 31 * 24 * 60 * 60 * 1000,
+  '6m': 6 * 31 * 24 * 60 * 60 * 1000,
+  '12m': 12 * 31 * 24 * 60 * 60 * 1000,
+  never: 10 * 12 * 31 * 24 * 60 * 60 * 1000,
+};
+function getExpiresAt(term: keyof typeof expirationTimesMap) {
+  const ms = expirationTimesMap[term];
+  return new Date(Date.now() + ms).toISOString();
+}
 export async function AddProjectMember(
   projectId: string,
-  data: { userId: string; role: Omit<Role, 'owner'> },
+  data: {
+    userId: string;
+    role: Omit<Role, 'owner'>;
+    expirationTime: keyof typeof expirationTimesMap;
+  },
 ) {
-  return await postRequest(`projects/${projectId}/users`, data, {
-    headers: { 'x-user-id': await getUserId() },
-  });
+  return await postRequest(
+    `projects/${projectId}/users`,
+    { ...data, expiresAt: getExpiresAt(data.expirationTime) },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
 }
 
 export async function UpdateProjectMemberRole(
