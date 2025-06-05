@@ -219,11 +219,11 @@
     },
     "invite": {
       "team": {
-        "description1": "USER invites you in team NAME as ",
+        "description1": "USER invites you to team NAME as ",
         "description2": ". Accept?"
       },
       "project": {
-        "description1": "USER invites you in project NAME as ",
+        "description1": "USER invites you to project NAME as ",
         "description2": ". Accept?"
       }
     },
