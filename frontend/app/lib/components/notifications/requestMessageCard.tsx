@@ -21,13 +21,20 @@ export default function RequestMessageCard({
         <div className="flex w-full items-center justify-start gap-1">
           <Avatar
             classNames={{
-              base: 'h-7 w-7 border-default-200 border-2',
+              base: clsx(onExpand && 'h-7 w-7', 'border-default-200 border-2'),
             }}
             color="primary"
             src={avatar}
             name={nickname}
           />
-          <p className="text-xs font-bold text-default-700">{nickname}</p>
+          <p
+            className={clsx(
+              'font-bold text-default-700',
+              onExpand ? 'text-xs' : 'text-sm',
+            )}
+          >
+            {nickname}
+          </p>
         </div>
         {onExpand && (
           <Button
@@ -44,8 +51,8 @@ export default function RequestMessageCard({
       <div className="w-full">
         <p
           className={clsx(
-            'w-full pr-0.5 text-start text-xs',
-            onExpand ? 'line-clamp-1' : 'line-clamp-none',
+            'w-full pr-0.5 text-start',
+            onExpand ? 'line-clamp-1 text-xs' : 'line-clamp-none text-sm',
           )}
         >
           {message}

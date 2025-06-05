@@ -237,7 +237,7 @@
       "project": {
         "description1": "USER wants to join project NAME as ",
         "description2": ". Accept?",
-        "accepted": "You made the project _ as",
+        "accepted": "You made the project _ as ",
         "rejected": "Project _ join request rejected"
       }
     },

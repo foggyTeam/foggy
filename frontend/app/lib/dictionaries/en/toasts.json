@@ -70,6 +70,11 @@
       "title": "Error",
       "description": "Filters have been reset."
     },
+    "notifications": {
+      "updateNotificationsError": "Failed to update notifications list",
+      "updateNotificationError": "Failed to update notification",
+      "updateNotificationsNumberError": "Failed to update unread number"
+    },
     "copyError": "Failed to copy to clipboard",
     "copySuccess": "Copied to clipboard",
     "globalError": "An unexpected error occurred",

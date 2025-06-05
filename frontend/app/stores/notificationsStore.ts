@@ -1,6 +1,7 @@
 import { action, makeAutoObservable, observable } from 'mobx';
 import { Notification, NotificationType } from '@/app/lib/types/definitions';
 import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 class NotificationsStore {
   notifications: Notification[] = [];
@@ -28,10 +29,14 @@ class NotificationsStore {
       (notification) => notification.id === id,
     );
     if (id < 0) {
-      addToast({ severity: 'danger', color: 'danger', title: 'failed' });
+      addToast({
+        severity: 'warning',
+        color: 'warning',
+        title: settingsStore.t.toasts.notifications.updateNotificationError,
+      });
       return;
     }
-    this.notifications[index].type = newType;
+    this.notifications[index] = { ...this.notifications[index], type: newType };
   };
   deleteNotification = (id: string) => {
     this.notifications = [

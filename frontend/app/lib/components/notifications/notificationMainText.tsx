@@ -11,11 +11,12 @@ export default function NotificationMainText({
   const roleColor: string = colorMap[metadata.role] || colorMap.default;
   const textClasses: string = 'h-fit w-full text-start text-default-700';
 
-  const replaceFields = (s: string) =>
-    s
-      .replace('_', target.name.toUpperCase)
-      .replace('NAME', target.name.toUpperCase())
+  const replaceFields = (s: string) => {
+    return s
+      .replace('_', (target?.name || '').toUpperCase())
+      .replace('NAME', (target?.name || '').toUpperCase())
       .replace('USER', initiator.nickname);
+  };
 
   switch (type) {
     case 'PROJECT_INVITE':
@@ -72,14 +73,14 @@ export default function NotificationMainText({
           {replaceFields(
             settingsStore.t.notifications.request.project.accepted,
           )}
-          <span style={{ color: roleColor }}>{metadata.role}</span>
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );
     case 'TEAM_JOIN_ACCEPTED':
       return (
         <p className={textClasses}>
           {replaceFields(settingsStore.t.notifications.request.team.accepted)}
-          <span style={{ color: roleColor }}>{metadata.role}</span>
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );
     case 'PROJECT_JOIN_REJECTED':
@@ -94,21 +95,21 @@ export default function NotificationMainText({
       return (
         <p className={textClasses}>
           {replaceFields(settingsStore.t.notifications.request.team.rejected)}
-          <span style={{ color: roleColor }}>{metadata.role}</span>
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );
     case 'PROJECT_MEMBER_ADDED':
       return (
         <p className={textClasses}>
           {replaceFields(settingsStore.t.notifications.newMember.project)}
-          <span style={{ color: roleColor }}>{metadata.role}</span>
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );
     case 'TEAM_MEMBER_ADDED':
       return (
         <p className={textClasses}>
           {replaceFields(settingsStore.t.notifications.newMember.team)}
-          <span style={{ color: roleColor }}>{metadata.role}</span>
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );
   }

@@ -9,6 +9,7 @@ import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import { GetUserById } from '@/app/lib/server/actions/userServerActions';
+import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
 
 async function getUser() {
   try {
@@ -59,6 +60,7 @@ export default async function MainLayout({
       <UserLoader userData={user} />
       <ProjectsLoader projectsData={userProjects} />
       <TeamsLoader teamsData={userTeams} />
+      <NotificationsLoader />
       <LeftSideBar />
       <RightSideBar />
       {children}
