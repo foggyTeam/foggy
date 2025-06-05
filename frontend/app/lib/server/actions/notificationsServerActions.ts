@@ -49,11 +49,11 @@ export async function AnswerNotification(
   accept: boolean,
 ) {
   if (accept) {
-    return postRequest(`notifications/${notificationId}/accept`, {
+    return postRequest(`notifications/${notificationId}/accept`, null, {
       headers: { 'x-user-id': await getUserId() },
     });
   } else {
-    return postRequest(`notifications/${notificationId}/reject`, {
+    return postRequest(`notifications/${notificationId}/reject`, null, {
       headers: { 'x-user-id': await getUserId() },
     });
   }
