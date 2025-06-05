@@ -205,6 +205,47 @@
     }
   },
 
+  "notifications": {
+    "answers": {
+      "accept": "Принять",
+      "accepted": "Принято",
+      "reject": "Отклонить",
+      "rejected": "Отклонено"
+    },
+    "titleType": {
+      "team": "Команда _",
+      "project": "Проект _"
+    },
+    "invite": {
+      "team": {
+        "description1": "USER приглашает вас в команду NAME как ",
+        "description2": ". Принять приглашение?"
+      },
+      "project": {
+        "description1": "USER приглашает вас в проект NAME как ",
+        "description2": ". Принять приглашение?"
+      }
+    },
+    "request": {
+      "team": {
+        "description1": "USER хочет присоединиться к команде NAME как ",
+        "description2": ". Принять заявку?",
+        "accepted": "Вы приняты в команду _ как ",
+        "rejected": "Заявка в команду _ отклонена"
+      },
+      "project": {
+        "description1": "USER хочет присоединиться к проекту NAME как ",
+        "description2": ". Принять заявку?",
+        "accepted": "Вы приняты в проект _ как ",
+        "rejected": "Заявка в проект _ отклонена"
+      }
+    },
+    "newMember": {
+      "team": "USER принят в команду NAME",
+      "project": "USER принят в проект NAME"
+    }
+  },
+
   "menu": {
     "tabs": {
       "projects": "ПРОЕКТЫ",

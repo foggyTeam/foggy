@@ -20,6 +20,7 @@ import { Select, SelectItem } from '@heroui/select';
 import settingsStore from '@/app/stores/settingsStore';
 import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
+import NotificationMainText from '@/app/lib/components/notifications/notificationMainText';
 
 export default function NotificationCard(notification: Notification) {
   const { onAnswer, onDelete }: NotificationsContextType =
@@ -45,6 +46,19 @@ export default function NotificationCard(notification: Notification) {
     };
   }, []);
 
+  const getTitle = () => {
+    function chooseTitle() {
+      switch (notification.target.type) {
+        case 'TEAM':
+          return settingsStore.t.notifications.titleType.team;
+        case 'PROJECT':
+          return settingsStore.t.notifications.titleType.project;
+      }
+    }
+
+    return chooseTitle().replace('_', notification.target.name.toUpperCase());
+  };
+
   return (
     <div
       ref={cardRef}
@@ -69,8 +83,7 @@ export default function NotificationCard(notification: Notification) {
             name={notification.target.name}
           />
           <h1 className="w-fit max-w-24 truncate text-nowrap font-medium">
-            {/*TODO: text based on notif content*/}
-            {notification.target.name}
+            {getTitle()}
           </h1>
         </div>
         <div className="flex h-full w-fit items-center justify-start gap-1">
@@ -91,76 +104,104 @@ export default function NotificationCard(notification: Notification) {
       </div>
       {isExpanded && (
         <div className="flex h-fit w-full flex-col gap-2">
-          <p className="h-fit w-full text-start text-default-700">
-            {notification.initiator.nickname} wants you to join her project{' '}
-            {notification.target.name.toUpperCase()} as editor. Accept?
-            {/*TODO: notification text*/}
-          </p>
-          <RequestMessageCard
-            onExpand={() => console.log('expand')}
-            nickname={notification.initiator.nickname}
-            avatar={notification.initiator.avatar}
-            message={notification.metadata.customMessage}
-          />
-          <Select
-            radius="full"
-            className="w-full"
-            variant="bordered"
-            size="sm"
-            classNames={{
-              popoverContent: clsx(
-                bg_container_no_padding,
-                'p-2 sm:p-3 bg-opacity-100',
-              ),
-            }}
-            selectedKeys={role}
-            onSelectionChange={(keys) => setRole(Array.from(keys) as Role[])}
-            placeholder={settingsStore.t.members.addMember.rolePlaceholder}
-            aria-label="select-role"
-            renderValue={(items) => {
-              return (
-                <div className="flex gap-1 overflow-hidden">
-                  {items.map((item) => (
-                    <RoleCard key={item.key} role={item.key as string} />
-                  ))}
-                </div>
-              );
-            }}
-          >
-            {rolesList
-              .filter((role) => role !== 'owner')
-              .map(
-                (role) =>
-                  (
-                    <SelectItem key={role} textValue={role}>
-                      <RoleCard role={role} />
-                    </SelectItem>
-                  ) as any,
-              )}
-          </Select>
-          <div className="flex w-full items-center justify-between gap-4">
-            <FButton
-              onPress={() => onAnswer(notification.id, false)}
-              variant="bordered"
-              color="danger"
-              size="sm"
-              className="text-small"
-              radius="full"
-            >
-              Decline
-            </FButton>
-            <FButton
-              onPress={() => onAnswer(notification.id, true, role[0])}
-              isDisabled={!role.length}
-              variant="flat"
-              color="success"
-              size="sm"
-              className="text-small"
-              radius="full"
-            >
-              Accept
-            </FButton>
-          </div>
+          <NotificationMainText {...notification} />
+          {notification.metadata.customMessage && (
+            <RequestMessageCard
+              onExpand={() => console.log('expand')}
+              nickname={notification.initiator.nickname}
+              avatar={notification.initiator.avatar}
+              message={notification.metadata.customMessage}
+            />
+          )}
+          {['PROJECT_MEMBER_ADDED', 'TEAM_MEMBER_ADDED'].findIndex(
+            (key) => key == notification.type.toString(),
+          ) < 0 && (
+            <>
+              <Select
+                isDisabled={
+                  ['PROJECT_JOIN_REQUEST'].findIndex(
+                    (key) => key == notification.type.toString(),
+                  ) < 0
+                }
+                radius="full"
+                className="w-full"
+                variant="bordered"
+                size="sm"
+                classNames={{
+                  popoverContent: clsx(
+                    bg_container_no_padding,
+                    'p-2 sm:p-3 bg-opacity-100',
+                  ),
+                }}
+                selectedKeys={role}
+                onSelectionChange={(keys) =>
+                  setRole(Array.from(keys) as Role[])
+                }
+                placeholder={settingsStore.t.members.addMember.rolePlaceholder}
+                aria-label="select-role"
+                renderValue={(items) => {
+                  return (
+                    <div className="flex gap-1 overflow-hidden">
+                      {items.map((item) => (
+                        <RoleCard key={item.key} role={item.key as string} />
+                      ))}
+                    </div>
+                  );
+                }}
+              >
+                {rolesList
+                  .filter((role) => role !== 'owner')
+                  .map(
+                    (role) =>
+                      (
+                        <SelectItem key={role} textValue={role}>
+                          <RoleCard role={role} />
+                        </SelectItem>
+                      ) as any,
+                  )}
+              </Select>
+              <div className="flex w-full items-center justify-between gap-4">
+                <FButton
+                  isDisabled={
+                    [
+                      'PROJECT_JOIN_ACCEPTED',
+                      'PROJECT_JOIN_REJECTED',
+                      'TEAM_JOIN_ACCEPTED',
+                      'TEAM_JOIN_REJECTED',
+                    ].findIndex((key) => key == notification.type.toString()) >=
+                    0
+                  }
+                  onPress={() => onAnswer(notification.id, false)}
+                  variant="bordered"
+                  color="danger"
+                  size="sm"
+                  className="text-small"
+                  radius="full"
+                >
+                  Decline
+                </FButton>
+                <FButton
+                  isDisabled={
+                    [
+                      'PROJECT_JOIN_ACCEPTED',
+                      'PROJECT_JOIN_REJECTED',
+                      'TEAM_JOIN_ACCEPTED',
+                      'TEAM_JOIN_REJECTED',
+                    ].findIndex((key) => key == notification.type.toString()) >=
+                      0 || !role.length
+                  }
+                  onPress={() => onAnswer(notification.id, true, role[0])}
+                  variant="flat"
+                  color="success"
+                  size="sm"
+                  className="text-small"
+                  radius="full"
+                >
+                  Accept
+                </FButton>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
