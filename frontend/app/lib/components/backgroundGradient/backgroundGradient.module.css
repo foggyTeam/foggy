@@ -1,0 +1,27 @@
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(0.8);
+  }
+  25% {
+    transform: translateY(48px) translateX(-64px) scale(1);
+  }
+  50% {
+    transform: translateY(64px) translateX(0px) scaleX(1.1);
+  }
+  85% {
+    transform: translateY(48px) translateX(64px) scaleY(1.1);
+  }
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3),
+    rgba(255, 255, 255, 0)
+  );
+  animation: float 10s ease-in-out infinite;
+  filter: blur(128px);
+}

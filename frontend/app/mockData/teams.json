@@ -1,0 +1,203 @@
+[
+  {
+    "id": "team-1",
+    "name": "Creative Minds",
+    "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_17-00-25-222.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-4",
+        "nickname": "CoachMaster",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230813_221251.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TechGuru",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b3.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-8",
+        "nickname": "Mentor8",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_114733.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "Brainstorm9",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b5.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-2",
+    "name": "Marketing Wizards",
+    "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_124747.png",
+    "favorite": false,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-3",
+        "nickname": "TeamPlayer",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_124849.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-5",
+        "nickname": "DesignWiz",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_16-55-16-775.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-6",
+        "nickname": "StratPro6",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b6.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-8",
+        "nickname": "Mentor8",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_114733.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-3",
+    "name": "Tech Innovators",
+    "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_122220.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-7",
+        "nickname": "TechGuru",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b3.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-6",
+        "nickname": "StratPro6",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b6.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-9",
+        "nickname": "Brainstorm9",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/b5.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-10",
+        "nickname": "ProjLead10",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_16-20-26-810.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-11",
+        "nickname": "ProjLead10",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_16-20-26-810.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-4",
+    "name": "Student Helpers",
+    "avatar": "https://storage.yandexcloud.net/foggy/mock/b1.png",
+    "favorite": false,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+        "role": "editor"
+      },
+      {
+        "id": "user-12",
+        "nickname": "Visionary",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_113312.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-13",
+        "nickname": "Collabor13",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_124747.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-15",
+        "nickname": "GoalAchiev",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_17-55-00-005.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-16",
+        "nickname": "DynLeader",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_16-10-46-468.png",
+        "role": "reader"
+      }
+    ],
+    "projects": []
+  },
+  {
+    "id": "team-5",
+    "name": "Event Coordinators",
+    "avatar": "https://storage.yandexcloud.net/foggy/mock/b4.png",
+    "favorite": true,
+    "members": [
+      {
+        "id": "67f18c3ece58d18c7ebaae02",
+        "nickname": "iciicifur",
+        "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-14",
+        "nickname": "ContentCrt",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_16-43-58-604.png",
+        "role": "owner"
+      },
+      {
+        "id": "user-17",
+        "nickname": "CodeExpert",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_114524.png",
+        "role": "reader"
+      },
+      {
+        "id": "user-18",
+        "nickname": "Organizer",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_122220.png",
+        "role": "admin"
+      },
+      {
+        "id": "user-19",
+        "nickname": "ProbSolver",
+        "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_164743.png",
+        "role": "editor"
+      }
+    ],
+    "projects": []
+  }
+]
