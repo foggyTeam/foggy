@@ -62,7 +62,7 @@ const LeftSideBar = observer(() => {
             addToast({
               color: 'danger',
               severity: 'danger',
-              title: settingsStore.t.toasts.project.project.addSectionError,
+              title: settingsStore.t.toasts.project.addSectionError,
             }),
           )
           .then((response: { data: { id: string } }) => {

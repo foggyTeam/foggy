@@ -17,7 +17,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
 import projectsStore from '@/app/stores/projectsStore';
 import RightSideBarElementCard from '@/app/lib/components/menu/rightSideBar/rightSideBarElementCard';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import teamsStore from '@/app/stores/teamsStore';
 import AllNotifications from '@/app/lib/components/notifications/allNotifications';
 
@@ -29,7 +29,7 @@ const OpenedRightSideBar = observer(
     closeSideBar,
   }: {
     activeTab: 'projects' | 'teams' | 'notifications';
-    setActiveTab: (newTab: 'projects' | 'teams' | 'notifications') => void;
+    setActiveTab: Dispatch<SetStateAction<any>>;
     isOpened: boolean;
     closeSideBar: () => void;
   }) => {

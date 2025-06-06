@@ -4,7 +4,10 @@ import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 
-export default function openBoardSocketConnection(boardId, userId) {
+export default function openBoardSocketConnection(
+  boardId: string,
+  userId: string,
+) {
   const socket = io(`${process.env.NEXT_PUBLIC_API_URI}/elements`, {
     auth: {
       boardId,

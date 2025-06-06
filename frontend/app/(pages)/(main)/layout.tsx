@@ -1,6 +1,5 @@
 import React from 'react';
 import RightSideBar from '@/app/lib/components/menu/rightSideBar/rightSideBar';
-import { User } from 'next-auth';
 import UserLoader from '@/app/lib/components/dataLoaders/userLoader';
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
@@ -10,6 +9,7 @@ import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import { GetUserById } from '@/app/lib/server/actions/userServerActions';
 import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
+import { User } from 'next-auth';
 
 async function getUser() {
   try {

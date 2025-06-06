@@ -1,9 +1,6 @@
 import { Notification, Role } from '@/app/lib/types/definitions';
-import {
-  NotificationsContext,
-  NotificationsContextType,
-} from '@/app/lib/components/notifications/allNotifications';
-import React, { useContext } from 'react';
+import { NotificationsContext } from '@/app/lib/components/notifications/allNotifications';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import {
   Modal,
   ModalBody,
@@ -27,12 +24,11 @@ export default function NotificationCardModal({
 }: {
   notification: Notification;
   role: Role | undefined;
-  setRole: (value: Role | undefined | ((prevState: Role) => Role)) => void;
+  setRole: Dispatch<SetStateAction<Role | undefined>>;
   isOpen: boolean;
   onOpenChange: () => void;
 }) {
-  const { onAnswer }: NotificationsContextType =
-    useContext(NotificationsContext);
+  const { onAnswer } = useContext(NotificationsContext);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>

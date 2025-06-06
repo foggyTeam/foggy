@@ -417,7 +417,7 @@ export const isElementVisible = (
 };
 
 const getElementId = (tool: string) => {
-  if (!userStore.user) return '';
+  if (!userStore.user?.id) return '';
   const userId = userStore.user.id;
   return `${tool}_${Date.now()}_${userId.slice(userId.length - 5, userId.length - 1)}`;
 };

@@ -78,7 +78,7 @@ const ProjectSettingsModal = observer(
       if (imageBlob) {
         const response = await uploadImage('projects_data', imageBlob);
 
-        if ('url' in response) {
+        if ('url' in response && response.url) {
           if (avatar)
             await deleteImage(avatar).then((response) => {
               if ('error' in response)
@@ -129,8 +129,6 @@ const ProjectSettingsModal = observer(
     };
 
     const onSubmit = async () => {
-      if (!userStore.user) return;
-
       if (!Object.keys(errors as any).length) {
         setIsSaving(true);
         const updatedData: Partial<Project> = {
@@ -152,13 +150,14 @@ const ProjectSettingsModal = observer(
               ) {
                 setErrors(result.errors);
               } else {
+                if (!userStore.user) return;
                 const newProject = {
                   id: result.data.id,
                   members: [
                     {
                       id: userStore.user.id,
-                      nickname: userStore.user.nickname,
-                      avatar: userStore.user.avatar,
+                      nickname: userStore.user.name,
+                      avatar: userStore.user.image,
                       role: 'owner',
                     },
                   ],
@@ -209,7 +208,7 @@ const ProjectSettingsModal = observer(
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
         <ModalContent className="w-2xl flex max-w-2xl gap-2 overflow-visible p-6">
-          {(onClose) =>
+          {() =>
             (
               <ModalBody className="w-2xl flex h-fit max-w-2xl gap-2 p-0">
                 <Form className={'flex h-fit w-full min-w-24 flex-col gap-6'}>

@@ -11,10 +11,7 @@ import { Button } from '@heroui/button';
 import { TrashIcon } from 'lucide-react';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 import RequestMessageCard from '@/app/lib/components/notifications/requestMessageCard';
-import {
-  NotificationsContext,
-  NotificationsContextType,
-} from '@/app/lib/components/notifications/allNotifications';
+import { NotificationsContext } from '@/app/lib/components/notifications/allNotifications';
 import settingsStore from '@/app/stores/settingsStore';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import NotificationMainText from '@/app/lib/components/notifications/notificationMainText';
@@ -23,8 +20,7 @@ import NotificationCardModal from '@/app/lib/components/notifications/notificati
 import SelectRole from '@/app/lib/components/members/selectRole';
 
 export default function NotificationCard(notification: Notification) {
-  const { onAnswer, onDelete }: NotificationsContextType =
-    useContext(NotificationsContext);
+  const { onAnswer, onDelete } = useContext(NotificationsContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
