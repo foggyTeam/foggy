@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import SelectRole from '@/app/lib/components/members/selectRole';
 
-export default function ({
+export default function ChangeRoleModal({
   member,
   submitRole,
   submitRoleType,

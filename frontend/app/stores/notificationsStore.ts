@@ -28,7 +28,7 @@ class NotificationsStore {
     const index = this.notifications.findIndex(
       (notification) => notification.id === id,
     );
-    if (id < 0) {
+    if (index < 0) {
       addToast({
         severity: 'warning',
         color: 'warning',

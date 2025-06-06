@@ -335,8 +335,8 @@ export const handleEndDrawing =
   }: FreeDrawingHandlersProps) =>
   () => {
     if (drawing && newElement) {
-      let xPoints: number[] = [];
-      let yPoints: number[] = [];
+      const xPoints: number[] = [];
+      const yPoints: number[] = [];
       newElement.points.map((point, index) =>
         index % 2 ? yPoints.push(point) : xPoints.push(point),
       );

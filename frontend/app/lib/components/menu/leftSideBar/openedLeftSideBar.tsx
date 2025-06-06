@@ -74,6 +74,7 @@ const OpenedLeftSideBar = observer(
     }, []);
 
     useEffect(() => {
+      if (!activeSection) return;
       if (
         'children' in activeSection &&
         projectsStore.activeProject &&
@@ -105,7 +106,12 @@ const OpenedLeftSideBar = observer(
     };
 
     const handleOpenParent = async () => {
-      if (!('id' in activeSection) || !projectsStore.activeProject) return;
+      if (
+        !activeSection ||
+        !('id' in activeSection) ||
+        !projectsStore.activeProject
+      )
+        return;
       try {
         const newParentList = projectsStore.getProjectChildParentList(
           activeSection.id,
@@ -243,7 +249,9 @@ const OpenedLeftSideBar = observer(
                   ).map((sectionId) => (
                     <BreadcrumbItem key={sectionId} onPress={handleOpenParent}>
                       <p className="w-full overflow-hidden text-ellipsis text-nowrap">
-                        {'id' in activeSection && sectionId === activeSection.id
+                        {activeSection &&
+                        'id' in activeSection &&
+                        sectionId === activeSection.id
                           ? activeSection.name
                           : ''}
                       </p>
@@ -272,11 +280,13 @@ const OpenedLeftSideBar = observer(
                     <Spinner className="w-full p-1" size="sm" />
                   ) : (
                     Array.from(
-                      'children' in activeSection
-                        ? activeSection.children.values()
-                        : !('type' in activeSection)
-                          ? activeSection.values()
-                          : [],
+                      !activeSection
+                        ? []
+                        : 'children' in activeSection
+                          ? activeSection.children.values()
+                          : !('type' in activeSection)
+                            ? activeSection.values()
+                            : [],
                     ).map(
                       (
                         child:

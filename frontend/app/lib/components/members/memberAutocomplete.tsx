@@ -37,7 +37,7 @@ export default function MemberAutocomplete({
 
   const handleSelectionChange = (key: any | null) => {
     if (key) {
-      let filtered = selectedMembers.filter((item) => item.id !== key);
+      const filtered = selectedMembers.filter((item) => item.id !== key);
       if (filtered.length < selectedMembers.length)
         setSelectedMembers(filtered);
       else

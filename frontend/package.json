@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix",
+    "lint": "next lint --fix --quiet",
     "check": "tsc --noEmit"
   },
   "dependencies": {

@@ -9,13 +9,13 @@ import { Button } from '@heroui/button';
 import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import Link from 'next/link';
-import ChangeRoleModal from '@/app/lib/components/members/changeRoleModal';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import { useMembersContext } from '@/app/lib/components/projects/allProjectMembers';
 import RemoveTeamMemberModal from '@/app/lib/components/members/removeTeamMemberModal';
 import SelectOwnerModal from '@/app/lib/components/members/selectOwnerModal';
 import { useMemberModals } from '@/app/lib/hooks/useMemberModals';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import ChangeRoleModal from '@/app/lib/components/members/changeRoleModal';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
   const { currentStep, nextStep, resetSequence } = useMemberModals();

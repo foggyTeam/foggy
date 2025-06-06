@@ -10,7 +10,7 @@ jobs:
       - name: Lint backend
         run: |
           pnpm install
-          pnpm eslint "{src,apps,libs,test}/**/*.ts"
+          pnpm lint
         working-directory: backend
       - run: echo "Backend / ${{ job.status }}."
 
