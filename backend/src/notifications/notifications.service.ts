@@ -418,9 +418,9 @@ export class NotificationService {
   }
 
   private async handleTeamInvite(
-    notification: NotificationDocument,
-    userId: Types.ObjectId,
-    isAccept: boolean,
+    notification: NotificationDocument, // eslint-disable-line @typescript-eslint/no-unused-vars
+    userId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
+    isAccept: boolean, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) {
     //TODO: team notification
     throw new CustomException(
@@ -430,9 +430,9 @@ export class NotificationService {
   }
 
   private async handleTeamJoinRequest(
-    notification: NotificationDocument,
-    inviterId: Types.ObjectId,
-    isAccept: boolean,
+    notification: NotificationDocument, // eslint-disable-line @typescript-eslint/no-unused-vars
+    inviterId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
+    isAccept: boolean, // eslint-disable-line @typescript-eslint/no-unused-vars
   ) {
     //TODO: team notification
     throw new CustomException(

@@ -25,6 +25,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { ProjectService } from '../projects/project.service';
+import { Role } from '../shared/types/enums';
 
 @Injectable()
 export class BoardService {
@@ -358,6 +359,7 @@ export class BoardService {
     updateBoardTitleDto: UpdateBoardDto,
     userId: Types.ObjectId,
   ): Promise<void> {
+    await this.projectService.validateUser(userId, projectId, Role.EDITOR);
     const board = await this.boardModel.findById(boardId).exec();
     if (!board) {
       throw new NotFoundException(`Board with ID "${boardId}" not found`);
