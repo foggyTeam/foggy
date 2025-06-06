@@ -59,7 +59,7 @@ export default function FilterModal({
   useEffect(() => {
     if (data.length) {
       // nickname || team
-      if ('members' in data[0] || 'role' in data[0]) {
+      if ('members' in data[0] || 'role' in data[0] || 'initiator' in data[0]) {
         const allMembers: Map<string, ProjectMember> = new Map();
         const allTeams: Set<string> = new Set([]);
         const alreadySelectedMembers: Map<string, string> = new Map();
@@ -85,6 +85,24 @@ export default function FilterModal({
             if (filters.team.has(element.team))
               alreadySelectedTeams.add(element.team);
           }
+
+          if ('target' in element && element.target) {
+            allTeams.add(element.target.name);
+            if (filters.team.has(element.target.name))
+              alreadySelectedTeams.add(element.target.name);
+          }
+
+          if ('initiator' in element && element.initiator) {
+            allMembers.set(
+              element.initiator.id,
+              element.initiator as TeamMember,
+            );
+            if (filters.nickname.has(element.initiator.nickname))
+              alreadySelectedMembers.set(
+                element.initiator.id,
+                element.initiator.nickname,
+              );
+          }
         });
 
         setMembersList(Array.from(allMembers.values()));
@@ -98,7 +116,7 @@ export default function FilterModal({
         setSelectedRoles(Array.from(filters.role));
       }
       // lastChange
-      if ('lastChange' in data[0]) {
+      if ('lastChange' in data[0] || 'createdAt' in data[0]) {
         setMaxDate(now(getLocalTimeZone()));
         if (filters.lastChange) {
           const [periodStart, periodEnd] = filters.lastChange.split('_');
