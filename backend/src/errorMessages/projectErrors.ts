@@ -48,6 +48,10 @@ export const projectErrors = {
       en: 'Join requests are disabled for this project',
       ru: 'Запросы на присоединение в данный проект отключены',
     },
+    mustSetNewOwner: {
+      en: 'Must set new owner',
+      ru: 'Нужно выбрать нового владельца',
+    },
   },
   section: {
     required: {

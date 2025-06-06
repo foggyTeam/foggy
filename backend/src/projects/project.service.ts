@@ -418,28 +418,47 @@ export class ProjectService {
     projectId: Types.ObjectId,
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
-  ): Promise<ProjectDocument> {
+    newOwner?: Types.ObjectId,
+  ): Promise<void> {
+    const isSelfRemove = requestingUserId.equals(targetUserId);
+    const requiredRole = isSelfRemove ? undefined : Role.ADMIN;
     const project = (await this.validateUser(
       requestingUserId,
       projectId,
-      Role.ADMIN,
+      requiredRole,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
     const isOwner = project.accessControlUsers.some(
       (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
     );
-
-    if (isOwner) {
+    if (isOwner && isSelfRemove) {
+      if (!newOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      await this.validateUser(newOwner);
+      project.accessControlUsers = project.accessControlUsers.filter(
+        (user) => !user.userId.equals(newOwner),
+      );
+      const ownerIndex = project.accessControlUsers.findIndex(
+        (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
+      );
+      if (ownerIndex !== -1) {
+        project.accessControlUsers[ownerIndex].userId = newOwner;
+      }
+    } else if (isOwner) {
       throw new CustomException(
         getErrorMessages({ project: 'cannotRemoveOwner' }),
         HttpStatus.FORBIDDEN,
       );
+    } else {
+      project.accessControlUsers = project.accessControlUsers.filter(
+        (user) => !user.userId.equals(targetUserId),
+      );
     }
-
-    project.accessControlUsers = project.accessControlUsers.filter(
-      (user) => !user.userId.equals(targetUserId),
-    );
-    return await this.saveProject(project);
+    await this.saveProject(project);
   }
 
   async updateUserRole(
@@ -711,6 +730,30 @@ export class ProjectService {
       .exec();
   }
 
+  async validateUser(
+    userId: Types.ObjectId,
+    projectId?: Types.ObjectId,
+    requiredRole?: Role,
+  ): Promise<ProjectDocument | void> {
+    await this.usersService.findUserById(userId.toString());
+    if (projectId) {
+      const project = await this.findProjectById(projectId);
+
+      if (requiredRole) {
+        const userRole = await this.getUserRole(projectId, userId);
+        if (!userRole || RoleLevel[userRole] < RoleLevel[requiredRole]) {
+          throw new CustomException(
+            getErrorMessages({ project: 'noPermission' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+      }
+
+      return project;
+    }
+    return;
+  }
+
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
     if (!Types.ObjectId.isValid(id)) {
       throw new CustomException(
@@ -841,30 +884,6 @@ export class ProjectService {
     await parentSection.save();
 
     return newSection._id;
-  }
-
-  async validateUser(
-    userId: Types.ObjectId,
-    projectId?: Types.ObjectId,
-    requiredRole?: Role,
-  ): Promise<ProjectDocument | void> {
-    await this.usersService.findUserById(userId.toString());
-    if (projectId) {
-      const project = await this.findProjectById(projectId);
-
-      if (requiredRole) {
-        const userRole = await this.getUserRole(projectId, userId);
-        if (!userRole || RoleLevel[userRole] < RoleLevel[requiredRole]) {
-          throw new CustomException(
-            getErrorMessages({ project: 'noPermission' }),
-            HttpStatus.FORBIDDEN,
-          );
-        }
-      }
-
-      return project;
-    }
-    return;
   }
 
   private async isUserInTeam(
