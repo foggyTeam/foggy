@@ -843,7 +843,7 @@ export class ProjectService {
     return newSection._id;
   }
 
-  private async validateUser(
+  async validateUser(
     userId: Types.ObjectId,
     projectId?: Types.ObjectId,
     requiredRole?: Role,
@@ -868,8 +868,8 @@ export class ProjectService {
   }
 
   private async isUserInTeam(
-    teamId: Types.ObjectId,
-    userId: Types.ObjectId,
+    teamId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
+    userId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<boolean> {
     // TODO: Реализовать вызов сервиса команд, чтобы проверить пользователя
     return false;

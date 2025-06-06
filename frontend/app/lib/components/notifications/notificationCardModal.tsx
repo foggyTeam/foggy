@@ -1,9 +1,6 @@
 import { Notification, Role } from '@/app/lib/types/definitions';
-import {
-  NotificationsContext,
-  NotificationsContextType,
-} from '@/app/lib/components/notifications/allNotifications';
-import React, { useContext } from 'react';
+import { NotificationsContext } from '@/app/lib/components/notifications/allNotifications';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import {
   Modal,
   ModalBody,
@@ -12,14 +9,11 @@ import {
   ModalHeader,
 } from '@heroui/modal';
 import settingsStore from '@/app/stores/settingsStore';
-import { Select, SelectItem } from '@heroui/select';
-import clsx from 'clsx';
-import { bg_container_no_padding } from '@/app/lib/types/styles';
-import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import NotificationMainText from '@/app/lib/components/notifications/notificationMainText';
 import RequestMessageCard from '@/app/lib/components/notifications/requestMessageCard';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { Avatar } from '@heroui/avatar';
+import SelectRole from '@/app/lib/components/members/selectRole';
 
 export default function NotificationCardModal({
   notification,
@@ -29,18 +23,17 @@ export default function NotificationCardModal({
   onOpenChange,
 }: {
   notification: Notification;
-  role: Omit<Role, 'owner'>[];
-  setRole: (newRole: Omit<Role, 'owner'>[]) => void;
+  role: Role | undefined;
+  setRole: Dispatch<SetStateAction<Role | undefined>>;
   isOpen: boolean;
   onOpenChange: () => void;
 }) {
-  const { onAnswer }: NotificationsContextType =
-    useContext(NotificationsContext);
+  const { onAnswer } = useContext(NotificationsContext);
 
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
       <ModalContent className="flex w-full max-w-lg gap-2 p-6">
-        {(onClose) => (
+        {() => (
           <>
             <ModalHeader className="flex p-0">
               <div className="flex items-center justify-start gap-2">
@@ -51,7 +44,6 @@ export default function NotificationCardModal({
                 {notification.target.name.toUpperCase()}
               </div>
             </ModalHeader>
-
             <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
               <div className="flex h-fit w-full flex-col gap-2">
                 <NotificationMainText {...notification} />
@@ -65,54 +57,17 @@ export default function NotificationCardModal({
                   (key) => key == notification.type.toString(),
                 ) < 0 && (
                   <>
-                    <Select
+                    <SelectRole
+                      role={role}
+                      setRole={setRole}
+                      disallowEmptySelection={true}
                       isDisabled={
                         ['PROJECT_JOIN_REQUEST'].findIndex(
                           (key) => key == notification.type.toString(),
                         ) < 0
                       }
-                      radius="full"
-                      className="w-full"
-                      variant="bordered"
-                      size="sm"
-                      classNames={{
-                        popoverContent: clsx(
-                          bg_container_no_padding,
-                          'p-2 sm:p-3 bg-opacity-100',
-                        ),
-                      }}
-                      selectedKeys={role}
-                      onSelectionChange={(keys) =>
-                        setRole(Array.from(keys) as Role[])
-                      }
-                      placeholder={
-                        settingsStore.t.members.addMember.rolePlaceholder
-                      }
-                      aria-label="select-role"
-                      renderValue={(items) => {
-                        return (
-                          <div className="flex gap-1 overflow-hidden">
-                            {items.map((item) => (
-                              <RoleCard
-                                key={item.key}
-                                role={item.key as string}
-                              />
-                            ))}
-                          </div>
-                        );
-                      }}
-                    >
-                      {rolesList
-                        .filter((role) => role !== 'owner')
-                        .map(
-                          (role) =>
-                            (
-                              <SelectItem key={role} textValue={role}>
-                                <RoleCard role={role} />
-                              </SelectItem>
-                            ) as any,
-                        )}
-                    </Select>
+                      style="bordered"
+                    />
                   </>
                 )}
               </div>
@@ -155,15 +110,10 @@ export default function NotificationCardModal({
                         'TEAM_JOIN_REJECTED',
                       ].findIndex(
                         (key) => key == notification.type.toString(),
-                      ) >= 0 || !role.length
+                      ) >= 0 || !role
                     }
                     onPress={() =>
-                      onAnswer(
-                        notification.id,
-                        notification.type,
-                        true,
-                        role[0],
-                      )
+                      onAnswer(notification.id, notification.type, true, role)
                     }
                     size="md"
                     variant="flat"

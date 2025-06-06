@@ -260,7 +260,7 @@ export class NotificationController {
   })
   @ApiResponse({
     status: 204,
-    description: 'Notification accepted',
+    description: 'Notification rejected',
   })
   async rejectNotification(
     @Headers('x-user-id') userId: Types.ObjectId,

@@ -1,17 +1,22 @@
 import { Project, Team } from '@/app/lib/types/definitions';
 import { Avatar } from '@heroui/avatar';
-import React, { ComponentType } from 'react';
+import React, { ComponentType, SVGProps } from 'react';
 import { Button } from '@heroui/button';
 import Link from 'next/link';
 import clsx from 'clsx';
+import { ChevronLeftIcon } from 'lucide-react';
 
 export default function RightSideBarElementCard({
+  link = { href: '/', Icon: ChevronLeftIcon, text: '' },
   element,
-  link,
   isActive,
 }: {
+  link?: {
+    href: string;
+    Icon: ComponentType<SVGProps<SVGSVGElement>>;
+    text: string;
+  };
   element?: Project | Team;
-  link?: { href: string; Icon: ComponentType; text: string };
   isActive?: boolean;
 }) {
   return (

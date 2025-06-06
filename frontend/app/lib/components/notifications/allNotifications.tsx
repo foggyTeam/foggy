@@ -19,23 +19,24 @@ export interface NotificationsContextType {
     notificationId: string,
     notificationType: NotificationType,
     accept: boolean,
-    role?: Omit<Role, 'owner'>,
+    role?: Role,
   ) => void;
   onDelete: (notificationId: string) => void;
 }
-export const NotificationsContext = createContext<
-  NotificationsContextType | undefined
->(undefined);
+export const NotificationsContext = createContext<NotificationsContextType>({
+  onAnswer: () => {},
+  onDelete: () => {},
+});
 
 const AllNotifications = observer(() => {
-  const {
-    data: revalidatedData,
-
-    error,
-  } = useSWR('notificationsData', () => GetAllNotifications(), {
-    revalidateOnFocus: true,
-    refreshInterval: 150000, // 2 минуты
-  });
+  const { data: revalidatedData, error } = useSWR(
+    'notificationsData',
+    () => GetAllNotifications(),
+    {
+      revalidateOnFocus: true,
+      refreshInterval: 150000, // 2 минуты
+    },
+  );
 
   useEffect(() => {
     if (revalidatedData && !error) {

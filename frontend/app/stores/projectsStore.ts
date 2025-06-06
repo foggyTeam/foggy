@@ -58,7 +58,8 @@ class ProjectsStore {
   }
 
   connectSocket(boardId: string) {
-    if (boardId && userStore.user) {
+    if (!userStore.user?.id) return;
+    if (boardId) {
       this.boardWebsocket = openBoardSocketConnection(
         boardId,
         userStore.user.id,
@@ -134,8 +135,8 @@ class ProjectsStore {
     layers[position.layer] = [...layers[position.layer]];
 
     const maxMin = this.getMaxMinElementPositions();
-    let firstNonEmptyLayer = maxMin.min.layer;
-    let lastNonEmptyLayer = maxMin.max.layer;
+    const firstNonEmptyLayer = maxMin.min.layer;
+    const lastNonEmptyLayer = maxMin.max.layer;
 
     let targetLayer = position.layer;
     let targetIndex = position.index;
@@ -153,7 +154,7 @@ class ProjectsStore {
           let prevLayer = position.layer - 1;
           while (prevLayer >= 0 && layers[prevLayer].length === 0) prevLayer--;
           targetLayer = prevLayer;
-          let len = layers[targetLayer].length;
+          const len = layers[targetLayer].length;
           targetIndex = len > 0 ? len - 1 : 0;
         }
         break;
@@ -307,7 +308,9 @@ class ProjectsStore {
     } else {
       this.activeBoard = {
         ...board,
-        layers: board.layers.map((layer) => observable.array(layer)),
+        layers: board.layers.map((layer: BoardElement[]) =>
+          observable.array(layer),
+        ),
         lastChange: board.updatedAt,
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
@@ -323,9 +326,9 @@ class ProjectsStore {
       return;
     }
     this.activeProject = ConvertRawProject(project);
-    this.myRole = this.activeProject.members?.find(
+    this.myRole = this.activeProject.members.find(
       (member) => member.id === userStore.user?.id,
-    ).role;
+    )?.role;
   };
   revalidateActiveProject = (rawRevalidatedData: RawProject) => {
     if (!this.activeProject) return;
@@ -343,7 +346,7 @@ class ProjectsStore {
     this.allProjects = projects.map((project) => {
       return {
         lastChange: project.updatedAt,
-        members: project.members.map((member) => member as ProjectMember),
+        members: project.members.map((member: ProjectMember) => member),
         ...project,
       } as Project;
     }) as Project[];
@@ -373,7 +376,7 @@ class ProjectsStore {
       path: string[],
     ): string[] | undefined {
       if (searchId === section.id) return path;
-      for (let child of section.children.values()) {
+      for (const child of section.children.values()) {
         if ('type' in child && child.id === searchId) {
           return [...path, section.id];
         }
@@ -533,9 +536,16 @@ class ProjectsStore {
   getProjectChild = (
     childId: string | undefined,
     parentSections?: string[],
-  ): Board | ProjectSection | Map<string, ProjectSection> => {
-    if (!this.activeProject) return;
-    if (childId === undefined && parentSections === undefined) return;
+  ):
+    | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    | ProjectSection
+    | Map<string, ProjectSection>
+    | undefined => {
+    if (
+      !this.activeProject ||
+      (childId === undefined && parentSections === undefined)
+    )
+      return undefined;
 
     parentSections =
       parentSections !== undefined
@@ -558,9 +568,10 @@ class ProjectsStore {
 
       if (i === parentSections.length - 1) {
         if (nextSection.id === childId) return nextSection;
-
+        if (!childId) return undefined;
         if (nextSection.children) return nextSection.children.get(childId);
-      } else currentSection = nextSection.children;
+      } else
+        currentSection = nextSection.children as Map<string, ProjectSection>;
     }
 
     // поиск на верхнем уровне
@@ -644,7 +655,7 @@ class ProjectsStore {
       }
 
       parentSection = found as ProjectSection;
-      current = parentSection.children as Map<string, ProjectSection | Board>;
+      current = parentSection.children as Map<string, ProjectSection>;
     }
 
     if (!parentSection) {

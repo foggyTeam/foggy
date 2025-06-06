@@ -69,8 +69,6 @@ export class BoardElementsGateway
         throw new Error('Board ID not found in connection');
       }
 
-      this.logger.log(`[AddElement] Received:`, elementData);
-
       if (!elementData?.type) {
         throw new Error('Element type is required');
       }
@@ -81,7 +79,6 @@ export class BoardElementsGateway
         layerNumber,
         elementData,
       );
-      this.logger.log(`Emitting elementAdded to room ${boardId}`, element);
       client.to(boardId).emit('elementAdded', element);
       return { status: 'success', element };
     } catch (error) {
@@ -138,10 +135,8 @@ export class BoardElementsGateway
       let elementId: string;
 
       if (typeof data === 'string') {
-        this.logger.log(`[DeleteElement] Received string ID: ${data}`);
         elementId = data;
       } else if (data?.id) {
-        this.logger.log(`[DeleteElement] Received object with ID: ${data.id}`);
         elementId = data.id;
       } else {
         this.logger.error(`[DeleteElement] Invalid data format:`, data);

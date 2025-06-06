@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix",
+    "lint": "next lint --fix --quiet",
     "check": "tsc --noEmit"
   },
   "dependencies": {
@@ -37,7 +37,7 @@
     "@heroui/toast": "^2.0.9",
     "@heroui/tooltip": "^2.2.14",
     "@heroui/use-infinite-scroll": "^2.2.9",
-    "@internationalized/date": "3.7.0",
+    "@internationalized/date": "3.8.1",
     "@next/env": "^15.3.0",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@types/react": "^19.1.2",

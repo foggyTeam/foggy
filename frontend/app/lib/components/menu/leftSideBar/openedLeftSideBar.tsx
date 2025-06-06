@@ -74,6 +74,7 @@ const OpenedLeftSideBar = observer(
     }, []);
 
     useEffect(() => {
+      if (!activeSection) return;
       if (
         'children' in activeSection &&
         projectsStore.activeProject &&
@@ -88,7 +89,7 @@ const OpenedLeftSideBar = observer(
               result,
             );
           })
-          .catch((error) =>
+          .catch((error: any) =>
             addToast({
               color: 'danger',
               severity: 'danger',
@@ -105,7 +106,12 @@ const OpenedLeftSideBar = observer(
     };
 
     const handleOpenParent = async () => {
-      if (!('id' in activeSection) || !projectsStore.activeProject) return;
+      if (
+        !activeSection ||
+        !('id' in activeSection) ||
+        !projectsStore.activeProject
+      )
+        return;
       try {
         const newParentList = projectsStore.getProjectChildParentList(
           activeSection.id,
@@ -128,7 +134,7 @@ const OpenedLeftSideBar = observer(
               activeSection.id,
             );
             setParentList(newParentList);
-          } catch (error) {
+          } catch (error: any) {
             addToast({
               color: 'danger',
               severity: 'danger',
@@ -177,7 +183,7 @@ const OpenedLeftSideBar = observer(
               nodeToRemove.parentList,
             );
           }
-        } catch (error) {
+        } catch (error: any) {
           addToast({
             color: 'danger',
             severity: 'danger',
@@ -243,7 +249,9 @@ const OpenedLeftSideBar = observer(
                   ).map((sectionId) => (
                     <BreadcrumbItem key={sectionId} onPress={handleOpenParent}>
                       <p className="w-full overflow-hidden text-ellipsis text-nowrap">
-                        {'id' in activeSection && sectionId === activeSection.id
+                        {activeSection &&
+                        'id' in activeSection &&
+                        sectionId === activeSection.id
                           ? activeSection.name
                           : ''}
                       </p>
@@ -272,29 +280,48 @@ const OpenedLeftSideBar = observer(
                     <Spinner className="w-full p-1" size="sm" />
                   ) : (
                     Array.from(
-                      'children' in activeSection
-                        ? activeSection.children.values()
-                        : activeSection.values(),
-                    ).map((child: ProjectSection | Board) => {
-                      if (
-                        'parentId' in child &&
-                        child.parentId &&
-                        !parentList.length
-                      )
-                        return null;
-                      return (
-                        <LeftSideBarElementCard
-                          element={child}
-                          isActive={child.id === projectsStore.activeBoard?.id}
-                          key={child.id}
-                          handleClick={() => handleChildClick(child)}
-                          addNode={() => onAddOpen(child.id)}
-                          removeNode={() =>
-                            removeNode(child.id, 'children' in child)
-                          }
-                        />
-                      );
-                    })
+                      !activeSection
+                        ? []
+                        : 'children' in activeSection
+                          ? activeSection.children.values()
+                          : !('type' in activeSection)
+                            ? activeSection.values()
+                            : [],
+                    ).map(
+                      (
+                        child:
+                          | ProjectSection
+                          | Pick<
+                              Board,
+                              | 'id'
+                              | 'type'
+                              | 'name'
+                              | 'sectionId'
+                              | 'lastChange'
+                            >,
+                      ) => {
+                        if (
+                          'parentId' in child &&
+                          child.parentId &&
+                          !parentList.length
+                        )
+                          return null;
+                        return (
+                          <LeftSideBarElementCard
+                            element={child as Board}
+                            isActive={
+                              child.id === projectsStore.activeBoard?.id
+                            }
+                            key={child.id}
+                            handleClick={() => handleChildClick(child as Board)}
+                            addNode={() => onAddOpen(child.id)}
+                            removeNode={() =>
+                              removeNode(child.id, 'children' in child)
+                            }
+                          />
+                        );
+                      },
+                    )
                   )}
                 </div>
               </div>

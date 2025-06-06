@@ -30,19 +30,16 @@ export default function LineCapTool({
     },
   };
 
-  const getIcon = (value: string): ReactNode | undefined => {
-    if (Object.keys(options).includes(value)) {
-      const Icon = options[value].icon;
-      return (
-        <Icon
-          className={clsx(
-            'h-4 w-4 fill-default-500 stroke-default-500',
-            value !== 'butt' && 'scale-x-75',
-          )}
-        />
-      ) as ReactNode;
-    }
-    return undefined;
+  const getIcon = (value: keyof typeof options): ReactNode => {
+    const Icon = options[value].icon;
+    return (
+      <Icon
+        className={clsx(
+          'h-4 w-4 fill-default-500 stroke-default-500',
+          value !== 'butt' && 'scale-x-75',
+        )}
+      />
+    ) as ReactNode;
   };
 
   return (
@@ -63,19 +60,18 @@ export default function LineCapTool({
         <Listbox
           className="w-fit"
           selectedKeys={[value]}
-          onSelectionChange={(keys) =>
-            setValue((Array.from(keys) as ('butt' | 'round' | 'square')[])[0])
+          onSelectionChange={(keys: any) =>
+            setValue((Array.from(keys) as (keyof typeof options)[])[0])
           }
           selectionMode="single"
           disallowEmptySelection
-          label={settingsStore.t.filters.byMember.label}
-          placeholder={settingsStore.t.filters.byMember.placeholder}
+          label="linecap"
         >
           {
             Object.entries(options).map(([key, option]) => (
               <ListboxItem
                 key={key}
-                startContent={getIcon(key)}
+                startContent={getIcon(key as keyof typeof options)}
                 title={option.label}
               />
             )) as any

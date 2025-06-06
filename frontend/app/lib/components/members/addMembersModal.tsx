@@ -13,12 +13,12 @@ import { Select, SelectItem } from '@heroui/select';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { HistoryIcon } from 'lucide-react';
-import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { Button } from '@heroui/button';
 import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
 import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
+import SelectRole from '@/app/lib/components/members/selectRole';
 
 const AddMembersModal = observer(
   ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: () => void }) => {
@@ -34,19 +34,18 @@ const AddMembersModal = observer(
     const [isLoading, setIsLoading] = useState(false);
 
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-    const [role, setRole] = useState<Omit<Role, 'owner'>[]>([]);
-    const [expirationTime, setExpirationTime] = useState<
-      (keyof typeof expirationTimes)[]
-    >(['24h']);
+    const [role, setRole] = useState<Role | undefined>(undefined);
+    const [expirationTime, setExpirationTime] =
+      useState<keyof typeof expirationTimes>('24h');
 
     const handleAddMembers = () => {
       setIsLoading(true);
       selectedMembers.forEach(async (id) => {
-        if (!projectsStore.activeProject) return;
+        if (!projectsStore.activeProject || !role) return;
         await AddProjectMember(projectsStore.activeProject.id, {
           userId: id,
-          role: role[0],
-          expirationTime: expirationTime[0],
+          role: role,
+          expirationTime: expirationTime,
         }).catch((error: any) =>
           addToast({
             color: 'danger',
@@ -63,7 +62,7 @@ const AddMembersModal = observer(
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
         <ModalContent className="flex w-full max-w-lg gap-2 p-6">
-          {(onClose) => (
+          {() => (
             <>
               <ModalHeader className="flex p-0">
                 {settingsStore.t.members.addMember.modalHeader}
@@ -72,49 +71,12 @@ const AddMembersModal = observer(
               <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
                 <MemberAutocomplete setSelectedId={setSelectedMembers} />
                 <div className="flex w-full flex-nowrap justify-between gap-2">
-                  <Select
-                    radius="full"
-                    className="w-48"
-                    variant="bordered"
-                    size="sm"
-                    classNames={{
-                      popoverContent: clsx(
-                        bg_container_no_padding,
-                        'p-2 sm:p-3 bg-opacity-100',
-                      ),
-                    }}
-                    selectedKeys={role}
-                    onSelectionChange={(keys) =>
-                      setRole(Array.from(keys) as Role[])
-                    }
-                    placeholder={
-                      settingsStore.t.members.addMember.rolePlaceholder
-                    }
-                    aria-label="select-role"
-                    renderValue={(items) => {
-                      return (
-                        <div className="flex gap-1 overflow-hidden">
-                          {items.map((item) => (
-                            <RoleCard
-                              key={item.key}
-                              role={item.key as string}
-                            />
-                          ))}
-                        </div>
-                      );
-                    }}
-                  >
-                    {rolesList
-                      .filter((role) => role !== 'owner')
-                      .map(
-                        (role) =>
-                          (
-                            <SelectItem key={role} textValue={role}>
-                              <RoleCard role={role} />
-                            </SelectItem>
-                          ) as any,
-                      )}
-                  </Select>
+                  <SelectRole
+                    role={role}
+                    setRole={setRole}
+                    style={'bordered'}
+                    className={'w-48'}
+                  />
                   <div className="flex w-fit items-center gap-1">
                     <div className="flex items-center gap-1">
                       <HistoryIcon className="stroke-default-500" />
@@ -135,10 +97,13 @@ const AddMembersModal = observer(
                         innerWrapper: 'w-full',
                         selectorIcon: 'invisible',
                       }}
-                      selectedKeys={expirationTime}
+                      selectedKeys={[expirationTime]}
                       onSelectionChange={(keys) =>
-                        setExpirationTime(Array.from(keys))
+                        setExpirationTime(
+                          keys.currentKey as keyof typeof expirationTimes,
+                        )
                       }
+                      selectionMode="single"
                       disallowEmptySelection
                       aria-label="expires-in"
                     >
@@ -146,7 +111,11 @@ const AddMembersModal = observer(
                         (time) =>
                           (
                             <SelectItem key={time} className="w-full p-1">
-                              {expirationTimes[time]}
+                              {
+                                expirationTimes[
+                                  time as keyof typeof expirationTimes
+                                ]
+                              }
                             </SelectItem>
                           ) as any,
                       )}
@@ -156,11 +125,11 @@ const AddMembersModal = observer(
               </ModalBody>
               <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
                 {/*TODO: add link*/}
-                <Button isDisabled={!role.length} size="md" variant="light">
+                <Button isDisabled={!role} size="md" variant="light">
                   {settingsStore.t.members.addMember.modalCopyLink}
                 </Button>
                 <Button
-                  isDisabled={!selectedMembers.length || !role.length}
+                  isDisabled={!selectedMembers.length || !role}
                   isLoading={isLoading}
                   onPress={handleAddMembers}
                   size="md"

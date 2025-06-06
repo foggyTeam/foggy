@@ -9,12 +9,12 @@ import settingsStore from '@/app/stores/settingsStore';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { ProjectMember, Role, TeamMember } from '@/app/lib/types/definitions';
 import { Select, SelectItem } from '@heroui/select';
-import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import SelectRole from '@/app/lib/components/members/selectRole';
 
-export default function ({
+export default function ChangeRoleModal({
   member,
   submitRole,
   submitRoleType,
@@ -26,7 +26,7 @@ export default function ({
   submitRole: (value: Role) => void;
   submitRoleType: (type: 'override' | 'updateMax') => void;
   isOpen: boolean;
-  onOpenChange: any;
+  onOpenChange: () => void;
   action: () => void;
 }) {
   const changeTypes = {
@@ -36,14 +36,14 @@ export default function ({
     ),
     updateMax: settingsStore.t.members.changeRole.upgradeTeam,
   };
-  const [newRole, setNewRole] = useState<Role[]>([member.role]);
-  const [changeType, setChangeType] = useState<('override' | 'updateMax')[]>([
-    'override',
-  ]);
+  const [newRole, setNewRole] = useState<Role | undefined>(member.role);
+  const [changeType, setChangeType] =
+    useState<keyof typeof changeTypes>('override');
 
   useEffect(() => {
-    submitRole(newRole[0]);
-    if ('team' in member) submitRoleType(changeType[0]);
+    if (!newRole) return;
+    submitRole(newRole);
+    if ('team' in member) submitRoleType(changeType);
   }, [newRole, changeType, submitRoleType, submitRole]);
 
   return (
@@ -60,43 +60,14 @@ export default function ({
               </ModalHeader>
 
               <ModalBody className="flex h-fit max-h-40 w-full max-w-2xl flex-col flex-wrap gap-2 p-0">
-                <Select
-                  radius="full"
-                  size="sm"
+                <SelectRole
+                  role={newRole}
+                  setRole={setNewRole}
+                  includeOwner={true}
+                  disableOwner={true}
+                  disallowEmptySelection={true}
                   className="m-0 w-full p-0"
-                  classNames={{
-                    innerWrapper: 'text-sm',
-                    value: 'text-sm',
-                    popoverContent: clsx(
-                      bg_container_no_padding,
-                      'p-2 sm:p-3 bg-opacity-100',
-                    ),
-                  }}
-                  selectedKeys={newRole}
-                  disabledKeys={['owner']}
-                  onSelectionChange={(keys) =>
-                    setNewRole(Array.from(keys) as Role[])
-                  }
-                  aria-label="Select role"
-                  renderValue={(items) => {
-                    return (
-                      <div className="flex gap-1 overflow-hidden">
-                        {items.map((item) => (
-                          <RoleCard key={item.key} role={item.key as string} />
-                        ))}
-                      </div>
-                    );
-                  }}
-                >
-                  {rolesList.map(
-                    (role) =>
-                      (
-                        <SelectItem key={role} textValue={role}>
-                          <RoleCard role={role} />
-                        </SelectItem>
-                      ) as any,
-                  )}
-                </Select>
+                />
                 {'team' in member && member.team && (
                   <Select
                     color="primary"
@@ -111,27 +82,28 @@ export default function ({
                         'p-2 sm:p-3 bg-opacity-100',
                       ),
                     }}
-                    selectedKeys={changeType}
+                    selectedKeys={[changeType]}
                     onSelectionChange={(keys) =>
-                      setChangeType(Array.from(keys) as string[])
+                      setChangeType(keys.currentKey as keyof typeof changeTypes)
                     }
-                    aria-label="Select type of change"
-                    renderValue={(items: any[]) => {
+                    aria-label="change-type"
+                    renderValue={(items) => {
                       return (
                         <div className="flex gap-1 overflow-hidden p-1">
-                          {items.map((item: any) => changeTypes[item.key])}
+                          {items.map(
+                            ({ key }) =>
+                              changeTypes[key as keyof typeof changeTypes],
+                          )}
                         </div>
                       );
                     }}
+                    disallowEmptySelection
                   >
-                    {Object.keys(changeTypes).map(
-                      (item: any) =>
-                        (
-                          <SelectItem key={item} textValue={item}>
-                            {changeTypes[item]}
-                          </SelectItem>
-                        ) as any,
-                    )}
+                    {Object.keys(changeTypes).map((item) => (
+                      <SelectItem key={item} textValue={item}>
+                        {changeTypes[item as keyof typeof changeTypes]}
+                      </SelectItem>
+                    ))}
                   </Select>
                 )}
               </ModalBody>
