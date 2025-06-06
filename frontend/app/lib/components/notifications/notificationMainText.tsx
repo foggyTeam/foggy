@@ -1,6 +1,7 @@
 import { Notification } from '@/app/lib/types/definitions';
 import settingsStore from '@/app/stores/settingsStore';
 import { colorMap } from '@/app/lib/components/members/roleCard';
+import userStore from '@/app/stores/userStore';
 
 export default function NotificationMainText({
   type,
@@ -18,6 +19,7 @@ export default function NotificationMainText({
       .replace('USER', initiator.nickname);
   };
 
+  if (!userStore.user) return null;
   switch (type) {
     case 'PROJECT_INVITE':
       return (
@@ -84,17 +86,27 @@ export default function NotificationMainText({
         </p>
       );
     case 'PROJECT_JOIN_REJECTED':
-      return (
+      return metadata.inviterId !== userStore.user.id ? (
         <p className={textClasses}>
           {replaceFields(
             settingsStore.t.notifications.request.project.rejected,
           )}
         </p>
+      ) : (
+        <p className={textClasses}>
+          {replaceFields(settingsStore.t.notifications.invite.project.rejected)}
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
+        </p>
       );
     case 'TEAM_JOIN_REJECTED':
-      return (
+      return metadata.inviterId !== userStore.user.id ? (
         <p className={textClasses}>
           {replaceFields(settingsStore.t.notifications.request.team.rejected)}
+          <span style={{ color: roleColor }}>{metadata.role}</span>.
+        </p>
+      ) : (
+        <p className={textClasses}>
+          {replaceFields(settingsStore.t.notifications.invite.team.rejected)}
           <span style={{ color: roleColor }}>{metadata.role}</span>.
         </p>
       );

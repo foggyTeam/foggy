@@ -220,11 +220,13 @@
     "invite": {
       "team": {
         "description1": "USER invites you to team NAME as ",
-        "description2": ". Accept?"
+        "description2": ". Accept?",
+        "rejected": "USER rejected your invitation to team NAME as "
       },
       "project": {
         "description1": "USER invites you to project NAME as ",
-        "description2": ". Accept?"
+        "description2": ". Accept?",
+        "rejected": "USER rejected your invitation to project NAME as "
       }
     },
     "request": {

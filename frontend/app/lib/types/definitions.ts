@@ -181,6 +181,11 @@ export interface Notification {
     avatar?: string;
   };
   target: NotificationTarget;
-  metadata: { role: Role; customMessage?: string; expiresAt?: string };
+  metadata: {
+    role: Role;
+    customMessage?: string;
+    expiresAt?: string;
+    inviterId?: string;
+  };
   createdAt: string;
 }

@@ -219,11 +219,13 @@
     "invite": {
       "team": {
         "description1": "USER приглашает вас в команду NAME как ",
-        "description2": ". Принять приглашение?"
+        "description2": ". Принять приглашение?",
+        "rejected": "USER отклонил ваше приглашение в команду NAME как "
       },
       "project": {
         "description1": "USER приглашает вас в проект NAME как ",
-        "description2": ". Принять приглашение?"
+        "description2": ". Принять приглашение?",
+        "rejected": "USER отклонил ваше приглашение в проект NAME как "
       }
     },
     "request": {
