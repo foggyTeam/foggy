@@ -5,7 +5,7 @@ import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
-import { throttle } from 'lodash';
+import { throttle } from 'lodash.throttle';
 
 export default function Cursors() {
   const [cursors, setCursors] = useState<{
