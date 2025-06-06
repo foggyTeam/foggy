@@ -1,5 +1,6 @@
 import {
   FilterSet,
+  Notification,
   Project,
   ProjectMember,
   Role,
@@ -24,7 +25,7 @@ import {
 import { Button } from '@heroui/button';
 import { X } from 'lucide-react';
 import { FilterReducerActionPayload } from '@/app/lib/components/contentSection';
-import debounce from 'lodash.debounce';
+import debounce from 'lodash/debounce';
 
 const teamRoles: Set<Role> = new Set(['owner', 'admin', 'editor', 'reader']);
 
@@ -35,7 +36,7 @@ export default function FilterModal({
   isOpen,
   onOpenChange,
 }: {
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[]; // | Notification[];
+  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
   filters: FilterSet;
   dispatchFilters: any;
   isOpen: any;
@@ -142,7 +143,7 @@ export default function FilterModal({
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
       <ModalContent className="flex w-fit max-w-2xl gap-2 p-6">
-        {(onClose) =>
+        {() =>
           (
             <>
               <ModalHeader className="flex p-0">
@@ -267,7 +268,7 @@ export default function FilterModal({
                           isIconOnly
                           variant="light"
                           className="h-fit w-fit min-w-fit"
-                          onClick={() => setLastUpdated(null)}
+                          onPress={() => setLastUpdated(null)}
                         >
                           <X className="stroke-default-400" />
                         </Button>

@@ -31,12 +31,11 @@ export default function RemoveTeamMemberModal({
     breakup: settingsStore.t.members.removeTeamMember.breakup.option,
     entire: settingsStore.t.members.removeTeamMember.entire.option,
   };
-  const [removeType, setRemoveType] = useState<('breakup' | 'entire')[]>([
-    'entire',
-  ]);
+  const [removeType, setRemoveType] =
+    useState<keyof typeof removeTypes>('entire');
 
   useEffect(() => {
-    submitRemoveType(removeType[0]);
+    submitRemoveType(removeType);
   }, [removeType, submitRemoveType]);
 
   return (
@@ -58,7 +57,6 @@ export default function RemoveTeamMemberModal({
                   color="primary"
                   radius="full"
                   size="sm"
-                  type="text"
                   className="m-0 w-full p-0"
                   classNames={{
                     innerWrapper: 'text-sm',
@@ -68,33 +66,35 @@ export default function RemoveTeamMemberModal({
                       'p-2 sm:p-3 bg-opacity-100',
                     ),
                   }}
-                  selectedKeys={removeType}
+                  selectedKeys={[removeType]}
                   onSelectionChange={(keys) =>
-                    setRemoveType(Array.from(keys) as ('breakup' | 'entire')[])
+                    setRemoveType(keys.currentKey as keyof typeof removeTypes)
                   }
-                  aria-label="Select type of remove"
-                  renderValue={(items: any[]) => {
+                  aria-label="remove-type"
+                  renderValue={(items) => {
                     return (
                       <div className="flex gap-1 overflow-hidden p-1">
-                        {items.map((item: any) => removeTypes[item.key])}
+                        {items.map(
+                          ({ key }) =>
+                            removeTypes[key as keyof typeof removeTypes],
+                        )}
                       </div>
                     );
                   }}
+                  selectionMode="single"
+                  disallowEmptySelection
                 >
-                  {Object.keys(removeTypes).map(
-                    (item: 'breakup' | 'entire') =>
-                      (
-                        <SelectItem key={item} textValue={item}>
-                          {removeTypes[item]}
-                        </SelectItem>
-                      ) as any,
-                  )}
+                  {Object.keys(removeTypes).map((item) => (
+                    <SelectItem key={item} textValue={item}>
+                      {removeTypes[item as keyof typeof removeTypes]}
+                    </SelectItem>
+                  ))}
                 </Select>
 
                 <Alert
                   color="danger"
                   description={
-                    removeType[0] === 'entire'
+                    removeType === 'entire'
                       ? settingsStore.t.members.removeTeamMember.entire.hint
                       : settingsStore.t.members.removeTeamMember.breakup.hint
                   }

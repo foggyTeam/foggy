@@ -81,7 +81,7 @@ export const handleMouseDown =
     setDrawing,
     setNewElement,
   }: DrawingHandlersProps) =>
-  (e: any) => {
+  () => {
     if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -110,7 +110,7 @@ export const handleMouseDown =
 
 export const handleMouseMove =
   ({ stageRef, drawing, newElement, updateElement }: DrawingHandlersProps) =>
-  (e: any) => {
+  () => {
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -135,7 +135,7 @@ export const handleMouseUp =
     setNewElement,
     setActiveTool,
   }: DrawingHandlersProps) =>
-  (e: any) => {
+  () => {
     if (drawing) {
       setDrawing(false);
       setNewElement(null);
@@ -159,7 +159,7 @@ export const handlePlaceText =
     textHeight,
     setTextHeight,
   }: any) =>
-  async (e: any) => {
+  async () => {
     if (isEditing) {
       const { x, y } = clickPosition.stagePosition;
       const defaultTextWidth = 432;
@@ -271,7 +271,7 @@ export const handleStartDrawing =
     setNewElement,
     pencilParams,
   }: FreeDrawingHandlersProps) =>
-  (e: any) => {
+  () => {
     if (activeTool === 'pencil' && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -333,10 +333,10 @@ export const handleEndDrawing =
     setNewElement,
     updateElement,
   }: FreeDrawingHandlersProps) =>
-  (e: any) => {
+  () => {
     if (drawing && newElement) {
-      let xPoints = [];
-      let yPoints = [];
+      let xPoints: number[] = [];
+      let yPoints: number[] = [];
       newElement.points.map((point, index) =>
         index % 2 ? yPoints.push(point) : xPoints.push(point),
       );
@@ -364,7 +364,7 @@ export const handleStartErasing =
     activeTool: string;
     setDrawing: (isDrawing: boolean) => void;
   }) =>
-  (e: any) => {
+  () => {
     if (activeTool === 'eraser' && stageRef.current) {
       setDrawing(true);
     }
@@ -393,7 +393,7 @@ export const handleEndErasing =
     drawing: boolean;
     setDrawing: (isDrawing: boolean) => void;
   }) =>
-  (e: any) => {
+  () => {
     if (drawing) setDrawing(false);
   };
 
@@ -417,6 +417,7 @@ export const isElementVisible = (
 };
 
 const getElementId = (tool: string) => {
-  const userId = userStore.user?.id || '';
+  if (!userStore.user) return '';
+  const userId = userStore.user.id;
   return `${tool}_${Date.now()}_${userId.slice(userId.length - 5, userId.length - 1)}`;
 };

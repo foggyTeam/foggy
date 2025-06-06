@@ -28,7 +28,6 @@ export default function MemberAutocomplete({
   const { membersList, isLoading, hasMore, onLoadMore } = useMembersList({
     inputValue,
   });
-  const [isOpen, setIsOpen] = useState(false);
   const [, scrollerRef] = useInfiniteScroll({
     hasMore,
     isEnabled: true,
@@ -46,7 +45,6 @@ export default function MemberAutocomplete({
           ...prev,
           membersList.find((member) => member.id === key),
         ]);
-      setIsOpen(true);
     }
   };
 
@@ -62,7 +60,6 @@ export default function MemberAutocomplete({
         onInputChange={setInputValue}
         items={membersList}
         onSelectionChange={handleSelectionChange}
-        selectedKeys={selectedMembers.map((member) => member.id)}
         radius="full"
         size="sm"
         variant="flat"
@@ -87,8 +84,6 @@ export default function MemberAutocomplete({
         isVirtualized
         itemHeight={44}
         maxListboxHeight={200}
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
         aria-label="select-members"
       >
         {membersList.map(

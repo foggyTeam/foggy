@@ -1,7 +1,6 @@
 import { Notification, Role } from '@/app/lib/types/definitions';
 import clsx from 'clsx';
 import {
-  bg_container_no_padding,
   el_animation,
   notification_tile,
   notification_tile_exp,
@@ -16,13 +15,12 @@ import {
   NotificationsContext,
   NotificationsContextType,
 } from '@/app/lib/components/notifications/allNotifications';
-import { Select, SelectItem } from '@heroui/select';
 import settingsStore from '@/app/stores/settingsStore';
-import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import NotificationMainText from '@/app/lib/components/notifications/notificationMainText';
 import { useDisclosure } from '@heroui/modal';
 import NotificationCardModal from '@/app/lib/components/notifications/notificationCardModal';
+import SelectRole from '@/app/lib/components/members/selectRole';
 
 export default function NotificationCard(notification: Notification) {
   const { onAnswer, onDelete }: NotificationsContextType =
@@ -31,9 +29,9 @@ export default function NotificationCard(notification: Notification) {
   const cardRef = useRef<HTMLDivElement>(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const [role, setRole] = useState<Omit<Role, 'owner'>[]>([
+  const [role, setRole] = useState<Role | undefined>(
     notification.metadata.role,
-  ]);
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -121,51 +119,17 @@ export default function NotificationCard(notification: Notification) {
               (key) => key == notification.type.toString(),
             ) < 0 && (
               <>
-                <Select
+                <SelectRole
+                  role={role}
+                  setRole={setRole}
+                  disallowEmptySelection={true}
                   isDisabled={
                     ['PROJECT_JOIN_REQUEST'].findIndex(
                       (key) => key == notification.type.toString(),
                     ) < 0
                   }
-                  radius="full"
-                  className="w-full"
-                  variant="bordered"
-                  size="sm"
-                  classNames={{
-                    popoverContent: clsx(
-                      bg_container_no_padding,
-                      'p-2 sm:p-3 bg-opacity-100',
-                    ),
-                  }}
-                  selectedKeys={role}
-                  onSelectionChange={(keys) =>
-                    setRole(Array.from(keys) as Role[])
-                  }
-                  placeholder={
-                    settingsStore.t.members.addMember.rolePlaceholder
-                  }
-                  aria-label="select-role"
-                  renderValue={(items) => {
-                    return (
-                      <div className="flex gap-1 overflow-hidden">
-                        {items.map((item) => (
-                          <RoleCard key={item.key} role={item.key as string} />
-                        ))}
-                      </div>
-                    );
-                  }}
-                >
-                  {rolesList
-                    .filter((role) => role !== 'owner')
-                    .map(
-                      (role) =>
-                        (
-                          <SelectItem key={role} textValue={role}>
-                            <RoleCard role={role} />
-                          </SelectItem>
-                        ) as any,
-                    )}
-                </Select>
+                  style="bordered"
+                />
                 {['PROJECT_MEMBER_ADDED', 'TEAM_MEMBER_ADDED'].findIndex(
                   (key) => key == notification.type.toString(),
                 ) < 0 && (
@@ -208,15 +172,10 @@ export default function NotificationCard(notification: Notification) {
                           'TEAM_JOIN_REJECTED',
                         ].findIndex(
                           (key) => key == notification.type.toString(),
-                        ) >= 0 || !role.length
+                        ) >= 0 || !role
                       }
                       onPress={() =>
-                        onAnswer(
-                          notification.id,
-                          notification.type,
-                          true,
-                          role[0],
-                        )
+                        onAnswer(notification.id, notification.type, true, role)
                       }
                       variant="flat"
                       color="success"
