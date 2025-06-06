@@ -1,4 +1,4 @@
-export const elementError = {
+export const elementErrors = {
   element: {
     required: {
       en: 'Element data is required',

@@ -70,6 +70,11 @@
       "title": "Ошибка",
       "description": "Фильтры были сброшены."
     },
+    "notifications": {
+      "updateNotificationsError": "Не удалось обновить список уведомлений",
+      "updateNotificationError": "Не удалось обновить уведомление",
+      "updateNotificationsNumberError": "Не удалось получить количество непрочитанных уведомлений"
+    },
     "copyError": "Не удалось скопировать в буфер обмена",
     "copySuccess": "Скопировано в буфер обмена",
     "globalError": "Произошла непредвиденная ошибка",

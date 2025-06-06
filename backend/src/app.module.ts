@@ -9,6 +9,7 @@ import { ApiKeyMiddleware } from './api-key.middleware';
 import { BoardGateway } from './websocket/board.gateway';
 import { ProjectModule } from './projects/projects.module';
 import { BoardModule } from './board/board.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { BoardModule } from './board/board.module';
     UsersModule,
     ProjectModule,
     BoardModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, BoardGateway],

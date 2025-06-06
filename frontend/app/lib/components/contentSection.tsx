@@ -6,6 +6,7 @@ import {
   ProjectMember,
   Team,
   TeamMember,
+  Notification,
 } from '@/app/lib/types/definitions';
 import { ComponentType, useMemo, useReducer, useState } from 'react';
 
@@ -22,9 +23,9 @@ import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 
 interface ContentSectionProps {
-  sectionTitle: string;
+  sectionTitle?: string;
   sectionAvatar?: string;
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[]; // | Notification[];
+  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
   DataCard: ComponentType<any>;
   filter?: boolean;
   onlyFavorite?: boolean;
@@ -78,6 +79,7 @@ function filtersReducer(state: FilterSet, action: FilterReducerAction) {
   }
 }
 
+// TODO: add loading state
 export default function ContentSection({
   sectionTitle,
   sectionAvatar,
@@ -147,10 +149,14 @@ export default function ContentSection({
     <>
       <div className="flex h-full w-full flex-col gap-2 overflow-clip text-sm">
         <div className="flex flex-col gap-1">
-          <div className="flex h-10 items-center justify-start gap-2">
-            {sectionAvatar?.length && <Avatar size="md" src={sectionAvatar} />}
-            <h1 className="font-medium">{sectionTitle}</h1>
-          </div>
+          {sectionTitle && (
+            <div className="flex h-10 items-center justify-start gap-2">
+              {sectionAvatar?.length && (
+                <Avatar size="md" src={sectionAvatar} />
+              )}
+              <h1 className="font-medium">{sectionTitle}</h1>
+            </div>
+          )}
 
           <ContentActionBar
             filters={filters}

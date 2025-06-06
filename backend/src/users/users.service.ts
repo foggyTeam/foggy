@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { transliterate } from 'transliteration';
-import { User } from './schemas/user.schema';
+import { User, UserDocument } from './schemas/user.schema';
 import { Counter } from './schemas/user-counter.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -16,7 +16,7 @@ import { ProjectService } from '../projects/project.service';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel('User') private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
     private readonly projectService: ProjectService,
   ) {}
@@ -41,8 +41,10 @@ export class UsersService {
     return this.transformUserResponse(user);
   }
 
-  async handleGoogleYandexUser(userDto: GoogleUserDto): Promise<Partial<User>> {
-    const user = await this.userModel.findOne({ email: userDto.email });
+  async handleGoogleYandexUser(
+    userDto: GoogleUserDto,
+  ): Promise<Partial<UserDocument>> {
+    const user = await this.userModel.findOne({ email: userDto.email }).exec();
 
     if (!user) {
       const nickname = await this.generateGoogleNickname(userDto.nickname);
@@ -58,14 +60,14 @@ export class UsersService {
       return this.saveUser(newUser);
     }
 
-    return this.transformUserResponse(user as User);
+    return this.transformUserResponse(user);
   }
 
-  async findAll(): Promise<User[]> {
+  async findAll(): Promise<UserDocument[]> {
     return this.userModel.find().exec();
   }
 
-  async findUserById(id: string): Promise<User> {
+  async findUserById(id: string): Promise<UserDocument> {
     const user = await this.userModel.findById(id);
     if (!user) {
       throw new CustomException(
@@ -73,7 +75,7 @@ export class UsersService {
         HttpStatus.NOT_FOUND,
       );
     }
-    return user as User;
+    return user;
   }
 
   async deleteUserById(id: string): Promise<void> {
@@ -89,7 +91,10 @@ export class UsersService {
     await this.counterModel.updateOne({}, { count: 0 });
   }
 
-  async updateUser(userId: string, updateData: Partial<User>): Promise<User> {
+  async updateUser(
+    userId: string,
+    updateData: Partial<User>,
+  ): Promise<UserDocument> {
     const user = await this.findUserById(userId);
 
     if (updateData.email) {
@@ -171,6 +176,24 @@ export class UsersService {
     };
   }
 
+  async getUserDetails(
+    userIds: Types.ObjectId[],
+  ): Promise<{ _id: Types.ObjectId; nickname: string; avatar: string }[]> {
+    return this.userModel
+      .find({ _id: { $in: userIds } }, { _id: 1, nickname: 1, avatar: 1 })
+      .lean()
+      .exec();
+  }
+
+  async getUsersWithSettings(
+    userIds: Types.ObjectId[],
+  ): Promise<{ _id: Types.ObjectId; settings?: any }[]> {
+    return this.userModel
+      .find({ _id: { $in: userIds } }, { _id: 1, settings: 1 })
+      .lean()
+      .exec();
+  }
+
   private async generateNickname(): Promise<string> {
     let counter = await this.counterModel.findOne().exec();
 
@@ -231,7 +254,7 @@ export class UsersService {
     return bcrypt.hash(password, 10);
   }
 
-  private async checkUserByEmail(email: string): Promise<User> {
+  private async checkUserByEmail(email: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ email });
     if (!user) {
       throw new CustomException(
@@ -275,9 +298,9 @@ export class UsersService {
     }
   }
 
-  private transformUserResponse(user: User): Partial<User> {
+  private transformUserResponse(user: UserDocument): Partial<UserDocument> {
     return {
-      id: user.id,
+      id: user._id,
       email: user.email,
       nickname: user.nickname,
       avatar: user.avatar,
@@ -298,7 +321,9 @@ export class UsersService {
     );
   }
 
-  private async saveUser(newUser: User): Promise<Partial<User>> {
+  private async saveUser(
+    newUser: UserDocument,
+  ): Promise<Partial<UserDocument>> {
     await this.checkUniqueFields({
       email: newUser.email,
       nickname: newUser.nickname,

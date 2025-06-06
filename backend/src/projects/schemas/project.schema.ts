@@ -1,8 +1,45 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
+import { Role, ROLES } from '../../shared/types/enums';
 
-const ROLES = ['owner', 'admin', 'editor', 'reader'] as const;
-export type Role = (typeof ROLES)[number];
+export interface MemberInfo {
+  id: Types.ObjectId;
+  nickname: string;
+  avatar: string;
+  role: Role;
+  team?: string;
+  teamId?: Types.ObjectId;
+}
+
+export interface ProjectListItem {
+  id: Types.ObjectId;
+  name: string;
+  avatar: string;
+  description?: string;
+  members: MemberInfo[];
+  updatedAt: Date;
+}
+
+export interface ChildBoard {
+  id: Types.ObjectId;
+  sectionId: Types.ObjectId;
+  name: string;
+  type: string;
+  updatedAt: Date;
+}
+
+export interface ChildSection {
+  id: Types.ObjectId;
+  parentId: Types.ObjectId | null;
+  name: string;
+  childrenNumber: number;
+  children: Array<ChildSection | ChildBoard>;
+}
+
+export interface ExtendedProjectListItem extends ProjectListItem {
+  settings: ProjectSettings;
+  sections: ChildSection[];
+}
 
 export interface MemberInfo {
   id: Types.ObjectId;

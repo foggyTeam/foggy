@@ -1,4 +1,4 @@
-export const projectError = {
+export const projectErrors = {
   project: {
     creationFailed: {
       en: 'Failed to create project',
@@ -43,6 +43,10 @@ export const projectError = {
     invalidDescription: {
       en: 'Invalid description format',
       ru: 'Недопустимый формат описания',
+    },
+    joinRequestsDisabled: {
+      en: 'Join requests are disabled for this project',
+      ru: 'Запросы на присоединение в данный проект отключены',
     },
   },
   section: {

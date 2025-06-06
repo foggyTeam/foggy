@@ -19,6 +19,7 @@ import projectsStore from '@/app/stores/projectsStore';
 import RightSideBarElementCard from '@/app/lib/components/menu/rightSideBar/rightSideBarElementCard';
 import React from 'react';
 import teamsStore from '@/app/stores/teamsStore';
+import AllNotifications from '@/app/lib/components/notifications/allNotifications';
 
 const OpenedRightSideBar = observer(
   ({
@@ -46,7 +47,7 @@ const OpenedRightSideBar = observer(
           bg_container,
           right_sidebar_layout,
           'h-fit w-fit',
-          'transform transition-all hover:bg-opacity-65 hover:pr-0.5',
+          'transform overflow-clip transition-all hover:bg-opacity-65 hover:pr-0.5',
         )}
       >
         <DrawerContent className="gap-4">
@@ -136,14 +137,11 @@ const OpenedRightSideBar = observer(
                   />
                 </div>
               </Tab>
-              {
-                // TODO: add notifications
-              }
               <Tab
                 key="notifications"
                 title={settingsStore.t.menu.tabs.notifications}
               >
-                Many many notifications
+                <AllNotifications />
               </Tab>
             </Tabs>
           </DrawerBody>

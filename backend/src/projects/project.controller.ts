@@ -26,7 +26,6 @@ import {
   ExtendedProjectListItem,
   Project,
   ProjectListItem,
-  Role,
 } from './schemas/project.schema';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -35,6 +34,7 @@ import { CreateSectionDto } from './dto/create-section.dto';
 import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
+import { Role } from '../shared/types/enums';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -115,6 +115,7 @@ export class ProjectController {
         value: {
           userId: '507f1f77bcf86cd799439011',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
       example2: {
@@ -131,12 +132,15 @@ export class ProjectController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') role: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-  ): Promise<Project> {
-    return this.projectService.addUser(
+    @Body('expiresAt') expiresAt?: Date,
+  ): Promise<void> {
+    return this.projectService.manageProjectUser(
       projectId,
       requestingUserId,
       targetUserId,
       role,
+      false,
+      expiresAt,
     );
   }
 

@@ -46,6 +46,7 @@ const AddMembersModal = observer(
         await AddProjectMember(projectsStore.activeProject.id, {
           userId: id,
           role: role[0],
+          expirationTime: expirationTime[0],
         }).catch((error: any) =>
           addToast({
             color: 'danger',
