@@ -1,2 +1,0 @@
-cd frontend && pnpm prettier --write .
-cd ../backend && pnpm prettier --write .
