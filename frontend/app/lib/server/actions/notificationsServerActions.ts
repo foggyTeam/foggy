@@ -15,7 +15,6 @@ export async function GetAllNotifications() {
 }
 
 export async function GetUnreadNumber() {
-  console.log(await getUserId());
   return getRequest(`notifications/unread-count`, {
     headers: { 'x-user-id': await getUserId() },
   });
