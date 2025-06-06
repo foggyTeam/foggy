@@ -20,11 +20,7 @@ export const getRequest: any = async (
     .then((response) => {
       return response.data;
     })
-    .catch((e) =>
-      console.error(
-        `error: ${e}; ${apiUri}, ${url}, ${options.headers}, ${verificationKey}, ${e.response.data}`,
-      ),
-    );
+    .catch((e) => console.error(`error: ${e}`));
 
 // poster accepts relative request's url.
 export const postRequest: any = async (
