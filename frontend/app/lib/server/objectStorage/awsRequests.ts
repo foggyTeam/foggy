@@ -2,37 +2,6 @@ import 'server-only';
 import axios from 'axios';
 import s3 from '@/app/lib/server/objectStorage/awsClient';
 
-axios.interceptors.request.use(
-  (config) => {
-    // Логируем URL
-    console.log('AXIOS REQUEST URL:', config.url);
-
-    // Логируем метод и все заголовки
-    console.log('AXIOS METHOD:', config.method);
-    console.log('AXIOS HEADERS:', config.headers);
-
-    // Логируем body (осторожно, если там большие файлы!)
-    if (config.data) {
-      if (config.data instanceof Buffer) {
-        console.log('AXIOS BODY: <Buffer: length', config.data.length, '>');
-      } else if (config.data instanceof ArrayBuffer) {
-        console.log(
-          'AXIOS BODY: <ArrayBuffer: byteLength',
-          config.data.byteLength,
-          '>',
-        );
-      } else {
-        console.log('AXIOS BODY:', config.data);
-      }
-    }
-
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
 const bucketName = 'foggy';
 
 export const getPublicFileURL = async (
@@ -47,14 +16,13 @@ export const getPublicFileURL = async (
     Bucket: bucketName,
     Key: key,
     ContentType: fileType,
-    Expires: 60 * 60 * 4,
+    Expires: 60,
     ACL: 'public-read',
   };
 
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
 
-    console.log(file);
     const response = await axios.put(uploadURL, file, {
       headers: {
         'Content-Type': fileType,
@@ -66,7 +34,6 @@ export const getPublicFileURL = async (
       return { url: `${s3.endpoint.href}${bucketName}/${key}` };
     else return { error: response.statusText };
   } catch (error: any) {
-    console.error(error.response?.data || error.message);
     return { error: error.response?.data || error.message };
   }
 };
