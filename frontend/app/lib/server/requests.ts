@@ -11,11 +11,8 @@ export const getRequest: any = async (
 ) =>
   axios
     .get(`${apiUri}/${url}`, {
-      headers: {
-        'x-api-key': `${verificationKey}`,
-        ...options.headers,
-      },
       ...options,
+      headers: { ...options.headers, 'x-api-key': `${verificationKey}` },
     } as AxiosRequestConfig)
     .then((response) => {
       return response.data;
@@ -30,11 +27,11 @@ export const postRequest: any = async (
 ) => {
   return await axios
     .post(`${apiUri}/${url}`, data, {
-      headers: {
-        'x-api-key': `${verificationKey}`,
-        ...options.headers,
-      },
       ...options,
+      headers: {
+        ...options.headers,
+        'x-api-key': `${verificationKey}`,
+      },
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;
@@ -51,11 +48,11 @@ export const patchRequest: any = async (
 ) => {
   return await axios
     .patch(`${apiUri}/${url}`, data, {
-      headers: {
-        'x-api-key': `${verificationKey}`,
-        ...options.headers,
-      },
       ...options,
+      headers: {
+        ...options.headers,
+        'x-api-key': `${verificationKey}`,
+      },
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;
@@ -71,11 +68,11 @@ export const deleteRequest: any = async (
 ) => {
   return await axios
     .delete(`${apiUri}/${url}`, {
-      headers: {
-        'x-api-key': `${verificationKey}`,
-        ...options.headers,
-      },
       ...options,
+      headers: {
+        ...options.headers,
+        'x-api-key': `${verificationKey}`,
+      },
     } as AxiosRequestConfig)
     .then((data) => {
       return data.data;
