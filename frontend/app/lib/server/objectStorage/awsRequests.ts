@@ -2,6 +2,21 @@ import 'server-only';
 import axios from 'axios';
 import s3 from '@/app/lib/server/objectStorage/awsClient';
 
+// outgoing interceptor
+axios.interceptors.request.use((config) => {
+  console.log('AXIOS OUTGOING REQUEST:');
+  console.log('  URL:   ', config.url);
+  console.log('  METHOD:', config.method);
+  console.log(
+    '  HEADERS:',
+    config.headers?.toJSON ? config.headers.toJSON() : config.headers,
+  );
+  if (config.data) {
+    console.log('  BODY:  ', config.data);
+  }
+  return config;
+});
+
 const bucketName = 'foggy';
 
 export const getPublicFileURL = async (
@@ -22,8 +37,6 @@ export const getPublicFileURL = async (
 
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
-
-    console.log(uploadURL);
 
     const response = await axios.put(uploadURL, file, {
       headers: {
