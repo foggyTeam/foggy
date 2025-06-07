@@ -18,10 +18,12 @@ export const getRequest: any = async (
       ...options,
     } as AxiosRequestConfig)
     .then((response) => {
-      console.log(response.data);
+      console.log(url, response.data);
       return response.data;
     })
-    .catch((e) => console.error(`error: ${e}`));
+    .catch((e) =>
+      console.error(url, options.headers?.['x-user-id'], `error: ${e}`),
+    );
 
 // poster accepts relative request's url.
 export const postRequest: any = async (
