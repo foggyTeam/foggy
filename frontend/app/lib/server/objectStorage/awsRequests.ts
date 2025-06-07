@@ -47,18 +47,15 @@ export const getPublicFileURL = async (
     Bucket: bucketName,
     Key: key,
     ContentType: fileType,
-    Expires: 60,
+    Expires: 60 * 60 * 4,
     ACL: 'public-read',
   };
 
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
 
-    console.log('Текущее время сервера (UTC):', new Date().toISOString());
-    console.log('Локальное время сервера:', new Date().toString());
-    const fileBuffer = Buffer.from(await file.arrayBuffer());
-
-    const response = await axios.put(uploadURL, fileBuffer, {
+    console.log(file);
+    const response = await axios.put(uploadURL, file, {
       headers: {
         'Content-Type': fileType,
         'x-amz-acl': 'public-read',
