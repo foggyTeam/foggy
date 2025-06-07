@@ -51,15 +51,14 @@ export const getPublicFileURL = async (
     ACL: 'public-read',
   };
 
-  console.log(
-    !!process.env.YANDEX_STORAGE_KEY_ID,
-    !!process.env.YANDEX_STORAGE_KEY,
-  );
-
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
 
-    const response = await axios.put(uploadURL, file, {
+    console.log('Текущее время сервера (UTC):', new Date().toISOString());
+    console.log('Локальное время сервера:', new Date().toString());
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+
+    const response = await axios.put(uploadURL, fileBuffer, {
       headers: {
         'Content-Type': fileType,
         'x-amz-acl': 'public-read',
