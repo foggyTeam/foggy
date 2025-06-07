@@ -9,7 +9,10 @@ axios.interceptors.request.use((config) => {
   console.log('AXIOS OUTGOING REQUEST:');
   console.log('  URL:   ', config.url);
   console.log('  METHOD:', config.method);
-  console.log('  HEADERS:', config.headers);
+  console.log(
+    '  HEADERS:',
+    config.headers?.toJSON ? config.headers.toJSON() : config.headers,
+  );
   if (config.data) {
     console.log('  BODY:  ', config.data);
   }
