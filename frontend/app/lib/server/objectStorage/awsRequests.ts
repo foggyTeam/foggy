@@ -20,7 +20,6 @@ export const getPublicFileURL = async (
     ACL: 'public-read',
   };
 
-  console.log(fileType, key, bucketName);
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
 
@@ -37,6 +36,7 @@ export const getPublicFileURL = async (
       return { url: `${s3.endpoint.href}${bucketName}/${key}` };
     else return { error: response.statusText };
   } catch (error: any) {
+    console.error(error.response?.data || error.message);
     return { error: error.response?.data || error.message };
   }
 };
