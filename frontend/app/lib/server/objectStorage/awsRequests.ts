@@ -13,8 +13,14 @@ axios.interceptors.request.use(
 
     // Логируем body (осторожно, если там большие файлы!)
     if (config.data) {
-      if (config.data instanceof Buffer || config.data instanceof ArrayBuffer) {
+      if (config.data instanceof Buffer) {
         console.log('AXIOS BODY: <Buffer: length', config.data.length, '>');
+      } else if (config.data instanceof ArrayBuffer) {
+        console.log(
+          'AXIOS BODY: <ArrayBuffer: byteLength',
+          config.data.byteLength,
+          '>',
+        );
       } else {
         console.log('AXIOS BODY:', config.data);
       }
