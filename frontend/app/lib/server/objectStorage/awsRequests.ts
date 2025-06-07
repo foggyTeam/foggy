@@ -15,7 +15,7 @@ export const getPublicFileURL = async (
   const params = {
     Bucket: bucketName,
     Key: key,
-    ContentType: fileType,
+    // ContentType: fileType,
     Expires: 60,
     ACL: 'public-read',
   };
@@ -25,6 +25,7 @@ export const getPublicFileURL = async (
 
     const response = await axios.put(uploadURL, file, {
       headers: {
+        // 'Content-Type': fileType,
         'x-amz-acl': 'public-read',
       },
     });
