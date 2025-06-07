@@ -4,6 +4,18 @@ import axios, { AxiosRequestConfig } from 'axios';
 const apiUri = process.env.NEXT_PUBLIC_API_URI;
 const verificationKey = process.env.VERIFICATION_KEY;
 
+// outgoing interceptor
+axios.interceptors.request.use((config) => {
+  console.log('AXIOS OUTGOING REQUEST:');
+  console.log('  URL:   ', config.url);
+  console.log('  METHOD:', config.method);
+  console.log('  HEADERS:', config.headers);
+  if (config.data) {
+    console.log('  BODY:  ', config.data);
+  }
+  return config;
+});
+
 // fetcher accepts relative request's url.
 export const getRequest: any = async (
   url: string,
@@ -18,12 +30,9 @@ export const getRequest: any = async (
       ...options,
     } as AxiosRequestConfig)
     .then((response) => {
-      console.log(url, response.data);
       return response.data;
     })
-    .catch((e) =>
-      console.error(url, options.headers?.['x-user-id'], `error: ${e}`),
-    );
+    .catch((e) => console.error(`error: ${e}`));
 
 // poster accepts relative request's url.
 export const postRequest: any = async (
