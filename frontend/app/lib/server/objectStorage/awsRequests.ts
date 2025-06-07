@@ -2,6 +2,31 @@ import 'server-only';
 import axios from 'axios';
 import s3 from '@/app/lib/server/objectStorage/awsClient';
 
+axios.interceptors.request.use(
+  (config) => {
+    // Логируем URL
+    console.log('AXIOS REQUEST URL:', config.url);
+
+    // Логируем метод и все заголовки
+    console.log('AXIOS METHOD:', config.method);
+    console.log('AXIOS HEADERS:', config.headers);
+
+    // Логируем body (осторожно, если там большие файлы!)
+    if (config.data) {
+      if (config.data instanceof Buffer || config.data instanceof ArrayBuffer) {
+        console.log('AXIOS BODY: <Buffer: length', config.data.length, '>');
+      } else {
+        console.log('AXIOS BODY:', config.data);
+      }
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
 const bucketName = 'foggy';
 
 export const getPublicFileURL = async (
@@ -15,17 +40,22 @@ export const getPublicFileURL = async (
   const params = {
     Bucket: bucketName,
     Key: key,
-    // ContentType: fileType,
+    ContentType: fileType,
     Expires: 60,
     ACL: 'public-read',
   };
+
+  console.log(
+    !!process.env.YANDEX_STORAGE_KEY_ID,
+    !!process.env.YANDEX_STORAGE_KEY,
+  );
 
   try {
     const uploadURL = await s3.getSignedUrlPromise('putObject', params);
 
     const response = await axios.put(uploadURL, file, {
       headers: {
-        // 'Content-Type': fileType,
+        'Content-Type': fileType,
         'x-amz-acl': 'public-read',
       },
     });
