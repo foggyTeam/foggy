@@ -6,8 +6,10 @@ import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import throttle from 'lodash/throttle';
+import projectsStore from '@/app/stores/projectsStore';
+import { observer } from 'mobx-react-lite';
 
-export default function Cursors() {
+const Cursors = observer(() => {
   const [cursors, setCursors] = useState<{
     [key: string]: {
       x: number;
@@ -49,17 +51,20 @@ export default function Cursors() {
   };
 
   useEffect(() => {
+    if (!projectsStore.activeBoard) return;
     const stage = stageRef.current;
     const userId = userStore.user?.id;
     const nickname = userStore.user?.name;
     const avatar = userStore.user?.image;
+    const boardId = projectsStore.activeBoard.id;
 
     const socket = io(process.env.NEXT_PUBLIC_API_URI, {
-      query: {
+      auth: {
         id: userId,
         nickname: nickname,
         avatar: avatar,
         color: userColor,
+        boardId: boardId,
       },
       reconnectionAttempts: 3,
       reconnectionDelay: 1000,
@@ -89,6 +94,7 @@ export default function Cursors() {
     socket.on(
       'cursorMove',
       (data: {
+        boardId: string;
         id: string;
         nickname: string;
         x: number;
@@ -127,7 +133,7 @@ export default function Cursors() {
       socket.off('userDisconnected');
       socket.disconnect();
     };
-  }, [stageRef]);
+  }, [stageRef, projectsStore.activeBoard]);
 
   return (
     <>
@@ -163,4 +169,6 @@ export default function Cursors() {
       })}
     </>
   );
-}
+});
+
+export default Cursors;

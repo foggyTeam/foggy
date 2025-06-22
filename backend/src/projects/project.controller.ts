@@ -618,11 +618,13 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-  ): Promise<Project> {
+    @Body('newOwnerId') newOwnerId?: Types.ObjectId,
+  ): Promise<void> {
     return this.projectService.removeUser(
-      projectId,
-      requestingUserId,
-      targetUserId,
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(requestingUserId),
+      new Types.ObjectId(targetUserId),
+      new Types.ObjectId(newOwnerId),
     );
   }
 

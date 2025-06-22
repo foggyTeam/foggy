@@ -37,8 +37,6 @@ export class BoardElementsGateway
   constructor(private readonly boardService: BoardService) {}
 
   handleConnection(client: Socket) {
-    this.logger.log(`Client connecting: ${client.id}`);
-
     const { boardId } = client.handshake.auth;
 
     if (!boardId) {
@@ -49,13 +47,16 @@ export class BoardElementsGateway
 
     client.data.boardId = boardId;
     client.join(boardId);
-    this.logger.log(`Client ${client.id} joined room ${boardId}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(
-      `Client disconnected: ${client.id} (board ${client.data.boardId})`,
-    );
+    try {
+    } catch (error) {
+      this.logger.error(
+        `[DisconnectError] Error ${client.id}: ${error.message}`,
+        error.stack,
+      );
+    }
   }
 
   @SubscribeMessage('addElement')

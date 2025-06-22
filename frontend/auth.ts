@@ -35,14 +35,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             };
 
         const result = await postRequest(request.url, request.data);
-
-        if (result.errors || !result) {
-          const errorMessage =
-            result.errors?.email && credentials.register
-              ? result.errors.email
-              : undefined;
-          throw new CredentialsSignin(errorMessage);
-        }
+        if (result.errors) {
+          throw new CredentialsSignin(JSON.stringify(result.errors));
+        } else if (!result) throw new CredentialsSignin();
 
         // 3. create user session
         const user: User = {

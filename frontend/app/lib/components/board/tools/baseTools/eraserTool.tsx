@@ -13,8 +13,14 @@ import useTool from '@/app/lib/hooks/useTool';
 import debounce from 'lodash/debounce';
 
 export default function EraserTool() {
-  const { stageRef, toolsDisabled, activeTool, setActiveTool, removeElement } =
-    useBoardContext();
+  const {
+    stageRef,
+    toolsDisabled,
+    activeTool,
+    setActiveTool,
+    removeElement,
+    allToolsDisabled,
+  } = useBoardContext();
   const [drawing, setDrawing] = useState(false);
 
   const mouseDownHandler = handleStartErasing({
@@ -49,7 +55,7 @@ export default function EraserTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.eraserTool}>
       <Button
-        isDisabled={toolsDisabled}
+        isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'eraser') setActiveTool('');
           else setActiveTool('eraser');

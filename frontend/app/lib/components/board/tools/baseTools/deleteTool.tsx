@@ -5,10 +5,12 @@ import { Button } from '@heroui/button';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function DeleteTool() {
-  const { selectedElement, removeElement } = useBoardContext();
+  const { selectedElement, removeElement, allToolsDisabled } =
+    useBoardContext();
   return (
     <Button
       onPress={() => removeElement(selectedElement.attrs.id)}
+      isDisabled={allToolsDisabled}
       variant="light"
       color="danger"
       isIconOnly
