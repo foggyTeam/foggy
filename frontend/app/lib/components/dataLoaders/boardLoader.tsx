@@ -13,9 +13,9 @@ const BoardLoader = ({
 }) => {
   useEffect(() => {
     if (sectionData && boardData) {
-      boardData.sectionIds.pop();
+      const sectionId = boardData.sectionIds.pop();
       projectsStore.insertProjectChild(boardData.sectionIds, sectionData, true);
-      projectsStore.setActiveBoard(boardData);
+      projectsStore.setActiveBoard({ ...boardData, sectionId });
     }
     return () => projectsStore.setActiveBoard(undefined);
   }, [sectionData, boardData]);
