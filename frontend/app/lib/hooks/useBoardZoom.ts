@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
+const WHEEL_DELTA = 50;
 
 export default function UseBoardZoom(
   stageRef: any,
@@ -14,13 +15,11 @@ export default function UseBoardZoom(
       const handleWheel = (e: any) => {
         e.evt.preventDefault();
 
-        const threshold = 50;
-
         const isPinchZoom = e.evt.ctrlKey;
         const isMouseWheel =
           !e.evt.ctrlKey &&
           e.evt.deltaX === 0 &&
-          Math.abs(e.evt.deltaY) > threshold;
+          Math.abs(e.evt.deltaY) > WHEEL_DELTA;
 
         if (isPinchZoom || isMouseWheel) {
           const scaleBy = 1.04;

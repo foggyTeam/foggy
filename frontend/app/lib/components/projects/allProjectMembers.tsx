@@ -66,7 +66,16 @@ const AllProjectMembers = observer(() => {
           description: error,
         }),
       )
-      .then(() => projectsStore.removeProjectMember(id));
+      .then((response) => {
+        if ('errors' in response) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.members.deleteMemberError,
+            description: response.errors[Object.keys(response.errors)[0]],
+          });
+        } else projectsStore.removeProjectMember(id);
+      });
   };
   const handleUpdateMemberRole = async (
     id: string,
