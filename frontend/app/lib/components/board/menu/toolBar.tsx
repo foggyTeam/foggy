@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import RectTool from '@/app/lib/components/board/tools/baseTools/rectTool';
 import EllipseTool from '@/app/lib/components/board/tools/baseTools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/menu/elementToolBar';
@@ -41,10 +41,6 @@ export default function ToolBar() {
 
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
-
-  useEffect(() => {
-    if (activeTool !== 'pencil') setPencilParams(DEFAULT_PENCIL);
-  }, [activeTool]);
 
   return (
     <div

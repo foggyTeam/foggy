@@ -19,12 +19,14 @@ interface CursorMoveData {
   color: string;
   x: number;
   y: number;
+  boardId: string;
 }
 
 interface UserDisconnectedData {
   id: string;
   nickname: string;
   color: string;
+  boardId: string;
 }
 
 interface UserData {
@@ -32,6 +34,7 @@ interface UserData {
   nickname: string;
   avatar: string;
   color: string;
+  boardId: string;
 }
 
 @WebSocketGateway({
@@ -66,24 +69,22 @@ export class BoardGateway
 
   handleConnection(client: Socket) {
     try {
-      const { id, nickname, avatar, color } = client.handshake.query as {
+      const { id, nickname, avatar, color, boardId } = client.handshake
+        .auth as {
         id: string;
         nickname: string;
         avatar: string;
         color: string;
+        boardId: string;
       };
-
-      if (!id || !nickname || !color) {
+      if (!id || !nickname || !color || !boardId) {
         this.logger.error('Invalid client data');
         client.disconnect();
         return;
       }
-
-      const userData: UserData = { id, nickname, avatar, color };
+      const userData: UserData = { id, nickname, avatar, color, boardId };
       this.clients.set(client.id, userData);
-      this.logger.log(
-        `Client connected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
-      );
+      client.join(boardId);
     } catch (error) {
       this.logger.error(`Error handling connection: ${error.message}`);
       client.disconnect();
@@ -98,11 +99,11 @@ export class BoardGateway
           id: userData.id,
           nickname: userData.nickname,
           color: userData.color,
+          boardId: userData.boardId,
         };
-        this.logger.log(
-          `Client disconnected: ${client.id} (User: ${userData.id} ${userData.nickname}, Color: ${userData.color})`,
-        );
-        client.broadcast.emit('userDisconnected', userDisconnectedData as any);
+        this.server
+          .to(userData.boardId)
+          .emit('userDisconnected', userDisconnectedData as any);
         this.clients.delete(client.id);
       } else {
         this.logger.warn(`No user data found for client: ${client.id}`);
@@ -125,9 +126,13 @@ export class BoardGateway
           nickname: clientData.nickname,
           avatar: clientData.avatar,
           color: clientData.color,
+          boardId: clientData.boardId,
           ...data,
         };
-        client.broadcast.emit('cursorMove', cursorMoveData as any);
+        this.server
+          .to(clientData.boardId)
+          .except(client.id)
+          .emit('cursorMove', cursorMoveData as any);
       } else {
         this.logger.warn(`No client data found for client: ${client.id}`);
       }

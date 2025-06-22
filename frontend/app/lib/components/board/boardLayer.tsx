@@ -18,8 +18,13 @@ export default function BoardLayer({
     element: BoardElement,
   ) => { x: number; y: number };
 }) {
-  const { updateElement, handleSelect, handleTextEdit, transformAvailable } =
-    useBoardContext();
+  const {
+    updateElement,
+    handleSelect,
+    handleTextEdit,
+    transformAvailable,
+    allToolsDisabled,
+  } = useBoardContext();
   const holdTextTransform = (e: any, element: TextElement) => {
     const node = e.target;
 
@@ -47,6 +52,14 @@ export default function BoardLayer({
   const holdTransformEnd = (e: any, element: BoardElement) => {
     const node = e.target;
 
+    if (element.type === 'line') {
+      updateElement(element.id, {
+        x: node.x(),
+        y: node.y(),
+        rotation: node.rotation(),
+      });
+      return;
+    }
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     node.scaleX(1);
@@ -78,7 +91,7 @@ export default function BoardLayer({
                   })
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
-                draggable={transformAvailable}
+                draggable={transformAvailable && !allToolsDisabled}
               />
             );
           case 'ellipse':
@@ -97,7 +110,7 @@ export default function BoardLayer({
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 radiusX={element.width / 2}
                 radiusY={element.height / 2}
-                draggable={transformAvailable}
+                draggable={transformAvailable && !allToolsDisabled}
               />
             );
           case 'line':
@@ -113,7 +126,8 @@ export default function BoardLayer({
                     y: e.target.attrs.y,
                   });
                 }}
-                draggable={transformAvailable}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
               />
             );
           case 'text':
@@ -149,7 +163,7 @@ export default function BoardLayer({
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
-                draggable={transformAvailable}
+                draggable={transformAvailable && !allToolsDisabled}
               />
             );
           case 'marker':
@@ -162,7 +176,7 @@ export default function BoardLayer({
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
-                draggable={transformAvailable}
+                draggable={transformAvailable && !allToolsDisabled}
               />
             );
           default:

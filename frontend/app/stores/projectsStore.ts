@@ -1,4 +1,4 @@
-import { action, makeAutoObservable, observable } from 'mobx';
+import { action, computed, makeAutoObservable, observable } from 'mobx';
 import {
   Board,
   BoardElement,
@@ -22,6 +22,8 @@ import openBoardSocketConnection, {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 
+const RECENT_BOARDS_NUMBER = 4;
+
 class ProjectsStore {
   myRole: Role | undefined = undefined;
 
@@ -31,8 +33,12 @@ class ProjectsStore {
   activeProject: Project | undefined = undefined;
   allProjects: Project[] = [];
 
+  recentBoards: { url: string; name: string; type: BoardTypes }[] = [];
+
   constructor() {
     makeAutoObservable(this, {
+      myRole: observable,
+      recentBoards: observable,
       activeBoard: observable,
       activeProject: observable,
       allProjects: observable,
@@ -52,7 +58,7 @@ class ProjectsStore {
       deleteProjectChild: action,
       updateProjectMember: action,
       removeProjectMember: action,
-      activeBoardParentList: observable,
+      activeBoardParentList: computed,
       getProjectChildParentList: action,
     });
   }
@@ -314,8 +320,38 @@ class ProjectsStore {
         lastChange: board.updatedAt,
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
+      this.addRecentBoard(
+        this.activeProject?.id || '',
+        board.sectionId,
+        board.id,
+        board.name,
+        board.type.toUpperCase() as BoardTypes,
+      );
       this.connectSocket(this.activeBoard.id || '');
     }
+  };
+
+  addRecentBoard = (
+    projectId: string,
+    sectionId: string,
+    boardId: string,
+    boardName: string,
+    type: BoardTypes,
+  ) => {
+    if (!(projectId && sectionId && boardId)) return;
+    const newURL = `/project/${projectId}/${sectionId}/${boardId}`;
+    const newBoard = { url: newURL, name: boardName, type };
+
+    let boards = [...this.recentBoards];
+    const boardIndex = boards.findIndex((board) => board.url.endsWith(boardId));
+
+    if (boardIndex !== -1) {
+      boards[boardIndex] = newBoard;
+    } else {
+      boards = [...boards, newBoard].slice(-RECENT_BOARDS_NUMBER);
+    }
+
+    this.recentBoards = boards;
   };
 
   // PROJECT
@@ -397,7 +433,10 @@ class ProjectsStore {
     }
     throw new Error('Project child with this id not found!');
   };
-  activeBoardParentList: string[] = this.getProjectChildParentList() || [];
+  get activeBoardParentList() {
+    if (!this.activeBoard) return [];
+    return this.getProjectChildParentList(this.activeBoard.id) || [];
+  }
   addProjectChild = (
     parentSections: string[],
     child: ProjectSection | Board,

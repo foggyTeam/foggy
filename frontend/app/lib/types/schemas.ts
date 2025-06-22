@@ -26,8 +26,6 @@ export const loginFormSchema = z.object({
     ),
 });
 
-export type loginForm = z.infer<typeof loginFormSchema>;
-
 export const profileFormSchema = z.object({
   nickname: z
     .string()

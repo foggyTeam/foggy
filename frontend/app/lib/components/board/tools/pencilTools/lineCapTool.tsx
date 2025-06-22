@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Listbox, ListboxItem } from '@heroui/listbox';
 import { ReactNode } from 'react';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function LineCapTool({
   value,
@@ -15,6 +16,7 @@ export default function LineCapTool({
   value: 'butt' | 'round' | 'square';
   setValue: (newValue: 'butt' | 'round' | 'square') => void;
 }) {
+  const { allToolsDisabled } = useBoardContext();
   const options = {
     round: {
       icon: CircleIcon,
@@ -45,7 +47,13 @@ export default function LineCapTool({
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.pencilCap}>
             {getIcon(value)}
           </FTooltip>
