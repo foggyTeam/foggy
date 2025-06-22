@@ -612,19 +612,35 @@ export class ProjectController {
     description: 'User has been successfully removed from project',
     type: Project,
   })
+  @ApiBody({
+    description: 'New owner id',
+    required: false,
+    examples: {
+      example1: {
+        summary: 'Owner leaves the project',
+        value: {
+          newOwnerId: '507f1f77bcf86cd799439012',
+        },
+      },
+      example2: {
+        summary: 'Empty body',
+        value: {},
+      },
+    },
+  })
   @ApiResponse({ status: 404, description: 'Project or user not found' })
   @ApiResponse({ status: 403, description: 'Forbidden - cannot remove owner' })
   async removeUser(
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-    @Body('newOwnerId') newOwnerId?: Types.ObjectId,
+    @Body() body?: { newOwnerId?: string },
   ): Promise<void> {
     return this.projectService.removeUser(
       new Types.ObjectId(projectId),
       new Types.ObjectId(requestingUserId),
       new Types.ObjectId(targetUserId),
-      new Types.ObjectId(newOwnerId),
+      body?.newOwnerId ? new Types.ObjectId(body.newOwnerId) : undefined,
     );
   }
 
