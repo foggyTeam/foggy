@@ -52,6 +52,14 @@ export default function BoardLayer({
   const holdTransformEnd = (e: any, element: BoardElement) => {
     const node = e.target;
 
+    if (element.type === 'line') {
+      updateElement(element.id, {
+        x: node.x(),
+        y: node.y(),
+        rotation: node.rotation(),
+      });
+      return;
+    }
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
     node.scaleX(1);
@@ -118,6 +126,7 @@ export default function BoardLayer({
                     y: e.target.attrs.y,
                   });
                 }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );
