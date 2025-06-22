@@ -6,6 +6,7 @@ import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import throttle from 'lodash/throttle';
+import projectsStore from '@/app/stores/projectsStore';
 
 export default function Cursors() {
   const [cursors, setCursors] = useState<{
@@ -53,6 +54,7 @@ export default function Cursors() {
     const userId = userStore.user?.id;
     const nickname = userStore.user?.name;
     const avatar = userStore.user?.image;
+    const boardId = projectsStore.activeBoard?.id;
 
     const socket = io(process.env.NEXT_PUBLIC_API_URI, {
       query: {
@@ -60,6 +62,7 @@ export default function Cursors() {
         nickname: nickname,
         avatar: avatar,
         color: userColor,
+        boardId,
       },
       reconnectionAttempts: 3,
       reconnectionDelay: 1000,
@@ -89,6 +92,7 @@ export default function Cursors() {
     socket.on(
       'cursorMove',
       (data: {
+        boardId: string;
         id: string;
         nickname: string;
         x: number;
