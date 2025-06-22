@@ -59,7 +59,7 @@ const Cursors = observer(() => {
     const boardId = projectsStore.activeBoard.id;
 
     const socket = io(process.env.NEXT_PUBLIC_API_URI, {
-      query: {
+      auth: {
         id: userId,
         nickname: nickname,
         avatar: avatar,

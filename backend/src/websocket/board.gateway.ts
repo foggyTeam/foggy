@@ -70,7 +70,7 @@ export class BoardGateway
   handleConnection(client: Socket) {
     try {
       const { id, nickname, avatar, color, boardId } = client.handshake
-        .query as {
+        .auth as {
         id: string;
         nickname: string;
         avatar: string;
@@ -129,7 +129,10 @@ export class BoardGateway
           boardId: clientData.boardId,
           ...data,
         };
-        client.to(clientData.boardId).emit('cursorMove', cursorMoveData as any);
+        this.server
+          .to(clientData.boardId)
+          .except(client.id)
+          .emit('cursorMove', cursorMoveData as any);
       } else {
         this.logger.warn(`No client data found for client: ${client.id}`);
       }
