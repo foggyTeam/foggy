@@ -49,7 +49,15 @@ export class BoardElementsGateway
     client.join(boardId);
   }
 
-  handleDisconnect(client: Socket) {}
+  handleDisconnect(client: Socket) {
+    try {
+    } catch (error) {
+      this.logger.error(
+        `[DisconnectError] Error ${client.id}: ${error.message}`,
+        error.stack,
+      );
+    }
+  }
 
   @SubscribeMessage('addElement')
   async handleAddElement(
