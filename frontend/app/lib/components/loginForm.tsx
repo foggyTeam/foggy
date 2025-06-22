@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from '@heroui/form';
 import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
@@ -9,7 +9,6 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@heroui/button';
 import { AvailableProviders } from '@/app/lib/types/definitions';
 import { loginFormSchema } from '@/app/lib/types/schemas';
-import z from 'zod';
 import { observer } from 'mobx-react-lite';
 import settingsStore from '../../stores/settingsStore';
 import GoogleIcon from '@/app/lib/components/svg/GoogleIcon';
@@ -19,6 +18,7 @@ import {
   SignUserIn,
   SignUserViaProviders,
 } from '@/app/lib/server/actions/userServerActions';
+import IsFormValid from '@/app/lib/utils/isFormValid';
 
 enum ButtonAction {
   UNDEFINED,
@@ -31,30 +31,16 @@ const LoginForm = observer(() => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState({} as any);
+  const [errors, setErrors] = useState<any>({});
   const [action, setAction] = useState(ButtonAction.UNDEFINED);
   const [loginButtonLoading, setLoginButtonLoading] = useState(false);
-  const [signinButtonLoading, setSigninButtonLoading] = useState(false);
+  const [signInButtonLoading, setSignInButtonLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
-  function isFormValid(data: { email: string; password: string }) {
-    try {
-      loginFormSchema.parse(data);
-      setErrors({});
-      return true;
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        const newErrors: any = {};
-        e.errors.forEach((error) => {
-          if (error.path.length > 0) {
-            newErrors[error.path[0]] = error.message;
-          }
-        });
-        setErrors(newErrors);
-      }
-      return false;
-    }
-  }
+  useEffect(() => {
+    if (email || password)
+      IsFormValid({ email, password }, loginFormSchema, setErrors);
+  }, [password, email]);
 
   const onSubmit = async (formData: any) => {
     formData.preventDefault();
@@ -64,11 +50,11 @@ const LoginForm = observer(() => {
       password: string;
     };
 
-    if (!isFormValid(data)) return;
+    if (Object.keys(errors).length) return;
 
     try {
       if (action === ButtonAction.SIGNIN) {
-        setSigninButtonLoading(true);
+        setSignInButtonLoading(true);
 
         await SignUserIn(
           {
@@ -77,7 +63,7 @@ const LoginForm = observer(() => {
           },
           true,
         ).finally(() => {
-          setSigninButtonLoading(false);
+          setSignInButtonLoading(false);
         });
       } else if (action === ButtonAction.LOGIN) {
         setLoginButtonLoading(true);
@@ -92,7 +78,7 @@ const LoginForm = observer(() => {
 
       setAction(ButtonAction.UNDEFINED);
     } catch (e: any) {
-      if (e.message) setErrors({ email: e.message.split('.')[0] });
+      if (e.message) setErrors(JSON.parse(e.message.split('.')[0]));
       else
         setErrors({
           email: settingsStore.t.errors.invalidCredentials,
@@ -101,8 +87,6 @@ const LoginForm = observer(() => {
       return;
     }
 
-    setErrors({});
-
     await router.push('/');
   };
 
@@ -110,10 +94,11 @@ const LoginForm = observer(() => {
     <Form
       className={'flex min-w-24 flex-col gap-2 sm:w-80'}
       onSubmit={onSubmit}
-      validationErrors={errors as any}
+      validationErrors={errors}
     >
       <Input
         isRequired
+        isInvalid={errors.email}
         errorMessage={errors.email}
         label={settingsStore.t.login.email}
         labelPlacement="inside"
@@ -141,11 +126,12 @@ const LoginForm = observer(() => {
 
       <Input
         isRequired
-        errorMessage={errors.password}
+        isInvalid={errors.password}
         label={settingsStore.t.login.password}
         labelPlacement="inside"
         placeholder={settingsStore.t.login.passwordPlaceholder}
         name="password"
+        errorMessage={errors.password}
         value={password}
         onValueChange={setPassword}
         type={passwordVisible ? 'text' : 'password'}
@@ -183,8 +169,9 @@ const LoginForm = observer(() => {
       <div className="mt-1 flex w-full items-center justify-between gap-2">
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
+          isDisabled={!!Object.keys(errors).length || loginButtonLoading}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
-          isLoading={signinButtonLoading}
+          isLoading={signInButtonLoading}
           variant="bordered"
           color="primary"
           size="md"
@@ -195,6 +182,7 @@ const LoginForm = observer(() => {
 
         <FButton
           onPress={() => setAction(ButtonAction.LOGIN)}
+          isDisabled={!!Object.keys(errors).length || signInButtonLoading}
           isLoading={loginButtonLoading}
           type="submit"
           variant="solid"
