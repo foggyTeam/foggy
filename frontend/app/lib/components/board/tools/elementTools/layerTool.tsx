@@ -16,7 +16,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function LayerTool() {
-  const { selectedElement } = useBoardContext();
+  const { selectedElement, allToolsDisabled } = useBoardContext();
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {
@@ -51,7 +51,13 @@ export default function LayerTool() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.layerTool}>
             <LayersIcon className="stroke-default-500" />
           </FTooltip>

@@ -19,6 +19,7 @@ export default function RectTool() {
     addElement,
     updateElement,
     toolsDisabled,
+    allToolsDisabled,
   } = useBoardContext();
 
   const [drawing, setDrawing] = useState(false);
@@ -56,7 +57,7 @@ export default function RectTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
       <Button
-        isDisabled={toolsDisabled}
+        isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'rect') setActiveTool('');
           else setActiveTool('rect');

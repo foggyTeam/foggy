@@ -7,6 +7,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function ColorTool({
   color,
@@ -15,10 +16,18 @@ export default function ColorTool({
   color: string;
   setColor: (newColor: string) => void;
 }) {
+  const { allToolsDisabled } = useBoardContext();
+
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.pencilColor}>
             <CircleIcon fill={color} stroke={`rgba(${to_rgb(color)}, .48)`} />
           </FTooltip>

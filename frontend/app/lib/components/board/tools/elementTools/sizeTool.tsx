@@ -17,7 +17,8 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function SizeTool() {
-  const { selectedElement, updateElement } = useBoardContext();
+  const { selectedElement, updateElement, allToolsDisabled } =
+    useBoardContext();
 
   const [width, setWidth] = useState(selectedElement.attrs.width);
   const [height, setHeight] = useState(selectedElement.attrs.height);
@@ -68,7 +69,13 @@ export default function SizeTool() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.sizeTool}>
             <RulerIcon className="stroke-default-500" />
           </FTooltip>

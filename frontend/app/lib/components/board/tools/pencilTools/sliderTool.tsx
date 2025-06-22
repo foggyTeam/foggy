@@ -6,6 +6,7 @@ import { AudioWaveformIcon, DotIcon } from 'lucide-react';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Slider } from '@heroui/slider';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function SliderTool({
   type,
@@ -16,6 +17,7 @@ export default function SliderTool({
   value: number;
   setValue: (newValue: number) => void;
 }) {
+  const { allToolsDisabled } = useBoardContext();
   const boundary = {
     width: { min: 1, max: 20, step: 0.5 },
     tension: { min: 0, max: 8, step: 0.5 },
@@ -24,7 +26,13 @@ export default function SliderTool({
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           {type === 'width' ? (
             <FTooltip content={settingsStore.t.toolTips.tools.pencilWidth}>
               <DotIcon

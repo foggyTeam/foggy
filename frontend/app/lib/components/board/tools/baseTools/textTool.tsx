@@ -18,6 +18,7 @@ export default function TextTool() {
     toolsDisabled,
     addElement,
     resetStage,
+    allToolsDisabled,
   } = useBoardContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -56,7 +57,7 @@ export default function TextTool() {
     <>
       <FTooltip content={settingsStore.t.toolTips.tools.textTool}>
         <Button
-          isDisabled={toolsDisabled}
+          isDisabled={toolsDisabled || allToolsDisabled}
           onPress={() => {
             if (activeTool === 'text') setActiveTool('');
             else setActiveTool('text');

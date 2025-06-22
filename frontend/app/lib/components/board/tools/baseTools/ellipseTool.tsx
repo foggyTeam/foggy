@@ -19,6 +19,7 @@ export default function EllipseTool() {
     setActiveTool,
     addElement,
     updateElement,
+    allToolsDisabled,
   } = useBoardContext();
 
   const [drawing, setDrawing] = useState(false);
@@ -56,7 +57,7 @@ export default function EllipseTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
       <Button
-        isDisabled={toolsDisabled}
+        isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'ellipse') setActiveTool('');
           else setActiveTool('ellipse');
