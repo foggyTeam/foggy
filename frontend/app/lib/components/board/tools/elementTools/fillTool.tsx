@@ -14,7 +14,8 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
 
 export default function FillTool() {
-  const { selectedElement, updateElement } = useBoardContext();
+  const { selectedElement, updateElement, allToolsDisabled } =
+    useBoardContext();
   const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');
 
   useEffect(() => {
@@ -58,7 +59,13 @@ export default function FillTool() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.fillTool}>
             <CircleIcon
               fill={fillColor}

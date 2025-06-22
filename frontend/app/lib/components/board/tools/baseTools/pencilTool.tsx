@@ -25,6 +25,7 @@ export default function PencilTool({
     addElement,
     updateElement,
     toolsDisabled,
+    allToolsDisabled,
   } = useBoardContext();
 
   const [drawing, setDrawing] = useState(false);
@@ -68,7 +69,7 @@ export default function PencilTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
       <Button
-        isDisabled={toolsDisabled}
+        isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'pencil') setActiveTool('');
           else setActiveTool('pencil');

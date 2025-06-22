@@ -9,12 +9,13 @@ export const getPublicFileURL = async (
   directoryName: string,
   file: Blob,
 ) => {
-  const key = `${directoryName}/${fileName}.${file.type.split('/')[1]}`;
+  const fileType = file.type;
+  const key = `${directoryName}/${fileName}.${fileType.split('/')[1]}`;
 
   const params = {
     Bucket: bucketName,
     Key: key,
-    ContentType: file.type,
+    ContentType: fileType,
     Expires: 60,
     ACL: 'public-read',
   };
@@ -24,7 +25,7 @@ export const getPublicFileURL = async (
 
     const response = await axios.put(uploadURL, file, {
       headers: {
-        'Content-Type': file.type,
+        'Content-Type': fileType,
         'x-amz-acl': 'public-read',
       },
     });

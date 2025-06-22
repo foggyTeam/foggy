@@ -48,15 +48,20 @@ const LeftSideBar = observer(() => {
     if (!isOpened) setParentList(projectsStore.activeBoardParentList);
   }, [isOpened]);
   const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
-    if (!projectsStore.activeProject) return;
-    const fullParentList = parentSectionId
-      ? [...parentList, parentSectionId]
+    if (!projectsStore.activeProject || !projectsStore.activeBoard) return;
+    const fullParentList = isOpened
+      ? parentSectionId
+        ? [...parentList, parentSectionId]
+        : parentList
       : parentList;
+
     switch (nodeType) {
       case 'SECTION':
         await AddSection(projectsStore.activeProject.id, {
           name: nodeName,
-          parentSectionId,
+          parentSectionId: isOpened
+            ? parentSectionId
+            : projectsStore.activeBoard.sectionId,
         })
           .catch(() =>
             addToast({
@@ -79,7 +84,9 @@ const LeftSideBar = observer(() => {
         await AddBoard(projectsStore.activeProject.id, {
           name: nodeName,
           type: nodeType.toLowerCase(),
-          sectionId: parentSectionId,
+          sectionId: isOpened
+            ? parentSectionId
+            : projectsStore.activeBoard.sectionId,
         })
           .catch(() =>
             addToast({

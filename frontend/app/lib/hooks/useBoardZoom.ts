@@ -14,7 +14,15 @@ export default function UseBoardZoom(
       const handleWheel = (e: any) => {
         e.evt.preventDefault();
 
-        if (Math.floor(e.evt.deltaY as number) !== (e.evt.deltaY as number)) {
+        const threshold = 50;
+
+        const isPinchZoom = e.evt.ctrlKey;
+        const isMouseWheel =
+          !e.evt.ctrlKey &&
+          e.evt.deltaX === 0 &&
+          Math.abs(e.evt.deltaY) > threshold;
+
+        if (isPinchZoom || isMouseWheel) {
           const scaleBy = 1.04;
           const oldScale = stage.scaleX();
           const pointer = stage.getPointerPosition();

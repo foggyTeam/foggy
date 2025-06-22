@@ -15,7 +15,8 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
 
 export default function StrokeTool() {
-  const { selectedElement, updateElement } = useBoardContext();
+  const { selectedElement, updateElement, allToolsDisabled } =
+    useBoardContext();
   const [strokeColor, changeColor] = useState(
     selectedElement.attrs.stroke || '',
   );
@@ -83,7 +84,13 @@ export default function StrokeTool() {
   return (
     <Popover>
       <PopoverTrigger>
-        <Button variant="light" color="default" isIconOnly size="md">
+        <Button
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="default"
+          isIconOnly
+          size="md"
+        >
           <FTooltip content={settingsStore.t.toolTips.tools.strokeTool}>
             <CircleDashedIcon
               stroke={`rgb(${to_rgb(strokeColor ? strokeColor : primary.DEFAULT)})`}

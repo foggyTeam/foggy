@@ -8,6 +8,7 @@ import projectsStore from '@/app/stores/projectsStore';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import React from 'react';
 import Link from 'next/link';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 const RecentBar = observer(
   ({
@@ -28,20 +29,24 @@ const RecentBar = observer(
             'transform transition-all hover:bg-opacity-65 hover:pl-4',
           )}
         >
-          {projectsStore.activeBoard && (
-            <Button
-              as={Link}
-              href={`/project/${projectsStore.activeProject?.id}/${projectsStore.activeBoard.sectionId}/${projectsStore.activeBoard.id}`}
-              key={projectsStore.activeBoard?.id}
-              isIconOnly
-              variant="light"
-              size="md"
-            >
-              <ElementIcon
-                elementType={projectsStore.activeBoard?.type || 'SIMPLE'}
-              />
-            </Button>
-          )}
+          {projectsStore.recentBoards.map((board) => (
+            <FTooltip key={board.url} content={board.name} placement="right">
+              <Button
+                as={Link}
+                href={board.url}
+                isIconOnly
+                variant={
+                  board.url.endsWith(projectsStore.activeBoard?.id || '')
+                    ? 'flat'
+                    : 'light'
+                }
+                color="primary"
+                size="md"
+              >
+                <ElementIcon elementType={board.type} />
+              </Button>
+            </FTooltip>
+          ))}
 
           <Button onPress={onAddOpen} isIconOnly variant="light" size="md">
             <PlusIcon className="stroke-default-500" />
