@@ -47,7 +47,6 @@ export class BoardElementsGateway
 
     client.data.boardId = boardId;
     client.join(boardId);
-    this.logger.log(`Client ${client.id} joined room ${boardId}`);
   }
 
   handleDisconnect(client: Socket) {}
