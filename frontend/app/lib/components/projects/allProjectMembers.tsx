@@ -15,6 +15,7 @@ import {
   UpdateProjectMemberRole,
 } from '@/app/lib/server/actions/membersServerActions';
 import { addToast } from '@heroui/toast';
+import { useRouter } from 'next/navigation';
 
 interface MembersContextType {
   memberType: 'team' | 'project';
@@ -40,6 +41,7 @@ export const useMembersContext = () => {
 };
 
 const AllProjectMembers = observer(() => {
+  const router = useRouter();
   const myRole: Role | null =
     projectsStore.activeProject?.members.toSorted(CompareByRole)[0].role ||
     null;
@@ -55,9 +57,7 @@ const AllProjectMembers = observer(() => {
     removeType?: 'breakup' | 'entire' | null,
   ) => {
     if (!projectsStore.activeProject) return;
-    // TODO: add new owner if needed
-    if (newOwnerId) return;
-    await DeleteProjectMember(projectsStore.activeProject.id, id)
+    await DeleteProjectMember(projectsStore.activeProject.id, id, newOwnerId)
       .catch((error: string) =>
         addToast({
           color: 'danger',
@@ -66,7 +66,19 @@ const AllProjectMembers = observer(() => {
           description: error,
         }),
       )
-      .then(() => projectsStore.removeProjectMember(id));
+      .then((response) => {
+        if (response.errors) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.members.deleteMemberError,
+            description: response.errors[Object.keys(response.errors)[0]],
+          });
+        } else {
+          projectsStore.removeProjectMember(id);
+          if (newOwnerId) router.push('/');
+        }
+      });
   };
   const handleUpdateMemberRole = async (
     id: string,

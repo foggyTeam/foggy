@@ -35,9 +35,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             };
 
         const result = await postRequest(request.url, request.data);
-        if (result.errors) {
+
+        if (!result) throw new CredentialsSignin();
+        else if (result.errors)
           throw new CredentialsSignin(JSON.stringify(result.errors));
-        } else if (!result) throw new CredentialsSignin();
 
         // 3. create user session
         const user: User = {
@@ -112,7 +113,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           data: {
             nickname: user.name,
             email: user.email,
-            // avatar: user.image,
+            avatar: user.image,
           },
         };
 

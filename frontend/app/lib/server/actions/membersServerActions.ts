@@ -63,8 +63,17 @@ export async function UpdateProjectMemberRole(
   );
 }
 
-export async function DeleteProjectMember(projectId: string, userId: string) {
-  return await deleteRequest(`projects/${projectId}/users/${userId}`, {
-    headers: { 'x-user-id': await getUserId() },
-  });
+export async function DeleteProjectMember(
+  projectId: string,
+  userId: string,
+  newOwnerId?: string | null,
+) {
+  return await deleteRequest(
+    newOwnerId
+      ? `projects/${projectId}/users/${userId}?newOwner=${newOwnerId}`
+      : `projects/${projectId}/users/${userId}`,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
 }

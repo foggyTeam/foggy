@@ -10,11 +10,13 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -607,6 +609,12 @@ export class ProjectController {
     description: 'ID of the user to remove',
     type: String,
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if removing owner)',
+    required: false,
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'User has been successfully removed from project',
@@ -618,13 +626,15 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-    @Body('newOwnerId') newOwnerId?: Types.ObjectId,
+
+    @Query('newOwner') newOwner?: string,
   ): Promise<void> {
     return this.projectService.removeUser(
       new Types.ObjectId(projectId),
       new Types.ObjectId(requestingUserId),
       new Types.ObjectId(targetUserId),
-      new Types.ObjectId(newOwnerId),
+
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
