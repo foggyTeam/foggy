@@ -243,8 +243,8 @@
       }
     },
     "newMember": {
-      "team": "USER принят в команду NAME",
-      "project": "USER принят в проект NAME"
+      "team": "USER принят в команду NAME как ",
+      "project": "USER принят в проект NAME как "
     }
   },
 
