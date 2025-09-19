@@ -210,7 +210,7 @@ const OpenedLeftSideBar = observer(
             bg_container,
             left_sidebar_layout,
             'h-fit w-fit overflow-clip',
-            'hover:bg-opacity-65 transform transition-all hover:pl-0.5',
+            'transform transition-all hover:bg-white/65 hover:pl-0.5',
           )}
         >
           <DrawerContent className="gap-4">

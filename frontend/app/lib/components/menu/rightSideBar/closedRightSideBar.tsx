@@ -26,7 +26,7 @@ const ClosedRightSideBar = observer(
           bg_container,
           right_sidebar_layout,
           'flex flex-col items-center justify-center gap-4',
-          'hover:bg-opacity-65 transform transition-all hover:pr-2',
+          'transform transition-all hover:bg-white/65 hover:pr-2',
         )}
       >
         <Button

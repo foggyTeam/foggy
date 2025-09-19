@@ -1,6 +1,9 @@
 @import 'tailwindcss';
-
 @config '../tailwind.config.ts';
+
+@plugin './hero.ts';
+@source '../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
 
 /*
   The default border color has changed to `currentcolor` in Tailwind CSS v4,

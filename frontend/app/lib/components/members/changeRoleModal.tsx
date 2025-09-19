@@ -79,7 +79,7 @@ export default function ChangeRoleModal({
                       value: 'text-sm',
                       popoverContent: clsx(
                         bg_container_no_padding,
-                        'p-2 sm:p-3 bg-opacity-100',
+                        'p-2 sm:p-3 bg-white/100',
                       ),
                     }}
                     selectedKeys={[changeType]}

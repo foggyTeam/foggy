@@ -68,7 +68,7 @@ export default function MemberAutocomplete({
         classNames={{
           popoverContent: clsx(
             bg_container_no_padding,
-            'p-2 sm:p-3 bg-opacity-90 border-default-500',
+            'p-2 sm:p-3 bg-white/90 border-default',
           ),
         }}
         listboxProps={{
