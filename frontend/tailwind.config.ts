@@ -262,7 +262,7 @@ export default {
           backgroundColor: 'rgba(0, 0, 0, 0)',
           color: foggy_accent.DEFAULT,
         },
-        '.accent-l:hover': {
+        '.accent-l-hover': {
           opacity: '1',
           backgroundColor: `rgba(${foggy_accent_rgb.DEFAULT}, 0.25)`,
         },
@@ -277,7 +277,7 @@ export default {
           border: `var(--heroui-border-width-medium) solid ${foggy_accent.DEFAULT}`,
           color: foggy_accent.DEFAULT,
         },
-        '.accent-g:hover': {
+        '.accent-g-hover': {
           backgroundColor: foggy_accent.DEFAULT,
           color: foggy_accent.foreground,
         },
@@ -298,8 +298,7 @@ export default {
           transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
           transitionDuration: '200ms',
         },
-        // TODO: think
-        /*  '.accent-link:hover': { color: `rgb(${to_rgb(foggy_accent.DEFAULT)})`,},*/
+        '.accent-link-hover': { color: `rgb(${to_rgb(foggy_accent.DEFAULT)})` },
       };
 
       addUtilities({ ...avatars, ...badges, ...buttons, ...theme_styles }, [
