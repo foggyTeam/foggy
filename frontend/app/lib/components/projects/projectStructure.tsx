@@ -71,7 +71,7 @@ const ProjectStructure = observer(() => {
           </div>
         </div>
 
-        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t" />
+        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-linear-to-t" />
       </div>
       {isSettingsOpen && (
         <ProjectSettingsModal
