@@ -165,6 +165,8 @@ export default {
   },
   darkMode: 'class',
   plugins: [
+    // TODO: uncomment
+    /*
     heroui({
       addCommonColors: true,
       themes: {
@@ -206,7 +208,7 @@ export default {
         },
       },
     }),
-    scrollbarPlugin({ nocompatible: true }),
+    scrollbarPlugin({ nocompatible: true }),*/
     function ({ addUtilities }: any) {
       const avatars = {
         '.accent-avatar': {
