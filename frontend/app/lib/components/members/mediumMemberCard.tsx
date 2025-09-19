@@ -10,7 +10,7 @@ export default function MediumMemberCard(member: ProjectMember | TeamMember) {
   return (
     <Button
       // TODO: navigate to member
-      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pl-0 pr-1 transition-colors duration-300 shadow-container hover:bg-primary-100"
+      className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pr-1 pl-0 transition-colors duration-300"
     >
       <div className="flex items-center justify-start gap-1">
         <Avatar

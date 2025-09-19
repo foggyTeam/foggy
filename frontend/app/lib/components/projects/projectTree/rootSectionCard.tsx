@@ -50,7 +50,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
       onBlur={() => setActiveNodes([])}
       className={clsx(
         'flex flex-col items-start justify-start rounded-2xl',
-        'hover:bg-default-50 w-full bg-white px-3 py-2 shadow-container',
+        'hover:bg-default-50 shadow-container w-full bg-white px-3 py-2',
         'max-h-16 transition-all duration-500',
         !isExpanded && el_animation,
         isExpanded && 'max-h-[1000px]',

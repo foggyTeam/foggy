@@ -29,7 +29,7 @@ export default function LeftSideBarElementCard({
         <ElementIcon
           elementType={'type' in element ? element.type : 'SECTION'}
         />
-        <p className={isActive ? 'font-medium text-f_accent' : ''}>
+        <p className={isActive ? 'text-f_accent font-medium' : ''}>
           {element.name}
         </p>
       </div>

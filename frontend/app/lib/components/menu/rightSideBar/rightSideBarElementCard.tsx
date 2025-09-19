@@ -29,7 +29,7 @@ export default function RightSideBarElementCard({
             : `/project/${element.id}`)) ||
         link.href
       }
-      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white/25 pl-0 pr-1 transition-colors duration-300 shadow-container hover:bg-primary-100"
+      className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white/25 pr-1 pl-0 transition-colors duration-300"
     >
       <div className="flex items-center justify-start gap-1">
         {element ? (

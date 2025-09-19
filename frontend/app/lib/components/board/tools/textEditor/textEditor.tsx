@@ -99,7 +99,7 @@ export default function CustomTextEditor({
           height: height ? `${height}px` : '',
         }}
         ref={editorContainerRef}
-        className="quill-editor-container max-w-108 caret-f_accent"
+        className="quill-editor-container caret-f_accent max-w-108"
       />
     </div>
   );

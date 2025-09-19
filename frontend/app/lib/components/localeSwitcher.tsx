@@ -23,7 +23,7 @@ const LocaleSwitcher = observer(() => {
   }, []);
 
   return (
-    <div className="invisible absolute bottom-4 right-4 z-50 sm:visible">
+    <div className="invisible absolute right-4 bottom-4 z-50 sm:visible">
       <Button
         onPress={() => {
           if (settingsStore.locale == 'en') settingsStore.setLocale('ru');

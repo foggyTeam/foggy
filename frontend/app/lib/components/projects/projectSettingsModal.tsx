@@ -207,10 +207,10 @@ const ProjectSettingsModal = observer(
 
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-        <ModalContent className="w-2xl flex max-w-2xl gap-2 overflow-visible p-6">
+        <ModalContent className="flex w-2xl max-w-2xl gap-2 overflow-visible p-6">
           {() =>
             (
-              <ModalBody className="w-2xl flex h-fit max-w-2xl gap-2 p-0">
+              <ModalBody className="flex h-fit w-2xl max-w-2xl gap-2 p-0">
                 <Form className={'flex h-fit w-full min-w-24 flex-col gap-6'}>
                   <div className="items-top -mt-12 flex w-1/2 justify-center">
                     <UploadAvatarButton

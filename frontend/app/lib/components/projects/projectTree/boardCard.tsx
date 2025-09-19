@@ -54,7 +54,7 @@ export default function BoardCard({
           `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
         )
       }
-      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pl-10 pr-0"
+      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0 pl-10"
     >
       <div
         onClick={(event) =>

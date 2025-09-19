@@ -38,7 +38,7 @@ export default function ProjectCard(project: Project) {
       ref={cardRef}
       onClick={() => setIsExpanded(true)}
       className={clsx(
-        'hover:bg-default-50 box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container',
+        'hover:bg-default-50 shadow-container box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
         el_animation,
         isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px] cursor-pointer',
         isExpanded ? project_tile_exp : project_tile,
@@ -54,7 +54,7 @@ export default function ProjectCard(project: Project) {
           />
           <h1
             className={clsx(
-              'truncate text-nowrap font-medium accent-link hover:accent-link-hover',
+              'accent-link hover:accent-link-hover truncate font-medium text-nowrap',
               !isExpanded && 'max-w-40',
             )}
           >
@@ -113,7 +113,7 @@ export default function ProjectCard(project: Project) {
             {project.members.length > 7 && (
               <a
                 href={`project/${project.id}`}
-                className="h-8 content-center justify-start px-4 italic accent-link hover:accent-link-hover"
+                className="accent-link hover:accent-link-hover h-8 content-center justify-start px-4 italic"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',

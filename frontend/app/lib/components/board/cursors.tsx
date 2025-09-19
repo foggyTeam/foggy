@@ -158,7 +158,7 @@ const Cursors = observer(() => {
             startContent={
               (
                 <MousePointer2Icon
-                  className={`relative -left-0.5 -top-1 stroke-${color}-500`}
+                  className={`relative -top-1 -left-0.5 stroke-${color}-500`}
                 />
               ) as ReactNode
             }

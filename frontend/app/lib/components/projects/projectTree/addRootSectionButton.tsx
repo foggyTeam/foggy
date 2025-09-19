@@ -15,7 +15,7 @@ export default function AddRootSectionButton({
       onPress={() => onPress([])}
       className={clsx(
         'flex items-center justify-start rounded-2xl',
-        'hover:bg-default-50/50 w-full bg-white/50 px-3 py-2 shadow-container',
+        'hover:bg-default-50/50 shadow-container w-full bg-white/50 px-3 py-2',
         'h-14 gap-2 transition-all duration-500',
         el_animation,
       )}

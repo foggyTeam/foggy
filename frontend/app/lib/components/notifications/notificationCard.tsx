@@ -65,7 +65,7 @@ export default function NotificationCard(notification: Notification) {
           setIsExpanded(true);
         }}
         className={clsx(
-          'py-auto box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-white px-2 shadow-container',
+          'py-auto shadow-container box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-white px-2',
           el_animation,
           isExpanded ? 'h-fit py-2' : 'h-8 cursor-pointer',
           isExpanded ? notification_tile_exp : notification_tile,
@@ -80,12 +80,12 @@ export default function NotificationCard(notification: Notification) {
               src={notification.target.avatar}
               name={notification.target.name}
             />
-            <h1 className="w-fit max-w-24 truncate text-nowrap font-medium">
+            <h1 className="w-fit max-w-24 truncate font-medium text-nowrap">
               {getTitle()}
             </h1>
           </div>
           <div className="flex h-full w-fit items-center justify-start gap-1">
-            <p className="text-default-700 w-fit text-nowrap text-end text-xs">
+            <p className="text-default-700 w-fit text-end text-xs text-nowrap">
               {GetDateTime(notification.createdAt)}
             </p>
             <Button
@@ -96,7 +96,7 @@ export default function NotificationCard(notification: Notification) {
               radius="full"
               size="sm"
             >
-              <TrashIcon className="stroke-default-300 transition-colors hover:stroke-danger" />
+              <TrashIcon className="stroke-default-300 hover:stroke-danger transition-colors" />
             </Button>
           </div>
         </div>

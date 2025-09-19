@@ -45,8 +45,8 @@ export default function ToolBar() {
   return (
     <div
       className={clsx(
-        'absolute bottom-0 left-0 right-0 z-50 w-full justify-self-center px-2 py-3',
-        'sm:bottom-4 sm:left-auto sm:right-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
+        'absolute right-0 bottom-0 left-0 z-50 w-full justify-self-center px-2 py-3',
+        'sm:right-auto sm:bottom-4 sm:left-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
         bg_container,
         'flex flex-col justify-center gap-1 rounded-none',
         'overflow-visible',
