@@ -54,7 +54,7 @@ export default function ProjectCard(project: Project) {
           />
           <h1
             className={clsx(
-              'hover:accent-link-hover truncate text-nowrap font-medium accent-link',
+              'truncate text-nowrap font-medium accent-link hover:accent-link-hover',
               !isExpanded && 'max-w-40',
             )}
           >
@@ -113,7 +113,7 @@ export default function ProjectCard(project: Project) {
             {project.members.length > 7 && (
               <a
                 href={`project/${project.id}`}
-                className="hover:accent-link-hover h-8 content-center justify-start px-4 italic accent-link"
+                className="h-8 content-center justify-start px-4 italic accent-link hover:accent-link-hover"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
