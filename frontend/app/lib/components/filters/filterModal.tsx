@@ -224,7 +224,7 @@ export default function FilterModal({
                           <SelectItem
                             key={team}
                             textValue={team}
-                            className="text-small font-bold text-default-700"
+                            className="text-small text-default-700 font-bold"
                           >
                             {team}
                           </SelectItem>

@@ -50,7 +50,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
       onBlur={() => setActiveNodes([])}
       className={clsx(
         'flex flex-col items-start justify-start rounded-2xl',
-        'w-full bg-white px-3 py-2 shadow-container hover:bg-default-50',
+        'hover:bg-default-50 w-full bg-white px-3 py-2 shadow-container',
         'max-h-16 transition-all duration-500',
         !isExpanded && el_animation,
         isExpanded && 'max-h-[1000px]',
@@ -65,7 +65,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           )
         }
         className={clsx(
-          'group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-1 hover:bg-default-100',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-1',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == section.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',

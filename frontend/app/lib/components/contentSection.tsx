@@ -185,7 +185,7 @@ export default function ContentSection({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
+        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t" />
       </div>
 
       {isFiltersOpen && (

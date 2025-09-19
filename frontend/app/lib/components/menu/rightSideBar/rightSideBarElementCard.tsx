@@ -44,7 +44,7 @@ export default function RightSideBarElementCard({
             src={element.avatar}
           />
         ) : (
-          <link.Icon className="h-8 w-8 stroke-default-500 p-1" />
+          <link.Icon className="stroke-default-500 h-8 w-8 p-1" />
         )}
         <p className={clsx('font-medium', isActive && 'text-f_accent')}>
           {element ? element.name : link.text}

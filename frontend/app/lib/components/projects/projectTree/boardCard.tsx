@@ -65,7 +65,7 @@ export default function BoardCard({
           )
         }
         className={clsx(
-          'group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors hover:bg-default-100',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == board.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',

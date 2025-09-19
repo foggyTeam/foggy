@@ -22,11 +22,11 @@ export default function MediumMemberCard(member: ProjectMember | TeamMember) {
           name={member.nickname}
           src={member.avatar}
         />
-        <p className="text-small font-bold text-default-700">
+        <p className="text-small text-default-700 font-bold">
           {member.nickname}
         </p>
         {userStore.user?.id === member.id && (
-          <p className="text-xs text-default-700">{settingsStore.t.main.you}</p>
+          <p className="text-default-700 text-xs">{settingsStore.t.main.you}</p>
         )}
       </div>
       <RoleCard role={member.role} />

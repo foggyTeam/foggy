@@ -63,7 +63,7 @@ const SubSectionCard = observer(
             )
           }
           className={clsx(
-            'group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 hover:bg-default-100',
+            'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0',
             activeNodes.length &&
               activeNodes.findIndex((node) => node.id == subSection.id) > -1 &&
               'bg-primary-100 hover:bg-primary-100',

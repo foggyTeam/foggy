@@ -38,7 +38,7 @@ const ClosedRightSideBar = observer(
         >
           <Avatar
             showFallback
-            icon={<User2Icon className="h-64 w-64 stroke-default-200" />}
+            icon={<User2Icon className="stroke-default-200 h-64 w-64" />}
             name={userStore.user?.name || undefined}
             src={userStore.user?.image || undefined}
             size="lg"

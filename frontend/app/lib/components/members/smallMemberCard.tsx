@@ -23,7 +23,7 @@ export default function SmallMemberCard({
         src={member.avatar}
       />
       <div className="flex w-full flex-nowrap justify-between gap-4">
-        <p className="text-small font-bold text-default-700">
+        <p className="text-small text-default-700 font-bold">
           {('nickname' in member && member.nickname) ||
             ('name' in member && member.name) ||
             ''}

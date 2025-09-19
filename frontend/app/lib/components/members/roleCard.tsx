@@ -16,7 +16,7 @@ export default function RoleCard({ role }: { role: Role | string }) {
   return (
     <div
       style={{ borderColor: cardColor }}
-      className="flex w-fit min-w-[72px] max-w-32 items-center justify-center gap-1 rounded-full border-1.5 px-3 py-0.5"
+      className="border-1.5 flex w-fit min-w-[72px] max-w-32 items-center justify-center gap-1 rounded-full px-3 py-0.5"
     >
       <p style={{ color: cardColor }} className="truncate text-nowrap text-xs">
         {role}

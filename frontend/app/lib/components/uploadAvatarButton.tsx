@@ -43,7 +43,7 @@ export default function UploadAvatarButton({
           showFallback
           icon={
             <User2Icon
-              className={clsx('h-72 w-72 stroke-default-200', classNames?.icon)}
+              className={clsx('stroke-default-200 h-72 w-72', classNames?.icon)}
             />
           }
           name={name}

@@ -23,7 +23,7 @@ export default function LeftSideBarElementCard({
         event.stopPropagation();
         handleClick();
       }}
-      className="group flex max-h-16 w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1 transition-colors hover:bg-default-100"
+      className="hover:bg-default-100 group flex max-h-16 w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1 transition-colors"
     >
       <div className="flex h-full w-full items-center gap-3 text-sm">
         <ElementIcon

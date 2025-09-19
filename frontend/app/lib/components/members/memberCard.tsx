@@ -86,7 +86,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
     <>
       <div
         className={clsx(
-          'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+          'hover:bg-default-50 box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container',
           el_animation,
           'h-16 w-[98%] max-w-[379px]',
           team_tile,
@@ -109,7 +109,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 </Link>
               </h1>
               {userStore.user?.id === member.id && (
-                <p className="text-xs text-default-700">
+                <p className="text-default-700 text-xs">
                   {settingsStore.t.main.you}
                 </p>
               )}

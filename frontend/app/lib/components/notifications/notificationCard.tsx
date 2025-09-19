@@ -85,7 +85,7 @@ export default function NotificationCard(notification: Notification) {
             </h1>
           </div>
           <div className="flex h-full w-fit items-center justify-start gap-1">
-            <p className="w-fit text-nowrap text-end text-xs text-default-700">
+            <p className="text-default-700 w-fit text-nowrap text-end text-xs">
               {GetDateTime(notification.createdAt)}
             </p>
             <Button
