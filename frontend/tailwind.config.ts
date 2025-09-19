@@ -298,9 +298,8 @@ export default {
           transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
           transitionDuration: '200ms',
         },
-        '.accent-link:hover': {
-          color: `rgb(${to_rgb(foggy_accent.DEFAULT)})`,
-        },
+        // TODO: think
+        /*  '.accent-link:hover': { color: `rgb(${to_rgb(foggy_accent.DEFAULT)})`,},*/
       };
 
       addUtilities({ ...avatars, ...badges, ...buttons, ...theme_styles }, [
