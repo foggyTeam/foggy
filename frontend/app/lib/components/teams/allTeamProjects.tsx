@@ -6,8 +6,9 @@ import ProjectCard from '@/app/lib/components/projects/projectCard';
 import teamsStore from '@/app/stores/teamsStore';
 import { useDisclosure } from '@heroui/modal';
 import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
+import { observer } from 'mobx-react-lite';
 
-export default function AllTeamProjects() {
+const AllTeamProjects = observer(() => {
   const {
     isOpen: isCreateProjectOpen,
     onOpen: onCreateProjectOpen,
@@ -38,4 +39,6 @@ export default function AllTeamProjects() {
       )}
     </>
   );
-}
+});
+
+export default AllTeamProjects;
