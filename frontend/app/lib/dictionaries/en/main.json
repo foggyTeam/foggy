@@ -160,7 +160,10 @@
   "members": {
     "addMember": {
       "modalHeader": "Invite members",
-      "searchPlaceholder": "Find by nickname or team name...",
+      "searchPlaceholder": {
+        "project": "Find by nickname or team name...",
+        "team": "Find by nickname..."
+      },
       "rolePlaceholder": "Choose a role...",
       "expiresIn": "Expires in",
       "modalCopyLink": "Copy invite link",

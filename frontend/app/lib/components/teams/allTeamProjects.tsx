@@ -4,8 +4,16 @@ import ContentSection from '@/app/lib/components/contentSection';
 import settingsStore from '@/app/stores/settingsStore';
 import ProjectCard from '@/app/lib/components/projects/projectCard';
 import teamsStore from '@/app/stores/teamsStore';
+import { useDisclosure } from '@heroui/modal';
+import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
 
 export default function AllTeamProjects() {
+  const {
+    isOpen: isCreateProjectOpen,
+    onOpen: onCreateProjectOpen,
+    onOpenChange: onCreateProjectOpenChange,
+  } = useDisclosure();
+
   return (
     <>
       <ContentSection
@@ -18,8 +26,16 @@ export default function AllTeamProjects() {
         filter
         type="team"
         onlyWithNotification
-        addNew={() => console.log('new project')}
+        addNew={onCreateProjectOpen}
       />
+      {isCreateProjectOpen && (
+        <ProjectSettingsModal
+          isTeamProject={true}
+          isNewProject={true}
+          isOpen={isCreateProjectOpen}
+          onOpenChange={onCreateProjectOpenChange}
+        />
+      )}
     </>
   );
 }

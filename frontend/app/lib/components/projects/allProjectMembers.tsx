@@ -101,6 +101,7 @@ const AllProjectMembers = observer(() => {
       </MembersContext.Provider>
       {isAddMemberOpen && (
         <AddMembersModal
+          type="project"
           isOpen={isAddMemberOpen}
           onOpenChange={onAddMemberOpenChange}
         />

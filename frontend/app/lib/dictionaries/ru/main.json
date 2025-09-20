@@ -160,7 +160,10 @@
   "members": {
     "addMember": {
       "modalHeader": "Пригласить участников",
-      "searchPlaceholder": "Поиск по имени пользователя или команды...",
+      "searchPlaceholder": {
+        "project": "Поиск по имени пользователя или команды...",
+        "team": "Поиск по имени пользователя..."
+      },
       "rolePlaceholder": "Выберите роль...",
       "expiresIn": "Истекает через",
       "modalCopyLink": "Копировать ссылку",

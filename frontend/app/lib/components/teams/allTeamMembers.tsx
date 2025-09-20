@@ -7,21 +7,30 @@ import MemberCard from '@/app/lib/components/members/memberCard';
 import { Role } from '@/app/lib/types/definitions';
 import MembersContext from '@/app/lib/hooks/useMembersContext';
 import CompareByRole from '@/app/lib/utils/compareByRole';
+import { useDisclosure } from '@heroui/modal';
+import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 
 const AllTeamMembers = observer(() => {
   const myRole: Role | null =
     teamsStore.activeTeam?.members.toSorted(CompareByRole)[0].role || null;
+  const {
+    isOpen: isAddMemberOpen,
+    onOpen: onAddMemberOpen,
+    onOpenChange: onAddMemberOpenChange,
+  } = useDisclosure();
+  const {
+    isOpen: isSettingsOpen,
+    onOpen: onOpenSettings,
+    onOpenChange: onSettingsOpenChange,
+  } = useDisclosure();
 
-  const onOpenSettings = () => console.log('settings');
-  const onAddMemberOpen = () => {
-    console.log('add member');
-  };
   const handleRemoveMember = async (id: string, newOwnerId?: string | null) => {
-    console.log('remove member');
+    if (!teamsStore.activeTeam) return;
+    // TODO: redo when API ready
   };
   const handleUpdateMemberRole = async (id: string, newRole: Role) => {
     if (!teamsStore.activeTeam) return;
-    console.log('update role');
+    // TODO: redo when API ready
   };
 
   return (
@@ -45,6 +54,13 @@ const AllTeamMembers = observer(() => {
           openSettings={onOpenSettings}
         />
       </MembersContext.Provider>
+      {isAddMemberOpen && (
+        <AddMembersModal
+          type="team"
+          isOpen={isAddMemberOpen}
+          onOpenChange={onAddMemberOpenChange}
+        />
+      )}
     </>
   );
 });

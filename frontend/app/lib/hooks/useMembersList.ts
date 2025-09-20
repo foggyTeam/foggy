@@ -3,10 +3,17 @@ import { SearchUsers } from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import teamsStore from '@/app/stores/teamsStore';
 
 const limit = 20;
 
-export function useMembersList({ inputValue }: { inputValue: string }) {
+export function useMembersList({
+  inputValue,
+  memberType,
+}: {
+  inputValue: string;
+  memberType: 'project' | 'team';
+}) {
   const [membersList, setMembersList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -19,19 +26,29 @@ export function useMembersList({ inputValue }: { inputValue: string }) {
     search: string,
     append = false,
   ) => {
-    if (!projectsStore.activeProject) return;
+    if (
+      (memberType === 'project' && !projectsStore.activeProject) ||
+      (memberType === 'team' && !teamsStore.activeTeam)
+    )
+      return;
     setIsLoading(true);
 
-    await SearchUsers({
+    const data = {
       query: search,
-      projectId: projectsStore.activeProject.id,
       cursor,
       limit,
-    })
+      teamId: undefined,
+      projectId: undefined,
+    };
+    if (memberType === 'project')
+      data.projectId = projectsStore.activeProject.id;
+    if (memberType === 'team') data.teamId = teamsStore.activeTeam.id;
+
+    await SearchUsers(data)
       .then(
         (data: { hasNextPage: boolean; nextCursor: string; users: any[] }) => {
           setMembersList((prev) =>
-            append ? [...prev, ...data.users] : data.users,
+            append ? [...prev, ...data.users] : (data.users ?? []),
           );
           setNextCursor(data.nextCursor || '');
           setHasMore(data.hasNextPage);

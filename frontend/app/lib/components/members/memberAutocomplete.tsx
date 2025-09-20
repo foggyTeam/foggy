@@ -5,28 +5,32 @@ import settingsStore from '@/app/stores/settingsStore';
 import { CheckIcon, SearchIcon } from 'lucide-react';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import React, { useEffect, useState } from 'react';
-import { ProjectMember, Team } from '@/app/lib/types/definitions';
+import { ProjectMember, Team, TeamMember } from '@/app/lib/types/definitions';
 import FilterCard from '@/app/lib/components/filters/filterCard';
 import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
 import { useMembersList } from '@/app/lib/hooks/useMembersList';
 
 export default function MemberAutocomplete({
   setSelectedId,
+  memberType,
 }: {
   setSelectedId: (
     newId: ((prevState: string[]) => string[]) | string[],
   ) => void;
+  memberType: 'project' | 'team';
 }) {
   const [selectedMembers, setSelectedMembers] = useState<
     Array<
       | Pick<ProjectMember, 'id' | 'nickname' | 'avatar'>
       | Pick<Team, 'id' | 'name' | 'avatar'>
+      | Pick<TeamMember, 'id' | 'nickname' | 'avatar'>
     >
   >([]);
   const [inputValue, setInputValue] = useState('');
 
   const { membersList, isLoading, hasMore, onLoadMore } = useMembersList({
     inputValue,
+    memberType,
   });
   const [, scrollerRef] = useInfiniteScroll({
     hasMore,
@@ -75,7 +79,9 @@ export default function MemberAutocomplete({
           selectionMode: 'multiple',
           hideSelectedIcon: true,
         }}
-        placeholder={settingsStore.t.members.addMember.searchPlaceholder}
+        placeholder={
+          settingsStore.t.members.addMember.searchPlaceholder[memberType]
+        }
         selectorIcon={<SearchIcon className="stroke-default-500" />}
         allowsCustomValue
         menuTrigger="input"

@@ -24,16 +24,19 @@ import {
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
+import teamsStore from '@/app/stores/teamsStore';
 
 const ProjectSettingsModal = observer(
   ({
     isOpen,
     onOpenChange,
     isNewProject = false,
+    isTeamProject = false,
   }: {
     isOpen: boolean;
     onOpenChange: any;
     isNewProject?: boolean;
+    isTeamProject?: boolean;
   }) => {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
@@ -141,6 +144,7 @@ const ProjectSettingsModal = observer(
         }
 
         if (isNewProject) {
+          // TODO: if team project, add team members initially
           await AddNewProject(updatedData)
             .then((result) => {
               if (
@@ -151,16 +155,19 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
               } else {
                 if (!userStore.user) return;
+                const projectMembers = isTeamProject
+                  ? teamsStore.activeTeam?.members
+                  : [
+                      {
+                        id: userStore.user.id,
+                        nickname: userStore.user.name,
+                        avatar: userStore.user.image,
+                        role: 'owner',
+                      },
+                    ];
                 const newProject = {
                   id: result.data.id,
-                  members: [
-                    {
-                      id: userStore.user.id,
-                      nickname: userStore.user.name,
-                      avatar: userStore.user.image,
-                      role: 'owner',
-                    },
-                  ],
+                  members: [...projectMembers],
                   ...updatedData,
                 } as Project;
 
@@ -207,10 +214,10 @@ const ProjectSettingsModal = observer(
 
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-        <ModalContent className="flex w-2xl max-w-2xl gap-2 overflow-visible p-6">
+        <ModalContent className="flex w-full max-w-2xl gap-2 overflow-visible p-6">
           {() =>
             (
-              <ModalBody className="flex h-fit w-2xl max-w-2xl gap-2 p-0">
+              <ModalBody className="flex h-fit w-full max-w-2xl gap-2 p-0">
                 <Form className={'flex h-fit w-full min-w-24 flex-col gap-6'}>
                   <div className="items-top -mt-12 flex w-1/2 justify-center">
                     <UploadAvatarButton
