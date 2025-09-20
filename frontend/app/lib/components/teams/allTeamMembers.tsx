@@ -9,6 +9,7 @@ import MembersContext from '@/app/lib/hooks/useMembersContext';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 import { useDisclosure } from '@heroui/modal';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
+import TeamSettingsModal from '@/app/lib/components/teams/teamSettingsModal';
 
 const AllTeamMembers = observer(() => {
   const myRole: Role | null =
@@ -54,6 +55,12 @@ const AllTeamMembers = observer(() => {
           openSettings={onOpenSettings}
         />
       </MembersContext.Provider>
+      {isSettingsOpen && (
+        <TeamSettingsModal
+          isOpen={isSettingsOpen}
+          onOpenChange={onSettingsOpenChange}
+        />
+      )}
       {isAddMemberOpen && (
         <AddMembersModal
           type="team"
