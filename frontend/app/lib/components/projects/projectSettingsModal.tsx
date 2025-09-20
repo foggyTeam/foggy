@@ -298,12 +298,12 @@ const ProjectSettingsModal = observer(
                   <div
                     className={clsx(
                       'flex w-full items-center gap-2',
-                      isNewProject || !CheckAccess(['owner'])
+                      isNewProject || !CheckAccess(['owner'], 'project')
                         ? 'justify-end'
                         : 'justify-between',
                     )}
                   >
-                    {!isNewProject && CheckAccess(['owner']) && (
+                    {!isNewProject && CheckAccess(['owner'], 'project') && (
                       <FButton
                         onPress={onDeleteProjectOpen}
                         isDisabled={isSaving}

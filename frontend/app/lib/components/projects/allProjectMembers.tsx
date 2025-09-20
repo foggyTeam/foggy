@@ -7,7 +7,6 @@ import { observer } from 'mobx-react-lite';
 import { useDisclosure } from '@heroui/modal';
 import MemberCard from '@/app/lib/components/members/memberCard';
 import CompareByRole from '@/app/lib/utils/compareByRole';
-import { createContext, useContext } from 'react';
 import { Role } from '@/app/lib/types/definitions';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 import {
@@ -16,29 +15,7 @@ import {
 } from '@/app/lib/server/actions/membersServerActions';
 import { addToast } from '@heroui/toast';
 import { useRouter } from 'next/navigation';
-
-interface MembersContextType {
-  memberType: 'team' | 'project';
-  myRole: Role | null;
-  removeMember: (
-    id: string,
-    newOwnerId?: string | null,
-    removeType?: 'breakup' | 'entire' | null,
-  ) => void;
-  updateMemberRole: (
-    id: string,
-    newRole: Role,
-    changeType?: 'override' | 'updateMax' | null,
-  ) => void;
-}
-
-const MembersContext = createContext<MembersContextType | null>(null);
-export const useMembersContext = () => {
-  const context = useContext(MembersContext);
-  if (!context)
-    throw new Error('useContext must be used within a ContextProvider');
-  return context;
-};
+import MembersContext from '@/app/lib/hooks/useMembersContext';
 
 const AllProjectMembers = observer(() => {
   const router = useRouter();
@@ -119,6 +96,7 @@ const AllProjectMembers = observer(() => {
           DataCard={MemberCard}
           filter
           addMember={onAddMemberOpen}
+          type="project"
         />
       </MembersContext.Provider>
       {isAddMemberOpen && (

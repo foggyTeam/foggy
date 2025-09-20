@@ -1,0 +1,39 @@
+{
+  "id": "team-1",
+  "name": "Creative Minds",
+  "avatar": "https://storage.yandexcloud.net/foggy/mock/Picsart_25-05-28_17-00-25-222.png",
+  "favorite": true,
+  "members": [
+    {
+      "id": "67f18c3ece58d18c7ebaae02",
+      "nickname": "iciicifur",
+      "avatar": "https://storage.yandexcloud.net/foggy/avatar/12SRvRow8kY7TTn7bmJkzC.png",
+      "role": "owner"
+    },
+    {
+      "id": "user-4",
+      "nickname": "CoachMaster",
+      "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230813_221251.png",
+      "role": "admin"
+    },
+    {
+      "id": "user-7",
+      "nickname": "TechGuru",
+      "avatar": "https://storage.yandexcloud.net/foggy/mock/b3.png",
+      "role": "editor"
+    },
+    {
+      "id": "user-8",
+      "nickname": "Mentor8",
+      "avatar": "https://storage.yandexcloud.net/foggy/mock/IMG_20230901_114733.png",
+      "role": "reader"
+    },
+    {
+      "id": "user-9",
+      "nickname": "Brainstorm9",
+      "avatar": "https://storage.yandexcloud.net/foggy/mock/b5.png",
+      "role": "editor"
+    }
+  ],
+  "projects": []
+}

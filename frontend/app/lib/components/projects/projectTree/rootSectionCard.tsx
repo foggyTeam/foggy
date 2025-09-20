@@ -87,7 +87,8 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           </Button>
           <NameInput
             isReadonly={
-              isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+              isReadonly ||
+              !CheckAccess(['admin', 'owner', 'editor'], 'project')
             }
             setIsReadonly={setIsReadonly}
             onBlur={updateSectionName}
@@ -98,7 +99,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
             maxW="lg"
           />
         </div>
-        {CheckAccess(['admin', 'owner', 'editor']) && (
+        {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
           <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
             <>
               <Button

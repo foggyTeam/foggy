@@ -34,7 +34,7 @@ export default function LeftSideBarElementCard({
         </p>
       </div>
       <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
-        {CheckAccess(['admin', 'owner', 'editor']) && (
+        {CheckAccess(['admin', 'owner', 'editor'], 'team') && (
           <>
             {'children' in element && (
               <Button isIconOnly onPress={addNode} variant="light" size="sm">

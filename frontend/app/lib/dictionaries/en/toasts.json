@@ -15,6 +15,16 @@
       "deleteMemberError": "Failed to remove member",
       "updateMemberRoleError": "Failed to update member role"
     },
+    "team": {
+      "addTeamError": "Failed to create the team",
+      "addTeamSuccess": "Team created",
+      "deleteTeamError": "Failed to delete the team",
+      "deleteTeamSuccess": "Team deleted",
+      "noActive": "No active team",
+      "teamNotExist": "A team with this ID does not exist",
+      "updateTeamError": "Failed to update team data",
+      "updateTeamSuccess": "Team data updated"
+    },
     "project": {
       "addProjectError": "Failed to create the project",
       "addProjectSuccess": "Project created",

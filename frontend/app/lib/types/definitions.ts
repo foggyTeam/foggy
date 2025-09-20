@@ -136,6 +136,9 @@ export interface Team {
   projects: Project[];
 }
 
+// TODO: actualize when API available
+export type RawTeam = Team;
+
 export type Role = 'owner' | 'admin' | 'editor' | 'reader';
 
 export interface TeamMember {

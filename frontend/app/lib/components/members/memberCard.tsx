@@ -10,7 +10,7 @@ import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import Link from 'next/link';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
-import { useMembersContext } from '@/app/lib/components/projects/allProjectMembers';
+import { useMembersContext } from '@/app/lib/hooks/useMembersContext';
 import RemoveTeamMemberModal from '@/app/lib/components/members/removeTeamMemberModal';
 import SelectOwnerModal from '@/app/lib/components/members/selectOwnerModal';
 import { useMemberModals } from '@/app/lib/hooks/useMemberModals';
@@ -19,7 +19,8 @@ import ChangeRoleModal from '@/app/lib/components/members/changeRoleModal';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
   const { currentStep, nextStep, resetSequence } = useMemberModals();
-  const { myRole, updateMemberRole, removeMember } = useMembersContext();
+  const { myRole, updateMemberRole, removeMember, memberType } =
+    useMembersContext();
 
   const areYouSureModalText = {
     newOwner: {
@@ -125,7 +126,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
 
         <div className="flex h-full w-fit items-center justify-start gap-2">
           <>
-            {CheckAccess(['admin', 'owner']) && (
+            {CheckAccess(['admin', 'owner'], memberType) && (
               <Button
                 isDisabled={
                   (member.role === 'owner' && myRole !== 'owner') ||
@@ -157,7 +158,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 <LogOutIcon className="stroke-danger" />
               </Button>
             ) : (
-              CheckAccess(['admin', 'owner']) && (
+              CheckAccess(['admin', 'owner'], memberType) && (
                 <Button
                   isDisabled={
                     member.role === 'owner' ||

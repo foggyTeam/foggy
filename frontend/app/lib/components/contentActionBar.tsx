@@ -26,6 +26,7 @@ export interface ActionBarProps {
   addNew?: any;
   addMember?: any;
   openSettings?: any;
+  type?: 'project' | 'team';
 }
 
 export default function ContentActionBar({
@@ -40,6 +41,7 @@ export default function ContentActionBar({
   addNew,
   addMember,
   openSettings,
+  type,
 }: ActionBarProps) {
   const hasFilters = () => {
     return [
@@ -120,16 +122,22 @@ export default function ContentActionBar({
               <PlusIcon className="stroke-default-500" />
             </Button>
           )}
-          {addMember !== undefined && CheckAccess(['admin', 'owner']) && (
+          {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
             <Button onPress={addMember} isIconOnly variant="light" size="sm">
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
-          {openSettings !== undefined && CheckAccess(['admin', 'owner']) && (
-            <Button onPress={openSettings} isIconOnly variant="light" size="sm">
-              <SettingsIcon className="stroke-default-500" />
-            </Button>
-          )}
+          {openSettings !== undefined &&
+            CheckAccess(['admin', 'owner'], type) && (
+              <Button
+                onPress={openSettings}
+                isIconOnly
+                variant="light"
+                size="sm"
+              >
+                <SettingsIcon className="stroke-default-500" />
+              </Button>
+            )}
         </div>
       </div>
       {dispatchFilters !== undefined && (

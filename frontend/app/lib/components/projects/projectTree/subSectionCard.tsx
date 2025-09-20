@@ -89,7 +89,8 @@ const SubSectionCard = observer(
             </Button>
             <NameInput
               isReadonly={
-                isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+                isReadonly ||
+                !CheckAccess(['admin', 'owner', 'editor'], 'project')
               }
               setIsReadonly={setIsReadonly}
               value={subSectionName}
@@ -97,7 +98,7 @@ const SubSectionCard = observer(
               onBlur={updateSectionName}
             />
           </div>
-          {CheckAccess(['admin', 'owner', 'editor']) && (
+          {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
               <Button
                 isIconOnly

@@ -198,7 +198,7 @@ const ProjectTree = observer(() => {
         }}
       >
         <div className="flex h-fit w-full flex-col gap-2 pr-2 pb-16">
-          {CheckAccess(['admin', 'owner', 'editor']) && (
+          {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <AddRootSectionButton
               title={settingsStore.t.projects.addSection}
               onPress={openAddNodeModal}

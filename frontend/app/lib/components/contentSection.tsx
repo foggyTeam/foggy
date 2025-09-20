@@ -33,6 +33,7 @@ interface ContentSectionProps {
   addNew?: any;
   addMember?: any;
   openSettings?: any;
+  type?: 'project' | 'team';
 }
 
 export type FilterReducerActionPayload = {
@@ -91,6 +92,7 @@ export default function ContentSection({
   addNew,
   addMember,
   openSettings,
+  type,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
@@ -116,6 +118,7 @@ export default function ContentSection({
 
   const actionBarProps = useMemo(() => {
     const props: ActionBarProps = {
+      type,
       setSearchValue,
       addNew,
       addMember,

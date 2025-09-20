@@ -36,7 +36,7 @@ const ProjectStructure = observer(() => {
                 {projectsStore.activeProject?.name}
               </h1>
             </div>
-            {CheckAccess(['admin', 'owner']) && (
+            {CheckAccess(['admin', 'owner'], 'project') && (
               <Button onPress={onSettingsOpen} isIconOnly variant="light">
                 <SettingsIcon className="stroke-default-500" />
               </Button>
