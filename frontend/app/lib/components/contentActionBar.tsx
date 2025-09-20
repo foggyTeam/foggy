@@ -117,11 +117,12 @@ export default function ContentActionBar({
         </div>
 
         <div className="flex gap-1">
-          {addNew !== undefined && (
-            <Button onPress={addNew} isIconOnly variant="light" size="sm">
-              <PlusIcon className="stroke-default-500" />
-            </Button>
-          )}
+          {addNew !== undefined &&
+            (type ? CheckAccess(['admin', 'owner'], type) : true) && (
+              <Button onPress={addNew} isIconOnly variant="light" size="sm">
+                <PlusIcon className="stroke-default-500" />
+              </Button>
+            )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
             <Button onPress={addMember} isIconOnly variant="light" size="sm">
               <UserRoundPlusIcon className="stroke-default-500" />

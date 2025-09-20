@@ -85,6 +85,10 @@
     }
   },
 
+  "team": {
+    "teamProject": "ПРОЕКТЫ _"
+  },
+
   "projects": {
     "projectSettings": {
       "name": "Название проекта",

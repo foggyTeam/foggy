@@ -60,7 +60,7 @@ export default function ProjectCard(project: Project) {
           >
             <a
               onClick={(event) => event.stopPropagation()}
-              href={`project/${project.id}`}
+              href={`/project/${project.id}`}
             >
               {project.name}
             </a>

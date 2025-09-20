@@ -85,6 +85,9 @@
       "team": "team"
     }
   },
+  "team": {
+    "teamProject": "_ PROJECTS"
+  },
 
   "projects": {
     "projectSettings": {
