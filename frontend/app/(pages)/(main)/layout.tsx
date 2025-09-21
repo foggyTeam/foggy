@@ -42,7 +42,7 @@ async function getUserTeams(): Promise<Team[] | undefined> {
         () =>
           resolve(
             allTeams.map((team: any) => {
-              return { ...team, settings: new TeamSettings() };
+              return { ...team, settings: { ...new TeamSettings() } };
             }) as Team[],
           ),
         300,

@@ -223,8 +223,8 @@ importers:
         specifier: ^2.2.11
         version: 2.2.11(react@18.3.1)
       '@internationalized/date':
-        specifier: 3.8.1
-        version: 3.8.1
+        specifier: 3.9.0
+        version: 3.9.0
       '@next/env':
         specifier: ^15.5.3
         version: 15.5.3
@@ -1425,9 +1425,6 @@ packages:
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     cpu: [x64]
     os: [win32]
-
-  '@internationalized/date@3.8.1':
-    resolution: {integrity: sha512-PgVE6B6eIZtzf9Gu5HvJxRK3ufUFz9DhspELuhW/N0GuMGMTLvPQNRkHP2hTuP9lblOk+f+1xi96sPiPXANXAA==}
 
   '@internationalized/date@3.9.0':
     resolution: {integrity: sha512-yaN3brAnHRD+4KyyOsJyk49XUvj2wtbNACSqg0bz3u8t2VuzhC8Q5dfRnrSxjnnbDb+ienBnkn1TzQfE154vyg==}
@@ -8218,10 +8215,6 @@ snapshots:
 
   '@img/sharp-win32-x64@0.33.5':
     optional: true
-
-  '@internationalized/date@3.8.1':
-    dependencies:
-      '@swc/helpers': 0.5.17
 
   '@internationalized/date@3.9.0':
     dependencies:

@@ -14,7 +14,7 @@ export default function TeamCard(team: Team) {
     <div
       onClick={() => router.push(`/team/${team.id}`)}
       className={clsx(
-        'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
+        'hover:bg-default-50 accent-link hover:accent-link-hover shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
         el_animation,
         'h-16 w-[379px] cursor-pointer',
         team_tile,

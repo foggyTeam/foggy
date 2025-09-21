@@ -37,7 +37,7 @@
     "@heroui/toast": "^2.0.16",
     "@heroui/tooltip": "^2.2.23",
     "@heroui/use-infinite-scroll": "^2.2.11",
-    "@internationalized/date": "3.8.1",
+    "@internationalized/date": "3.9.0",
     "@next/env": "^15.5.3",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.13",

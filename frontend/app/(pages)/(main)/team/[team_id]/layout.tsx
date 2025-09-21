@@ -13,7 +13,8 @@ async function getTeam(id: string): Promise<RawTeam | undefined> {
   // const team = await GetTeam(id);
   const team: Promise<RawTeam> = new Promise((resolve) =>
     setTimeout(
-      () => resolve({ ...activeTeam, settings: new TeamSettings() } as any),
+      () =>
+        resolve({ ...activeTeam, settings: { ...new TeamSettings() } } as any),
       300,
     ),
   );
