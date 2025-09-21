@@ -3,7 +3,7 @@ import RightSideBar from '@/app/lib/components/menu/rightSideBar/rightSideBar';
 import UserLoader from '@/app/lib/components/dataLoaders/userLoader';
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
-import { Project, Team } from '@/app/lib/types/definitions';
+import { Project, Team, TeamSettings } from '@/app/lib/types/definitions';
 import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
@@ -38,7 +38,15 @@ async function getUserProjects(): Promise<Project[] | undefined> {
 async function getUserTeams(): Promise<Team[] | undefined> {
   try {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(allTeams as Team[]), 300);
+      setTimeout(
+        () =>
+          resolve(
+            allTeams.map((team: any) => {
+              return { ...team, settings: { ...new TeamSettings() } };
+            }) as Team[],
+          ),
+        300,
+      );
     });
   } catch (e) {
     console.error('User with this id does not exist.');

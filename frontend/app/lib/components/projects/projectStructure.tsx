@@ -36,7 +36,7 @@ const ProjectStructure = observer(() => {
                 {projectsStore.activeProject?.name}
               </h1>
             </div>
-            {CheckAccess(['admin', 'owner']) && (
+            {CheckAccess(['admin', 'owner'], 'project') && (
               <Button onPress={onSettingsOpen} isIconOnly variant="light">
                 <SettingsIcon className="stroke-default-500" />
               </Button>
@@ -71,7 +71,7 @@ const ProjectStructure = observer(() => {
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
+        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-linear-to-t" />
       </div>
       {isSettingsOpen && (
         <ProjectSettingsModal

@@ -1,14 +1,18 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { Team } from '@/app/lib/types/definitions';
+import { RawTeam, Role, Team } from '@/app/lib/types/definitions';
+import userStore from '@/app/stores/userStore';
 
 class TeamsStore {
+  myRole: Role | undefined = undefined;
   activeTeam: Team | undefined = undefined;
   allTeams: Team[] = [];
 
   constructor() {
     makeAutoObservable(this, {
+      myRole: observable,
       activeTeam: observable,
       allTeams: observable,
+      revalidateActiveTeam: action,
       setActiveTeam: action,
       setAllTeams: action,
       addTeam: action,
@@ -16,8 +20,23 @@ class TeamsStore {
     });
   }
 
-  setActiveTeam = (team: Team) => {
-    this.activeTeam = { ...this.activeTeam, ...team };
+  setActiveTeam = (team: RawTeam | null) => {
+    if (!team) {
+      this.activeTeam = undefined;
+      this.myRole = undefined;
+      return;
+    }
+    this.activeTeam = { ...team };
+    this.myRole = this.activeTeam.members.find(
+      (member) => member.id === userStore.user?.id,
+    )?.role;
+  };
+  revalidateActiveTeam = (revalidatedData: RawTeam) => {
+    if (!this.activeTeam) return;
+    Object.assign(this.activeTeam, revalidatedData);
+    this.myRole = this.activeTeam.members.find(
+      (member) => member.id === userStore.user?.id,
+    )?.role;
   };
   setAllTeams = (teams: Team[]) => {
     this.allTeams = teams;

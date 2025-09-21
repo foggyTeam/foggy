@@ -133,7 +133,7 @@ const BoardStage = observer(() => {
           color="secondary"
           variant="light"
           size="md"
-          className="invisible absolute bottom-4 right-16 z-50 font-semibold sm:visible"
+          className="invisible absolute right-16 bottom-4 z-50 font-semibold sm:visible"
         >
           <MaximizeIcon />
         </Button>

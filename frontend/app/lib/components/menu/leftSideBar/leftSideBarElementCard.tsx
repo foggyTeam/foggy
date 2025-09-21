@@ -23,18 +23,18 @@ export default function LeftSideBarElementCard({
         event.stopPropagation();
         handleClick();
       }}
-      className="group flex max-h-16 w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1 transition-colors hover:bg-default-100"
+      className="hover:bg-default-100 group flex max-h-16 w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1 transition-colors"
     >
       <div className="flex h-full w-full items-center gap-3 text-sm">
         <ElementIcon
           elementType={'type' in element ? element.type : 'SECTION'}
         />
-        <p className={isActive ? 'font-medium text-f_accent' : ''}>
+        <p className={isActive ? 'text-f_accent font-medium' : ''}>
           {element.name}
         </p>
       </div>
       <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
-        {CheckAccess(['admin', 'owner', 'editor']) && (
+        {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
           <>
             {'children' in element && (
               <Button isIconOnly onPress={addNode} variant="light" size="sm">

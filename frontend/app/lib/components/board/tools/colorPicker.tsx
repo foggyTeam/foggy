@@ -53,7 +53,7 @@ export default function ColorPicker({
             size="sm"
             variant="light"
           >
-            <CopyIcon className="h-5 w-5 stroke-default-500" />
+            <CopyIcon className="stroke-default-500 h-5 w-5" />
           </Button>
         }
       />

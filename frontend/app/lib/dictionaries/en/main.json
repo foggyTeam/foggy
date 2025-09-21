@@ -34,6 +34,11 @@
       "required": "Name is required",
       "maxLength": "Name must be no more than 20 characters long",
       "invalidSymbols": "Name may contain only letters, digits and special symbols"
+    },
+    "teamName": {
+      "required": "Team name is required",
+      "maxLength": "Team name must be no more than 20 characters long",
+      "invalidSymbols": "Team name may contain only letters, digits and special symbols"
     }
   },
 
@@ -83,6 +88,26 @@
       "editor": "editor",
       "reader": "reader",
       "team": "team"
+    }
+  },
+  "team": {
+    "teamProject": "_ PROJECTS",
+    "teamSettings": {
+      "name": "Team name",
+      "uploadAvatarHint": "Upload new team avatar",
+      "allowRequests": "Allow requests to the team",
+      "memberListIsPublic": "Member list is public",
+      "projectListIsPublic": "Project list is public",
+      "leaveButton": "Leave the team",
+      "deleteButton": "Delete team",
+      "saveButton": "Save",
+      "createButton": "Create team"
+    },
+    "deleteTeam": {
+      "modalHeader": "Do you really want to delete your team?",
+      "modalDescription": "Deleting your team will result in the irreversible loss of all team data, including members and project membership. After deletion data recovery will be impossible.",
+      "modalSure": "Delete anyway",
+      "modalDismiss": "Dismiss"
     }
   },
 
@@ -157,7 +182,10 @@
   "members": {
     "addMember": {
       "modalHeader": "Invite members",
-      "searchPlaceholder": "Find by nickname or team name...",
+      "searchPlaceholder": {
+        "project": "Find by nickname or team name...",
+        "team": "Find by nickname..."
+      },
       "rolePlaceholder": "Choose a role...",
       "expiresIn": "Expires in",
       "modalCopyLink": "Copy invite link",

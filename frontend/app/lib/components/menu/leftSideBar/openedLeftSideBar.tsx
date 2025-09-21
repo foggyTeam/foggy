@@ -210,7 +210,7 @@ const OpenedLeftSideBar = observer(
             bg_container,
             left_sidebar_layout,
             'h-fit w-fit overflow-clip',
-            'transform transition-all hover:bg-opacity-65 hover:pl-0.5',
+            'transform transition-all hover:bg-white/65 hover:pl-0.5',
           )}
         >
           <DrawerContent className="gap-4">
@@ -239,7 +239,7 @@ const OpenedLeftSideBar = observer(
                   itemsAfterCollapse={1}
                 >
                   <BreadcrumbItem onPress={handleOpenRoot}>
-                    <p className="w-full overflow-hidden text-ellipsis text-nowrap">
+                    <p className="w-full overflow-hidden text-nowrap text-ellipsis">
                       {(projectsStore.activeProject?.name || '').toUpperCase()}
                     </p>
                   </BreadcrumbItem>
@@ -248,7 +248,7 @@ const OpenedLeftSideBar = observer(
                     : parentList
                   ).map((sectionId) => (
                     <BreadcrumbItem key={sectionId} onPress={handleOpenParent}>
-                      <p className="w-full overflow-hidden text-ellipsis text-nowrap">
+                      <p className="w-full overflow-hidden text-nowrap text-ellipsis">
                         {activeSection &&
                         'id' in activeSection &&
                         sectionId === activeSection.id

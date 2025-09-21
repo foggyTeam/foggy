@@ -77,3 +77,14 @@ export const projectElementNameSchema = z.object({
       settingsStore.t.validationErrors.projectElementName.invalidSymbols,
     ),
 });
+
+export const teamFormSchema = z.object({
+  name: z
+    .string()
+    .nonempty(settingsStore.t.validationErrors.teamName.required)
+    .max(20, settingsStore.t.validationErrors.teamName.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.teamName.invalidSymbols,
+    ),
+});

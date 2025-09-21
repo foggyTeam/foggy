@@ -15,6 +15,16 @@
       "deleteMemberError": "Не удалось удалить участника",
       "updateMemberRoleError": "Не удалось обновить роль участника"
     },
+    "team": {
+      "addTeamError": "Не удалось создать команду",
+      "addTeamSuccess": "Команда создана",
+      "deleteTeamError": "Не удалось удалить команду",
+      "deleteTeamSuccess": "Команда удалена",
+      "noActive": "Нет активной команды",
+      "teamNotExist": "Команда с этим ID не найдена",
+      "updateTeamError": "Не удалось обновить данные команды",
+      "updateTeamSuccess": "Данные команды обновлены"
+    },
     "project": {
       "addProjectError": "Не удалось создать проект",
       "addProjectSuccess": "Проект создан",

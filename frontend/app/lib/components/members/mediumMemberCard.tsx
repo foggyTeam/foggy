@@ -10,7 +10,7 @@ export default function MediumMemberCard(member: ProjectMember | TeamMember) {
   return (
     <Button
       // TODO: navigate to member
-      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pl-0 pr-1 transition-colors duration-300 shadow-container hover:bg-primary-100"
+      className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pr-1 pl-0 transition-colors duration-300"
     >
       <div className="flex items-center justify-start gap-1">
         <Avatar
@@ -22,11 +22,11 @@ export default function MediumMemberCard(member: ProjectMember | TeamMember) {
           name={member.nickname}
           src={member.avatar}
         />
-        <p className="text-small font-bold text-default-700">
+        <p className="text-small text-default-700 font-bold">
           {member.nickname}
         </p>
         {userStore.user?.id === member.id && (
-          <p className="text-xs text-default-700">{settingsStore.t.main.you}</p>
+          <p className="text-default-700 text-xs">{settingsStore.t.main.you}</p>
         )}
       </div>
       <RoleCard role={member.role} />

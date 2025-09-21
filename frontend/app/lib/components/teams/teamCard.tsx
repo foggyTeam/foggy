@@ -14,7 +14,7 @@ export default function TeamCard(team: Team) {
     <div
       onClick={() => router.push(`/team/${team.id}`)}
       className={clsx(
-        'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+        'hover:bg-default-50 accent-link hover:accent-link-hover shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
         el_animation,
         'h-16 w-[379px] cursor-pointer',
         team_tile,
@@ -28,7 +28,7 @@ export default function TeamCard(team: Team) {
           src={team.avatar}
         />
         <div className="flex h-full flex-col items-start justify-between">
-          <h1 className="max-w-32 truncate text-nowrap font-medium">
+          <h1 className="max-w-32 truncate font-medium text-nowrap">
             {team.name}
           </h1>
           <RoleCard

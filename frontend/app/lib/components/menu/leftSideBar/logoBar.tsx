@@ -7,8 +7,8 @@ export default function LogoBar() {
   return (
     <div
       className={clsx(
-        'absolute left-0 top-8 z-50 flex flex-col items-center justify-center ' +
-          'rounded-l-none rounded-br-[64px] rounded-tr-2xl px-2 py-12',
+        'absolute top-8 left-0 z-50 flex flex-col items-center justify-center ' +
+          'rounded-l-none rounded-tr-2xl rounded-br-[64px] px-2 py-12',
         bg_container,
       )}
     >

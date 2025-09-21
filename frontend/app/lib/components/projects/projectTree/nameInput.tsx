@@ -47,7 +47,7 @@ export default function NameInput({
       variant="bordered"
       size={size}
       className={clsx(
-        'h-6 w-fit content-center rounded-lg border-1.5 border-default/0',
+        'border-1.5 border-default/0 h-6 w-fit content-center rounded-lg',
         !isReadonly &&
           ('name' in error ? 'border-danger-400' : 'border-default-200'),
       )}

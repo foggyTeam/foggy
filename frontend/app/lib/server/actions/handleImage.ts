@@ -7,11 +7,11 @@ import {
 import getHash from '@/app/lib/utils/getStringHash';
 import getUserId from '@/app/lib/getUserId';
 
-export async function uploadImage(directoryName: string, image: Blob) {
+export async function uploadImage(directoryName: string, image: Blob | string) {
   return await getPublicFileURL(
     getHash((await getUserId()) + Date().toString()),
     directoryName,
-    image,
+    image as Blob,
   );
 }
 

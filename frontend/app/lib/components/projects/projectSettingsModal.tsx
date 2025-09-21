@@ -3,7 +3,11 @@ import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
-import { Project, ProjectSettings } from '@/app/lib/types/definitions';
+import {
+  Project,
+  ProjectSettings,
+  TeamMember,
+} from '@/app/lib/types/definitions';
 import { projectFormSchema } from '@/app/lib/types/schemas';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { Form } from '@heroui/form';
@@ -24,16 +28,19 @@ import {
 import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
+import teamsStore from '@/app/stores/teamsStore';
 
 const ProjectSettingsModal = observer(
   ({
     isOpen,
     onOpenChange,
     isNewProject = false,
+    isTeamProject = false,
   }: {
     isOpen: boolean;
     onOpenChange: any;
     isNewProject?: boolean;
+    isTeamProject?: boolean;
   }) => {
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
@@ -141,6 +148,7 @@ const ProjectSettingsModal = observer(
         }
 
         if (isNewProject) {
+          // TODO: if team project, add team members initially
           await AddNewProject(updatedData)
             .then((result) => {
               if (
@@ -151,16 +159,21 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
               } else {
                 if (!userStore.user) return;
+                const projectMembers = (
+                  isTeamProject
+                    ? (teamsStore.activeTeam?.members ?? [])
+                    : [
+                        {
+                          id: userStore.user.id,
+                          nickname: userStore.user.name,
+                          avatar: userStore.user.image,
+                          role: 'owner',
+                        },
+                      ]
+                ) as TeamMember[];
                 const newProject = {
                   id: result.data.id,
-                  members: [
-                    {
-                      id: userStore.user.id,
-                      nickname: userStore.user.name,
-                      avatar: userStore.user.image,
-                      role: 'owner',
-                    },
-                  ],
+                  members: [...projectMembers],
                   ...updatedData,
                 } as Project;
 
@@ -207,10 +220,10 @@ const ProjectSettingsModal = observer(
 
     return (
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-        <ModalContent className="w-2xl flex max-w-2xl gap-2 overflow-visible p-6">
+        <ModalContent className="flex w-full max-w-2xl gap-2 overflow-visible p-6">
           {() =>
             (
-              <ModalBody className="w-2xl flex h-fit max-w-2xl gap-2 p-0">
+              <ModalBody className="flex h-fit w-full max-w-2xl gap-2 p-0">
                 <Form className={'flex h-fit w-full min-w-24 flex-col gap-6'}>
                   <div className="items-top -mt-12 flex w-1/2 justify-center">
                     <UploadAvatarButton
@@ -298,12 +311,12 @@ const ProjectSettingsModal = observer(
                   <div
                     className={clsx(
                       'flex w-full items-center gap-2',
-                      isNewProject || !CheckAccess(['owner'])
+                      isNewProject || !CheckAccess(['owner'], 'project')
                         ? 'justify-end'
                         : 'justify-between',
                     )}
                   >
-                    {!isNewProject && CheckAccess(['owner']) && (
+                    {!isNewProject && CheckAccess(['owner'], 'project') && (
                       <FButton
                         onPress={onDeleteProjectOpen}
                         isDisabled={isSaving}

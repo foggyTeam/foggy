@@ -132,11 +132,21 @@ export interface Team {
   id: string;
   name: string;
   avatar?: string;
+  settings: TeamSettings;
   members: TeamMember[];
   projects: Project[];
 }
 
+// TODO: actualize when API available
+export type RawTeam = Team;
+
 export type Role = 'owner' | 'admin' | 'editor' | 'reader';
+
+export class TeamSettings {
+  allowRequests: boolean = true;
+  memberListIsPublic: boolean = true;
+  projectListIsPublic: boolean = true;
+}
 
 export interface TeamMember {
   id: string;

@@ -16,7 +16,7 @@ export default function RequestMessageCard({
   onExpand?: () => void;
 }) {
   return (
-    <div className="flex w-full flex-col gap-1 rounded-small bg-default-200 p-2">
+    <div className="rounded-small bg-default-200 flex w-full flex-col gap-1 p-2">
       <div className="flex w-full flex-nowrap items-center justify-between gap-2">
         <div className="flex w-full items-center justify-start gap-1">
           <Avatar
@@ -29,7 +29,7 @@ export default function RequestMessageCard({
           />
           <p
             className={clsx(
-              'font-bold text-default-700',
+              'text-default-700 font-bold',
               onExpand ? 'text-xs' : 'text-sm',
             )}
           >
@@ -44,7 +44,7 @@ export default function RequestMessageCard({
             radius="full"
             size="sm"
           >
-            <MoveDiagonalIcon className="stroke-default-400 transition-colors hover:stroke-default-500" />
+            <MoveDiagonalIcon className="stroke-default-400 hover:stroke-default-500 transition-colors" />
           </Button>
         )}
       </div>

@@ -19,9 +19,18 @@ import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions'
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
+import teamsStore from '@/app/stores/teamsStore';
 
 const AddMembersModal = observer(
-  ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: () => void }) => {
+  ({
+    isOpen,
+    onOpenChange,
+    type,
+  }: {
+    isOpen: boolean;
+    onOpenChange: () => void;
+    type: 'project' | 'team';
+  }) => {
     const expirationTimes = {
       '24h': `24 ${settingsStore.t.time.hours.toLowerCase()}`,
       '7d': `7 ${settingsStore.t.time.days.toLowerCase()}`,
@@ -41,19 +50,27 @@ const AddMembersModal = observer(
     const handleAddMembers = () => {
       setIsLoading(true);
       selectedMembers.forEach(async (id) => {
-        if (!projectsStore.activeProject || !role) return;
-        await AddProjectMember(projectsStore.activeProject.id, {
-          userId: id,
-          role: role,
-          expirationTime: expirationTime,
-        }).catch((error: any) =>
-          addToast({
-            color: 'danger',
-            severity: 'danger',
-            title: settingsStore.t.toasts.members.addMemberError,
-            description: error,
-          }),
-        );
+        switch (type) {
+          case 'project':
+            if (!projectsStore.activeProject || !role) return;
+            await AddProjectMember(projectsStore.activeProject.id, {
+              userId: id,
+              role: role,
+              expirationTime: expirationTime,
+            }).catch((error: any) =>
+              addToast({
+                color: 'danger',
+                severity: 'danger',
+                title: settingsStore.t.toasts.members.addMemberError,
+                description: error,
+              }),
+            );
+            break;
+          case 'team':
+            if (!teamsStore.activeTeam || !role) return;
+            // TODO: add team member
+            console.log('add team member', id);
+        }
       });
       setIsLoading(false);
       onOpenChange();
@@ -69,7 +86,10 @@ const AddMembersModal = observer(
               </ModalHeader>
 
               <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
-                <MemberAutocomplete setSelectedId={setSelectedMembers} />
+                <MemberAutocomplete
+                  memberType={type}
+                  setSelectedId={setSelectedMembers}
+                />
                 <div className="flex w-full flex-nowrap justify-between gap-2">
                   <SelectRole
                     role={role}
@@ -92,7 +112,7 @@ const AddMembersModal = observer(
                       classNames={{
                         popoverContent: clsx(
                           bg_container_no_padding,
-                          'p-2 sm:p-3 bg-opacity-100 w-36',
+                          'p-2 sm:p-3 bg-white/100 w-36',
                         ),
                         innerWrapper: 'w-full',
                         selectorIcon: 'invisible',

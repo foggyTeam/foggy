@@ -33,6 +33,7 @@ interface ContentSectionProps {
   addNew?: any;
   addMember?: any;
   openSettings?: any;
+  type?: 'project' | 'team';
 }
 
 export type FilterReducerActionPayload = {
@@ -91,6 +92,7 @@ export default function ContentSection({
   addNew,
   addMember,
   openSettings,
+  type,
 }: ContentSectionProps) {
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
@@ -116,6 +118,7 @@ export default function ContentSection({
 
   const actionBarProps = useMemo(() => {
     const props: ActionBarProps = {
+      type,
       setSearchValue,
       addNew,
       addMember,
@@ -185,7 +188,7 @@ export default function ContentSection({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
+        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-linear-to-t" />
       </div>
 
       {isFiltersOpen && (

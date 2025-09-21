@@ -54,7 +54,7 @@ export default function BoardCard({
           `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
         )
       }
-      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pl-10 pr-0"
+      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0 pl-10"
     >
       <div
         onClick={(event) =>
@@ -65,7 +65,7 @@ export default function BoardCard({
           )
         }
         className={clsx(
-          'group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors hover:bg-default-100',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == board.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
@@ -77,7 +77,8 @@ export default function BoardCard({
           </div>
           <NameInput
             isReadonly={
-              isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+              isReadonly ||
+              !CheckAccess(['admin', 'owner', 'editor'], 'project')
             }
             setIsReadonly={setIsReadonly}
             onBlur={updateBoardName}
@@ -86,7 +87,7 @@ export default function BoardCard({
           />
         </div>
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
-          {CheckAccess(['admin', 'owner', 'editor']) && (
+          {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <Button
               isIconOnly
               onPress={() => removeNode(board.id, parentList)}

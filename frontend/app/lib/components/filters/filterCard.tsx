@@ -29,7 +29,7 @@ export default function FilterCard({
   return (
     <div
       style={{ borderColor: cardColor }}
-      className="flex h-7 w-fit items-center justify-between gap-1 rounded-full border-1.5 px-2 transition-background hover:bg-primary/10"
+      className="border-1.5 transition-background hover:bg-primary/10 flex h-7 w-fit items-center justify-between gap-1 rounded-full px-2"
     >
       {filterKey === 'lastChange' && (
         <CalendarDaysIcon stroke={cardColor} className="h-4" />
