@@ -3,7 +3,11 @@ import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import React, { ReactNode, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
-import { Project, ProjectSettings } from '@/app/lib/types/definitions';
+import {
+  Project,
+  ProjectSettings,
+  TeamMember,
+} from '@/app/lib/types/definitions';
 import { projectFormSchema } from '@/app/lib/types/schemas';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { Form } from '@heroui/form';
@@ -155,16 +159,18 @@ const ProjectSettingsModal = observer(
                 setErrors(result.errors);
               } else {
                 if (!userStore.user) return;
-                const projectMembers = isTeamProject
-                  ? teamsStore.activeTeam?.members
-                  : [
-                      {
-                        id: userStore.user.id,
-                        nickname: userStore.user.name,
-                        avatar: userStore.user.image,
-                        role: 'owner',
-                      },
-                    ];
+                const projectMembers = (
+                  isTeamProject
+                    ? (teamsStore.activeTeam?.members ?? [])
+                    : [
+                        {
+                          id: userStore.user.id,
+                          nickname: userStore.user.name,
+                          avatar: userStore.user.image,
+                          role: 'owner',
+                        },
+                      ]
+                ) as TeamMember[];
                 const newProject = {
                   id: result.data.id,
                   members: [...projectMembers],

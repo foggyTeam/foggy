@@ -33,7 +33,7 @@ export function useMembersList({
       return;
     setIsLoading(true);
 
-    const data = {
+    const data: any = {
       query: search,
       cursor,
       limit,
@@ -41,8 +41,8 @@ export function useMembersList({
       projectId: undefined,
     };
     if (memberType === 'project')
-      data.projectId = projectsStore.activeProject.id;
-    if (memberType === 'team') data.teamId = teamsStore.activeTeam.id;
+      data.projectId = projectsStore.activeProject?.id;
+    if (memberType === 'team') data.teamId = teamsStore.activeTeam?.id;
 
     await SearchUsers(data)
       .then(

@@ -20,7 +20,7 @@ class TeamsStore {
     });
   }
 
-  setActiveTeam = (team: RawTeam) => {
+  setActiveTeam = (team: RawTeam | null) => {
     if (!team) {
       this.activeTeam = undefined;
       this.myRole = undefined;

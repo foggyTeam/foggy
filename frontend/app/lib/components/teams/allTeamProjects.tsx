@@ -20,7 +20,7 @@ const AllTeamProjects = observer(() => {
       <ContentSection
         sectionTitle={settingsStore.t.team.teamProject.replace(
           '_',
-          teamsStore.activeTeam?.name.toUpperCase(),
+          (teamsStore.activeTeam?.name ?? '').toUpperCase(),
         )}
         data={teamsStore.activeTeam?.projects?.slice() ?? []}
         DataCard={ProjectCard}
