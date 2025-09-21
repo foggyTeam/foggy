@@ -5,6 +5,8 @@ import { montserrat } from '@/public/fonts/fonts';
 import { Providers } from '@/app/providers';
 import LocaleSwitcher from '@/app/lib/components/localeSwitcher';
 import BackgroundGradient from '@/app/lib/components/backgroundGradient/backgroundGradient';
+import NextTopLoader from 'nextjs-toploader';
+import { foggy_accent } from '@/tailwind.config';
 
 export const metadata: Metadata = {
   title: { template: `foggy | %s`, default: 'foggy' },
@@ -25,6 +27,7 @@ export default function RootLayout({
 
           <BackgroundGradient backgroundColor="default-100" />
 
+          <NextTopLoader color={foggy_accent[500]} showSpinner={false} />
           <LocaleSwitcher />
         </Providers>
       </body>
