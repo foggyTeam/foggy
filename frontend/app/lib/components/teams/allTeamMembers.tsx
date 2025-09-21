@@ -6,14 +6,12 @@ import teamsStore from '@/app/stores/teamsStore';
 import MemberCard from '@/app/lib/components/members/memberCard';
 import { Role } from '@/app/lib/types/definitions';
 import MembersContext from '@/app/lib/hooks/useMembersContext';
-import CompareByRole from '@/app/lib/utils/compareByRole';
 import { useDisclosure } from '@heroui/modal';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 import TeamSettingsModal from '@/app/lib/components/teams/teamSettingsModal';
 
 const AllTeamMembers = observer(() => {
-  const myRole: Role | null =
-    teamsStore.activeTeam?.members.toSorted(CompareByRole)[0].role || null;
+  const myRole: Role | null = teamsStore.myRole ?? null;
   const {
     isOpen: isAddMemberOpen,
     onOpen: onAddMemberOpen,

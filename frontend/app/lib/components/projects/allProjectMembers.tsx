@@ -19,9 +19,7 @@ import MembersContext from '@/app/lib/hooks/useMembersContext';
 
 const AllProjectMembers = observer(() => {
   const router = useRouter();
-  const myRole: Role | null =
-    projectsStore.activeProject?.members.toSorted(CompareByRole)[0].role ||
-    null;
+  const myRole: Role | null = projectsStore.myRole ?? null;
   const {
     isOpen: isAddMemberOpen,
     onOpen: onAddMemberOpen,

@@ -34,6 +34,9 @@ class TeamsStore {
   revalidateActiveTeam = (revalidatedData: RawTeam) => {
     if (!this.activeTeam) return;
     Object.assign(this.activeTeam, revalidatedData);
+    this.myRole = this.activeTeam.members.find(
+      (member) => member.id === userStore.user?.id,
+    )?.role;
   };
   setAllTeams = (teams: Team[]) => {
     this.allTeams = teams;

@@ -19,6 +19,7 @@ import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions'
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
+import teamsStore from '@/app/stores/teamsStore';
 
 const AddMembersModal = observer(
   ({
@@ -66,7 +67,7 @@ const AddMembersModal = observer(
             );
             break;
           case 'team':
-            if (!projectsStore.activeProject || !role) return;
+            if (!teamsStore.activeTeam || !role) return;
             // TODO: add team member
             console.log('add team member', id);
         }
