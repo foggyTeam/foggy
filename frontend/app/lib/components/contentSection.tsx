@@ -21,12 +21,14 @@ import FilterModal from '@/app/lib/components/filters/filterModal';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
 
 interface ContentSectionProps {
   sectionTitle?: string;
   sectionAvatar?: string;
   data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
   DataCard: ComponentType<any>;
+  emptyState?: EmptyStateProps;
   filter?: boolean;
   onlyFavorite?: boolean;
   onlyWithNotification?: boolean;
@@ -86,6 +88,7 @@ export default function ContentSection({
   sectionAvatar,
   data,
   DataCard,
+  emptyState,
   filter,
   onlyFavorite,
   onlyWithNotification,
@@ -123,6 +126,7 @@ export default function ContentSection({
       addNew,
       addMember,
       openSettings,
+      filtersDisabled: !data.length,
     };
 
     if (filter) {
@@ -176,16 +180,30 @@ export default function ContentSection({
             'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
           )}
         >
-          <div
-            className="grid-rows-auto grid content-between gap-y-2 pb-16"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fill, 97px)',
-            }}
-          >
-            {filteredData.map((element) => (
-              <DataCard key={element.id} {...element} />
-            ))}
-          </div>
+          {!!filteredData.length && (
+            <div
+              className="grid-rows-auto grid content-between gap-y-2 pb-16"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, 97px)',
+              }}
+            >
+              {filteredData.map((element) => (
+                <DataCard key={element.id} {...element} />
+              ))}
+            </div>
+          )}
+
+          {!!data.length && !filteredData.length && (
+            <EmptyState
+              className="pb-16"
+              title={settingsStore.t.filters.emptyResult.title}
+              text={settingsStore.t.filters.emptyResult.text}
+              illustrationType="question"
+            />
+          )}
+          {!data.length && emptyState && (
+            <EmptyState className="pb-16" {...emptyState} />
+          )}
         </div>
 
         <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-linear-to-t" />

@@ -107,11 +107,16 @@ const AllNotifications = observer(() => {
   };
 
   return (
-    <div className="w-72">
+    <div className="w-full">
       <NotificationsContext.Provider value={{ onAnswer, onDelete }}>
         <ContentSection
           data={notificationsStore.notifications.slice()}
           DataCard={NotificationCard}
+          emptyState={{
+            title: settingsStore.t.notifications.empty.title,
+            text: settingsStore.t.notifications.empty.text,
+            illustrationType: 'empty',
+          }}
           filter
         />
       </NotificationsContext.Provider>

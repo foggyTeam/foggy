@@ -82,6 +82,16 @@
     "you": "(you)",
     "searchPlaceholder": "Find...",
     "noProjectDescription": "This project doesn't have any description yet...",
+    "emptyProjects": {
+      "title": "NO PROJECTS",
+      "text": "You are not a member of any project yet",
+      "action": "Create a new project!"
+    },
+    "emptyTeams": {
+      "title": "NO TEAMS",
+      "text": "You are not a member of any team yet",
+      "action": "Create a new team!"
+    },
     "roles": {
       "owner": "owner",
       "admin": "admin",
@@ -108,6 +118,10 @@
       "modalDescription": "Deleting your team will result in the irreversible loss of all team data, including members and project membership. After deletion data recovery will be impossible.",
       "modalSure": "Delete anyway",
       "modalDismiss": "Dismiss"
+    },
+    "notFound": {
+      "title": "Ooops!",
+      "text": "Team with this ID wasn't found. Try to check the url"
     }
   },
 
@@ -156,7 +170,15 @@
     },
     "projectMembers": "PARTICIPANTS",
     "projectSections": "SECTIONS",
-    "addSection": "ADD SECTION"
+    "addSection": "ADD SECTION",
+    "notFound": {
+      "title": "Ooops",
+      "text": "Project with this ID wasn't found. Try to check the url"
+    },
+    "notFoundBoard": {
+      "title": "Ooops",
+      "text": "Board with this ID wasn't found. Try to check the url"
+    }
   },
 
   "filters": {
@@ -176,6 +198,10 @@
     "byLastChange": {
       "label": "Last change",
       "placeholder": "Updated at..."
+    },
+    "emptyResult": {
+      "title": "NOTHING FOUND",
+      "text": "Try to change search input or filters"
     }
   },
 
@@ -274,6 +300,10 @@
     "newMember": {
       "team": "USER joined team NAME as ",
       "project": "USER joined project NAME as "
+    },
+    "empty": {
+      "title": "NO NOTIFICATIONS",
+      "text": "You haven't received any notifications yet"
     }
   },
 

@@ -149,10 +149,12 @@ const OpenedLeftSideBar = observer(
 
     const handleChildClick = (child: ProjectSection | Board) => {
       if ('children' in child) setParentList((prev) => [...prev, child.id]);
-      else
+      else {
+        settingsStore.startLoading();
         router.push(
           `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
         );
+      }
     };
     const removeNode = (id: string, isSection: boolean) => {
       setNodeToRemove({ id: id, parentList: parentList, isSection });
