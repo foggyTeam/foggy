@@ -98,6 +98,11 @@
       "editor": "editor",
       "reader": "reader",
       "team": "team"
+    },
+    "notFound": {
+      "title": "Ooops!",
+      "text": "It seems this page doesn't exist",
+      "action": "Go to main"
     }
   },
   "team": {
@@ -121,7 +126,8 @@
     },
     "notFound": {
       "title": "Ooops!",
-      "text": "Team with this ID wasn't found. Try to check the url"
+      "text": "Team with this ID wasn't found. Try to check the url",
+      "action": "Go back"
     }
   },
 
@@ -172,12 +178,19 @@
     "projectSections": "SECTIONS",
     "addSection": "ADD SECTION",
     "notFound": {
-      "title": "Ooops",
-      "text": "Project with this ID wasn't found. Try to check the url"
+      "title": "Ooops!",
+      "text": "Project with this ID wasn't found. Try to check the url",
+      "action": "Go back"
+    },
+    "notFoundSection": {
+      "title": "Ooops!",
+      "text": "Section with this ID wasn't found. Try to check the url",
+      "action": "Go back"
     },
     "notFoundBoard": {
-      "title": "Ooops",
-      "text": "Board with this ID wasn't found. Try to check the url"
+      "title": "Ooops!",
+      "text": "Board with this ID wasn't found. Try to check the url",
+      "action": "Go back"
     }
   },
 

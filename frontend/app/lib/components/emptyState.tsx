@@ -33,7 +33,7 @@ export interface EmptyStateProps {
   text?: string;
   illustrationType?: keyof typeof illustrationsMap;
   action?: { title: string; callback: () => void };
-  size?: 'default' | 'sm' | 'lg';
+  size?: 'default' | 'sm' | 'lg' | 'full';
 }
 
 export default function EmptyState({
@@ -47,31 +47,39 @@ export default function EmptyState({
   const maxHeight = (size) => {
     switch (size) {
       case 'default':
-        return 'max-h-40';
+        return 'max-h-40 max-w-sm';
       case 'sm':
-        return 'max-h-24';
+        return 'max-h-24 max-w-sm';
       case 'lg':
-        return 'max-h-96';
+        return 'max-h-96 max-w-lg';
+      case 'full':
+        return '';
     }
   };
   return (
-    <div className="flex h-full min-h-fit w-full flex-col items-center justify-center gap-2 px-2 py-4">
+    <div
+      className={clsx(
+        'flex h-full min-h-fit w-full flex-col items-center justify-center gap-2 px-2 py-4',
+        size === 'full' && 'gap-4',
+      )}
+    >
       {illustrationType && (
         <Illustration
-          className={clsx(
-            'h-full w-full max-w-sm object-fill px-8',
-            maxHeight(size),
-          )}
+          className={clsx('h-fit w-full object-fill px-8', maxHeight(size))}
         />
       )}
       <div className="flex w-full flex-col items-center justify-center gap-1">
-        <p className="text-small text-default-700 line-clamp-1 w-full text-center font-medium">
-          {title}
+        <p className="text-small text-primary-900 line-clamp-1 w-full text-center font-medium">
+          {title.toUpperCase()}
         </p>
-        {text && <p className="text-default-500 w-full text-center">{text}</p>}
+        {text && (
+          <p className="text-default-500 text-small w-full text-center">
+            {text}
+          </p>
+        )}
       </div>
       {action && (
-        <FButton color="primary" onClick={action.callback}>
+        <FButton size="md" color="primary" onClick={action.callback}>
           {action.title}
         </FButton>
       )}

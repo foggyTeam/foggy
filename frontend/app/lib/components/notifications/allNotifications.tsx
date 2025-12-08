@@ -107,7 +107,7 @@ const AllNotifications = observer(() => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-72">
       <NotificationsContext.Provider value={{ onAnswer, onDelete }}>
         <ContentSection
           data={notificationsStore.notifications.slice()}
