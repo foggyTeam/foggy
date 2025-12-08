@@ -112,6 +112,11 @@ const AllNotifications = observer(() => {
         <ContentSection
           data={notificationsStore.notifications.slice()}
           DataCard={NotificationCard}
+          emptyState={{
+            title: settingsStore.t.notifications.empty.title,
+            text: settingsStore.t.notifications.empty.text,
+            illustrationType: 'empty',
+          }}
           filter
         />
       </NotificationsContext.Provider>

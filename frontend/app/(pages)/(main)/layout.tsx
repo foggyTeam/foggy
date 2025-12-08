@@ -10,6 +10,7 @@ import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import { GetUserById } from '@/app/lib/server/actions/userServerActions';
 import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
 import { User } from 'next-auth';
+import BoardLoadingCard from '@/app/lib/components/boardLoadingCard';
 
 async function getUser() {
   try {
@@ -71,6 +72,7 @@ export default async function MainLayout({
       <NotificationsLoader />
       <LeftSideBar />
       <RightSideBar />
+      <BoardLoadingCard />
       {children}
     </>
   );

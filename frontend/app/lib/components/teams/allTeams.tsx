@@ -20,6 +20,15 @@ const AllTeams = observer(() => {
         sectionTitle={settingsStore.t.main.myTeams}
         data={teamsStore.allTeams.slice()}
         DataCard={TeamCard}
+        emptyState={{
+          title: settingsStore.t.main.emptyTeams.title,
+          text: settingsStore.t.main.emptyTeams.text,
+          illustrationType: 'creative',
+          rightButton: {
+            title: settingsStore.t.main.emptyTeams.action,
+            callback: onCreateTeamOpen,
+          },
+        }}
         filter
         onlyWithNotification
         addNew={onCreateTeamOpen}

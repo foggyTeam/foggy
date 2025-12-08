@@ -22,6 +22,15 @@ const AllTeamProjects = observer(() => {
           '_',
           (teamsStore.activeTeam?.name ?? '').toUpperCase(),
         )}
+        emptyState={{
+          title: settingsStore.t.main.emptyProjects.title,
+          text: settingsStore.t.main.emptyProjects.text,
+          illustrationType: 'search',
+          rightButton: {
+            title: settingsStore.t.main.emptyProjects.action,
+            callback: onCreateProjectOpen,
+          },
+        }}
         data={teamsStore.activeTeam?.projects?.slice() ?? []}
         DataCard={ProjectCard}
         filter

@@ -17,6 +17,7 @@ import CheckAccess from '@/app/lib/utils/checkAccess';
 export interface ActionBarProps {
   setSearchValue: any;
   filters?: FilterSet;
+  filtersDisabled?: boolean;
   dispatchFilters?: any;
   openFilters?: any;
   favorite?: any;
@@ -34,6 +35,7 @@ export default function ContentActionBar({
   filters,
   dispatchFilters,
   openFilters,
+  filtersDisabled,
   favorite,
   setFavorite,
   withNotification,
@@ -71,6 +73,7 @@ export default function ContentActionBar({
           />
           {dispatchFilters !== undefined && (
             <Button
+              isDisabled={filtersDisabled}
               onPress={openFilters}
               isIconOnly
               variant={hasFilters() ? 'flat' : 'light'}

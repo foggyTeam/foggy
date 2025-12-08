@@ -17,6 +17,6 @@ jobs:
       - name: Lint frontend
         run: |
           pnpm install
-          pnpm next lint
+          pnpm lint
         working-directory: frontend
       - run: echo "Frontend / ${{ job.status }}."

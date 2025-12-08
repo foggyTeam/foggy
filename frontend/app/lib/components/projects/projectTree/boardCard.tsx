@@ -12,6 +12,7 @@ import CheckAccess from '@/app/lib/utils/checkAccess';
 import { UpdateBoard } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import { useTopLoader } from 'nextjs-toploader';
 
 export default function BoardCard({
   parentList,
@@ -22,6 +23,7 @@ export default function BoardCard({
 }) {
   const { activeNodes, setActiveNodes, removeNode } = useActiveSectionContext();
   const router = useRouter();
+  const { start } = useTopLoader();
   const [isReadonly, setIsReadonly] = useState(true);
   const [boardName, setBoardName] = useState(board.name);
 
@@ -49,11 +51,13 @@ export default function BoardCard({
 
   return (
     <div
-      onDoubleClick={() =>
+      onDoubleClick={() => {
+        start();
+        settingsStore.startLoading();
         router.push(
           `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
-        )
-      }
+        );
+      }}
       className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0 pl-10"
     >
       <div

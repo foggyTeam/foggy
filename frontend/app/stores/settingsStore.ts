@@ -13,12 +13,18 @@ import { addToast } from '@heroui/toast';
 
 class SettingsStore {
   locale: AvailableLocales = 'en';
+  isLoading: boolean = false;
 
   constructor() {
     makeAutoObservable(this, {
+      // LOCALE
       locale: observable,
       t: computed,
       setLocale: action,
+      // LOADING BAR
+      isLoading: observable,
+      startLoading: action,
+      endLoading: action,
     });
 
     reaction(
@@ -37,12 +43,20 @@ class SettingsStore {
     );
   }
 
+  // LOCALE
   setLocale(newLocale: AvailableLocales) {
     this.locale = newLocale;
   }
-
   get t() {
     return this.locale == 'en' ? en : ru;
+  }
+
+  // LOADING BAR
+  startLoading() {
+    this.isLoading = true;
+  }
+  endLoading() {
+    this.isLoading = false;
   }
 }
 

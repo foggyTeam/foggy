@@ -22,6 +22,15 @@ const AllProjects = observer(() => {
         data={projectsStore.allProjects.slice()}
         DataCard={ProjectCard}
         filter
+        emptyState={{
+          title: settingsStore.t.main.emptyProjects.title,
+          text: settingsStore.t.main.emptyProjects.text,
+          illustrationType: 'search',
+          rightButton: {
+            title: settingsStore.t.main.emptyProjects.action,
+            callback: onCreateProjectOpen,
+          },
+        }}
         onlyFavorite
         onlyWithNotification
         addNew={onCreateProjectOpen}
