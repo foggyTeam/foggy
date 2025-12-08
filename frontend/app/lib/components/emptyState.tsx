@@ -13,6 +13,7 @@ import ChartIllustration from '@/app/lib/components/svg/illustrations/statistics
 import MessagingIllustration from '@/app/lib/components/svg/illustrations/study';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
+import { Button } from '@heroui/button';
 
 const illustrationsMap = {
   404: NotFoundIllustration,
@@ -32,7 +33,8 @@ export interface EmptyStateProps {
   title: string;
   text?: string;
   illustrationType?: keyof typeof illustrationsMap;
-  action?: { title: string; callback: () => void };
+  leftButton?: { title: string; callback: () => void };
+  rightButton?: { title: string; callback: () => void };
   size?: 'default' | 'sm' | 'lg' | 'full';
 }
 
@@ -40,7 +42,8 @@ export default function EmptyState({
   title,
   text,
   illustrationType,
-  action,
+  leftButton,
+  rightButton,
   size = 'default',
 }: EmptyStateProps) {
   const Illustration = illustrationsMap[illustrationType];
@@ -78,10 +81,24 @@ export default function EmptyState({
           </p>
         )}
       </div>
-      {action && (
-        <FButton size="md" color="primary" onClick={action.callback}>
-          {action.title}
-        </FButton>
+      {(leftButton || rightButton) && (
+        <div className="flex w-full items-center justify-center gap-16">
+          {!!leftButton && (
+            <FButton
+              size="md"
+              variant="light"
+              color="primary"
+              onClick={leftButton.callback}
+            >
+              {leftButton.title}
+            </FButton>
+          )}
+          {!!rightButton && (
+            <FButton size="md" color="primary" onClick={rightButton.callback}>
+              {rightButton.title}
+            </FButton>
+          )}
+        </div>
       )}
     </div>
   );

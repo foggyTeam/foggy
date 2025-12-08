@@ -103,6 +103,11 @@
       "title": "Ooops!",
       "text": "It seems this page doesn't exist",
       "action": "Go to main"
+    },
+    "error": {
+      "title": "Ooops! An error occured",
+      "goToMain": "Go to main",
+      "retry": "Try again"
     }
   },
   "team": {

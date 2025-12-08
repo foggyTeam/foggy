@@ -51,7 +51,7 @@ const NotFound = observer(() => {
 
   return (
     <EmptyState
-      action={{ title: text.action, callback }}
+      rightButton={{ title: text.action, callback }}
       title={text.title}
       text={text.text}
       size="full"
