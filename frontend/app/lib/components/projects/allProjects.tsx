@@ -26,7 +26,7 @@ const AllProjects = observer(() => {
           title: settingsStore.t.main.emptyProjects.title,
           text: settingsStore.t.main.emptyProjects.text,
           illustrationType: 'search',
-          action: {
+          rightButton: {
             title: settingsStore.t.main.emptyProjects.action,
             callback: onCreateProjectOpen,
           },

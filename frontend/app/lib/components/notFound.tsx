@@ -33,17 +33,15 @@ const NotFound = observer(() => {
     text: '',
     action: '',
   });
-  const [callback, setCallback] = useState<() => void>();
-
   const router = useRouter();
+  const [callback, setCallback] = useState<() => void>(router.back);
   const path = usePathname();
 
   useEffect(() => {
-    for (let [key, item] of Object.entries(regexMap)) {
+    for (const [key, item] of Object.entries(regexMap)) {
       if (item.regex.test(path)) {
-        setText(item.text);
+        setText({ action: '', ...item.text });
         if (key === 'other') setCallback(() => router.push('/'));
-        else setCallback(router.back);
         break;
       }
     }

@@ -24,7 +24,7 @@ const AllTeams = observer(() => {
           title: settingsStore.t.main.emptyTeams.title,
           text: settingsStore.t.main.emptyTeams.text,
           illustrationType: 'creative',
-          action: {
+          rightButton: {
             title: settingsStore.t.main.emptyTeams.action,
             callback: onCreateTeamOpen,
           },

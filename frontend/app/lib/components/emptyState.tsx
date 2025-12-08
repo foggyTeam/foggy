@@ -36,18 +36,20 @@ export interface EmptyStateProps {
   leftButton?: { title: string; callback: () => void };
   rightButton?: { title: string; callback: () => void };
   size?: 'default' | 'sm' | 'lg' | 'full';
+  className?: string;
 }
 
 export default function EmptyState({
   title,
   text,
-  illustrationType,
+  illustrationType = 'love',
   leftButton,
   rightButton,
   size = 'default',
+  className,
 }: EmptyStateProps) {
   const Illustration = illustrationsMap[illustrationType];
-  const maxHeight = (size) => {
+  const maxHeight = (size: 'default' | 'sm' | 'lg' | 'full') => {
     switch (size) {
       case 'default':
         return 'max-h-40 max-w-sm';
@@ -64,6 +66,7 @@ export default function EmptyState({
       className={clsx(
         'flex h-full min-h-fit w-full flex-col items-center justify-center gap-2 px-2 py-4',
         size === 'full' && 'gap-4',
+        className,
       )}
     >
       {illustrationType && (
