@@ -17,7 +17,10 @@ export const getRequest: any = async (
     .then((response) => {
       return response.data;
     })
-    .catch((e) => console.error(`error: ${e}`));
+    .catch((e) => {
+      console.error(`error: ${e}`);
+      if (e.status === 403) return e;
+    });
 
 // poster accepts relative request's url.
 export const postRequest: any = async (
