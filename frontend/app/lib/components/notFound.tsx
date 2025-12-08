@@ -34,7 +34,7 @@ const NotFound = observer(() => {
     action: '',
   });
   const router = useRouter();
-  const [callback, setCallback] = useState<() => void>(router.back);
+  const [callback, setCallback] = useState<() => void>(() => router.back());
   const path = usePathname();
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const NotFound = observer(() => {
         break;
       }
     }
-  }, [path]);
+  }, [path, router]);
 
   return (
     <EmptyState

@@ -13,7 +13,6 @@ import ChartIllustration from '@/app/lib/components/svg/illustrations/statistics
 import MessagingIllustration from '@/app/lib/components/svg/illustrations/study';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
-import { Button } from '@heroui/button';
 
 const illustrationsMap = {
   404: NotFoundIllustration,
