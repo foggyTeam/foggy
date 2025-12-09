@@ -729,22 +729,42 @@ export class ProjectController {
   }
 
   @Post(':id/teams')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Add team to project (not implemented)' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Invite team to project (admins of project only)' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
   @ApiBody({
-    description: 'Team data',
+    description: 'Team id and role to grant',
     examples: {
       example1: {
-        summary: 'Add team to project',
+        summary: 'Invite team as editors',
         value: {
           teamId: '507f1f77bcf86cd799439013',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
     },
   })
-  async addTeamToProject(): Promise<void> {
-    throw new Error('Not implemented');
+  async addTeamToProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Body('teamId') teamId: Types.ObjectId,
+    @Body('role') role: Role,
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Body('expiresAt') expiresAt?: Date,
+  ): Promise<void> {
+    return this.projectService.addTeamToProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      role,
+      new Types.ObjectId(userId),
+      true,
+      expiresAt,
+    );
   }
 
   @Delete(':id/teams/:teamId')

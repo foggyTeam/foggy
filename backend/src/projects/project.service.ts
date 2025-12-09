@@ -666,17 +666,56 @@ export class ProjectService {
     }
   }
 
-  async addTeamToProject(
+  public async addTeamToProject(
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
     role: Role,
     userId: Types.ObjectId,
+    sendInvite = true,
+    expiresAt?: Date,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, Role.ADMIN);
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
+    if (!ROLES.includes(role)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'invalidRole' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (sendInvite) {
+      await this.validateUser(userId, projectId, Role.ADMIN);
+    } else {
+      await this.findProjectById(projectId);
+    }
+
+    await this.teamService.findTeamById(teamId);
+    const project = await this.findProjectById(projectId);
+    const exists = project.accessControlTeams.some((t) =>
+      t.teamId.equals(teamId),
     );
+    if (exists) {
+      throw new CustomException(
+        getErrorMessages({ general: "errorNotRecognized" }),
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (sendInvite) {
+      await this.notificationService.createProjectTeamInvite(
+        projectId,
+        teamId,
+        userId,
+        role,
+        expiresAt,
+      );
+      return;
+    }
+
+    project.accessControlTeams.push({
+      teamId,
+      role,
+      addedAt: new Date(),
+      individualOverrides: [],
+    } as any);
+    await this.saveProject(project);
   }
 
   async removeTeamFromProject(
@@ -932,7 +971,7 @@ export class ProjectService {
         let effectiveRole: Role = overrideMap.get(idStr) ?? tm.role;
 
         if (
-          overrideMap.get(idStr) === undefined && // если role пришла из команды (не переопределение)
+          overrideMap.get(idStr) === undefined &&
           RoleLevel[effectiveRole] > RoleLevel[teamAccess.role] &&
           RoleLevel[teamAccess.role] !== undefined
         ) {

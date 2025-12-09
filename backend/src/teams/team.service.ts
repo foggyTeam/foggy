@@ -399,6 +399,29 @@ export class TeamService {
     };
   }
 
+  public async getTeamAdminIds(
+    teamId: Types.ObjectId,
+  ): Promise<Types.ObjectId[]> {
+    const team = await this.teamModel.findById(teamId).exec();
+    if (!team) return [];
+    return team.members
+      .filter((m) => m.role === Role.ADMIN || m.role === Role.OWNER)
+      .map((m) => m.userId);
+  }
+
+  public async findTeamById(teamId: Types.ObjectId): Promise<TeamDocument> {
+    if (!Types.ObjectId.isValid(teamId)) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return await this.teamModel
+      .findById(teamId)
+      .orFail(() => this.notFoundError())
+      .exec();
+  }
+
   private async validateTeamAccess(
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
