@@ -31,7 +31,7 @@ export default async function ProjectRequestPage({
         className={clsx(
           'flex h-fit min-h-56 w-fit items-center justify-center',
           bg_container_no_padding,
-          'rounded-br-[64px] px-8 pt-8',
+          'rounded-br-[64px] p-8',
         )}
       >
         <ProjectRequest project={projectData} />

@@ -8,6 +8,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import React from 'react';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 import MediumMemberCard from '@/app/lib/components/members/mediumMemberCard';
+import RequestForm from '@/app/lib/components/requestForm';
 
 const ProjectRequest = observer(
   ({ project }: { project: Project | undefined }) => {
@@ -52,6 +53,8 @@ const ProjectRequest = observer(
             </p>
           )}
         </div>
+
+        <RequestForm id={project?.id} type="project" />
       </div>
     );
   },

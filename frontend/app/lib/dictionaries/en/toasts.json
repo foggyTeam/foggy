@@ -85,6 +85,17 @@
       "updateNotificationError": "Failed to update notification",
       "updateNotificationsNumberError": "Failed to update unread number"
     },
+    "joinRequest": {
+      "sendRequestError": "Failed to send your request",
+      "requestError": {
+        "title": "Incorrect request",
+        "description": "Make sure form fields are filled in correctly"
+      },
+      "requestSent": {
+        "title": "Request was sent!",
+        "description": "You will receive a notification when it is approved or declined."
+      }
+    },
     "copyError": "Failed to copy to clipboard",
     "copySuccess": "Copied to clipboard",
     "globalError": "An unexpected error occurred",
