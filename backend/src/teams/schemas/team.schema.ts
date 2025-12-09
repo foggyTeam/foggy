@@ -8,6 +8,7 @@ export interface TeamMemberInfo {
   avatar: string;
   role: Role;
   joinedAt: Date;
+  teamName?: string;
 }
 
 export interface TeamListItem {

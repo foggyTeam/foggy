@@ -316,6 +316,41 @@ export class TeamService {
     return team.members.map((member) => member.userId);
   }
 
+  public async getMembersInfo(
+    teamId: Types.ObjectId,
+  ): Promise<TeamMemberInfo[]> {
+    const team = await this.teamModel.findById(teamId).exec();
+    if (!team) return [];
+
+    const populatedTeam = await this.teamModel
+      .findById(team._id)
+      .populate<{
+        'members.userId': {
+          _id: Types.ObjectId;
+          nickname: string;
+          avatar: string;
+        };
+      }>({
+        path: 'members.userId',
+        select: 'nickname avatar',
+      })
+      .exec();
+
+    const teamName = populatedTeam.name;
+
+    return populatedTeam.members.map((member) => {
+      const userObj = member.userId as any;
+      return {
+        id: userObj._id,
+        nickname: userObj.nickname,
+        avatar: userObj.avatar,
+        role: member.role,
+        joinedAt: member.joinedAt,
+        teamName,
+      };
+    });
+  }
+
   async getTeamBriefInfo(
     teamId: Types.ObjectId,
     userId?: Types.ObjectId,

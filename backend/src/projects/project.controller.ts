@@ -748,38 +748,79 @@ export class ProjectController {
   }
 
   @Delete(':id/teams/:teamId')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Remove team from project (not implemented)' })
-  @ApiBody({
-    description: 'Team ID',
-    examples: {
-      example1: {
-        summary: 'Remove team from project',
-        value: {
-          teamId: '507f1f77bcf86cd799439013',
-        },
-      },
-    },
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove team from project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
   })
-  async removeTeamFromProject(): Promise<void> {
-    throw new Error('Not implemented');
+  @ApiParam({
+    name: 'teamId',
+    description: 'ID of the team to remove',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Team has been successfully removed from project',
+  })
+  @ApiResponse({ status: 404, description: 'Project or team not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  async removeTeamFromProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('teamId') teamId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.projectService.removeTeamFromProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      new Types.ObjectId(userId),
+    );
   }
 
   @Put(':id/teams/:teamId/role')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Update team role in project (not implemented)' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update team role in project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'teamId',
+    description: 'ID of the team',
+    type: String,
+  })
   @ApiBody({
-    description: 'New role for team',
+    description: 'New role for team in project',
     examples: {
       example1: {
-        summary: 'Update team role',
+        summary: 'Make team admin',
         value: {
           role: 'admin',
         },
       },
     },
   })
-  async updateTeamRoleInProject(): Promise<void> {
-    throw new Error('Not implemented');
+  @ApiResponse({
+    status: 200,
+    description: 'Team role has been successfully updated in project',
+  })
+  @ApiResponse({ status: 404, description: 'Project or team not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  async updateTeamRoleInProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('teamId') teamId: Types.ObjectId,
+    @Body('role') newRole: Role,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.projectService.updateTeamRoleInProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      newRole,
+      new Types.ObjectId(userId),
+    );
   }
 }
