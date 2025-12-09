@@ -96,6 +96,66 @@ export class TeamController {
     return this.teamService.getTeamById(teamId, userId);
   }
 
+  @Get(':id/brief')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get public brief information about team' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns brief public information about team',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+        avatar: { type: 'string' },
+        description: { type: 'string', nullable: true },
+        memberCount: { type: 'number' },
+        members: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              nickname: { type: 'string' },
+              avatar: { type: 'string' },
+              role: {
+                type: 'string',
+                enum: ['owner', 'admin', 'editor', 'reader'],
+              },
+              joinedAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
+        updatedAt: { type: 'string', format: 'date-time' },
+        settings: {
+          type: 'object',
+          properties: {
+            allowRequests: { type: 'boolean' },
+            memberListIsPublic: { type: 'boolean' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiResponse({ status: 403, description: 'Team is not public' })
+  @ApiResponse({
+    status: 409,
+    description: 'User already a member of this team',
+  })
+  async getTeamBriefInfo(
+    @Param('id') teamId: Types.ObjectId,
+    @Headers('x-user-id') userId?: Types.ObjectId,
+  ): Promise<any> {
+    return this.teamService.getTeamBriefInfo(teamId, userId);
+  }
+
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update team information' })

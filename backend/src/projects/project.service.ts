@@ -374,7 +374,7 @@ export class ProjectService {
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     role: Role,
-    addUser: boolean = false,
+    addUser = false,
     expiresAt?: Date,
   ): Promise<void> {
     const project = (await this.validateUser(
@@ -752,6 +752,56 @@ export class ProjectService {
       return project;
     }
     return;
+  }
+
+  async getProjectBriefInfo(
+    projectId: Types.ObjectId,
+    userId?: Types.ObjectId,
+  ): Promise<any> {
+    this.validateObjectId(projectId, 'project');
+
+    const project = await this.projectModel
+      .findById(projectId)
+      .orFail(() => this.notFoundError('project'))
+      .exec();
+
+    // Если проект не публичный - ошибка 403
+    if (!project.settings.isPublic) {
+      throw new CustomException(
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    // Проверяем, состоит ли пользователь уже в проекте
+    if (userId) {
+      const userRole = await this.getUserRole(projectId, userId);
+      if (userRole) {
+        throw new CustomException(
+          { message: 'User already a member of this project' },
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    // Получаем информацию о членах только если список публичен
+    let members: MemberInfo[] = [];
+    if (project.settings.memberListIsPublic) {
+      members = await this.getMembers(project);
+    }
+
+    return {
+      id: project._id,
+      name: project.name,
+      avatar: project.avatar,
+      description: project.description,
+      members: project.settings.memberListIsPublic ? members : [],
+      updatedAt: project.updatedAt,
+      settings: {
+        allowRequests: project.settings.allowRequests,
+        memberListIsPublic: project.settings.memberListIsPublic,
+      },
+    };
   }
 
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {

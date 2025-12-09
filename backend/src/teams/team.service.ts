@@ -1,15 +1,15 @@
 import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { type Model, Types } from 'mongoose';
 import {
   Team,
-  TeamDocument,
-  TeamListItem,
-  TeamMemberInfo,
+  type TeamDocument,
+  type TeamListItem,
+  type TeamMemberInfo,
 } from './schemas/team.schema';
-import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
-import { ChangeTeamMemberRoleDto } from './dto/change-team-member-role.dto';
+import type { CreateTeamDto } from './dto/create-team.dto';
+import type { UpdateTeamDto } from './dto/update-team.dto';
+import type { ChangeTeamMemberRoleDto } from './dto/change-team-member-role.dto';
 import { UsersService } from '../users/users.service';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
@@ -235,7 +235,7 @@ export class TeamService {
       adminMembers[0].role = Role.OWNER;
     } else if (isOwner) {
       throw new CustomException(
-        getErrorMessages({ project: 'cannotRemoveOwner' }),
+        getErrorMessages({ general: 'errorNotRecognized' }),
         HttpStatus.FORBIDDEN,
       );
     }
@@ -314,6 +314,54 @@ export class TeamService {
       return [];
     }
     return team.members.map((member) => member.userId);
+  }
+
+  async getTeamBriefInfo(
+    teamId: Types.ObjectId,
+    userId?: Types.ObjectId,
+  ): Promise<any> {
+    this.validateObjectId(teamId);
+
+    const team = await this.teamModel
+      .findById(teamId)
+      .orFail(() => this.notFoundError())
+      .exec();
+
+    if (!team.settings.isPublic) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (userId) {
+      const userRole = await this.getUserRoleInTeam(teamId, userId);
+      if (userRole) {
+        throw new CustomException(
+          { message: 'User already a member of this team' },
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    let members: TeamMemberInfo[] = [];
+    if (team.settings.memberListIsPublic) {
+      members = await this.getMembers(team);
+    }
+
+    return {
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      description: team.description,
+      memberCount: team.members.length,
+      members: team.settings.memberListIsPublic ? members : [],
+      updatedAt: team.updatedAt,
+      settings: {
+        allowRequests: team.settings.allowRequests,
+        memberListIsPublic: team.settings.memberListIsPublic,
+      },
+    };
   }
 
   private async validateTeamAccess(
