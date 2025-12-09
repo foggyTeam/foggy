@@ -431,37 +431,76 @@ export class ProjectService {
       requiredRole,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
+    const explicitIndex = project.accessControlUsers.findIndex((u) =>
+      u.userId.equals(targetUserId),
     );
-    if (isOwner && isSelfRemove) {
-      if (!newOwner) {
-        throw new CustomException(
-          getErrorMessages({ project: 'mustSetNewOwner' }),
-          HttpStatus.FORBIDDEN,
-        );
-      }
-      await this.validateUser(newOwner);
-      project.accessControlUsers = project.accessControlUsers.filter(
-        (user) => !user.userId.equals(newOwner),
-      );
-      const ownerIndex = project.accessControlUsers.findIndex(
+
+    if (explicitIndex !== -1) {
+      const isOwner = project.accessControlUsers.some(
         (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
       );
-      if (ownerIndex !== -1) {
-        project.accessControlUsers[ownerIndex].userId = newOwner;
+      if (isOwner && isSelfRemove) {
+        if (!newOwner) {
+          throw new CustomException(
+            getErrorMessages({ project: 'mustSetNewOwner' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        await this.validateUser(newOwner);
+        project.accessControlUsers = project.accessControlUsers.filter(
+          (user) => !user.userId.equals(newOwner),
+        );
+        const ownerIndex = project.accessControlUsers.findIndex(
+          (user) =>
+            user.userId.equals(targetUserId) && user.role === Role.OWNER,
+        );
+        if (ownerIndex !== -1) {
+          project.accessControlUsers[ownerIndex].userId = newOwner;
+        }
+      } else if (isOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotRemoveOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      } else {
+        project.accessControlUsers = project.accessControlUsers.filter(
+          (user) => !user.userId.equals(targetUserId),
+        );
       }
-    } else if (isOwner) {
-      throw new CustomException(
-        getErrorMessages({ project: 'cannotRemoveOwner' }),
-        HttpStatus.FORBIDDEN,
+      await this.saveProject(project);
+      return;
+    }
+
+    let teamIndex = -1;
+    for (let i = 0; i < project.accessControlTeams.length; i += 1) {
+      const t = project.accessControlTeams[i];
+      const hasOverride =
+        Array.isArray(t.individualOverrides) &&
+        t.individualOverrides.some(
+          (o) => o.userId && o.userId.equals(targetUserId),
+        );
+      if (hasOverride) {
+        teamIndex = i;
+        break;
+      }
+      const roleInTeam = await this.teamService.getUserRoleInTeam(
+        t.teamId,
+        targetUserId,
       );
-    } else {
-      project.accessControlUsers = project.accessControlUsers.filter(
-        (user) => !user.userId.equals(targetUserId),
+      if (roleInTeam) {
+        teamIndex = i;
+        break;
+      }
+    }
+
+    if (teamIndex === -1) {
+      throw new CustomException(
+        getErrorMessages({ project: 'userNotFound' }),
+        HttpStatus.NOT_FOUND,
       );
     }
-    await this.saveProject(project);
+
+    await this.disbandTeamAndPromoteMembers(project, teamIndex, targetUserId);
   }
 
   async updateUserRole(
@@ -693,7 +732,7 @@ export class ProjectService {
     );
     if (exists) {
       throw new CustomException(
-        getErrorMessages({ general: "errorNotRecognized" }),
+        getErrorMessages({ general: 'errorNotRecognized' }),
         HttpStatus.CONFLICT,
       );
     }
@@ -876,6 +915,87 @@ export class ProjectService {
         memberListIsPublic: project.settings.memberListIsPublic,
       },
     };
+  }
+
+  /**
+   * Вспомогательная функция: расформировываем командную запись в проекте:
+   * - project — уже загружен (mutable)
+   * - teamIndex — индекс записи accessControlTeams, которую нужно удалить/расформировать
+   * - removedUserId — id пользователя, которого удаляют (его не добавляем в accessControlUsers)
+   *
+   * Правила добавления участников в accessControlUsers:
+   * - не добавляем пользователей, которые уже есть в accessControlUsers;
+   * - не добавляем пользователя, если он принадлежит к другой команде с более высоким приоритетом (т.е. к команде, которая идёт в accessControlTeams раньше этой);
+   * - роль участника берётся из индивидуального переопределения (если есть) — оно имеет приоритет и не ограничивается ролью команды;
+   * - если индивидуального переопределения нет — берём роль пользователя в команде и "обрезаем" её до роли команды в проекте (если пользовательская роль выше роли команды).
+   */
+  private async disbandTeamAndPromoteMembers(
+    project: ProjectDocument,
+    teamIndex: number,
+    removedUserId: Types.ObjectId,
+  ): Promise<void> {
+    const teamAccess = project.accessControlTeams[teamIndex];
+    const teamId = teamAccess.teamId;
+    const teamMemberIds = await this.teamService.getTeamMemberIds(teamId);
+    const explicitUserIdSet = new Set(
+      project.accessControlUsers.map((u) => u.userId.toString()),
+    );
+
+    const earlierTeams = project.accessControlTeams
+      .slice(0, teamIndex)
+      .map((t) => t.teamId.toString());
+
+    for (const memberId of teamMemberIds) {
+      if (memberId.equals(removedUserId)) continue;
+
+      if (explicitUserIdSet.has(memberId.toString())) continue;
+
+      let isInHigherPriorityTeam = false;
+      for (const earlierTeamIdStr of earlierTeams) {
+        const roleInEarlierTeam = await this.teamService.getUserRoleInTeam(
+          new Types.ObjectId(earlierTeamIdStr),
+          memberId,
+        );
+        if (roleInEarlierTeam) {
+          isInHigherPriorityTeam = true;
+          break;
+        }
+      }
+      if (isInHigherPriorityTeam) continue;
+
+      let effectiveRole: Role | null = null;
+      if (Array.isArray(teamAccess.individualOverrides)) {
+        const override = teamAccess.individualOverrides.find((o) =>
+          o.userId.equals(memberId),
+        );
+        if (override) {
+          effectiveRole = override.role;
+        }
+      }
+      if (!effectiveRole) {
+        const roleInTeam = await this.teamService.getUserRoleInTeam(
+          teamId,
+          memberId,
+        );
+        if (!roleInTeam) {
+          continue;
+        }
+        effectiveRole = roleInTeam;
+        if (
+          RoleLevel[effectiveRole] > RoleLevel[teamAccess.role] &&
+          RoleLevel[teamAccess.role] !== undefined
+        ) {
+          effectiveRole = teamAccess.role;
+        }
+      }
+      project.accessControlUsers.push({
+        userId: memberId,
+        role: effectiveRole,
+      } as any);
+      explicitUserIdSet.add(memberId.toString());
+    }
+    project.accessControlTeams.splice(teamIndex, 1);
+    await this.saveProject(project);
   }
 
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
