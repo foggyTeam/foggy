@@ -4,19 +4,14 @@ import { observer } from 'mobx-react-lite';
 import { Form } from '@heroui/form';
 import React, { useEffect, useState } from 'react';
 import { Role } from '@/app/lib/types/definitions';
-import clsx from 'clsx';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import { Textarea } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
-import { UpdateUserData } from '@/app/lib/server/actions/userServerActions';
 import { addToast } from '@heroui/toast';
 import { JoinProjectRequest } from '@/app/lib/server/actions/notificationsServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
-import {
-  profileFormSchema,
-  requestMessageFormSchema,
-} from '@/app/lib/types/schemas';
+import { requestMessageFormSchema } from '@/app/lib/types/schemas';
 
 const RequestForm = observer((id: string, type: 'project' | 'team') => {
   const [isLoading, setIsLoading] = useState(false);
@@ -76,11 +71,7 @@ const RequestForm = observer((id: string, type: 'project' | 'team') => {
   };
 
   return (
-    <Form
-      className={clsx(
-        'items-top flex w-full max-w-[736px] min-w-24 flex-col gap-2 py-2',
-      )}
-    >
+    <Form className="items-top flex w-full flex-col gap-2 py-2">
       <h1 className="flex h-10 items-center font-medium">
         {settingsStore.t.notifications.sendRequest.title}
       </h1>

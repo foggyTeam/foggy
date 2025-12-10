@@ -74,7 +74,14 @@ export default function EmptyState({
         />
       )}
       <div className="flex w-full flex-col items-center justify-center gap-1">
-        <p className="text-small text-primary-900 line-clamp-1 w-full text-center font-medium">
+        <p
+          className={clsx(
+            'line-clamp-1 w-full text-center',
+            size === 'full'
+              ? 'text-primary text-6xl font-extrabold'
+              : 'text-primary-900 text-small font-medium',
+          )}
+        >
           {title.toUpperCase()}
         </p>
         {text && (

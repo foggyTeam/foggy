@@ -1,5 +1,20 @@
 {
   "loading": {
     "boardLoading": "Loading the board..."
+  },
+  "forbidden": {
+    "action": "Go to main",
+    "global": {
+      "title": "Access denied",
+      "text": "Sorry, you are not allowed to see this page."
+    },
+    "project": {
+      "title": "403",
+      "text": "This project and its information is not public, and you can't request to join it."
+    },
+    "team": {
+      "title": "403",
+      "text": "This team and its information is not public, and you can't request to join it."
+    }
   }
 }

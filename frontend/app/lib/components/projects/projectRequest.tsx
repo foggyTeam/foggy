@@ -13,7 +13,7 @@ import RequestForm from '@/app/lib/components/requestForm';
 const ProjectRequest = observer(
   ({ project }: { project: Project | undefined }) => {
     return (
-      <div className="flex h-fit w-fit flex-col gap-4 overflow-clip text-sm">
+      <div className="flex h-fit w-full flex-col gap-4 overflow-clip text-sm">
         <div className="flex h-fit flex-col gap-4">
           <div className="flex h-fit w-fit items-center justify-between gap-4">
             <div className="flex h-fit items-center justify-start gap-4">
@@ -37,24 +37,29 @@ const ProjectRequest = observer(
               : settingsStore.t.main.noProjectDescription}
           </p>
         </div>
-        <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
-          {project.members
-            .sort(CompareByRole)
-            .slice(0, 7)
-            .map((member, index) => (
-              <MediumMemberCard key={index} {...member} />
-            ))}
-          {project.members.length > 7 && (
-            <p className="h-8 content-center justify-start px-4 italic">
-              {settingsStore.t.main.andNMore.replace(
-                '_',
-                (project.members.length - 7).toString(),
-              )}
-            </p>
-          )}
-        </div>
 
-        <RequestForm id={project?.id} type="project" />
+        {project?.settings.memberListIsPublic && (
+          <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
+            {project.members
+              ?.sort(CompareByRole)
+              .slice(0, 7)
+              .map((member, index) => (
+                <MediumMemberCard key={index} {...member} />
+              ))}
+            {project.members.length > 7 && (
+              <p className="h-8 content-center justify-start px-4 italic">
+                {settingsStore.t.main.andNMore.replace(
+                  '_',
+                  (project.members?.length - 7).toString(),
+                )}
+              </p>
+            )}
+          </div>
+        )}
+
+        {project?.settings.allowRequests && (
+          <RequestForm id={project?.id} type="project" />
+        )}
       </div>
     );
   },
