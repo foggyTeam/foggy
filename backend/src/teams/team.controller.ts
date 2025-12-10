@@ -156,6 +156,56 @@ export class TeamController {
     return this.teamService.getTeamBriefInfo(teamId, userId);
   }
 
+  @Get(':id/projects')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get all projects for a team' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID of the team',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns an array of team projects',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          name: { type: 'string' },
+          avatar: { type: 'string' },
+          description: { type: 'string', nullable: true },
+          members: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                id: { type: 'string' },
+                nickname: { type: 'string' },
+                avatar: { type: 'string' },
+                role: {
+                  type: 'string',
+                  enum: ['owner', 'admin', 'editor', 'reader'],
+                },
+              },
+            },
+          },
+          updatedAt: { type: 'string', format: 'date-time' },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  async getTeamProjects(
+    @Param('id') teamId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<any[]> {
+    return this.teamService.getTeamProjects(teamId, userId);
+  }
+
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update team information' })
@@ -299,5 +349,34 @@ export class TeamController {
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
     return this.teamService.deleteTeam(teamId, userId);
+  }
+
+  @Delete(':id/projects/:projectId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Remove project from team' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID of the team',
+    type: String,
+  })
+  @ApiParam({
+    name: 'projectId',
+    required: true,
+    description: 'Valid MongoDB ObjectID of the project',
+    type: String,
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'Project has been successfully removed from team',
+  })
+  @ApiResponse({ status: 404, description: 'Team or project not found' })
+  async leaveProject(
+    @Param('id') teamId: Types.ObjectId,
+    @Param('projectId') projectId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.teamService.leaveProject(teamId, projectId, userId);
   }
 }

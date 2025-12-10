@@ -15,6 +15,8 @@ import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { Role, RoleLevel } from '../shared/types/enums';
 import { NotificationService } from '../notifications/notifications.service';
+import { ProjectListItem } from '../projects/schemas/project.schema';
+import { ProjectService } from '../projects/project.service';
 
 @Injectable()
 export class TeamService {
@@ -24,6 +26,8 @@ export class TeamService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => ProjectService))
+    private readonly projectService: ProjectService,
   ) {}
 
   async createTeam(
@@ -420,6 +424,72 @@ export class TeamService {
       .findById(teamId)
       .orFail(() => this.notFoundError())
       .exec();
+  }
+
+  public async addProjectToTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    const team = await this.findTeamById(teamId);
+    const exists = team.projects.some((p) => p.equals(projectId));
+    if (exists) return;
+    team.projects.push(projectId);
+    await this.saveTeam(team);
+  }
+
+  public async removeProjectFromTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    const team = await this.findTeamById(teamId);
+    const had = team.projects.some((p) => p.equals(projectId));
+    if (!had) return;
+    team.projects = team.projects.filter((p) => !p.equals(projectId));
+    await this.saveTeam(team);
+  }
+
+  public async getTeamProjects(
+    teamId: Types.ObjectId,
+    requestingUserId: Types.ObjectId,
+  ): Promise<ProjectListItem[]> {
+    await this.validateTeamAccess(teamId, requestingUserId, Role.READER);
+    const team = await this.findTeamById(teamId);
+
+    if (!team.projects || team.projects.length === 0) return [];
+
+    const result: ProjectListItem[] = [];
+
+    for (const projectId of team.projects) {
+      try {
+        const projectView = await this.projectService.getProjectById(
+          projectId,
+          requestingUserId,
+        );
+        result.push({
+          id: projectView.id,
+          name: projectView.name,
+          avatar: projectView.avatar,
+          description: projectView.description,
+          updatedAt: projectView.updatedAt,
+          members: projectView.members,
+        });
+      } catch (err) {
+        console.warn(
+          `Skipping project ${projectId} for team ${teamId}: ${(err as Error).message}`,
+        );
+      }
+    }
+
+    return result;
+  }
+
+  public async leaveProject(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+    requestingUserId: Types.ObjectId,
+  ): Promise<void> {
+    await this.validateTeamAccess(teamId, requestingUserId, Role.ADMIN);
+    await this.projectService.removeTeamFromProjectByTeam(projectId, teamId);
   }
 
   private async validateTeamAccess(

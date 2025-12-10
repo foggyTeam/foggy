@@ -83,6 +83,18 @@ export class ProjectService {
     await this.sectionModel.deleteMany({
       $or: [{ _id: { $in: project.sections } }, { projectId }],
     });
+
+    if (
+      Array.isArray(project.accessControlTeams) &&
+      project.accessControlTeams.length > 0
+    ) {
+      await Promise.all(
+        project.accessControlTeams.map((t) =>
+          this.safeRemoveProjectFromTeam(t.teamId, projectId),
+        ),
+      );
+    }
+
     const result = await this.projectModel.deleteOne({ _id: projectId }).exec();
 
     if (result.deletedCount === 0) {
@@ -789,6 +801,7 @@ export class ProjectService {
       individualOverrides: [],
     } as any);
     await this.saveProject(project);
+    await this.safeAddProjectToTeam(teamId, projectId);
   }
 
   async removeTeamFromProject(
@@ -801,20 +814,15 @@ export class ProjectService {
       projectId,
       Role.ADMIN,
     )) as ProjectDocument;
+    await this.removeTeamInternal(projectId, teamId, project);
+  }
 
-    const teamIndex = project.accessControlTeams.findIndex((t) =>
-      t.teamId.equals(teamId),
-    );
-
-    if (teamIndex === -1) {
-      throw new CustomException(
-        getErrorMessages({ project: 'notFound' }),
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    project.accessControlTeams.splice(teamIndex, 1);
-    await this.saveProject(project);
+  public async removeTeamFromProjectByTeam(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<void> {
+    const project = await this.findProjectById(projectId);
+    await this.removeTeamInternal(projectId, teamId, project);
   }
 
   async updateTeamRoleInProject(
@@ -951,6 +959,25 @@ export class ProjectService {
     };
   }
 
+  private async removeTeamInternal(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    project: ProjectDocument,
+  ): Promise<void> {
+    const teamIndex = project.accessControlTeams.findIndex((t) =>
+      t.teamId.equals(teamId),
+    );
+    if (teamIndex === -1) {
+      throw new CustomException(
+        getErrorMessages({ project: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    project.accessControlTeams.splice(teamIndex, 1);
+    await this.saveProject(project);
+    await this.safeRemoveProjectFromTeam(teamId, projectId);
+  }
+
   private async disbandTeamAndPromoteMembers(
     project: ProjectDocument,
     teamIndex: number,
@@ -1018,6 +1045,7 @@ export class ProjectService {
     }
     project.accessControlTeams.splice(teamIndex, 1);
     await this.saveProject(project);
+    await this.safeRemoveProjectFromTeam(teamId, project._id);
   }
 
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
@@ -1210,5 +1238,31 @@ export class ProjectService {
   ): Promise<boolean> {
     const memberIds = await this.teamService.getTeamMemberIds(teamId);
     return memberIds.some((id) => id.equals(userId));
+  }
+
+  private async safeAddProjectToTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.teamService.addProjectToTeam(teamId, projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to add project ${projectId} to team ${teamId}: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  private async safeRemoveProjectFromTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.teamService.removeProjectFromTeam(teamId, projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to remove project ${projectId} from team ${teamId}: ${(err as Error).message}`,
+      );
+    }
   }
 }

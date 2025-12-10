@@ -730,7 +730,7 @@ export class ProjectController {
 
   @Post(':id/teams')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Invite team to project (admins of project only)' })
+  @ApiOperation({ summary: 'Invite team to project' })
   @ApiSecurity('x-user-id')
   @ApiParam({
     name: 'id',
