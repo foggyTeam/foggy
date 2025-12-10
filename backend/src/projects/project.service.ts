@@ -515,30 +515,64 @@ export class ProjectService {
       Role.ADMIN,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
-    );
 
-    if (isOwner) {
+    if (!ROLES.includes(newRole)) {
       throw new CustomException(
-        getErrorMessages({ project: 'cannotChangeOwnerRole' }),
-        HttpStatus.FORBIDDEN,
+        getErrorMessages({ project: 'invalidRole' }),
+        HttpStatus.BAD_REQUEST,
       );
     }
-
-    const userIndex = project.accessControlUsers.findIndex((user) =>
+    const explicitIndex = project.accessControlUsers.findIndex((user) =>
       user.userId.equals(targetUserId),
     );
 
-    if (userIndex === -1) {
-      throw new CustomException(
-        getErrorMessages({ project: 'userNotFound' }),
-        HttpStatus.NOT_FOUND,
+    if (explicitIndex !== -1) {
+      const isOwner = project.accessControlUsers.some(
+        (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
       );
+
+      if (isOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotChangeOwnerRole' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      project.accessControlUsers[explicitIndex].role = newRole;
+      return await this.saveProject(project);
     }
 
-    project.accessControlUsers[userIndex].role = newRole;
-    return await this.saveProject(project);
+    for (let i = 0; i < project.accessControlTeams.length; i += 1) {
+      const teamAccess = project.accessControlTeams[i];
+
+      if (Array.isArray(teamAccess.individualOverrides)) {
+        const override = teamAccess.individualOverrides.find((o) =>
+          o.userId.equals(targetUserId),
+        );
+        if (override) {
+          override.role = newRole;
+          return await this.saveProject(project);
+        }
+      }
+
+      const roleInTeam = await this.teamService.getUserRoleInTeam(
+        teamAccess.teamId,
+        targetUserId,
+      );
+      if (roleInTeam) {
+        teamAccess.individualOverrides = teamAccess.individualOverrides || [];
+        teamAccess.individualOverrides.push({
+          userId: targetUserId,
+          role: newRole,
+        } as any);
+        return await this.saveProject(project);
+      }
+    }
+
+    throw new CustomException(
+      getErrorMessages({ project: 'userNotFound' }),
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   async updateProjectInfo(
@@ -917,18 +951,6 @@ export class ProjectService {
     };
   }
 
-  /**
-   * Вспомогательная функция: расформировываем командную запись в проекте:
-   * - project — уже загружен (mutable)
-   * - teamIndex — индекс записи accessControlTeams, которую нужно удалить/расформировать
-   * - removedUserId — id пользователя, которого удаляют (его не добавляем в accessControlUsers)
-   *
-   * Правила добавления участников в accessControlUsers:
-   * - не добавляем пользователей, которые уже есть в accessControlUsers;
-   * - не добавляем пользователя, если он принадлежит к другой команде с более высоким приоритетом (т.е. к команде, которая идёт в accessControlTeams раньше этой);
-   * - роль участника берётся из индивидуального переопределения (если есть) — оно имеет приоритет и не ограничивается ролью команды;
-   * - если индивидуального переопределения нет — берём роль пользователя в команде и "обрезаем" её до роли команды в проекте (если пользовательская роль выше роли команды).
-   */
   private async disbandTeamAndPromoteMembers(
     project: ProjectDocument,
     teamIndex: number,
