@@ -44,8 +44,8 @@ const TeamRequest = observer(({ team }: { team: Team | undefined }) => {
         </div>
       )}
 
-      {team?.settings.allowRequests && (
-        <RequestForm id={team?.id} type="team" />
+      {team && team?.settings.allowRequests && (
+        <RequestForm id={team.id} type="team" />
       )}
     </div>
   );

@@ -12,8 +12,9 @@ const ForbiddenState = observer(() => {
   const params = useSearchParams();
 
   useEffect(() => {
-    if (params.get('type') === 'project' || params.get('type') == 'team') {
-      setType(params.get('type'));
+    const queryType = params.get('type');
+    if (queryType === 'project' || queryType == 'team') {
+      setType(queryType);
     }
   }, []);
   return (

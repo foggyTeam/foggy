@@ -57,8 +57,8 @@ const ProjectRequest = observer(
           </div>
         )}
 
-        {project?.settings.allowRequests && (
-          <RequestForm id={project?.id} type="project" />
+        {project && project?.settings.allowRequests && (
+          <RequestForm id={project.id} type="project" />
         )}
       </div>
     );

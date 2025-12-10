@@ -154,6 +154,7 @@
   "settings": {
     "allowRequests": true,
     "isPublic": false,
-    "memberListIsPublic": true
+    "memberListIsPublic": true,
+    "projectListIsPublic": true
   }
 }
