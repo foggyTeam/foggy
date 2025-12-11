@@ -24,6 +24,7 @@ import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { Role, RoleLevel, ROLES } from '../shared/types/enums';
 import { NotificationService } from '../notifications/notifications.service';
+import { TeamService } from '../teams/team.service';
 
 @Injectable()
 export class ProjectService {
@@ -36,6 +37,8 @@ export class ProjectService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => TeamService))
+    private readonly teamService: TeamService,
   ) {}
 
   async createProject(
@@ -80,6 +83,25 @@ export class ProjectService {
     await this.sectionModel.deleteMany({
       $or: [{ _id: { $in: project.sections } }, { projectId }],
     });
+
+    if (
+      Array.isArray(project.accessControlTeams) &&
+      project.accessControlTeams.length > 0
+    ) {
+      await Promise.all(
+        project.accessControlTeams.map((t) =>
+          this.safeRemoveProjectFromTeam(t.teamId, projectId),
+        ),
+      );
+    }
+
+    try {
+      await this.notificationService.removeProjectNotifications(projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for project ${projectId}: ${(err as Error).message}`,
+      );
+    }
     const result = await this.projectModel.deleteOne({ _id: projectId }).exec();
 
     if (result.deletedCount === 0) {
@@ -374,7 +396,7 @@ export class ProjectService {
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     role: Role,
-    addUser: boolean = false,
+    addUser = false,
     expiresAt?: Date,
   ): Promise<void> {
     const project = (await this.validateUser(
@@ -428,37 +450,82 @@ export class ProjectService {
       requiredRole,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
+    const explicitIndex = project.accessControlUsers.findIndex((u) =>
+      u.userId.equals(targetUserId),
     );
-    if (isOwner && isSelfRemove) {
-      if (!newOwner) {
-        throw new CustomException(
-          getErrorMessages({ project: 'mustSetNewOwner' }),
-          HttpStatus.FORBIDDEN,
-        );
-      }
-      await this.validateUser(newOwner);
-      project.accessControlUsers = project.accessControlUsers.filter(
-        (user) => !user.userId.equals(newOwner),
-      );
-      const ownerIndex = project.accessControlUsers.findIndex(
+
+    if (explicitIndex !== -1) {
+      const isOwner = project.accessControlUsers.some(
         (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
       );
-      if (ownerIndex !== -1) {
-        project.accessControlUsers[ownerIndex].userId = newOwner;
+      if (isOwner && isSelfRemove) {
+        if (!newOwner) {
+          throw new CustomException(
+            getErrorMessages({ project: 'mustSetNewOwner' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        await this.validateUser(newOwner);
+        project.accessControlUsers = project.accessControlUsers.filter(
+          (user) => !user.userId.equals(newOwner),
+        );
+        const ownerIndex = project.accessControlUsers.findIndex(
+          (user) =>
+            user.userId.equals(targetUserId) && user.role === Role.OWNER,
+        );
+        if (ownerIndex !== -1) {
+          project.accessControlUsers[ownerIndex].userId = newOwner;
+        }
+      } else if (isOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotRemoveOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      } else {
+        project.accessControlUsers = project.accessControlUsers.filter(
+          (user) => !user.userId.equals(targetUserId),
+        );
       }
-    } else if (isOwner) {
-      throw new CustomException(
-        getErrorMessages({ project: 'cannotRemoveOwner' }),
-        HttpStatus.FORBIDDEN,
+      await this.saveProject(project);
+      return;
+    }
+
+    let teamIndex = -1;
+    for (let i = 0; i < project.accessControlTeams.length; i += 1) {
+      const t = project.accessControlTeams[i];
+      const hasOverride =
+        Array.isArray(t.individualOverrides) &&
+        t.individualOverrides.some(
+          (o) => o.userId && o.userId.equals(targetUserId),
+        );
+      if (hasOverride) {
+        teamIndex = i;
+        break;
+      }
+    }
+    if (teamIndex === -1) {
+      const teamCheckPromises = project.accessControlTeams.map((team, index) =>
+        this.teamService
+          .getUserRoleInTeam(team.teamId, targetUserId)
+          .then((roleInTeam) => ({ index, roleInTeam })),
       );
-    } else {
-      project.accessControlUsers = project.accessControlUsers.filter(
-        (user) => !user.userId.equals(targetUserId),
+      const results = await Promise.all(teamCheckPromises);
+      for (const result of results) {
+        if (result.roleInTeam) {
+          teamIndex = result.index;
+          break;
+        }
+      }
+    }
+
+    if (teamIndex === -1) {
+      throw new CustomException(
+        getErrorMessages({ project: 'userNotFound' }),
+        HttpStatus.NOT_FOUND,
       );
     }
-    await this.saveProject(project);
+
+    await this.disbandTeamAndPromoteMembers(project, teamIndex, targetUserId);
   }
 
   async updateUserRole(
@@ -473,30 +540,70 @@ export class ProjectService {
       Role.ADMIN,
     )) as ProjectDocument;
     await this.validateUser(targetUserId);
-    const isOwner = project.accessControlUsers.some(
-      (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
-    );
 
-    if (isOwner) {
+    if (!ROLES.includes(newRole)) {
       throw new CustomException(
-        getErrorMessages({ project: 'cannotChangeOwnerRole' }),
-        HttpStatus.FORBIDDEN,
+        getErrorMessages({ project: 'invalidRole' }),
+        HttpStatus.BAD_REQUEST,
       );
     }
-
-    const userIndex = project.accessControlUsers.findIndex((user) =>
+    const explicitIndex = project.accessControlUsers.findIndex((user) =>
       user.userId.equals(targetUserId),
     );
 
-    if (userIndex === -1) {
-      throw new CustomException(
-        getErrorMessages({ project: 'userNotFound' }),
-        HttpStatus.NOT_FOUND,
+    if (explicitIndex !== -1) {
+      const isOwner = project.accessControlUsers.some(
+        (user) => user.userId.equals(targetUserId) && user.role === Role.OWNER,
       );
+
+      if (isOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotChangeOwnerRole' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      project.accessControlUsers[explicitIndex].role = newRole;
+      return await this.saveProject(project);
     }
 
-    project.accessControlUsers[userIndex].role = newRole;
-    return await this.saveProject(project);
+    for (let i = 0; i < project.accessControlTeams.length; i += 1) {
+      const teamAccess = project.accessControlTeams[i];
+
+      if (Array.isArray(teamAccess.individualOverrides)) {
+        const override = teamAccess.individualOverrides.find((o) =>
+          o.userId.equals(targetUserId),
+        );
+        if (override) {
+          override.role = newRole;
+          return await this.saveProject(project);
+        }
+      }
+    }
+
+    const teamCheckPromises = project.accessControlTeams.map(
+      (teamAccess, index) =>
+        this.teamService
+          .getUserRoleInTeam(teamAccess.teamId, targetUserId)
+          .then((roleInTeam) => ({ index, roleInTeam })),
+    );
+    const results = await Promise.all(teamCheckPromises);
+    for (const result of results) {
+      if (result.roleInTeam) {
+        const teamAccess = project.accessControlTeams[result.index];
+        teamAccess.individualOverrides = teamAccess.individualOverrides || [];
+        teamAccess.individualOverrides.push({
+          userId: targetUserId,
+          role: newRole,
+        } as any);
+        return await this.saveProject(project);
+      }
+    }
+
+    throw new CustomException(
+      getErrorMessages({ project: 'userNotFound' }),
+      HttpStatus.NOT_FOUND,
+    );
   }
 
   async updateProjectInfo(
@@ -663,17 +770,57 @@ export class ProjectService {
     }
   }
 
-  async addTeamToProject(
+  public async addTeamToProject(
     projectId: Types.ObjectId,
     teamId: Types.ObjectId,
     role: Role,
     userId: Types.ObjectId,
+    sendInvite = true,
+    expiresAt?: Date,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, Role.ADMIN);
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
+    if (!ROLES.includes(role)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'invalidRole' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (sendInvite) {
+      await this.validateUser(userId, projectId, Role.ADMIN);
+    } else {
+      await this.findProjectById(projectId);
+    }
+
+    await this.teamService.findTeamById(teamId);
+    const project = await this.findProjectById(projectId);
+    const exists = project.accessControlTeams.some((t) =>
+      t.teamId.equals(teamId),
     );
+    if (exists) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    if (sendInvite) {
+      await this.notificationService.createProjectTeamInvite(
+        projectId,
+        teamId,
+        userId,
+        role,
+        expiresAt,
+      );
+      return;
+    }
+
+    project.accessControlTeams.push({
+      teamId,
+      role,
+      addedAt: new Date(),
+      individualOverrides: [],
+    } as any);
+    await this.saveProject(project);
+    await this.safeAddProjectToTeam(teamId, projectId);
   }
 
   async removeTeamFromProject(
@@ -681,11 +828,20 @@ export class ProjectService {
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
   ): Promise<void> {
-    await this.validateUser(userId, projectId, Role.ADMIN);
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
-    );
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      Role.ADMIN,
+    )) as ProjectDocument;
+    await this.removeTeamInternal(projectId, teamId, project);
+  }
+
+  public async removeTeamFromProjectByTeam(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<void> {
+    const project = await this.findProjectById(projectId);
+    await this.removeTeamInternal(projectId, teamId, project);
   }
 
   async updateTeamRoleInProject(
@@ -693,12 +849,33 @@ export class ProjectService {
     teamId: Types.ObjectId,
     newRole: Role,
     userId: Types.ObjectId,
-  ): Promise<void> {
-    await this.validateUser(userId, projectId, Role.ADMIN);
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
+  ): Promise<ProjectDocument> {
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      Role.ADMIN,
+    )) as ProjectDocument;
+
+    if (!ROLES.includes(newRole)) {
+      throw new CustomException(
+        getErrorMessages({ project: 'invalidRole' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const teamIndex = project.accessControlTeams.findIndex((t) =>
+      t.teamId.equals(teamId),
     );
+
+    if (teamIndex === -1) {
+      throw new CustomException(
+        getErrorMessages({ project: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    project.accessControlTeams[teamIndex].role = newRole;
+    return await this.saveProject(project);
   }
 
   async getProjectMemberIds(
@@ -754,6 +931,142 @@ export class ProjectService {
     return;
   }
 
+  async getProjectBriefInfo(
+    projectId: Types.ObjectId,
+    userId?: Types.ObjectId,
+  ): Promise<any> {
+    this.validateObjectId(projectId, 'project');
+
+    const project = await this.projectModel
+      .findById(projectId)
+      .orFail(() => this.notFoundError('project'))
+      .exec();
+
+    if (!project.settings.isPublic) {
+      throw new CustomException(
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (userId) {
+      const userRole = await this.getUserRole(projectId, userId);
+      if (userRole) {
+        throw new CustomException(
+          { message: 'User already a member of this project' },
+          HttpStatus.CONFLICT,
+        );
+      }
+    }
+
+    let members: MemberInfo[] = [];
+    if (project.settings.memberListIsPublic) {
+      members = await this.getMembers(project);
+    }
+
+    return {
+      id: project._id,
+      name: project.name,
+      avatar: project.avatar,
+      description: project.description,
+      members: project.settings.memberListIsPublic ? members : [],
+      updatedAt: project.updatedAt,
+      settings: {
+        allowRequests: project.settings.allowRequests,
+        memberListIsPublic: project.settings.memberListIsPublic,
+      },
+    };
+  }
+
+  private async removeTeamInternal(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    project: ProjectDocument,
+  ): Promise<void> {
+    const teamIndex = project.accessControlTeams.findIndex((t) =>
+      t.teamId.equals(teamId),
+    );
+    if (teamIndex === -1) {
+      throw new CustomException(
+        getErrorMessages({ project: 'notFound' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    project.accessControlTeams.splice(teamIndex, 1);
+    await this.saveProject(project);
+    await this.safeRemoveProjectFromTeam(teamId, projectId);
+  }
+
+  private async disbandTeamAndPromoteMembers(
+    project: ProjectDocument,
+    teamIndex: number,
+    removedUserId: Types.ObjectId,
+  ): Promise<void> {
+    const teamAccess = project.accessControlTeams[teamIndex];
+    const teamId = teamAccess.teamId;
+    const teamMemberIds = await this.teamService.getTeamMemberIds(teamId);
+    const explicitUserIdSet = new Set(
+      project.accessControlUsers.map((u) => u.userId.toString()),
+    );
+
+    const earlierTeams = project.accessControlTeams
+      .slice(0, teamIndex)
+      .map((t) => t.teamId.toString());
+
+    for (const memberId of teamMemberIds) {
+      if (memberId.equals(removedUserId)) continue;
+
+      if (explicitUserIdSet.has(memberId.toString())) continue;
+
+      let isInHigherPriorityTeam = false;
+      for (const earlierTeamIdStr of earlierTeams) {
+        const roleInEarlierTeam = await this.teamService.getUserRoleInTeam(
+          new Types.ObjectId(earlierTeamIdStr),
+          memberId,
+        );
+        if (roleInEarlierTeam) {
+          isInHigherPriorityTeam = true;
+          break;
+        }
+      }
+      if (isInHigherPriorityTeam) continue;
+
+      let effectiveRole: Role | null = null;
+      if (Array.isArray(teamAccess.individualOverrides)) {
+        const override = teamAccess.individualOverrides.find((o) =>
+          o.userId.equals(memberId),
+        );
+        if (override) {
+          effectiveRole = override.role;
+        }
+      }
+      if (!effectiveRole) {
+        const roleInTeam = await this.teamService.getUserRoleInTeam(
+          teamId,
+          memberId,
+        );
+        if (!roleInTeam) {
+          continue;
+        }
+        effectiveRole = roleInTeam;
+        if (
+          RoleLevel[effectiveRole] > RoleLevel[teamAccess.role] &&
+          RoleLevel[teamAccess.role] !== undefined
+        ) {
+          effectiveRole = teamAccess.role;
+        }
+      }
+      project.accessControlUsers.push({
+        userId: memberId,
+        role: effectiveRole,
+      } as any);
+      explicitUserIdSet.add(memberId.toString());
+    }
+    project.accessControlTeams.splice(teamIndex, 1);
+    await this.saveProject(project);
+    await this.safeRemoveProjectFromTeam(teamId, project._id);
+  }
+
   private validateObjectId(id: Types.ObjectId, errorKey: Field): void {
     if (!Types.ObjectId.isValid(id)) {
       throw new CustomException(
@@ -794,7 +1107,6 @@ export class ProjectService {
   }
 
   private async getMembers(project: ProjectDocument): Promise<MemberInfo[]> {
-    // TODO: Реализовать полную логику с командами, когда будет сервис команд
     const populatedProject = await this.projectModel
       .findById(project._id)
       .populate<{
@@ -809,17 +1121,64 @@ export class ProjectService {
       })
       .exec();
 
-    return populatedProject.accessControlUsers.map((user) => {
+    const membersMap = new Map<string, MemberInfo>();
+
+    populatedProject.accessControlUsers.forEach((user) => {
       const userObj = user.userId as any;
-      return {
+      membersMap.set(userObj._id.toString(), {
         id: userObj._id,
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: user.role,
         team: undefined,
         teamId: undefined,
-      };
+      });
     });
+
+    for (const teamAccess of project.accessControlTeams) {
+      const overrideMap = new Map<string, Role>();
+      if (Array.isArray(teamAccess.individualOverrides)) {
+        for (const o of teamAccess.individualOverrides) {
+          if (o && o.userId) {
+            overrideMap.set(o.userId.toString(), o.role);
+          }
+        }
+      }
+
+      const teamMembers = await this.teamService.getMembersInfo(
+        teamAccess.teamId,
+      );
+      const teamName =
+        teamMembers.length > 0 && (teamMembers[0] as any).teamName
+          ? (teamMembers[0] as any).teamName
+          : undefined;
+
+      for (const tm of teamMembers) {
+        const idStr = tm.id.toString();
+        if (membersMap.has(idStr)) continue;
+
+        let effectiveRole: Role = overrideMap.get(idStr) ?? tm.role;
+
+        if (
+          overrideMap.get(idStr) === undefined &&
+          RoleLevel[effectiveRole] > RoleLevel[teamAccess.role] &&
+          RoleLevel[teamAccess.role] !== undefined
+        ) {
+          effectiveRole = teamAccess.role;
+        }
+
+        membersMap.set(idStr, {
+          id: tm.id,
+          nickname: tm.nickname,
+          avatar: tm.avatar,
+          role: effectiveRole,
+          team: teamName,
+          teamId: teamAccess.teamId,
+        });
+      }
+    }
+
+    return Array.from(membersMap.values());
   }
 
   private async getUserRole(
@@ -836,18 +1195,24 @@ export class ProjectService {
     }
 
     for (const teamAccess of project.accessControlTeams) {
-      const individualOverride = teamAccess.individualOverrides.find(
-        (override) => override.userId.equals(userId),
+      const individualOverride = (teamAccess.individualOverrides || []).find(
+        (override) => override.userId && override.userId.equals(userId),
       );
 
       if (individualOverride) {
         return individualOverride.role;
       }
 
-      // TODO: Заменить на реальную проверку, когда будет сервис команд
-      const isUserInTeam = await this.isUserInTeam(teamAccess.teamId, userId);
-      if (isUserInTeam) {
-        return teamAccess.role;
+      const userRoleInTeam = await this.teamService.getUserRoleInTeam(
+        teamAccess.teamId,
+        userId,
+      );
+
+      if (userRoleInTeam) {
+        if (RoleLevel[userRoleInTeam] > RoleLevel[teamAccess.role]) {
+          return teamAccess.role;
+        }
+        return userRoleInTeam;
       }
     }
 
@@ -887,10 +1252,36 @@ export class ProjectService {
   }
 
   private async isUserInTeam(
-    teamId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
-    userId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
+    teamId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<boolean> {
-    // TODO: Реализовать вызов сервиса команд, чтобы проверить пользователя
-    return false;
+    const memberIds = await this.teamService.getTeamMemberIds(teamId);
+    return memberIds.some((id) => id.equals(userId));
+  }
+
+  private async safeAddProjectToTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.teamService.addProjectToTeam(teamId, projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to add project ${projectId} to team ${teamId}: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  private async safeRemoveProjectFromTeam(
+    teamId: Types.ObjectId,
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.teamService.removeProjectFromTeam(teamId, projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to remove project ${projectId} from team ${teamId}: ${(err as Error).message}`,
+      );
+    }
   }
 }

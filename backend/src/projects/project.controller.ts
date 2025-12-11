@@ -366,6 +366,66 @@ export class ProjectController {
     );
   }
 
+  @Get(':id/brief')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get public brief information about project' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Valid MongoDB ObjectID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns brief public information about project',
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        name: { type: 'string' },
+        avatar: { type: 'string' },
+        description: { type: 'string', nullable: true },
+        members: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              nickname: { type: 'string' },
+              avatar: { type: 'string' },
+              role: {
+                type: 'string',
+                enum: ['owner', 'admin', 'editor', 'reader'],
+              },
+              team: { type: 'string', nullable: true },
+              teamId: { type: 'string', nullable: true },
+            },
+          },
+        },
+        updatedAt: { type: 'string', format: 'date-time' },
+        settings: {
+          type: 'object',
+          properties: {
+            allowRequests: { type: 'boolean' },
+            memberListIsPublic: { type: 'boolean' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  @ApiResponse({ status: 403, description: 'Project is not public' })
+  @ApiResponse({
+    status: 409,
+    description: 'User already a member of this project',
+  })
+  async getProjectBriefInfo(
+    @Param('id') projectId: Types.ObjectId,
+    @Headers('x-user-id') userId?: Types.ObjectId,
+  ): Promise<any> {
+    return this.projectService.getProjectBriefInfo(projectId, userId);
+  }
+
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Partially update project information' })
@@ -626,7 +686,6 @@ export class ProjectController {
     @Param('id') projectId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
-
     @Query('newOwner') newOwner?: string,
   ): Promise<void> {
     return this.projectService.removeUser(
@@ -670,57 +729,118 @@ export class ProjectController {
   }
 
   @Post(':id/teams')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Add team to project (not implemented)' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Invite team to project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
   @ApiBody({
-    description: 'Team data',
+    description: 'Team id and role to grant',
     examples: {
       example1: {
-        summary: 'Add team to project',
+        summary: 'Invite team as editors',
         value: {
           teamId: '507f1f77bcf86cd799439013',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
     },
   })
-  async addTeamToProject(): Promise<void> {
-    throw new Error('Not implemented');
+  async addTeamToProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Body('teamId') teamId: Types.ObjectId,
+    @Body('role') role: Role,
+    @Headers('x-user-id') userId: Types.ObjectId,
+    @Body('expiresAt') expiresAt?: Date,
+  ): Promise<void> {
+    return this.projectService.addTeamToProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      role,
+      new Types.ObjectId(userId),
+      true,
+      expiresAt,
+    );
   }
 
   @Delete(':id/teams/:teamId')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Remove team from project (not implemented)' })
-  @ApiBody({
-    description: 'Team ID',
-    examples: {
-      example1: {
-        summary: 'Remove team from project',
-        value: {
-          teamId: '507f1f77bcf86cd799439013',
-        },
-      },
-    },
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Remove team from project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
   })
-  async removeTeamFromProject(): Promise<void> {
-    throw new Error('Not implemented');
+  @ApiParam({
+    name: 'teamId',
+    description: 'ID of the team to remove',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Team has been successfully removed from project',
+  })
+  @ApiResponse({ status: 404, description: 'Project or team not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  async removeTeamFromProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('teamId') teamId: Types.ObjectId,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    return this.projectService.removeTeamFromProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      new Types.ObjectId(userId),
+    );
   }
 
   @Put(':id/teams/:teamId/role')
-  @HttpCode(HttpStatus.NOT_IMPLEMENTED)
-  @ApiOperation({ summary: 'Update team role in project (not implemented)' })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Update team role in project' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiParam({
+    name: 'teamId',
+    description: 'ID of the team',
+    type: String,
+  })
   @ApiBody({
-    description: 'New role for team',
+    description: 'New role for team in project',
     examples: {
       example1: {
-        summary: 'Update team role',
+        summary: 'Make team admin',
         value: {
           role: 'admin',
         },
       },
     },
   })
-  async updateTeamRoleInProject(): Promise<void> {
-    throw new Error('Not implemented');
+  @ApiResponse({
+    status: 200,
+    description: 'Team role has been successfully updated in project',
+  })
+  @ApiResponse({ status: 404, description: 'Project or team not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - no permission' })
+  async updateTeamRoleInProject(
+    @Param('id') projectId: Types.ObjectId,
+    @Param('teamId') teamId: Types.ObjectId,
+    @Body('role') newRole: Role,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<void> {
+    await this.projectService.updateTeamRoleInProject(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(teamId),
+      newRole,
+      new Types.ObjectId(userId),
+    );
   }
 }

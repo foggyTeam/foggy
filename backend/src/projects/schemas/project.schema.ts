@@ -49,6 +49,7 @@ interface AccessControlUser {
 interface AccessControlTeam {
   teamId: Types.ObjectId;
   role: Role;
+  addedAt: Date;
   individualOverrides: AccessControlUser[];
 }
 
