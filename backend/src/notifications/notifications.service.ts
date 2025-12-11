@@ -365,7 +365,7 @@ export class NotificationService {
     const adminIds =
       entityType === EntityType.PROJECT
         ? await this.projectService.getProjectAdminIds(entityId)
-        : []; //TODO: team admins
+        : await this.teamService.getTeamAdminIds(entityId);
 
     await new this.notificationModel({
       type: joinType,
