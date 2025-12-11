@@ -95,6 +95,13 @@ export class ProjectService {
       );
     }
 
+    try {
+      await this.notificationService.removeProjectNotifications(projectId);
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for project ${projectId}: ${(err as Error).message}`,
+      );
+    }
     const result = await this.projectModel.deleteOne({ _id: projectId }).exec();
 
     if (result.deletedCount === 0) {
@@ -495,13 +502,19 @@ export class ProjectService {
         teamIndex = i;
         break;
       }
-      const roleInTeam = await this.teamService.getUserRoleInTeam(
-        t.teamId,
-        targetUserId,
+    }
+    if (teamIndex === -1) {
+      const teamCheckPromises = project.accessControlTeams.map((team, index) =>
+        this.teamService
+          .getUserRoleInTeam(team.teamId, targetUserId)
+          .then((roleInTeam) => ({ index, roleInTeam })),
       );
-      if (roleInTeam) {
-        teamIndex = i;
-        break;
+      const results = await Promise.all(teamCheckPromises);
+      for (const result of results) {
+        if (result.roleInTeam) {
+          teamIndex = result.index;
+          break;
+        }
       }
     }
 
@@ -566,12 +579,18 @@ export class ProjectService {
           return await this.saveProject(project);
         }
       }
+    }
 
-      const roleInTeam = await this.teamService.getUserRoleInTeam(
-        teamAccess.teamId,
-        targetUserId,
-      );
-      if (roleInTeam) {
+    const teamCheckPromises = project.accessControlTeams.map(
+      (teamAccess, index) =>
+        this.teamService
+          .getUserRoleInTeam(teamAccess.teamId, targetUserId)
+          .then((roleInTeam) => ({ index, roleInTeam })),
+    );
+    const results = await Promise.all(teamCheckPromises);
+    for (const result of results) {
+      if (result.roleInTeam) {
+        const teamAccess = project.accessControlTeams[result.index];
         teamAccess.individualOverrides = teamAccess.individualOverrides || [];
         teamAccess.individualOverrides.push({
           userId: targetUserId,

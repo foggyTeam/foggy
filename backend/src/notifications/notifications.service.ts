@@ -304,6 +304,71 @@ export class NotificationService {
     }
   }
 
+  public async removeTeamNotifications(teamId: Types.ObjectId): Promise<void> {
+    try {
+      await this.notificationModel
+        .deleteMany({
+          $or: [
+            { 'target.type': EntityType.TEAM, 'target.id': teamId },
+            { 'metadata.teamId': teamId },
+            {
+              type: {
+                $in: [
+                  NotificationType.TEAM_INVITE,
+                  NotificationType.TEAM_JOIN_REQUEST,
+                  NotificationType.TEAM_JOIN_ACCEPTED,
+                  NotificationType.TEAM_JOIN_REJECTED,
+                  NotificationType.TEAM_MEMBER_ADDED,
+                  NotificationType.PROJECT_TEAM_INVITE,
+                  NotificationType.PROJECT_TEAM_INVITE_REJECTED,
+                ],
+              },
+              $or: [{ 'target.id': teamId }, { 'metadata.teamId': teamId }],
+            },
+          ],
+        })
+        .exec();
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for team ${teamId}: ${(err as Error).message}`,
+      );
+      throw err;
+    }
+  }
+
+  public async removeProjectNotifications(
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.notificationModel
+        .deleteMany({
+          $or: [
+            { 'target.type': EntityType.PROJECT, 'target.id': projectId },
+            {
+              type: {
+                $in: [
+                  NotificationType.PROJECT_INVITE,
+                  NotificationType.PROJECT_JOIN_REQUEST,
+                  NotificationType.PROJECT_JOIN_ACCEPTED,
+                  NotificationType.PROJECT_JOIN_REJECTED,
+                  NotificationType.PROJECT_MEMBER_ADDED,
+                  NotificationType.PROJECT_TEAM_INVITE,
+                  NotificationType.PROJECT_TEAM_INVITE_REJECTED,
+                ],
+              },
+              'target.id': projectId,
+            },
+          ],
+        })
+        .exec();
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for project ${projectId}: ${(err as Error).message}`,
+      );
+      throw err;
+    }
+  }
+
   private async createInvite(
     recipientId: Types.ObjectId,
     entityId: Types.ObjectId,

@@ -289,6 +289,33 @@ export class TeamService {
     userId: Types.ObjectId,
   ): Promise<void> {
     await this.validateTeamAccess(teamId, userId, Role.OWNER);
+    const team = await this.teamModel.findById(teamId).exec();
+    if (!team) {
+      throw this.notFoundError();
+    }
+
+    if (team.projects && team.projects.length > 0) {
+      for (const projectId of team.projects) {
+        try {
+          await this.projectService.removeTeamFromProjectByTeam(
+            projectId,
+            teamId,
+          );
+        } catch (err) {
+          console.warn(
+            `Failed to remove team ${teamId} from project ${projectId}: ${err.message}`,
+          );
+        }
+      }
+    }
+
+    try {
+      await this.notificationService.removeTeamNotifications(teamId);
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for team ${teamId}: ${err.message}`,
+      );
+    }
     const result = await this.teamModel.deleteOne({ _id: teamId }).exec();
 
     if (result.deletedCount === 0) {
@@ -512,9 +539,9 @@ export class TeamService {
     if (query) {
       filter.name = { $regex: query, $options: 'i' };
     }
-    filter._id = {
-      ...(cursor && { $gt: new Types.ObjectId(cursor) }),
-    };
+    if (cursor) {
+      filter._id = { $gt: new Types.ObjectId(cursor) };
+    }
 
     const teams = await this.teamModel
       .find(filter)
