@@ -492,6 +492,52 @@ export class TeamService {
     await this.projectService.removeTeamFromProjectByTeam(projectId, teamId);
   }
 
+  async searchTeams(
+    query: string,
+    limit = 20,
+    cursor?: string,
+  ): Promise<{
+    teams: {
+      id: Types.ObjectId;
+      name: string;
+      description?: string;
+      avatar?: string;
+    }[];
+    nextCursor: Types.ObjectId | null;
+    hasNextPage: boolean;
+  }> {
+    const validatedLimit = Math.min(Math.max(limit, 1), 100);
+
+    const filter: any = {};
+    if (query) {
+      filter.name = { $regex: query, $options: 'i' };
+    }
+    filter._id = {
+      ...(cursor && { $gt: new Types.ObjectId(cursor) }),
+    };
+
+    const teams = await this.teamModel
+      .find(filter)
+      .sort({ _id: 1 })
+      .limit(validatedLimit)
+      .select('name description avatar _id')
+      .exec();
+
+    const nextCursor =
+      teams.length === validatedLimit ? teams[teams.length - 1]._id : null;
+
+    return {
+      teams: teams.map((team) => ({
+        id: team._id,
+        name: team.name,
+        description: team.description,
+        avatar: team.avatar,
+      })),
+      nextCursor,
+      hasNextPage: Boolean(nextCursor),
+    };
+  }
+
   private async validateTeamAccess(
     teamId: Types.ObjectId,
     userId: Types.ObjectId,

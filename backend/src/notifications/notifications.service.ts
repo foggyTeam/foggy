@@ -198,11 +198,11 @@ export class NotificationService {
   }
 
   public async createProjectTeamInvite(
-      projectId: Types.ObjectId,
-      teamId: Types.ObjectId,
-      inviterId: Types.ObjectId,
-      role: Role,
-      expiresAt?: Date,
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+    role: Role,
+    expiresAt?: Date,
   ): Promise<void> {
     await this.projectService.findProjectById(projectId);
     await this.teamService.findTeamById(teamId);
@@ -210,17 +210,12 @@ export class NotificationService {
     const teamAdminIds = await this.teamService.getTeamAdminIds(teamId);
     if (!teamAdminIds || teamAdminIds.length === 0) {
       throw new CustomException(
-          getErrorMessages({ general: "errorNotRecognized" }),
-          HttpStatus.BAD_REQUEST,
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.BAD_REQUEST,
       );
     }
 
-    await this.checkInviteDuplicate(
-        NotificationType.PROJECT_TEAM_INVITE,
-        { type: EntityType.PROJECT, id: projectId },
-        teamAdminIds[0],
-    );
-
+    await this.checkProjectTeamInviteDuplicate(projectId, teamId);
     await new this.notificationModel({
       type: NotificationType.PROJECT_TEAM_INVITE,
       recipients: teamAdminIds.map((id) => ({ userId: id })),
@@ -753,6 +748,27 @@ export class NotificationService {
           existingNotification._id,
         );
       }
+    }
+  }
+
+  private async checkProjectTeamInviteDuplicate(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<void> {
+    const existingNotification = await this.notificationModel
+      .findOne({
+        type: NotificationType.PROJECT_TEAM_INVITE,
+        'target.type': EntityType.PROJECT,
+        'target.id': projectId,
+        'metadata.teamId': teamId,
+      })
+      .exec();
+
+    if (existingNotification) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'inviteDuplicateExists' }),
+        HttpStatus.CONFLICT,
+      );
     }
   }
 

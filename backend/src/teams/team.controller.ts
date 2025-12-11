@@ -59,6 +59,44 @@ export class TeamController {
     return { data: { id: teamId } };
   }
 
+  @Post('search')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Search teams by name' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of teams matching the search criteria',
+  })
+  @ApiBody({
+    description: 'Search parameters',
+    schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Search query for team name',
+          example: 'team name',
+        },
+        limit: {
+          type: 'number',
+          description: 'Maximum number of results (1-100)',
+          example: 20,
+        },
+        cursor: {
+          type: 'string',
+          description: 'Cursor for pagination',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+      },
+    },
+  })
+  async searchTeams(
+    @Body('query') query: string = '',
+    @Body('limit') limit: number = 20,
+    @Body('cursor') cursor?: string,
+  ) {
+    return this.teamService.searchTeams(query, limit, cursor);
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all teams for current user' })
