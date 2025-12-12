@@ -13,10 +13,10 @@ const ForbiddenState = observer(() => {
 
   useEffect(() => {
     const queryType = params.get('type');
-    if (queryType === 'project' || queryType == 'team') {
+    if (queryType === 'project' || queryType === 'team') {
       setType(queryType);
     }
-  }, []);
+  }, [params]);
   return (
     <EmptyState
       illustrationType="files"

@@ -44,7 +44,7 @@ export default function ProjectCard(
         el_animation,
         isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px]',
         isExpanded ? project_tile_exp : project_tile,
-        isExpanded && !project.isDisabled ? '' : 'cursor-pointer',
+        !isExpanded && !project.isDisabled ? 'cursor-pointer' : 'cursor-auto',
       )}
     >
       <div className="flex h-fit w-full items-center justify-between gap-2">

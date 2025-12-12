@@ -38,7 +38,7 @@ const NotFound = observer(() => {
   const path = usePathname();
 
   useEffect(() => {
-    setCallback(router.back);
+    setCallback(() => router.back());
     for (const [key, item] of Object.entries(regexMap)) {
       if (item.regex.test(path)) {
         setText({ action: '', ...item.text });

@@ -23,10 +23,8 @@ async function getTeamInfo(id: string): Promise<Team | undefined> {
 
 export default async function TeamRequestPage({
   params,
-  children,
 }: Readonly<{
   params: Promise<{ team_id: string }>;
-  children: React.ReactNode;
 }>) {
   const { team_id } = await params;
   const teamData = await getTeamInfo(team_id);
