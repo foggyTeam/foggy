@@ -4,7 +4,6 @@ import { Project } from '@/app/lib/types/definitions';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import ProjectRequest from '@/app/lib/components/projects/projectRequest';
-import { redirect } from 'next/navigation';
 
 async function getProjectInfo(id: string): Promise<Project | undefined> {
   //TODO: uncomment when API ready

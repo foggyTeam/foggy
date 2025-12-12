@@ -14,7 +14,7 @@ import IsFormValid from '@/app/lib/utils/isFormValid';
 import { requestMessageFormSchema } from '@/app/lib/types/schemas';
 
 const RequestForm = observer(
-  (id: string | undefined, type: 'project' | 'team') => {
+  ({ id, type }: { id: string | undefined; type: 'project' | 'team' }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({} as any);
 
