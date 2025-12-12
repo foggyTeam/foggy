@@ -2,7 +2,7 @@ import React from 'react';
 import { RawProject } from '@/app/lib/types/definitions';
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
 import { GetProject } from '@/app/lib/server/actions/projectServerActions';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 interface ProjectPageProps {
   project_id: string;
@@ -10,6 +10,8 @@ interface ProjectPageProps {
 
 async function getProject(id: string): Promise<RawProject | undefined> {
   const project = await GetProject(id);
+  if (project?.status === 403) redirect(`/project/request/${id}`);
+
   if (!project) notFound();
   return project;
 }

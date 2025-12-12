@@ -88,3 +88,13 @@ export const teamFormSchema = z.object({
       settingsStore.t.validationErrors.teamName.invalidSymbols,
     ),
 });
+
+export const requestMessageFormSchema = z.object({
+  message: z
+    .string()
+    .max(300, settingsStore.t.validationErrors.requestMessage.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.requestMessage.invalidSymbols,
+    ),
+});

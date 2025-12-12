@@ -34,10 +34,11 @@ const NotFound = observer(() => {
     action: '',
   });
   const router = useRouter();
-  const [callback, setCallback] = useState<() => void>(() => router.back());
+  const [callback, setCallback] = useState<() => void>(() => {});
   const path = usePathname();
 
   useEffect(() => {
+    setCallback(() => router.back());
     for (const [key, item] of Object.entries(regexMap)) {
       if (item.regex.test(path)) {
         setText({ action: '', ...item.text });

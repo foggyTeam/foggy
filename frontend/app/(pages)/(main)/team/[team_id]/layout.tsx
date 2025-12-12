@@ -11,6 +11,8 @@ interface TeamPageProps {
 async function getTeam(id: string): Promise<RawTeam | undefined> {
   // TODO: uncomment when API ready
   // const team = await GetTeam(id);
+  //if (team?.status === 403) redirect(`/team/request/${id}`);
+
   const team: Promise<RawTeam> = new Promise((resolve) =>
     setTimeout(
       () =>

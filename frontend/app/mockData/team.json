@@ -150,5 +150,11 @@
         }
       ]
     }
-  ]
+  ],
+  "settings": {
+    "allowRequests": true,
+    "isPublic": false,
+    "memberListIsPublic": true,
+    "projectListIsPublic": true
+  }
 }

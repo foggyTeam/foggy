@@ -39,6 +39,10 @@
       "required": "Team name is required",
       "maxLength": "Team name must be no more than 20 characters long",
       "invalidSymbols": "Team name may contain only letters, digits and special symbols"
+    },
+    "requestMessage": {
+      "maxLength": "Message must be no more than 300 characters long",
+      "invalidSymbols": "Message may contain only letters, digits and special symbols"
     }
   },
 
@@ -322,6 +326,13 @@
     "empty": {
       "title": "NO NOTIFICATIONS",
       "text": "You haven't received any notifications yet"
+    },
+    "sendRequest": {
+      "title": "SEND JOIN REQUEST",
+      "label": "Request Message",
+      "placeholder": "Can I join you as an editor, please?",
+      "sendButton": "Send",
+      "alreadySentButton": "Request sent!"
     }
   },
 
