@@ -17,7 +17,9 @@ import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 
-export default function ProjectCard(project: Project) {
+export default function ProjectCard(
+  project: Project & { isDisabled?: boolean; hideFavorite?: boolean },
+) {
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -36,12 +38,13 @@ export default function ProjectCard(project: Project) {
   return (
     <div
       ref={cardRef}
-      onClick={() => setIsExpanded(true)}
+      onClick={() => (project.isDisabled ? undefined : setIsExpanded(true))}
       className={clsx(
         'hover:bg-default-50 shadow-container box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
         el_animation,
-        isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px] cursor-pointer',
+        isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px]',
         isExpanded ? project_tile_exp : project_tile,
+        isExpanded && !project.isDisabled ? '' : 'cursor-pointer',
       )}
     >
       <div className="flex h-fit w-full items-center justify-between gap-2">
@@ -49,7 +52,7 @@ export default function ProjectCard(project: Project) {
           <Avatar
             size="md"
             color="primary"
-            name={project.name.toUpperCase()}
+            name={project.name?.toUpperCase()}
             src={project.avatar}
           />
           <h1
@@ -66,21 +69,23 @@ export default function ProjectCard(project: Project) {
             </a>
           </h1>
         </div>
-        <Button
-          onPress={() =>
-            projectsStore.updateProject(project.id, {
-              favorite: !project.favorite,
-            })
-          }
-          isIconOnly
-          variant="light"
-          size="sm"
-          radius="lg"
-        >
-          <StarIcon
-            className={`stroke-default-300 ${project.favorite ? 'fill-default-300' : ''}`}
-          />
-        </Button>
+        {!project.hideFavorite && (
+          <Button
+            onPress={() =>
+              projectsStore.updateProject(project.id, {
+                favorite: !project.favorite,
+              })
+            }
+            isIconOnly
+            variant="light"
+            size="sm"
+            radius="lg"
+          >
+            <StarIcon
+              className={`stroke-default-300 ${project.favorite ? 'fill-default-300' : ''}`}
+            />
+          </Button>
+        )}
       </div>
 
       <div

@@ -30,6 +30,7 @@
     "@heroui/popover": "^2.3.26",
     "@heroui/progress": "^2.2.22",
     "@heroui/react": "2.8.4",
+    "@heroui/scroll-shadow": "^2.3.18",
     "@heroui/select": "^2.4.27",
     "@heroui/skeleton": "2.2.6",
     "@heroui/slider": "^2.4.23",

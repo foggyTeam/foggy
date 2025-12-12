@@ -201,6 +201,9 @@ importers:
       '@heroui/react':
         specifier: 2.8.4
         version: 2.8.4(@types/react@19.1.13)(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(tailwindcss@4.1.13)
+      '@heroui/scroll-shadow':
+        specifier: ^2.3.18
+        version: 2.3.18(@heroui/system@2.4.22(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.22(tailwindcss@4.1.13))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@heroui/select':
         specifier: ^2.4.27
         version: 2.4.27(@heroui/system@2.4.22(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1036,6 +1039,14 @@ packages:
       react: '>=18 || >=19.0.0-rc.0'
       react-dom: '>=18 || >=19.0.0-rc.0'
 
+  '@heroui/scroll-shadow@2.3.18':
+    resolution: {integrity: sha512-P/nLQbFPOlbTLRjO2tKoZCljJtU7iq81wsp7C8wZ1rZI1RmkTx3UgLLeoFWgmAp3ZlUIYgaewTnejt6eRx+28w==}
+    peerDependencies:
+      '@heroui/system': '>=2.4.18'
+      '@heroui/theme': '>=2.4.17'
+      react: '>=18 || >=19.0.0-rc.0'
+      react-dom: '>=18 || >=19.0.0-rc.0'
+
   '@heroui/select@2.4.27':
     resolution: {integrity: sha512-CgMqVWYWcdHNOnSeMMraXFBXFsToyxZ9sSwszG3YlhGwaaj0yZonquMYgl5vHCnFLkGXwggNczl+vdDErLEsbw==}
     peerDependencies:
@@ -1235,6 +1246,11 @@ packages:
 
   '@heroui/use-data-scroll-overflow@2.2.12':
     resolution: {integrity: sha512-An+P5Tg8BtLpw5Ozi/og7s8cThduVMkCOvxMcl3izyYSFa826SIhAI99FyaS7Xb2zkwM/2ZMbK3W7DKt6w8fkg==}
+    peerDependencies:
+      react: '>=18 || >=19.0.0-rc.0'
+
+  '@heroui/use-data-scroll-overflow@2.2.13':
+    resolution: {integrity: sha512-zboLXO1pgYdzMUahDcVt5jf+l1jAQ/D9dFqr7AxWLfn6tn7/EgY0f6xIrgWDgJnM0U3hKxVeY13pAeB4AFTqTw==}
     peerDependencies:
       react: '>=18 || >=19.0.0-rc.0'
 
@@ -5191,6 +5207,7 @@ packages:
   next@15.1.9:
     resolution: {integrity: sha512-OoQpDPV2i3o5Hnn46nz2x6fzdFxFO+JsU4ZES12z65/feMjPHKKHLDVQ2NuEvTaXTRisix/G5+6hyTkwK329kA==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -7717,6 +7734,16 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  '@heroui/scroll-shadow@2.3.18(@heroui/system@2.4.22(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.22(tailwindcss@4.1.13))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@heroui/react-utils': 2.1.14(react@18.3.1)
+      '@heroui/shared-utils': 2.1.12
+      '@heroui/system': 2.4.22(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@heroui/theme': 2.4.22(tailwindcss@4.1.13)
+      '@heroui/use-data-scroll-overflow': 2.2.13(react@18.3.1)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@heroui/select@2.4.27(@heroui/system@2.4.22(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@heroui/aria-utils': 2.2.23(@heroui/theme@2.4.22(tailwindcss@4.1.13))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -8060,6 +8087,11 @@ snapshots:
   '@heroui/use-data-scroll-overflow@2.2.12(react@18.3.1)':
     dependencies:
       '@heroui/shared-utils': 2.1.11
+      react: 18.3.1
+
+  '@heroui/use-data-scroll-overflow@2.2.13(react@18.3.1)':
+    dependencies:
+      '@heroui/shared-utils': 2.1.12
       react: 18.3.1
 
   '@heroui/use-disclosure@2.2.16(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':

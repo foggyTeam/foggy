@@ -1,9 +1,8 @@
 import React from 'react';
-import teamShortData from '@/app/mockData/team.json';
-import { Team } from '@/app/lib/types/definitions';
+import activeTeam from '@/app/mockData/team.json';
+import { Team, TeamSettings } from '@/app/lib/types/definitions';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import ProjectRequest from '@/app/lib/components/projects/projectRequest';
 import TeamRequest from '@/app/lib/components/teams/teamRequest';
 
 async function getTeamInfo(id: string): Promise<Team | undefined> {
@@ -13,9 +12,13 @@ async function getTeamInfo(id: string): Promise<Team | undefined> {
 
   //if (!project) notFound();
 
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(teamShortData as Team), 300);
-  });
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve({ ...activeTeam, settings: { ...new TeamSettings() } } as any),
+      300,
+    ),
+  );
 }
 
 export default async function TeamRequestPage({
