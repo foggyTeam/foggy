@@ -10,7 +10,10 @@ interface ProjectPageProps {
 
 async function getProject(id: string): Promise<RawProject | undefined> {
   const project = await GetProject(id);
-  if (project?.status === 403) redirect(`/project/request/${id}`);
+  if (project?.status === 403) {
+    redirect(`/project/request/${id}`);
+    return;
+  }
 
   if (!project) notFound();
   return project;

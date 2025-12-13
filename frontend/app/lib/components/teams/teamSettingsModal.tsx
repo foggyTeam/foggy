@@ -19,6 +19,11 @@ import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
 import teamsStore from '@/app/stores/teamsStore';
+import {
+  AddNewTeam,
+  DeleteTeam,
+  UpdateTeam,
+} from '@/app/lib/server/actions/teamServerActions';
 
 const TeamSettingsModal = observer(
   ({
@@ -92,26 +97,23 @@ const TeamSettingsModal = observer(
 
     const deleteTeam = async () => {
       if (teamsStore.activeTeam) {
-        // TODO: delete when API ready
-        /*
-        await DeleteProject(projectsStore.activeProject.id)
-          .catch((error) =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.project.deleteProjectError,
-              description: error,
-            }),
-          )
-          .then(() => {
-            projectsStore.setActiveProject(null);
-            addToast({
-              color: 'success',
-              severity: 'success',
-              title: settingsStore.t.toasts.project.deleteProjectSuccess,
-            });
-            router.push('/');
-          });*/
+        try {
+          await DeleteTeam(teamsStore.activeTeam.id);
+          teamsStore.setActiveTeam(null);
+          addToast({
+            color: 'success',
+            severity: 'success',
+            title: settingsStore.t.toasts.team.deleteTeamSuccess,
+          });
+          router.push('/');
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.team.deleteTeamError,
+            description: e.toString(),
+          });
+        }
       } else {
         addToast({
           color: 'danger',
@@ -133,72 +135,70 @@ const TeamSettingsModal = observer(
         }
 
         if (isNewTeam) {
-          // TODO: add new team
-          /*
-          await AddNewProject(updatedData)
-            .then((result) => {
-              if (
-                Object.keys(result).findIndex(
-                  (element) => element === 'errors',
-                ) !== -1
-              ) {
-                setErrors(result.errors);
-              } else {
-                if (!userStore.user) return;
-                const newProject = {
-                  id: result.data.id,
-                  members: [
-                    {
-                      id: userStore.user.id,
-                      nickname: userStore.user.name,
-                      avatar: userStore.user.image,
-                      role: 'owner',
-                    },
-                  ],
-                  ...updatedData,
-                } as Project;
+          try {
+            const result = await AddNewTeam(updatedData);
+            if (
+              Object.keys(result).findIndex(
+                (element) => element === 'errors',
+              ) !== -1
+            ) {
+              setErrors(result.errors);
+            } else {
+              if (!userStore.user) return;
+              const newTeam = {
+                id: result.data.id,
+                members: [
+                  {
+                    id: userStore.user.id,
+                    nickname: userStore.user.name,
+                    avatar: userStore.user.image,
+                    role: 'owner',
+                  },
+                ],
+                ...updatedData,
+              } as Team;
+              teamsStore.addTeam(newTeam);
 
-                projectsStore.addProject(newProject);
-
-                router.push(`/project/${newProject.id}`);
-              }
-            })
-            .catch((error) =>
-              addToast({
-                color: 'danger',
-                severity: 'danger',
-                title: settingsStore.t.toasts.project.addProjectError,
-                description: error,
-              }),
-            )
-            .finally(() => setIsSaving(false));*/
+              router.push(`/team/${newTeam.id}`);
+            }
+          } catch (e: any) {
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.team.addTeamError,
+              description: e.toString(),
+            });
+          }
         } else if (teamsStore.activeTeam) {
-          // TODO: when API is ready
-          /*
-          await UpdateProject(projectsStore.activeProject.id, updatedData)
-            .then((result) => {
-              if (
-                Object.keys(result).findIndex(
-                  (element) => element === 'errors',
-                ) !== -1
-              ) {
-                setErrors(result.errors);
-                addToast({
-                  color: 'danger',
-                  severity: 'danger',
-                  title: settingsStore.t.toasts.project.updateProjectError,
-                });
-              } else {
-                addToast({
-                  color: 'success',
-                  severity: 'success',
-                  title: settingsStore.t.toasts.project.updateProjectSuccess,
-                });
-              }
-            })
-            .finally(() => setIsSaving(false));
-        */
+          try {
+            const result = await UpdateTeam(
+              teamsStore.activeTeam.id,
+              updatedData,
+            );
+            if (
+              Object.keys(result).findIndex(
+                (element) => element === 'errors',
+              ) !== -1
+            ) {
+              setErrors(result.errors);
+              throw new Error(result.errors);
+            } else {
+              addToast({
+                color: 'success',
+                severity: 'success',
+                title: settingsStore.t.toasts.team.updateTeamSuccess,
+              });
+            }
+          } catch (e: any) {
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.team.updateTeamError,
+              description: e.toString(),
+            });
+          }
         }
+        setIsSaving(false);
       }
     };
 

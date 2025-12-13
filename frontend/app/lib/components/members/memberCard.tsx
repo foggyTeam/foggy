@@ -98,7 +98,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
             size="md"
             color="primary"
             className="min-h-10 min-w-10"
-            name={member.nickname.toUpperCase()}
+            name={member.nickname?.toUpperCase()}
             src={member.avatar}
           />
           <div className="flex h-full w-full flex-col items-start justify-between">

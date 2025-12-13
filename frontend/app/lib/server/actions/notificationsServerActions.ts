@@ -44,6 +44,24 @@ export async function JoinProjectRequest(
   );
 }
 
+export async function JoinTeamRequest(
+  teamId: string,
+  role: Role,
+  message: string,
+) {
+  return postRequest(
+    `notifications/team-join-request`,
+    {
+      entityId: teamId,
+      customMessage: message,
+      role,
+    },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
 export async function AnswerNotification(
   notificationId: string,
   accept: boolean,

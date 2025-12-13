@@ -1,26 +1,22 @@
 import React from 'react';
 import { RawTeam, TeamSettings } from '@/app/lib/types/definitions';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import activeTeam from '@/app/mockData/team.json';
 import TeamLoader from '@/app/lib/components/dataLoaders/teamLoader';
+import { GetTeam } from '@/app/lib/server/actions/teamServerActions';
 
 interface TeamPageProps {
   team_id: string;
 }
 
 async function getTeam(id: string): Promise<RawTeam | undefined> {
-  // TODO: uncomment when API ready
-  // const team = await GetTeam(id);
-  //if (team?.status === 403) redirect(`/team/request/${id}`);
-
-  const team: Promise<RawTeam> = new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve({ ...activeTeam, settings: { ...new TeamSettings() } } as any),
-      300,
-    ),
-  );
+  const team = await GetTeam(id);
+  if (team?.status === 403) {
+    redirect(`/team/request/${id}`);
+    return;
+  }
   if (!team) notFound();
+
   return team;
 }
 export default async function TeamLayout({

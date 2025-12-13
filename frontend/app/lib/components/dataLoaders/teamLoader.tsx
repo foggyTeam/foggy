@@ -3,10 +3,10 @@
 import { useEffect } from 'react';
 import { RawTeam } from '@/app/lib/types/definitions';
 import useSWR from 'swr';
-import { GetProject } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import teamsStore from '@/app/stores/teamsStore';
+import { GetTeam } from '@/app/lib/server/actions/teamServerActions';
 
 export default function TeamLoader({
   teamData,
@@ -15,7 +15,7 @@ export default function TeamLoader({
 }) {
   const { data: revalidatedData, error } = useSWR(
     teamData ? teamData.id : null,
-    () => (teamData ? GetProject(teamData.id) : undefined),
+    () => (teamData ? GetTeam(teamData.id) : undefined),
     {
       fallbackData: teamData,
       revalidateOnFocus: true,

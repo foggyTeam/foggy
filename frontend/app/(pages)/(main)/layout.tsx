@@ -11,6 +11,7 @@ import { GetUserById } from '@/app/lib/server/actions/userServerActions';
 import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
 import { User } from 'next-auth';
 import BoardLoadingCard from '@/app/lib/components/boardLoadingCard';
+import { GetAllTeams } from '@/app/lib/server/actions/teamServerActions';
 
 async function getUser() {
   try {
@@ -38,17 +39,7 @@ async function getUserProjects(): Promise<Project[] | undefined> {
 }
 async function getUserTeams(): Promise<Team[] | undefined> {
   try {
-    return new Promise((resolve) => {
-      setTimeout(
-        () =>
-          resolve(
-            allTeams.map((team: any) => {
-              return { ...team, settings: { ...new TeamSettings() } };
-            }) as Team[],
-          ),
-        300,
-      );
-    });
+    return await GetAllTeams();
   } catch (e) {
     console.error('User with this id does not exist.');
     return undefined;

@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { RawTeam, Role, Team } from '@/app/lib/types/definitions';
+import { RawTeam, Role, Team, TeamMember } from '@/app/lib/types/definitions';
 import userStore from '@/app/stores/userStore';
 
 class TeamsStore {
@@ -26,7 +26,21 @@ class TeamsStore {
       this.myRole = undefined;
       return;
     }
-    this.activeTeam = { ...team };
+    this.activeTeam = {
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      settings: team.settings,
+      members: team.members.map((member) => {
+        return {
+          id: member.userId,
+          nickname: member.nickname,
+          avatar: member.avatar,
+          role: member.role,
+        } as TeamMember;
+      }),
+      projects: [...team.projects],
+    };
     this.myRole = this.activeTeam.members.find(
       (member) => member.id === userStore.user?.id,
     )?.role;

@@ -34,6 +34,8 @@ function getExpiresAt(term: keyof typeof expirationTimesMap) {
   const ms = expirationTimesMap[term];
   return new Date(Date.now() + ms).toISOString();
 }
+
+// PROJECT
 export async function AddProjectMember(
   projectId: string,
   data: {
@@ -74,6 +76,52 @@ export async function DeleteProjectMember(
     newOwnerId
       ? `projects/${projectId}/users/${userId}?newOwner=${newOwnerId}`
       : `projects/${projectId}/users/${userId}`,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+// TEAM
+export async function AddTeamMember(
+  teamId: string,
+  data: {
+    userId: string;
+    role: Omit<Role, 'owner'>;
+    expirationTime: keyof typeof expirationTimesMap;
+  },
+) {
+  return await postRequest(
+    `teams/${teamId}/members`,
+    { ...data, expiresAt: getExpiresAt(data.expirationTime) },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+export async function UpdateTeamMemberRole(
+  teamId: string,
+  data: { userId: string; role: Role },
+) {
+  return await patchRequest(
+    `teams/${teamId}/members/${data.userId}/role`,
+    data,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+export async function DeleteTeamMember(
+  teamId: string,
+  userId: string,
+  newOwnerId?: string | null,
+) {
+  return await deleteRequest(
+    newOwnerId
+      ? `teams/${teamId}/members/${userId}?newOwner=${newOwnerId}`
+      : `teams/${teamId}/members/${userId}`,
     {
       headers: { 'x-user-id': await getUserId() },
     },

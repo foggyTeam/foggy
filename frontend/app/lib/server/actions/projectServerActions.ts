@@ -29,6 +29,13 @@ export async function AddNewProject(data: Partial<Project>) {
     { headers: { 'x-user-id': await getUserId() } },
   );
 }
+export async function GetShortProjectInfo(id: string) {
+  return await getRequest(`projects/${id}/brief`, {
+    headers: {
+      'x-user-id': await getUserId(),
+    },
+  });
+}
 export async function GetProject(id: string) {
   return await getRequest(`projects/${id}`, {
     headers: {
