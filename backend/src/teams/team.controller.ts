@@ -350,7 +350,7 @@ export class TeamController {
       teamId,
       targetUserId,
       requestingUserId,
-      //newOwner ? new Types.ObjectId(newOwner) : undefined,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
@@ -368,17 +368,25 @@ export class TeamController {
     description: 'Member role has been successfully updated',
     type: Team,
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is changing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiResponse({ status: 404, description: 'Team or user not found' })
   @ApiBody({ type: ChangeTeamMemberRoleDto })
   async changeMemberRole(
     @Param('id') teamId: Types.ObjectId,
     @Body() changeRoleDto: ChangeTeamMemberRoleDto,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<TeamDocument> {
     return this.teamService.changeMemberRole(
       teamId,
       changeRoleDto,
       requestingUserId,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 

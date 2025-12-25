@@ -9,7 +9,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -489,6 +488,12 @@ export class ProjectController {
     status: 403,
     description: 'Forbidden - cannot change owner role',
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is changing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiBody({
     description: 'New role for user',
     examples: {
@@ -513,12 +518,14 @@ export class ProjectController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') newRole: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<Project> {
     return this.projectService.updateUserRole(
       projectId,
       requestingUserId,
       targetUserId,
       newRole,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
@@ -799,7 +806,7 @@ export class ProjectController {
     );
   }
 
-  @Put(':id/teams/:teamId/role')
+  @Patch(':id/teams/:teamId/role')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update team role in project' })
   @ApiSecurity('x-user-id')

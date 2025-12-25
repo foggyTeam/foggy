@@ -205,6 +205,7 @@ export class TeamService {
     teamId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     requestingUserId: Types.ObjectId,
+    newOwner?: Types.ObjectId,
   ): Promise<void> {
     const targetUserIdObj = new Types.ObjectId(targetUserId);
     const requestingUserIdObj = new Types.ObjectId(requestingUserId);
@@ -231,21 +232,32 @@ export class TeamService {
 
     const isOwner = targetMember.role === Role.OWNER;
     if (isOwner && isSelfRemove) {
-      const adminMembers = team.members.filter(
-        (member) =>
-          member.role === Role.ADMIN && !member.userId.equals(targetUserIdObj),
-      );
-      if (adminMembers.length === 0) {
+      if (!newOwner) {
         throw new CustomException(
           getErrorMessages({ project: 'mustSetNewOwner' }),
           HttpStatus.FORBIDDEN,
         );
       }
-
-      adminMembers[0].role = Role.OWNER;
+      if (newOwner.equals(targetUserIdObj)) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      await this.validateUser(newOwner);
+      const newOwnerMember = team.members.find((m) =>
+        m.userId.equals(newOwner),
+      );
+      if (!newOwnerMember) {
+        throw new CustomException(
+          getErrorMessages({ project: 'userNotFound' }),
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      newOwnerMember.role = Role.OWNER;
     } else if (isOwner) {
       throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
+        getErrorMessages({ project: 'cannotRemoveOwner' }),
         HttpStatus.FORBIDDEN,
       );
     }
@@ -260,6 +272,7 @@ export class TeamService {
     teamId: Types.ObjectId,
     changeRoleDto: ChangeTeamMemberRoleDto,
     requestingUserId: Types.ObjectId,
+    newOwner?: Types.ObjectId,
   ): Promise<TeamDocument> {
     const team = await this.validateTeamAccess(
       teamId,
@@ -274,16 +287,54 @@ export class TeamService {
 
     if (!targetMember) {
       throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
+        getErrorMessages({ project: 'userNotFound' }),
         HttpStatus.NOT_FOUND,
       );
     }
 
-    if (targetMember.role === Role.OWNER) {
-      throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
-        HttpStatus.FORBIDDEN,
+    const isOwner = targetMember.role === Role.OWNER;
+
+    if (isOwner) {
+      const isSelfChange = new Types.ObjectId(requestingUserId).equals(
+        changeRoleDto.userId,
       );
+
+      if (!isSelfChange) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotChangeOwnerRole' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (!newOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (newOwner.equals(changeRoleDto.userId)) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      await this.validateUser(newOwner);
+      const newOwnerMember = team.members.find((m) =>
+        m.userId.equals(newOwner),
+      );
+      if (!newOwnerMember) {
+        throw new CustomException(
+          getErrorMessages({ project: 'userNotFound' }),
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      newOwnerMember.role = Role.OWNER;
+      targetMember.role = changeRoleDto.role;
+
+      return await this.saveTeam(team);
     }
 
     targetMember.role = changeRoleDto.role;
