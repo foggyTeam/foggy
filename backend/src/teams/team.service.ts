@@ -63,14 +63,26 @@ export class TeamService {
   async getTeamById(
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<TeamDocument> {
+  ): Promise<any> {
     await this.validateUser(userId);
     await this.validateTeamAccess(teamId, userId, Role.READER);
 
-    return this.teamModel
+    const team = await this.teamModel
       .findById(teamId)
       .orFail(() => this.notFoundError())
+      .lean()
       .exec();
+
+    const members = await this.getMembers(team as TeamDocument);
+
+    return {
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      settings: team.settings,
+      members,
+      projects: team.projects,
+    };
   }
 
   async getUserTeams(userId: Types.ObjectId): Promise<TeamListItem[]> {
@@ -85,13 +97,12 @@ export class TeamService {
 
     for (const team of teams) {
       const members = await this.getMembers(team);
-      result.push({
+      result.push(<TeamListItem>{
         id: team._id,
         name: team.name,
         avatar: team.avatar,
         members,
         memberCount: members.length,
-        updatedAt: team.updatedAt,
       });
     }
 
@@ -371,7 +382,6 @@ export class TeamService {
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: member.role,
-        joinedAt: member.joinedAt,
         teamName,
       };
     });
@@ -416,7 +426,6 @@ export class TeamService {
       avatar: team.avatar,
       memberCount: team.members.length,
       members: team.settings.memberListIsPublic ? members : [],
-      updatedAt: team.updatedAt,
       settings: {
         allowRequests: team.settings.allowRequests,
         memberListIsPublic: team.settings.memberListIsPublic,
@@ -513,19 +522,7 @@ export class TeamService {
     await this.projectService.removeTeamFromProjectByTeam(projectId, teamId);
   }
 
-  async searchTeams(
-    query: string,
-    limit = 20,
-    cursor?: string,
-  ): Promise<{
-    teams: {
-      id: Types.ObjectId;
-      name: string;
-      avatar?: string;
-    }[];
-    nextCursor: Types.ObjectId | null;
-    hasNextPage: boolean;
-  }> {
+  async searchTeams(query: string, limit = 20, cursor?: string) {
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
 
     const filter: any = {};
@@ -619,7 +616,7 @@ export class TeamService {
       .findById(team._id)
       .populate<{
         'members.userId': {
-          _id: Types.ObjectId;
+          id: Types.ObjectId;
           nickname: string;
           avatar: string;
         };
@@ -636,7 +633,6 @@ export class TeamService {
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: member.role,
-        joinedAt: member.joinedAt,
       };
     });
   }

@@ -7,7 +7,6 @@ export interface TeamMemberInfo {
   nickname: string;
   avatar: string;
   role: Role;
-  joinedAt: Date;
   teamName?: string;
 }
 
@@ -17,7 +16,6 @@ export interface TeamListItem {
   avatar: string;
   members: TeamMemberInfo[];
   memberCount: number;
-  updatedAt: Date;
 }
 
 interface TeamSettings {

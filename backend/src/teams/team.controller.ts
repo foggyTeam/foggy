@@ -9,11 +9,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -165,11 +167,9 @@ export class TeamController {
                 type: 'string',
                 enum: ['owner', 'admin', 'editor', 'reader'],
               },
-              joinedAt: { type: 'string', format: 'date-time' },
             },
           },
         },
-        updatedAt: { type: 'string', format: 'date-time' },
         settings: {
           type: 'object',
           properties: {
@@ -230,7 +230,6 @@ export class TeamController {
               },
             },
           },
-          updatedAt: { type: 'string', format: 'date-time' },
         },
       },
     },
@@ -321,20 +320,37 @@ export class TeamController {
     description: 'ID of the user to remove',
     type: String,
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is removing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Member has been successfully removed from team',
   })
   @ApiResponse({ status: 404, description: 'Team or user not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid newOwner ID or newOwner is not a team member',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden - owner must specify newOwner when removing themselves',
+  })
   async removeMember(
     @Param('id') teamId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<void> {
     return this.teamService.removeMember(
       teamId,
       targetUserId,
       requestingUserId,
+      //newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
