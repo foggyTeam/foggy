@@ -50,15 +50,6 @@ export class CreateTeamDto {
   avatar?: string;
 
   @ApiProperty({
-    description: 'Description of the team',
-    example: 'Our awesome development team',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @ApiProperty({
     description: 'Team settings',
     type: TeamSettingsDto,
     required: false,

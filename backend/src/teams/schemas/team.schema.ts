@@ -15,7 +15,6 @@ export interface TeamListItem {
   id: Types.ObjectId;
   name: string;
   avatar: string;
-  description?: string;
   members: TeamMemberInfo[];
   memberCount: number;
   updatedAt: Date;
@@ -46,9 +45,6 @@ export class Team {
 
   @Prop({ default: '' })
   avatar: string;
-
-  @Prop({ default: '' })
-  description?: string;
 
   @Prop({ type: Object, default: defaultTeamSettings })
   settings: TeamSettings;

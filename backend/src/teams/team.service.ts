@@ -89,7 +89,6 @@ export class TeamService {
         id: team._id,
         name: team.name,
         avatar: team.avatar,
-        description: team.description,
         members,
         memberCount: members.length,
         updatedAt: team.updatedAt,
@@ -108,10 +107,6 @@ export class TeamService {
 
     if (updateData.name) {
       team.name = updateData.name;
-    }
-
-    if (updateData.description !== undefined) {
-      team.description = updateData.description;
     }
 
     if (updateData.avatar !== undefined) {
@@ -419,7 +414,6 @@ export class TeamService {
       id: team._id,
       name: team.name,
       avatar: team.avatar,
-      description: team.description,
       memberCount: team.members.length,
       members: team.settings.memberListIsPublic ? members : [],
       updatedAt: team.updatedAt,
@@ -527,7 +521,6 @@ export class TeamService {
     teams: {
       id: Types.ObjectId;
       name: string;
-      description?: string;
       avatar?: string;
     }[];
     nextCursor: Types.ObjectId | null;
@@ -547,7 +540,7 @@ export class TeamService {
       .find(filter)
       .sort({ _id: 1 })
       .limit(validatedLimit)
-      .select('name description avatar _id')
+      .select('name avatar _id')
       .exec();
 
     const nextCursor =
@@ -557,7 +550,6 @@ export class TeamService {
       teams: teams.map((team) => ({
         id: team._id,
         name: team.name,
-        description: team.description,
         avatar: team.avatar,
       })),
       nextCursor,

@@ -152,7 +152,6 @@ export class TeamController {
         id: { type: 'string' },
         name: { type: 'string' },
         avatar: { type: 'string' },
-        description: { type: 'string', nullable: true },
         memberCount: { type: 'number' },
         members: {
           type: 'array',
