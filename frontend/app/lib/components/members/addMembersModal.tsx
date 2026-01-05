@@ -15,7 +15,10 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { HistoryIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
-import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions';
+import {
+  AddProjectMember,
+  AddTeamMember,
+} from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
@@ -68,8 +71,20 @@ const AddMembersModal = observer(
             break;
           case 'team':
             if (!teamsStore.activeTeam || !role) return;
-            // TODO: add team member
-            console.log('add team member', id);
+            try {
+              await AddTeamMember(teamsStore.activeTeam.id, {
+                userId: id,
+                role: role,
+                expirationTime: expirationTime,
+              });
+            } catch (e: any) {
+              addToast({
+                color: 'danger',
+                severity: 'danger',
+                title: settingsStore.t.toasts.members.addMemberError,
+                description: e.message,
+              });
+            }
         }
       });
       setIsLoading(false);
