@@ -78,6 +78,19 @@ export class ProjectController {
           },
         },
       },
+      example2: {
+        summary: 'Create project from inside a team',
+        value: {
+          name: 'Team Project',
+          description: 'Created from team',
+          teamId: '507f1f77bcf86cd799439013',
+          settings: {
+            allowRequests: true,
+            isPublic: true,
+            memberListIsPublic: true,
+          },
+        },
+      },
     },
   })
   async create(

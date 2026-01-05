@@ -491,6 +491,19 @@ export class TeamService {
       .map((m) => m.userId);
   }
 
+  public async getTeamOwnerId(teamId: Types.ObjectId): Promise<Types.ObjectId> {
+    const team = await this.findTeamById(teamId);
+    const owner = team.members.find((m) => m.role === Role.OWNER);
+    if (!owner) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return owner.userId;
+  }
+
   public async findTeamById(teamId: Types.ObjectId): Promise<TeamDocument> {
     if (!Types.ObjectId.isValid(teamId)) {
       throw new CustomException(

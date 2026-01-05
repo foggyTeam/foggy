@@ -47,16 +47,48 @@ export class ProjectService {
   ): Promise<Types.ObjectId> {
     try {
       await this.validateUser(userId);
+
+      const { teamId, ...projectData } = createProjectDto as any;
+
+      let ownerId: Types.ObjectId = userId;
+      const accessControlTeams: ProjectDocument['accessControlTeams'] = [];
+
+      if (teamId) {
+        const teamObjectId =
+          teamId instanceof Types.ObjectId
+            ? teamId
+            : new Types.ObjectId(teamId);
+
+        ownerId = await this.teamService.getTeamOwnerId(teamObjectId);
+
+        accessControlTeams.push({
+          teamId: teamObjectId,
+          role: Role.ADMIN,
+          addedAt: new Date(),
+          individualOverrides: [],
+        } as any);
+      }
+
       const newProject = new this.projectModel({
-        ...createProjectDto,
+        ...projectData,
         accessControlUsers: [
           {
-            userId,
+            userId: ownerId,
             role: Role.OWNER,
           },
         ],
+        ...(accessControlTeams.length > 0 && { accessControlTeams }),
       });
+
       await this.saveProject(newProject);
+
+      if (accessControlTeams.length > 0) {
+        await this.safeAddProjectToTeam(
+          accessControlTeams[0].teamId,
+          newProject._id,
+        );
+      }
+
       return newProject._id;
     } catch (error) {
       if (error instanceof CustomException) {
