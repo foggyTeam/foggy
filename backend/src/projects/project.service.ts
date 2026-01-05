@@ -1015,10 +1015,7 @@ export class ProjectService {
       description: project.description,
       members: project.settings.memberListIsPublic ? members : [],
       updatedAt: project.updatedAt,
-      settings: {
-        allowRequests: project.settings.allowRequests,
-        memberListIsPublic: project.settings.memberListIsPublic,
-      },
+      settings: project.settings,
     };
   }
 
