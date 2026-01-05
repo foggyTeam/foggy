@@ -127,3 +127,33 @@ export async function DeleteTeamMember(
     },
   );
 }
+
+export async function GetInvitationLink(
+  type: 'project' | 'team',
+  data: {
+    id: string;
+    role: Omit<Role, 'owner'>;
+    expirationTime: keyof typeof expirationTimesMap;
+  },
+): Promise<string> {
+  // TODO: real request
+  const token = await new Promise((resolve) =>
+    setTimeout(() => resolve(`somestringhere${data}${type}`), 500),
+  );
+  return `${process.env.FRONTEND_URI}/invitation/${token}`;
+}
+
+export async function ProcessInvitationToken(token: string) {
+  // TODO: decrypt real request
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve({
+          accepted: true,
+          type: 'project',
+          id: '693d249238ecad24dc5f4b71',
+        }),
+      3000,
+    ),
+  );
+}

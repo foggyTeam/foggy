@@ -2,8 +2,7 @@ import { HexAlphaColorPicker } from 'react-colorful';
 import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
-import { addToast } from '@heroui/toast';
-import settingsStore from '@/app/stores/settingsStore';
+import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 
 export default function ColorPicker({
   value,
@@ -32,22 +31,7 @@ export default function ColorPicker({
         endContent={
           <Button
             onPress={() => {
-              navigator.clipboard
-                .writeText(value)
-                .catch(() =>
-                  addToast({
-                    color: 'danger',
-                    severity: 'danger',
-                    title: settingsStore.t.toasts.copyError,
-                  }),
-                )
-                .then(() =>
-                  addToast({
-                    color: 'default',
-                    severity: 'default',
-                    title: settingsStore.t.toasts.copySuccess,
-                  }),
-                );
+              CopyToClipboard(value);
             }}
             isIconOnly
             size="sm"

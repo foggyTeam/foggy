@@ -18,11 +18,13 @@ import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete'
 import {
   AddProjectMember,
   AddTeamMember,
+  GetInvitationLink,
 } from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import teamsStore from '@/app/stores/teamsStore';
+import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 
 const AddMembersModal = observer(
   ({
@@ -44,6 +46,7 @@ const AddMembersModal = observer(
       never: settingsStore.t.time.never.toLowerCase(),
     } as const;
     const [isLoading, setIsLoading] = useState(false);
+    const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
     const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
     const [role, setRole] = useState<Role | undefined>(undefined);
@@ -89,6 +92,25 @@ const AddMembersModal = observer(
       });
       setIsLoading(false);
       onOpenChange();
+    };
+
+    const handleCopyInvitationLink = async () => {
+      const entityId =
+        type === 'project'
+          ? projectsStore.activeProject?.id
+          : teamsStore.activeTeam?.id;
+      if (!entityId || !role) return;
+
+      setIsGeneratingLink(true);
+      try {
+        const link = await GetInvitationLink(type, {
+          id: entityId,
+          role,
+          expirationTime,
+        });
+        await CopyToClipboard(link);
+      } catch (e: any) {}
+      setIsGeneratingLink(false);
     };
 
     return (
@@ -160,7 +182,13 @@ const AddMembersModal = observer(
               </ModalBody>
               <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
                 {/*TODO: add link*/}
-                <Button isDisabled={!role} size="md" variant="light">
+                <Button
+                  isLoading={isGeneratingLink}
+                  onPress={handleCopyInvitationLink}
+                  isDisabled={!role}
+                  size="md"
+                  variant="light"
+                >
                   {settingsStore.t.members.addMember.modalCopyLink}
                 </Button>
                 <Button
