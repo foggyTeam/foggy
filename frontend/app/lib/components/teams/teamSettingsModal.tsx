@@ -143,6 +143,7 @@ const TeamSettingsModal = observer(
               ) !== -1
             ) {
               setErrors(result.errors);
+              throw new Error();
             } else {
               if (!userStore.user) return;
               const newTeam = {
@@ -183,6 +184,7 @@ const TeamSettingsModal = observer(
               setErrors(result.errors);
               throw new Error(result.errors);
             } else {
+              teamsStore.updateTeam(teamsStore.activeTeam.id, updatedData);
               addToast({
                 color: 'success',
                 severity: 'success',

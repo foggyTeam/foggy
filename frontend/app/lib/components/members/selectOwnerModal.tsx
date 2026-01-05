@@ -97,6 +97,7 @@ export default function SelectOwnerModal({
                   onPress={action}
                   color="primary"
                   size="md"
+                  isDisabled={!selectedOwner[0]}
                   className="w-full"
                 >
                   {settingsStore.t.members.selectOwner.modalSave}

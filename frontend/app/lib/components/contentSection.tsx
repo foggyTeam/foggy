@@ -158,8 +158,8 @@ export default function ContentSection({
         <div className="flex flex-col gap-1">
           {sectionTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
-              {!!sectionAvatar?.length && (
-                <Avatar size="md" src={sectionAvatar} />
+              {sectionAvatar !== undefined && (
+                <Avatar size="md" name={sectionTitle} src={sectionAvatar} />
               )}
               <h1 className="font-medium">{sectionTitle}</h1>
             </div>

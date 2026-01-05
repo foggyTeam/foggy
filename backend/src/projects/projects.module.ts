@@ -7,7 +7,7 @@ import { Section, SectionSchema } from './schemas/section.schema';
 import { UsersModule } from '../users/users.module';
 import { BoardModule } from '../board/board.module';
 import { NotificationsModule } from '../notifications/notifications.module';
-import {TeamModule} from "../teams/teams.module";
+import { TeamModule } from '../teams/teams.module';
 
 @Module({
   imports: [

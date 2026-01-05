@@ -140,8 +140,8 @@ export interface Team {
 }
 
 export interface RawTeam extends Omit<Team, 'id' | 'members' | 'projects'> {
-  _id: string;
-  members: any[];
+  id: string;
+  members: TeamMember[];
   projects: any[];
 }
 

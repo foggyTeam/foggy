@@ -206,6 +206,10 @@ const ProjectSettingsModal = observer(
                   title: settingsStore.t.toasts.project.updateProjectError,
                 });
               } else {
+                projectsStore.updateProject(
+                  projectsStore.activeProject.id,
+                  updatedData,
+                );
                 addToast({
                   color: 'success',
                   severity: 'success',

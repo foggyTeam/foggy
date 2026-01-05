@@ -120,6 +120,7 @@ export default function ChangeRoleModal({
                 </FButton>
 
                 <FButton
+                  isDisabled={newRole === member.role}
                   onPress={action}
                   color="primary"
                   size="md"

@@ -27,17 +27,12 @@ class TeamsStore {
       return;
     }
     this.activeTeam = {
-      id: team._id,
+      id: team.id,
       name: team.name,
       avatar: team.avatar,
       settings: team.settings,
       members: team.members.map((member) => {
-        return {
-          id: member.userId,
-          nickname: member.nickname,
-          avatar: member.avatar,
-          role: member.role,
-        } as TeamMember;
+        return { ...member } as TeamMember;
       }),
       projects: [...team.projects],
     };

@@ -23,7 +23,6 @@ export async function AddNewTeam(data: Partial<Team>) {
     {
       name: data.name,
       avatar: data.avatar,
-      description: '',
       settings: data.settings,
     },
     { headers: { 'x-user-id': await getUserId() } },
