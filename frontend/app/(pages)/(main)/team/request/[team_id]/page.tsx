@@ -1,24 +1,19 @@
 import React from 'react';
-import activeTeam from '@/app/mockData/team.json';
-import { Team, TeamSettings } from '@/app/lib/types/definitions';
+import { Team } from '@/app/lib/types/definitions';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import TeamRequest from '@/app/lib/components/teams/teamRequest';
+import { GetShortTeamInfo } from '@/app/lib/server/actions/teamServerActions';
+import { notFound, redirect } from 'next/navigation';
 
 async function getTeamInfo(id: string): Promise<Team | undefined> {
-  //TODO: uncomment when API ready
-  //const project = await GetProject(id);
-  //if (!team.settings.isPublic) redirect(`/forbidden?type=team`);
+  //TODO: check
+  const team = await GetShortTeamInfo(id);
+  if (!team.settings?.allowRequests) redirect(`/forbidden?type=team`);
 
-  //if (!project) notFound();
+  if (!team) notFound();
 
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve({ ...activeTeam, settings: { ...new TeamSettings() } } as any),
-      300,
-    ),
-  );
+  return team;
 }
 
 export default async function TeamRequestPage({
