@@ -477,10 +477,7 @@ export class TeamService {
       avatar: team.avatar,
       memberCount: team.members.length,
       members: team.settings.memberListIsPublic ? members : [],
-      settings: {
-        allowRequests: team.settings.allowRequests,
-        memberListIsPublic: team.settings.memberListIsPublic,
-      },
+      settings: team.settings,
     };
   }
 
