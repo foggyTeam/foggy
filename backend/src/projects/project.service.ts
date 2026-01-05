@@ -83,10 +83,7 @@ export class ProjectService {
       await this.saveProject(newProject);
 
       if (accessControlTeams.length > 0) {
-        await this.safeAddProjectToTeam(
-          accessControlTeams[0].teamId,
-          newProject._id,
-        );
+        await this.safeAddProjectToTeam(teamId, newProject._id);
       }
 
       return newProject._id;

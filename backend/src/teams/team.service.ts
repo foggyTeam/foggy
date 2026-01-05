@@ -74,6 +74,7 @@ export class TeamService {
       .exec();
 
     const members = await this.getMembers(team as TeamDocument);
+    const projects = await this.getTeamProjects(teamId, userId);
 
     return {
       id: team._id,
@@ -81,7 +82,7 @@ export class TeamService {
       avatar: team.avatar,
       settings: team.settings,
       members,
-      projects: team.projects,
+      projects,
     };
   }
 
@@ -449,13 +450,6 @@ export class TeamService {
       .orFail(() => this.notFoundError())
       .exec();
 
-    if (!team.settings.isPublic) {
-      throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     if (userId) {
       const userRole = await this.getUserRoleInTeam(teamId, userId);
       if (userRole) {
@@ -471,6 +465,25 @@ export class TeamService {
       members = await this.getMembers(team);
     }
 
+    let projects: any[] = [];
+    if (
+      team.settings.projectListIsPublic &&
+      team.projects &&
+      team.projects.length > 0
+    ) {
+      for (const projectId of team.projects) {
+        try {
+          projects.push(
+            await this.projectService.getProjectBriefInfo(projectId),
+          );
+        } catch (err) {
+          console.warn(
+            `Skipping project ${projectId} in team brief info ${teamId}: ${(err as Error).message}`,
+          );
+        }
+      }
+    }
+
     return {
       id: team._id,
       name: team.name,
@@ -478,6 +491,7 @@ export class TeamService {
       memberCount: team.members.length,
       members: team.settings.memberListIsPublic ? members : [],
       settings: team.settings,
+      projects: team.settings.projectListIsPublic ? projects : [],
     };
   }
 

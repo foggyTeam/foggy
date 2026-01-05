@@ -19,7 +19,7 @@ export class TeamSettingsDto {
   })
   @IsOptional()
   @IsBoolean()
-  isPublic?: boolean;
+  projectListIsPublic?: boolean;
 
   @ApiProperty({
     description: 'Team member list is publicly visible',

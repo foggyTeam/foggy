@@ -20,13 +20,13 @@ export interface TeamListItem {
 
 interface TeamSettings {
   allowRequests: boolean;
-  isPublic: boolean;
+  projectListIsPublic: boolean;
   memberListIsPublic: boolean;
 }
 
 const defaultTeamSettings: TeamSettings = {
   allowRequests: true,
-  isPublic: false,
+  projectListIsPublic: false,
   memberListIsPublic: false,
 };
 
