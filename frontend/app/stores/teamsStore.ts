@@ -60,6 +60,27 @@ class TeamsStore {
       ...newAttrs,
     };
   };
+
+  // MEMBERS
+  updateTeamMember = (memberId: string, newAttrs: Partial<TeamMember>) => {
+    if (this.activeTeam) {
+      const memberIndex = this.activeTeam.members.findIndex(
+        (member) => member.id === memberId,
+      );
+      if (memberIndex >= 0)
+        this.activeTeam.members[memberIndex] = {
+          ...this.activeTeam.members[memberIndex],
+          ...newAttrs,
+        };
+    }
+  };
+  removeTeamMember = (memberId: string) => {
+    if (this.activeTeam) {
+      this.activeTeam.members = this.activeTeam.members.filter(
+        (member) => member.id !== memberId,
+      );
+    }
+  };
 }
 
 const teamsStore = new TeamsStore();

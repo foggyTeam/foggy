@@ -9,8 +9,16 @@ import MembersContext from '@/app/lib/hooks/useMembersContext';
 import { useDisclosure } from '@heroui/modal';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 import TeamSettingsModal from '@/app/lib/components/teams/teamSettingsModal';
+import {
+  DeleteTeamMember,
+  UpdateTeamMemberRole,
+} from '@/app/lib/server/actions/membersServerActions';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
+import { useRouter } from 'next/navigation';
 
 const AllTeamMembers = observer(() => {
+  const router = useRouter();
   const myRole: Role | null = teamsStore.myRole ?? null;
   const {
     isOpen: isAddMemberOpen,
@@ -25,11 +33,37 @@ const AllTeamMembers = observer(() => {
 
   const handleRemoveMember = async (id: string, newOwnerId?: string | null) => {
     if (!teamsStore.activeTeam) return;
-    // TODO: redo when API ready
+    try {
+      const response = await DeleteTeamMember(teamsStore.activeTeam.id, id);
+      if (response.errors) throw new Error(JSON.stringify(response.errors));
+
+      teamsStore.removeTeamMember(id);
+      if (newOwnerId) router.push('/');
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.members.deleteMemberError,
+        description: e,
+      });
+    }
   };
   const handleUpdateMemberRole = async (id: string, newRole: Role) => {
     if (!teamsStore.activeTeam) return;
-    // TODO: redo when API ready
+    try {
+      await UpdateTeamMemberRole(teamsStore.activeTeam.id, {
+        userId: id,
+        role: newRole,
+      });
+      teamsStore.updateTeamMember(id, { role: newRole });
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.members.updateMemberRoleError,
+        description: e,
+      });
+    }
   };
 
   return (
