@@ -138,7 +138,7 @@ const ProjectSettingsModal = observer(
     const onSubmit = async () => {
       if (!Object.keys(errors as any).length) {
         setIsSaving(true);
-        const updatedData: Partial<Project> = {
+        const updatedData: Partial<Project & { teamId: string }> = {
           name: name,
           description: description,
           settings: { ...checkboxes },
@@ -148,7 +148,8 @@ const ProjectSettingsModal = observer(
         }
 
         if (isNewProject) {
-          // TODO: if team project, add team members initially
+          if (isTeamProject) updatedData.teamId = teamsStore.activeTeam?.id;
+
           await AddNewProject(updatedData)
             .then((result) => {
               if (
