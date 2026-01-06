@@ -87,7 +87,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
     <>
       <div
         className={clsx(
-          'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
+          'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
           el_animation,
           'h-16 w-[98%] max-w-[379px]',
           team_tile,

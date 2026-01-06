@@ -96,7 +96,7 @@ const RequestForm = observer(
           value={message}
           onValueChange={setMessage}
           classNames={{
-            inputWrapper: 'bg-white',
+            inputWrapper: 'bg-[hsl(var(--heroui-background))]',
           }}
         />
         <SelectRole

@@ -72,7 +72,7 @@ export default function MemberAutocomplete({
         classNames={{
           popoverContent: clsx(
             bg_container_no_padding,
-            'p-2 sm:p-3 bg-white/90 border-default',
+            'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/90 border-default',
           ),
         }}
         listboxProps={{

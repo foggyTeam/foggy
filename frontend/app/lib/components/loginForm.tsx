@@ -121,7 +121,7 @@ const LoginForm = observer(() => {
             </button>
           )
         }
-        classNames={{ inputWrapper: 'bg-white' }}
+        classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
       <Input
@@ -163,7 +163,7 @@ const LoginForm = observer(() => {
         }
         size="md"
         autoComplete="current-password"
-        classNames={{ inputWrapper: 'bg-white' }}
+        classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
       <div className="mt-1 flex w-full items-center justify-between gap-2">

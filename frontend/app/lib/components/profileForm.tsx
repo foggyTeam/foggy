@@ -195,7 +195,9 @@ const ProfileForm = observer((userData: ProfileData) => {
               size="md"
               value={nickname}
               onValueChange={setNickname}
-              classNames={{ inputWrapper: 'bg-white' }}
+              classNames={{
+                inputWrapper: 'bg-[hsl(var(--heroui-background))]',
+              }}
             />
             <Input
               isReadOnly
@@ -208,7 +210,9 @@ const ProfileForm = observer((userData: ProfileData) => {
               autoComplete="email"
               size="md"
               value={email}
-              classNames={{ inputWrapper: 'bg-white' }}
+              classNames={{
+                inputWrapper: 'bg-[hsl(var(--heroui-background))]',
+              }}
             />
           </div>
           <div className="flex h-full w-full flex-col">
@@ -225,7 +229,7 @@ const ProfileForm = observer((userData: ProfileData) => {
               value={about}
               onValueChange={setAbout}
               classNames={{
-                inputWrapper: 'bg-white',
+                inputWrapper: 'bg-[hsl(var(--heroui-background))]',
               }}
             />
           </div>

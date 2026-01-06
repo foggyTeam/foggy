@@ -66,7 +66,8 @@ export default function ContentActionBar({
             type="text"
             className="m-0 max-w-64 p-0"
             classNames={{
-              inputWrapper: 'shadow-none text-sm bg-white',
+              inputWrapper:
+                'shadow-none text-sm bg-[hsl(var(--heroui-background))]',
               input: 'text-sm',
             }}
             endContent={<SearchIcon className="stroke-default-500" />}

@@ -47,7 +47,7 @@ const OpenedRightSideBar = observer(
           bg_container,
           right_sidebar_layout,
           'h-fit w-fit',
-          'transform overflow-clip transition-all hover:bg-white/65 hover:pr-0.5',
+          'transform overflow-clip transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pr-0.5',
         )}
       >
         <DrawerContent className="gap-4">

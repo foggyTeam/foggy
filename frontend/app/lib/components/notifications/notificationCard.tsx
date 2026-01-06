@@ -65,7 +65,7 @@ export default function NotificationCard(notification: Notification) {
           setIsExpanded(true);
         }}
         className={clsx(
-          'py-auto shadow-container box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-white px-2',
+          'py-auto shadow-container box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2',
           el_animation,
           isExpanded ? 'h-fit py-2' : 'h-8 cursor-pointer',
           isExpanded ? notification_tile_exp : notification_tile,
@@ -75,7 +75,7 @@ export default function NotificationCard(notification: Notification) {
           <div className="flex h-full w-full items-center justify-start gap-1">
             <Avatar
               classNames={{
-                base: 'h-7 w-7 border-white border-2',
+                base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-2',
               }}
               src={notification.target.avatar}
               name={notification.target.name}

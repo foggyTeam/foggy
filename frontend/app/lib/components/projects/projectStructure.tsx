@@ -63,7 +63,7 @@ const ProjectStructure = observer(() => {
           <div
             className={clsx(
               'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
-              'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+              'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
               'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
             )}
           >

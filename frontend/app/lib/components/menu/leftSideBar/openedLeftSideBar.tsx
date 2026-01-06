@@ -212,7 +212,7 @@ const OpenedLeftSideBar = observer(
             bg_container,
             left_sidebar_layout,
             'h-fit w-fit overflow-clip',
-            'transform transition-all hover:bg-white/65 hover:pl-0.5',
+            'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-0.5',
           )}
         >
           <DrawerContent className="gap-4">
@@ -273,7 +273,7 @@ const OpenedLeftSideBar = observer(
               <div
                 className={clsx(
                   'relative h-full w-full flex-1 overflow-y-auto',
-                  'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+                  'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
                   'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
                 )}
               >
