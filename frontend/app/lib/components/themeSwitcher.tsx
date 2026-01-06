@@ -28,12 +28,13 @@ export default function ThemeSwitcher() {
         isIconOnly
         variant="light"
         size="md"
+        color="secondary"
         className="font-semibold"
       >
-        {theme === 'dark' ? (
-          <MoonIcon className="stroke-default-500" />
+        {theme === 'light' ? (
+          <MoonIcon className="stroke-secondary" />
         ) : (
-          <SunIcon className="stroke-default-500" />
+          <SunIcon className="stroke-secondary" />
         )}
       </Button>
     </div>

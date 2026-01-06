@@ -21,8 +21,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
-      <body className={`${montserrat.className} antialiased`}>
+    <html suppressHydrationWarning lang="ru">
+      <body
+        suppressHydrationWarning
+        className={`${montserrat.className} antialiased`}
+      >
         <Providers>
           <main className="h-screen w-screen">{children}</main>
 

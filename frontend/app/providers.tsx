@@ -17,7 +17,7 @@ export function Providers({
     <SessionProvider session={session}>
       <ToastProvider toastOffset={4} />
       <HeroUIProvider>
-        <NextThemesProvider attribute="class" defaultTheme="dark">
+        <NextThemesProvider attribute="class" defaultTheme="system">
           {children}
         </NextThemesProvider>
       </HeroUIProvider>
