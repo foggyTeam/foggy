@@ -45,7 +45,7 @@ const HtmlToSvg = (
           font-weight: 400;
         }
         a {
-          color: ${foggy_accent.DEFAULT};
+          color: ${foggy_accent.light.DEFAULT};
         }
         p {
           margin: 0;

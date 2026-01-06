@@ -15,6 +15,7 @@ import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
 import { foggy_accent } from '@/tailwind.config';
 import EraserTool from '@/app/lib/components/board/tools/baseTools/eraserTool';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { useTheme } from 'next-themes';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -27,15 +28,16 @@ export type ToolProps = {
   pencilParams?: PencilParams;
 };
 
-const DEFAULT_PENCIL: PencilParams = {
-  color: foggy_accent.DEFAULT,
-  width: 4,
-  tension: 0.4,
-  lineJoin: 'round',
-  lineCap: 'round',
-};
-
 export default function ToolBar() {
+  const { theme } = useTheme();
+  const DEFAULT_PENCIL: PencilParams = {
+    color: foggy_accent[theme].DEFAULT,
+    width: 4,
+    tension: 0.4,
+    lineJoin: 'round',
+    lineCap: 'round',
+  };
+
   const { selectedElement, activeTool } = useBoardContext();
   const tools = [TextTool, PencilTool, EraserTool, RectTool, EllipseTool];
 

@@ -19,6 +19,7 @@ import {
   SignUserViaProviders,
 } from '@/app/lib/server/actions/userServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
+import { useTheme } from 'next-themes';
 
 enum ButtonAction {
   UNDEFINED,
@@ -27,6 +28,7 @@ enum ButtonAction {
 }
 
 const LoginForm = observer(() => {
+  const { theme } = useTheme();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -205,7 +207,7 @@ const LoginForm = observer(() => {
             alt="Google"
             width="32"
             height="32"
-            stroke={primary.DEFAULT}
+            stroke={primary[theme].DEFAULT}
           />
         </Button>
 
@@ -220,7 +222,7 @@ const LoginForm = observer(() => {
             alt="Yandex"
             width="32"
             height="32"
-            stroke={primary.DEFAULT}
+            stroke={primary[theme].DEFAULT}
           />
         </Button>
       </div>

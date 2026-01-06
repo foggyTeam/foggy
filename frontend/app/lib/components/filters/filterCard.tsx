@@ -7,6 +7,7 @@ import {
 import { Button } from '@heroui/button';
 import { info, primary, secondary, success, warning } from '@/tailwind.config';
 import GetDateTime from '@/app/lib/utils/getDateTime';
+import { useTheme } from 'next-themes';
 
 export default function FilterCard({
   filterKey,
@@ -17,12 +18,13 @@ export default function FilterCard({
   filterValue: string;
   removeFilter: any;
 }) {
+  const { theme } = useTheme();
   const colorMap: any = {
-    lastChange: secondary.DEFAULT,
-    nickname: info.DEFAULT,
-    name: primary.DEFAULT,
-    role: warning.DEFAULT,
-    default: success.DEFAULT,
+    lastChange: secondary[theme].DEFAULT,
+    nickname: info[theme].DEFAULT,
+    name: primary[theme].DEFAULT,
+    role: warning[theme].DEFAULT,
+    default: success[theme].DEFAULT,
   };
   const cardColor: any = colorMap[filterKey] || colorMap.default;
 

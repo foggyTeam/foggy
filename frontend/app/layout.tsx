@@ -31,7 +31,7 @@ export default function RootLayout({
 
           <BackgroundGradient backgroundColor="default-100" />
 
-          <NextTopLoader color={primary.DEFAULT} showSpinner={false} />
+          <NextTopLoader color={primary.light.DEFAULT} showSpinner={false} />
           <LocaleSwitcher />
           <ThemeSwitcher />
         </Providers>

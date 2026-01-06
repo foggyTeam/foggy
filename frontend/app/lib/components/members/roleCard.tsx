@@ -3,11 +3,11 @@ import { Role } from '@/app/lib/types/definitions';
 
 export const rolesList: Role[] = ['admin', 'editor', 'reader', 'owner'];
 export const colorMap: any = {
-  owner: info.DEFAULT,
-  admin: danger.DEFAULT,
-  editor: success.DEFAULT,
-  reader: warning.DEFAULT,
-  default: primary.DEFAULT,
+  owner: info.light.DEFAULT,
+  admin: danger.light.DEFAULT,
+  editor: success.light.DEFAULT,
+  reader: warning.light.DEFAULT,
+  default: primary.light.DEFAULT,
 };
 
 export default function RoleCard({ role }: { role: Role | string }) {

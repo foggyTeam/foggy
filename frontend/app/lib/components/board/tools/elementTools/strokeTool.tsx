@@ -13,8 +13,10 @@ import { isElementVisible } from '@/app/lib/components/board/tools/drawingHandle
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
+import { useTheme } from 'next-themes';
 
 export default function StrokeTool() {
+  const { theme } = useTheme();
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
   const [strokeColor, changeColor] = useState(
@@ -47,7 +49,7 @@ export default function StrokeTool() {
             strokeColor &&
             (strokeColor.length === 7 || strokeColor.length === 9)
               ? strokeColor
-              : primary.DEFAULT,
+              : primary[theme].DEFAULT,
         } as BoardElement);
       else
         addToast({
@@ -59,7 +61,7 @@ export default function StrokeTool() {
       if (
         isElementVisible(
           selectedElement.attrs.type,
-          primary.DEFAULT,
+          primary[theme].DEFAULT,
           strokeColor,
           strokeWidth,
         )
@@ -70,7 +72,7 @@ export default function StrokeTool() {
             strokeColor &&
             (strokeColor.length === 7 || strokeColor.length === 9)
               ? strokeColor
-              : primary.DEFAULT,
+              : primary[theme].DEFAULT,
         } as Partial<BoardElement>);
       } else {
         updateElement(selectedElement.attrs.id, {
@@ -93,7 +95,7 @@ export default function StrokeTool() {
         >
           <FTooltip content={settingsStore.t.toolTips.tools.strokeTool}>
             <CircleDashedIcon
-              stroke={`rgb(${to_rgb(strokeColor ? strokeColor : primary.DEFAULT)})`}
+              stroke={`rgb(${to_rgb(strokeColor ? strokeColor : primary[theme].DEFAULT)})`}
             />
           </FTooltip>
         </Button>

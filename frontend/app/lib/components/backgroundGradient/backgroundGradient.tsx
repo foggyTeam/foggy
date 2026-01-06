@@ -1,3 +1,5 @@
+'use client';
+
 import clsx from 'clsx';
 import {
   danger,
@@ -8,6 +10,7 @@ import {
   warning,
 } from '@/tailwind.config';
 import BackgroundCircle from '@/app/lib/components/backgroundGradient/backgroundCircle';
+import { useTheme } from 'next-themes';
 
 export interface circleParams {
   width: number;
@@ -24,6 +27,7 @@ const BackgroundGradient = ({
 }: {
   backgroundColor: string;
 }) => {
+  const { theme } = useTheme();
   const circles = [
     {
       width: 200,
@@ -32,7 +36,7 @@ const BackgroundGradient = ({
       top: -2,
       left: -2,
       duration: 8,
-      color: `rgb(${to_rgb(danger['300'])})`,
+      color: `rgb(${to_rgb(danger[theme]['300'])})`,
     } as circleParams,
     {
       width: 300,
@@ -41,7 +45,7 @@ const BackgroundGradient = ({
       top: 4,
       left: 4,
       duration: 16,
-      color: `rgb(${to_rgb(primary['500'])})`,
+      color: `rgb(${to_rgb(primary[theme]['500'])})`,
     } as circleParams,
     {
       width: 400,
@@ -50,7 +54,7 @@ const BackgroundGradient = ({
       top: 8,
       left: 40,
       duration: 24,
-      color: `rgb(${to_rgb(primary['500'])})`,
+      color: `rgb(${to_rgb(primary[theme]['500'])})`,
     } as circleParams,
     {
       width: 324,
@@ -59,7 +63,7 @@ const BackgroundGradient = ({
       top: 12,
       left: 50,
       duration: 12,
-      color: `rgb(${to_rgb(secondary['500'])})`,
+      color: `rgb(${to_rgb(secondary[theme]['500'])})`,
     } as circleParams,
     {
       width: 400,
@@ -68,7 +72,7 @@ const BackgroundGradient = ({
       top: 85,
       left: 16,
       duration: 8,
-      color: `rgb(${to_rgb(foggy_accent['500'])})`,
+      color: `rgb(${to_rgb(foggy_accent[theme]['500'])})`,
     } as circleParams,
     {
       width: 256,
@@ -77,7 +81,7 @@ const BackgroundGradient = ({
       top: 85,
       left: 24,
       duration: 18,
-      color: `rgb(${to_rgb(warning['300'])})`,
+      color: `rgb(${to_rgb(warning[theme]['300'])})`,
     } as circleParams,
     {
       width: 200,
@@ -86,7 +90,7 @@ const BackgroundGradient = ({
       top: 0,
       left: 85,
       duration: 16,
-      color: `rgb(${to_rgb(foggy_accent['500'])})`,
+      color: `rgb(${to_rgb(foggy_accent[theme]['500'])})`,
     } as circleParams,
   ];
 
