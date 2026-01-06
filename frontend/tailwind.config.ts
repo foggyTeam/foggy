@@ -183,6 +183,11 @@ export default {
           colors: {
             background: '#18181b',
             foreground: '#fafafa',
+            primary: primary,
+            secondary: secondary,
+            danger: danger,
+            warning: warning,
+            success: success,
           },
         },
       },

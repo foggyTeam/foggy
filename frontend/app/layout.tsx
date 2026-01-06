@@ -7,6 +7,7 @@ import LocaleSwitcher from '@/app/lib/components/localeSwitcher';
 import BackgroundGradient from '@/app/lib/components/backgroundGradient/backgroundGradient';
 import NextTopLoader from 'nextjs-toploader';
 import { primary } from '@/tailwind.config';
+import ThemeSwitcher from '@/app/lib/components/themeSwitcher';
 
 export const metadata: Metadata = {
   title: { template: `foggy | %s`, default: 'foggy' },
@@ -20,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className="light">
+    <html lang="ru">
       <body className={`${montserrat.className} antialiased`}>
         <Providers>
           <main className="h-screen w-screen">{children}</main>
@@ -29,6 +30,7 @@ export default function RootLayout({
 
           <NextTopLoader color={primary.DEFAULT} showSpinner={false} />
           <LocaleSwitcher />
+          <ThemeSwitcher />
         </Providers>
       </body>
     </html>
