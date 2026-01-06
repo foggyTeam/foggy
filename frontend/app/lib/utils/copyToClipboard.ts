@@ -3,18 +3,21 @@ import settingsStore from '@/app/stores/settingsStore';
 
 export async function CopyToClipboard(text: string): Promise<boolean> {
   const copied = await copy(text);
-  if (copied)
+  if (copied) {
     addToast({
       color: 'success',
       severity: 'success',
       title: settingsStore.t.toasts.copySuccess,
     });
-  else
+    return true;
+  } else {
     addToast({
       color: 'warning',
       severity: 'warning',
       title: settingsStore.t.toasts.copyError,
     });
+    return false;
+  }
 }
 
 async function copy(text: string) {

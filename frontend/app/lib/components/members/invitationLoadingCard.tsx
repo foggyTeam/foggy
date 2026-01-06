@@ -13,33 +13,40 @@ import settingsStore from '@/app/stores/settingsStore';
 export default function InvitationLoadingCard({ token }: { token: string }) {
   const router = useRouter();
   useEffect(() => {
+    // TODO: consider decryption type
     ProcessInvitationToken(token)
-      .then((result) => {
-        if (result.accepted) {
-          addToast({
-            color: 'success',
-            severity: 'success',
-            title:
-              settingsStore.t.toasts.members.invitationLink.accepted[
-                result.type
-              ],
-          });
-          router.push(`/${result.type}/${result.id}`);
-        } else {
-          addToast({
-            color: 'warning',
-            severity: 'warning',
-            title: settingsStore.t.toasts.members.invitationLink.error.title,
-            description:
-              settingsStore.t.toasts.members.invitationLink.error.description,
-          });
-          router.push(`/${result.type}/request/${result.id}`);
-        }
-      })
+      .then(
+        (result: {
+          accepted: boolean;
+          type: 'team' | 'project';
+          id: string;
+        }) => {
+          if (result.accepted) {
+            addToast({
+              color: 'success',
+              severity: 'success',
+              title:
+                settingsStore.t.toasts.members.invitationLink.accepted[
+                  result.type
+                ],
+            });
+            router.push(`/${result.type}/${result.id}`);
+          } else {
+            addToast({
+              color: 'warning',
+              severity: 'warning',
+              title: settingsStore.t.toasts.members.invitationLink.error.title,
+              description:
+                settingsStore.t.toasts.members.invitationLink.error.description,
+            });
+            router.push(`/${result.type}/request/${result.id}`);
+          }
+        },
+      )
       .catch((e: any) => {
         addToast({
-          color: 'error',
-          severity: 'error',
+          color: 'danger',
+          severity: 'danger',
           title: settingsStore.t.toasts.members.invitationLink.error.title,
           description: e.toString(),
         });

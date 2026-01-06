@@ -143,7 +143,7 @@ export async function GetInvitationLink(
   return `${process.env.FRONTEND_URI}/invitation/${token}`;
 }
 
-export async function ProcessInvitationToken(token: string) {
+export async function ProcessInvitationToken(token: string): Promise<any> {
   // TODO: decrypt real request
   return new Promise((resolve) =>
     setTimeout(

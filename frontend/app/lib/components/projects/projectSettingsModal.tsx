@@ -207,6 +207,7 @@ const ProjectSettingsModal = observer(
                   title: settingsStore.t.toasts.project.updateProjectError,
                 });
               } else {
+                if (!projectsStore.activeProject) return;
                 projectsStore.updateProject(
                   projectsStore.activeProject.id,
                   updatedData,
