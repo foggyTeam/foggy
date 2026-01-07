@@ -17,11 +17,8 @@
 .circle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0)
-  );
+  background: radial-gradient(circle, var(--circle-color), transparent, transparent);
   animation: float 10s ease-in-out infinite;
-  filter: blur(128px);
+  filter: blur(8px);
+  will-change: transform;
 }

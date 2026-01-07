@@ -28,7 +28,7 @@ export default function RootLayout({
         <Providers>
           <main className="h-screen w-screen">{children}</main>
 
-          <BackgroundGradient backgroundColor="--heroui-danger-900" />
+          <BackgroundGradient />
 
           <NextTopLoader color={primary.light.DEFAULT} showSpinner={false} />
 
