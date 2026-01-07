@@ -15,7 +15,7 @@ import { addToast } from '@heroui/toast';
 import { useTheme } from 'next-themes';
 
 export default function FillTool() {
-  const { theme } = useTheme();
+  const { resolvedTheme: theme } = useTheme();
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
   const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');

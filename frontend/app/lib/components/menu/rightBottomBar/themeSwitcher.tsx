@@ -7,7 +7,7 @@ import { useTheme } from 'next-themes';
 
 export default function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme: theme, setTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);

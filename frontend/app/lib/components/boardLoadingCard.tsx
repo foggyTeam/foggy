@@ -10,7 +10,7 @@ import settingsStore from '@/app/stores/settingsStore';
 const BoardLoadingCard = observer(() => {
   return (
     settingsStore.isLoading && (
-      <div className="bg-default-900/10 absolute top-0 left-0 z-30 flex h-screen w-screen items-center justify-center backdrop-blur-xl">
+      <div className="bg-background/50 absolute top-0 left-0 z-30 flex h-screen w-screen items-center justify-center backdrop-blur-xl">
         <div
           className={clsx(
             'flex h-fit w-full max-w-sm flex-col items-center justify-center gap-4',

@@ -137,14 +137,14 @@ const BackgroundGradient = ({
 }: {
   backgroundColor: string;
 }) => {
-  const { theme } = useTheme();
-  const currentCircles = circles[theme];
+  const { resolvedTheme } = useTheme();
+  const currentCircles = circles[resolvedTheme];
 
   return (
     <div
       className={clsx(
         'transition-background absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
-        theme === 'dark' ? 'bg-default-100' : 'bg-default-200',
+        resolvedTheme === 'dark' ? 'bg-default-100' : 'bg-default-200',
       )}
     >
       {currentCircles.map((circle, index) => (

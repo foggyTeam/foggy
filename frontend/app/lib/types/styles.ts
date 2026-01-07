@@ -1,5 +1,5 @@
 export const bg_container_no_padding: string =
-  'overflow-clip border border-[hsl(var(--heroui-background)/0.1)] bg-[hsl(var(--heroui-background)/0.5)]' +
+  'overflow-clip border light:border-[hsl(var(--heroui-background)/0.1)] dark:border-[hsl(var(--heroui-foreground)/0.08)] bg-[hsl(var(--heroui-background)/0.5)]' +
   ' backdrop-blur-3xl rounded-xl shadow-container';
 export const bg_container: string = bg_container_no_padding + ' px-1 py-12';
 export const right_sidebar_layout: string =
