@@ -46,7 +46,7 @@ export default function CreativeIllustration(
       <path
         d="M773.42989,271.73374h-454.293a1.807,1.807,0,0,1,0-3.61319h454.293a1.807,1.807,0,0,1,0,3.61319Z"
         transform="translate(-289.56179 -237.24954)"
-        fill="hsl(var(--heroui-default-350))"
+        fill="hsl(var(--heroui-default-300))"
       />
       <ellipse
         cx="60.49941"

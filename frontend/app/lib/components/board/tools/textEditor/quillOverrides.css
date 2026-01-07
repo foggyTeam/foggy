@@ -11,3 +11,7 @@
 .ql-editor a {
   color: #b67fe9;
 }
+
+.ql-editor.ql-blank::before {
+  color: hsl(var(--heroui-foreground) / 0.6) !important;
+}

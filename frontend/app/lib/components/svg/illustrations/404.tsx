@@ -203,7 +203,7 @@ export default function NotFoundIllustration(
       <path
         d="M1028.875,735.26666l-857.75.30733a1.19068,1.19068,0,1,1,0-2.38136l857.75-.30734a1.19069,1.19069,0,0,1,0,2.38137Z"
         transform="translate(-169.93432 -164.42601)"
-        fill="hsl(var(--heroui-default-350))"
+        fill="hsl(var(--heroui-default-300))"
       />
     </svg>
   );

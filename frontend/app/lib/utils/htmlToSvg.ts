@@ -53,18 +53,16 @@ const HtmlToSvg = (
         ul, ol {
           list-style-position: inside;
         }
-        .ql-align-center {
-          text-align: center;
-        }
-        .ql-align-justify {
-          text-align: justify;
-        }
-        .ql-align-right {
-          text-align: right;
-        }
-        .ql-align-left {
-          text-align: left;
-        }
+
+        p { margin: 0; }
+
+        ul, ol { list-style-position: inside; }
+
+        .ql-align-center { text-align: center; }
+        .ql-align-justify { text-align: justify; }
+        .ql-align-right { text-align: right; }
+        .ql-align-left { text-align: left; }
+
         blockquote {
           border-left: 4px solid #ccc;
           padding-left: 16px;
