@@ -93,15 +93,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: foggy_accent.light.DEFAULT,
     } as circleParams,
     {
-      width: 256,
-      height: 300,
-      rotation: 16,
-      top: 37,
-      left: 40,
-      duration: 20,
-      color: 'hsl(var(--heroui-danger-50))',
-    } as circleParams,
-    {
       width: 160,
       height: 160,
       rotation: -12,
@@ -152,9 +143,9 @@ const BackgroundGradient = ({
   return (
     <div
       className={clsx(
-        'absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
+        'transition-background absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
+        theme === 'dark' ? 'bg-default-100' : 'bg-default-200',
       )}
-      style={{ backgroundColor: `hsl(var(${backgroundColor}))` }}
     >
       {currentCircles.map((circle, index) => (
         <BackgroundCircle key={index} params={circle} />

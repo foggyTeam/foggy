@@ -22,21 +22,19 @@ export default function ThemeSwitcher() {
   if (!mounted) return null;
 
   return (
-    <div className="invisible absolute right-16 bottom-4 z-50 sm:visible">
-      <Button
-        onPress={switchTheme}
-        isIconOnly
-        variant="light"
-        size="md"
-        color="secondary"
-        className="font-semibold"
-      >
-        {theme === 'light' ? (
-          <MoonIcon className="stroke-secondary" />
-        ) : (
-          <SunIcon className="stroke-secondary" />
-        )}
-      </Button>
-    </div>
+    <Button
+      onPress={switchTheme}
+      isIconOnly
+      variant="light"
+      size="md"
+      color="secondary"
+      className="font-semibold"
+    >
+      {theme === 'light' ? (
+        <MoonIcon className="stroke-secondary" />
+      ) : (
+        <SunIcon className="stroke-secondary" />
+      )}
+    </Button>
   );
 }

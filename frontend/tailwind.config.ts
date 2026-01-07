@@ -509,7 +509,10 @@ export default {
 
       const theme_styles = {
         '.shadow-container': {
-          boxShadow: `2px 4px 10px 0 rgba(${to_rgb(primary.light.DEFAULT)}, 0.04)`,
+          boxShadow: `2px 4px 10px 0 hsl(var(--heroui-primary-500)/0.06)`,
+        },
+        '.dark .shadow-container': {
+          boxShadow: `1px 4px 10px 0 rgba(${foggy_accent_rgb.dark['100']}, 0.02)`,
         },
         '.accent-link': {
           transitionProperty: 'color, text-decoration-color, fill, stroke',
