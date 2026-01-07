@@ -1,16 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import {
-  danger,
-  foggy_accent,
-  primary,
-  secondary,
-  to_rgb,
-  warning,
-} from '@/tailwind.config';
 import BackgroundCircle from '@/app/lib/components/backgroundGradient/backgroundCircle';
 import { useTheme } from 'next-themes';
+import { foggy_accent } from '@/tailwind.config';
 
 export interface circleParams {
   width: number;
@@ -22,13 +15,8 @@ export interface circleParams {
   color: string;
 }
 
-const BackgroundGradient = ({
-  backgroundColor,
-}: {
-  backgroundColor: string;
-}) => {
-  const { theme } = useTheme();
-  const circles = [
+const circles: { light: circleParams[]; dark: circleParams[] } = {
+  light: [
     {
       width: 200,
       height: 256,
@@ -36,7 +24,7 @@ const BackgroundGradient = ({
       top: -2,
       left: -2,
       duration: 8,
-      color: `rgb(${to_rgb(danger[theme]['300'])})`,
+      color: 'hsl(var(--heroui-danger-300))',
     } as circleParams,
     {
       width: 300,
@@ -45,7 +33,7 @@ const BackgroundGradient = ({
       top: 4,
       left: 4,
       duration: 16,
-      color: `rgb(${to_rgb(primary[theme]['500'])})`,
+      color: 'hsl(var(--heroui-primary-500))',
     } as circleParams,
     {
       width: 400,
@@ -54,7 +42,7 @@ const BackgroundGradient = ({
       top: 8,
       left: 40,
       duration: 24,
-      color: `rgb(${to_rgb(primary[theme]['500'])})`,
+      color: 'hsl(var(--heroui-primary-500))',
     } as circleParams,
     {
       width: 324,
@@ -63,7 +51,7 @@ const BackgroundGradient = ({
       top: 12,
       left: 50,
       duration: 12,
-      color: `rgb(${to_rgb(secondary[theme]['500'])})`,
+      color: 'hsl(var(--heroui-secondary-500))',
     } as circleParams,
     {
       width: 400,
@@ -72,7 +60,7 @@ const BackgroundGradient = ({
       top: 85,
       left: 16,
       duration: 8,
-      color: `rgb(${to_rgb(foggy_accent[theme]['500'])})`,
+      color: foggy_accent.light['200'],
     } as circleParams,
     {
       width: 256,
@@ -81,7 +69,7 @@ const BackgroundGradient = ({
       top: 85,
       left: 24,
       duration: 18,
-      color: `rgb(${to_rgb(warning[theme]['300'])})`,
+      color: 'hsl(var(--heroui-danger-300))',
     } as circleParams,
     {
       width: 200,
@@ -90,18 +78,85 @@ const BackgroundGradient = ({
       top: 0,
       left: 85,
       duration: 16,
-      color: `rgb(${to_rgb(foggy_accent[theme]['500'])})`,
+      color: foggy_accent.light['300'],
     } as circleParams,
-  ];
+  ],
+
+  dark: [
+    {
+      width: 140,
+      height: 180,
+      rotation: 10,
+      top: 6,
+      left: 24,
+      duration: 20,
+      color: foggy_accent.light.DEFAULT,
+    } as circleParams,
+    {
+      width: 256,
+      height: 300,
+      rotation: 16,
+      top: 37,
+      left: 40,
+      duration: 20,
+      color: 'hsl(var(--heroui-danger-50))',
+    } as circleParams,
+    {
+      width: 160,
+      height: 160,
+      rotation: -12,
+      top: 21,
+      left: 67,
+      duration: 22,
+      color: foggy_accent.light['600'],
+    } as circleParams,
+    {
+      width: 180,
+      height: 110,
+      rotation: 8,
+      top: 80,
+      left: 8,
+      duration: 24,
+      color: 'hsl(var(--heroui-primary-100))',
+    } as circleParams,
+
+    {
+      width: 110,
+      height: 130,
+      rotation: 16,
+      top: 56,
+      left: 58,
+      duration: 26,
+      color: 'hsl(var(--heroui-secondary-200))',
+    } as circleParams,
+    {
+      width: 88,
+      height: 120,
+      rotation: -14,
+      top: 12,
+      left: 88,
+      duration: 28,
+      color: 'hsl(var(--heroui-danger-500)/0.7)',
+    } as circleParams,
+  ],
+};
+
+const BackgroundGradient = ({
+  backgroundColor,
+}: {
+  backgroundColor: string;
+}) => {
+  const { theme } = useTheme();
+  const currentCircles = circles[theme];
 
   return (
     <div
       className={clsx(
         'absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
-        `bg-${backgroundColor}`,
       )}
+      style={{ backgroundColor: `hsl(var(${backgroundColor}))` }}
     >
-      {circles.map((circle, index) => (
+      {currentCircles.map((circle, index) => (
         <BackgroundCircle key={index} params={circle} />
       ))}
     </div>

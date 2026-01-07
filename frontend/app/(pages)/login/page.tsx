@@ -14,23 +14,10 @@ const LoginPage = () => {
       <div className="flex h-screen w-screen items-center justify-center">
         <div
           className={clsx(
-            'flex h-[560] w-4/5 max-w-[1040px] sm:w-3/4',
+            'flex h-[560] w-4/5 max-w-xl sm:w-3/4',
             bg_container_no_padding,
           )}
         >
-          <div
-            className={
-              'hidden h-auto w-[420] items-center justify-center md:flex'
-            }
-          >
-            <Image
-              className={'h-full w-full object-cover'}
-              alt={'bg-picture'}
-              priority
-              src={bg}
-            />
-          </div>
-
           <div
             className={
               'flex h-full w-full flex-col items-center justify-center gap-2 p-4'

@@ -27,7 +27,6 @@ import { Divider } from '@heroui/divider';
 import EditorToolButton from '@/app/lib/components/board/tools/textEditor/editorToolButton';
 import LinkPicker from '@/app/lib/components/board/tools/linkPicker';
 import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
-import { to_rgb } from '@/tailwind.config';
 import EditorToolDropdown from '@/app/lib/components/board/tools/textEditor/editorToolDropdown';
 
 interface EditorTool {
@@ -50,7 +49,7 @@ export default function TextEditorToolBar({
   restoreSelection,
 }: any) {
   const defaultLink = '/';
-  const defaultColor = `rgba(${to_rgb('#171717')}, 1)`;
+  const defaultColor = `rgba(var(--heroui-foreground), 1)`;
   const defaultBackground = '';
 
   const tools: {
