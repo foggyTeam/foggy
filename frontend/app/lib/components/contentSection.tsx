@@ -2,11 +2,11 @@
 
 import {
   FilterSet,
+  Notification,
   Project,
   ProjectMember,
   Team,
   TeamMember,
-  Notification,
 } from '@/app/lib/types/definitions';
 import { ComponentType, useMemo, useReducer, useState } from 'react';
 
@@ -26,7 +26,12 @@ import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
 interface ContentSectionProps {
   sectionTitle?: string;
   sectionAvatar?: string;
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
+  data:
+    | Project[]
+    | Team[]
+    | TeamMember[]
+    | ProjectMember[]
+    | { notification: Notification; isNew?: boolean }[];
   DataCard: ComponentType<any>;
   emptyState?: EmptyStateProps;
   filter?: boolean;

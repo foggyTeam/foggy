@@ -272,7 +272,7 @@ const BackgroundGradient = () => {
       className={clsx(
         'transition-background absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
         resolvedTheme === 'dark'
-          ? 'bg-default-100 opacity-80'
+          ? 'bg-default-100 opacity-50'
           : 'bg-default-200',
       )}
     >

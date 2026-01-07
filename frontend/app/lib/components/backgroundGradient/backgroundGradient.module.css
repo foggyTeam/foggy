@@ -24,6 +24,11 @@
     transparent
   );
   animation: float 10s ease-in-out infinite;
-  filter: blur(8px);
   will-change: transform;
+}
+
+@media (max-width: 768px) {
+  .circle {
+    animation: none;
+  }
 }

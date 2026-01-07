@@ -1,8 +1,6 @@
 'use server';
 import React, { Suspense } from 'react';
 import LoginForm from '@/app/lib/components/loginForm';
-import Image from 'next/image';
-import bg from '@/public/images/1.webp';
 import LoginFormSkeleton from '@/app/lib/components/skeletons/loginFormSkeleton';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -20,10 +18,15 @@ const LoginPage = () => {
         >
           <div
             className={
-              'flex h-full w-full flex-col items-center justify-center gap-2 p-4'
+              'flex h-full w-full flex-col items-center justify-center gap-1 p-4'
             }
           >
-            <FoggyLarge width={320} height={240} alt={'foggy logo'} />
+            <FoggyLarge
+              className="fill-primary"
+              width={320}
+              height={240}
+              alt={'foggy logo'}
+            />
 
             <Suspense fallback={<LoginFormSkeleton />}>
               <LoginForm />
