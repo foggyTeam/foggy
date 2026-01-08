@@ -105,6 +105,7 @@ const OpenedRightSideBar = observer(
                   }
                   {projectsStore.allProjects.slice(0, 4).map((project) => (
                     <RightSideBarElementCard
+                      type="project"
                       key={project.id}
                       element={project}
                       isActive={projectsStore.activeProject?.id === project.id}
@@ -125,6 +126,7 @@ const OpenedRightSideBar = observer(
                     <RightSideBarElementCard
                       key={team.id}
                       element={team}
+                      type="team"
                       isActive={teamsStore.activeTeam?.id === team.id}
                     />
                   ))}

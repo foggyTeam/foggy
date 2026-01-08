@@ -10,6 +10,7 @@ export default function RightSideBarElementCard({
   link = { href: '/', Icon: ChevronLeftIcon, text: '' },
   element,
   isActive,
+  type,
 }: {
   link?: {
     href: string;
@@ -18,17 +19,12 @@ export default function RightSideBarElementCard({
   };
   element?: Project | Team;
   isActive?: boolean;
+  type?: 'team' | 'project';
 }) {
   return (
     <Button
       as={Link}
-      href={
-        (element &&
-          ('projects' in element
-            ? `/team/${element.id}`
-            : `/project/${element.id}`)) ||
-        link.href
-      }
+      href={(element && type && `/${type}/${element.id}`) || link.href}
       className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-[hsl(var(--heroui-background))]/25 pr-1 pl-0 transition-colors duration-300"
     >
       <div className="flex items-center justify-start gap-1">
