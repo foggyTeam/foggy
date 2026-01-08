@@ -29,7 +29,9 @@ export type ToolProps = {
 };
 
 export default function ToolBar() {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const DEFAULT_PENCIL: PencilParams = {
     color: foggy_accent[theme].DEFAULT,
     width: 4,

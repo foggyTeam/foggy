@@ -264,8 +264,9 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
 
 const BackgroundGradient = () => {
   const { resolvedTheme } = useTheme();
-  const currentCircles =
-    circles[(resolvedTheme as 'light' | 'dark') ?? 'light'];
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
+  const currentCircles = circles[theme];
 
   return (
     <div

@@ -16,7 +16,9 @@ import { addToast } from '@heroui/toast';
 import { useTheme } from 'next-themes';
 
 export default function StrokeTool() {
-  const { resolvedTheme: theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
   const [strokeColor, changeColor] = useState(

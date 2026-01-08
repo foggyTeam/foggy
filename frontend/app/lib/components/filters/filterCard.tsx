@@ -18,7 +18,9 @@ export default function FilterCard({
   filterValue: string;
   removeFilter: any;
 }) {
-  const { resolvedTheme: theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const colorMap: any = {
     lastChange: secondary[theme].DEFAULT,
     nickname: info[theme].DEFAULT,

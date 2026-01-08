@@ -31,7 +31,7 @@ interface ContentSectionProps {
     | Team[]
     | TeamMember[]
     | ProjectMember[]
-    | { notification: Notification; isNew?: boolean }[];
+    | (Notification & { isNew?: boolean })[];
   DataCard: ComponentType<any>;
   emptyState?: EmptyStateProps;
   filter?: boolean;

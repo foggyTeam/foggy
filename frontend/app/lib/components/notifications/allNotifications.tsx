@@ -112,7 +112,7 @@ const AllNotifications = observer(() => {
         <ContentSection
           data={notificationsStore.notifications.map((notification, index) => {
             return {
-              notification,
+              ...notification,
               isNew: index < notificationsStore.unreadNumber,
             };
           })}

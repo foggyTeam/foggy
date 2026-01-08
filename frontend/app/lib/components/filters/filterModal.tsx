@@ -36,7 +36,12 @@ export default function FilterModal({
   isOpen,
   onOpenChange,
 }: {
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
+  data:
+    | Project[]
+    | Team[]
+    | TeamMember[]
+    | ProjectMember[]
+    | (Notification & { isNew?: boolean })[];
   filters: FilterSet;
   dispatchFilters: any;
   isOpen: any;

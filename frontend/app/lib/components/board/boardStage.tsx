@@ -25,7 +25,9 @@ const GRID_SIZE = 24;
 export const STAGE_SIZE = 3000;
 
 const BoardStage = observer(() => {
-  const { resolvedTheme: theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const {
     stageRef,
     scale,

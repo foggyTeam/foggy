@@ -12,7 +12,7 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
 
   const position = (initial: number) => {
     if (!isBoardPage) return initial;
-    return initial > 34 ? 85 : -15;
+    return initial > 34 ? 100 : -48;
   };
 
   useEffect(() => {
@@ -22,20 +22,22 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
   return (
     <div
       className={styles.circle}
-      style={{
-        width: `${params.width}px`,
-        height: `${params.height}px`,
-        rotate: `${params.rotation}deg`,
-        top: `${position(params.top)}%`,
-        left: `${params.left}%`,
-        animationDuration: `${params.duration}s`,
-        '--circle-color': params.color,
-        transition: `top ${params.duration / 2}s ease, left ${
-          params.duration / 2
-        }s ease, width ${params.duration / 2}s ease, height ${
-          params.duration / 2
-        }s ease`,
-      }}
+      style={
+        {
+          width: `${params.width}px`,
+          height: `${params.height}px`,
+          rotate: `${params.rotation}deg`,
+          top: `${position(params.top)}%`,
+          left: `${params.left}%`,
+          animationDuration: `${params.duration}s`,
+          '--circle-color': params.color,
+          transition: `top ${params.duration / 2}s ease, left ${
+            params.duration / 2
+          }s ease, width ${params.duration / 2}s ease, height ${
+            params.duration / 2
+          }s ease`,
+        } as any
+      }
     />
   );
 }

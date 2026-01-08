@@ -28,7 +28,9 @@ enum ButtonAction {
 }
 
 const LoginForm = observer(() => {
-  const { resolvedTheme: theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const router = useRouter();
 
   const [email, setEmail] = useState('');

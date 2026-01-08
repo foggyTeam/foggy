@@ -20,13 +20,9 @@ import NotificationCardModal from '@/app/lib/components/notifications/notificati
 import SelectRole from '@/app/lib/components/members/selectRole';
 import { Badge } from '@heroui/badge';
 
-export default function NotificationCard({
-  notification,
-  isNew,
-}: {
-  notification: Notification;
-  isNew: boolean;
-}) {
+export default function NotificationCard(
+  notification: Notification & { isNew?: boolean },
+) {
   const { onAnswer, onDelete } = useContext(NotificationsContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -81,7 +77,7 @@ export default function NotificationCard({
         <div className="absolute -top-2 right-1">
           <Badge
             showOutline={false}
-            isInvisible={!isNew}
+            isInvisible={!notification.isNew}
             size="sm"
             content=""
             color="success"
@@ -115,7 +111,7 @@ export default function NotificationCard({
             <Button
               isIconOnly
               onPress={() => onDelete(notification.id)}
-              variant="tonal"
+              variant="flat"
               color="danger"
               radius="full"
               size="sm"
