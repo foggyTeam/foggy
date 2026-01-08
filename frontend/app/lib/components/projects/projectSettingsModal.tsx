@@ -238,7 +238,8 @@ const ProjectSettingsModal = observer(
                       src={avatar}
                       classNames={{
                         icon: 'w-32 h-32',
-                        avatar: 'w-32 h-32 border border-4 border-white',
+                        avatar:
+                          'w-32 h-32 border border-4 border-[hsl(var(--heroui-background))]',
                       }}
                       tooltipContent={
                         settingsStore.t.projects.projectSettings

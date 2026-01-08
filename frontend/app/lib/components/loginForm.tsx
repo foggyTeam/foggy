@@ -19,6 +19,7 @@ import {
   SignUserViaProviders,
 } from '@/app/lib/server/actions/userServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
+import { useTheme } from 'next-themes';
 
 enum ButtonAction {
   UNDEFINED,
@@ -27,6 +28,9 @@ enum ButtonAction {
 }
 
 const LoginForm = observer(() => {
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -121,7 +125,7 @@ const LoginForm = observer(() => {
             </button>
           )
         }
-        classNames={{ inputWrapper: 'bg-white' }}
+        classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
       <Input
@@ -163,7 +167,7 @@ const LoginForm = observer(() => {
         }
         size="md"
         autoComplete="current-password"
-        classNames={{ inputWrapper: 'bg-white' }}
+        classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
       <div className="mt-1 flex w-full items-center justify-between gap-2">
@@ -205,7 +209,7 @@ const LoginForm = observer(() => {
             alt="Google"
             width="32"
             height="32"
-            stroke={primary.DEFAULT}
+            stroke={primary[theme].DEFAULT}
           />
         </Button>
 
@@ -220,7 +224,7 @@ const LoginForm = observer(() => {
             alt="Yandex"
             width="32"
             height="32"
-            stroke={primary.DEFAULT}
+            stroke={primary[theme].DEFAULT}
           />
         </Button>
       </div>

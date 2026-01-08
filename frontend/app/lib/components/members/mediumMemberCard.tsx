@@ -10,13 +10,13 @@ export default function MediumMemberCard(member: ProjectMember | TeamMember) {
   return (
     <Button
       // TODO: navigate to member
-      className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white pr-1 pl-0 transition-colors duration-300"
+      className="shadow-container hover:bg-primary-100 flex h-fit w-full items-center justify-between gap-1 rounded-full bg-[hsl(var(--heroui-background))] pr-1 pl-0 transition-colors duration-300"
     >
       <div className="flex items-center justify-start gap-1">
         <Avatar
           size="sm"
           classNames={{
-            base: 'border-white border-1.5',
+            base: 'border-[hsl(var(--heroui-background))] border-1.5',
           }}
           className="p-0"
           name={member.nickname}

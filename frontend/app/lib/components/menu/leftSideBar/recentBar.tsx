@@ -27,7 +27,7 @@ const RecentBar = observer(
             'absolute top-1/3 left-0 z-50 flex w-fit flex-col items-center' +
               ' justify-center gap-1 rounded-l-none rounded-r-[64px] px-3 py-6',
             bg_container,
-            'transform transition-all hover:bg-white/65 hover:pl-4',
+            'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-4',
           )}
         >
           {projectsStore.recentBoards.map((board) => (

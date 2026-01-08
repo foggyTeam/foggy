@@ -2,11 +2,11 @@
 
 import {
   FilterSet,
+  Notification,
   Project,
   ProjectMember,
   Team,
   TeamMember,
-  Notification,
 } from '@/app/lib/types/definitions';
 import { ComponentType, useMemo, useReducer, useState } from 'react';
 
@@ -26,7 +26,12 @@ import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
 interface ContentSectionProps {
   sectionTitle?: string;
   sectionAvatar?: string;
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
+  data:
+    | Project[]
+    | Team[]
+    | TeamMember[]
+    | ProjectMember[]
+    | (Notification & { isNew?: boolean })[];
   DataCard: ComponentType<any>;
   emptyState?: EmptyStateProps;
   filter?: boolean;
@@ -176,7 +181,7 @@ export default function ContentSection({
         <div
           className={clsx(
             'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
-            'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+            'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
             'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
           )}
         >

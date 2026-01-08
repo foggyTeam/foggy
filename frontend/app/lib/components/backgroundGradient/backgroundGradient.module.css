@@ -19,9 +19,16 @@
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 255, 255, 0.3),
-    rgba(255, 255, 255, 0)
+    var(--circle-color),
+    transparent,
+    transparent
   );
   animation: float 10s ease-in-out infinite;
-  filter: blur(128px);
+  will-change: transform;
+}
+
+@media (max-width: 768px) {
+  .circle {
+    animation: none;
+  }
 }

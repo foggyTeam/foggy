@@ -12,8 +12,12 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
+import { useTheme } from 'next-themes';
 
 export default function FillTool() {
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
   const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');
@@ -48,7 +52,7 @@ export default function FillTool() {
         fill: isElementVisible(
           selectedElement.attrs.type,
           fillColor,
-          primary.DEFAULT,
+          primary[theme].DEFAULT,
           1,
         )
           ? fillColor

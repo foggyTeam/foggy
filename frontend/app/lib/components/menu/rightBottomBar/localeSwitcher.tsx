@@ -23,21 +23,19 @@ const LocaleSwitcher = observer(() => {
   }, []);
 
   return (
-    <div className="invisible absolute right-4 bottom-4 z-50 sm:visible">
-      <Button
-        onPress={() => {
-          if (settingsStore.locale == 'en') settingsStore.setLocale('ru');
-          else settingsStore.setLocale('en');
-        }}
-        isIconOnly
-        color="secondary"
-        variant="light"
-        size="md"
-        className="font-semibold"
-      >
-        {settingsStore.locale.toUpperCase()}
-      </Button>
-    </div>
+    <Button
+      onPress={() => {
+        if (settingsStore.locale == 'en') settingsStore.setLocale('ru');
+        else settingsStore.setLocale('en');
+      }}
+      isIconOnly
+      color="secondary"
+      variant="light"
+      size="md"
+      className="font-semibold"
+    >
+      {settingsStore.locale.toUpperCase()}
+    </Button>
   );
 });
 

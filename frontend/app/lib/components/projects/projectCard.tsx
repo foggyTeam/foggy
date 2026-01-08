@@ -40,7 +40,7 @@ export default function ProjectCard(
       ref={cardRef}
       onClick={() => (project.isDisabled ? undefined : setIsExpanded(true))}
       className={clsx(
-        'hover:bg-default-50 shadow-container box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
+        'hover:bg-default-50 shadow-container box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
         el_animation,
         isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px]',
         isExpanded ? project_tile_exp : project_tile,
@@ -132,7 +132,7 @@ export default function ProjectCard(
             {project.members.slice(0, 3).map((member, index) => (
               <Avatar
                 classNames={{
-                  base: 'h-7 w-7 border-white border-1.5',
+                  base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-1.5',
                 }}
                 key={index}
                 name={member.nickname}
@@ -142,7 +142,7 @@ export default function ProjectCard(
             {project.members.length - 3 > 0 && (
               <Avatar
                 classNames={{
-                  base: 'h-7 w-7 border-white border-2',
+                  base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-2',
                 }}
                 name={`+${project.members.length - 3}`}
               />

@@ -36,7 +36,12 @@ export default function FilterModal({
   isOpen,
   onOpenChange,
 }: {
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
+  data:
+    | Project[]
+    | Team[]
+    | TeamMember[]
+    | ProjectMember[]
+    | (Notification & { isNew?: boolean })[];
   filters: FilterSet;
   dispatchFilters: any;
   isOpen: any;
@@ -176,7 +181,7 @@ export default function FilterModal({
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
-                        'p-2 sm:p-3 bg-white/100',
+                        'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',
                       ),
                     }}
                     selectedKeys={selectedMembers}
@@ -207,7 +212,7 @@ export default function FilterModal({
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
-                        'p-2 sm:p-3 bg-white/100',
+                        'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',
                       ),
                     }}
                     selectedKeys={selectedTeams}
@@ -239,7 +244,7 @@ export default function FilterModal({
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
-                        'p-2 sm:p-3 bg-white/100',
+                        'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',
                       ),
                     }}
                     selectedKeys={selectedRoles}

@@ -19,11 +19,15 @@ import settingsStore from '@/app/stores/settingsStore';
 import { createPortal } from 'react-dom';
 import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { useTheme } from 'next-themes';
 
 const GRID_SIZE = 24;
 export const STAGE_SIZE = 3000;
 
 const BoardStage = observer(() => {
+  const { resolvedTheme } = useTheme();
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const {
     stageRef,
     scale,
@@ -93,8 +97,8 @@ const BoardStage = observer(() => {
                     ? oldBox
                     : newBox
                 }
-                borderStroke={primary['400']}
-                anchorStroke={primary['400']}
+                borderStroke={primary[theme]['400']}
+                anchorStroke={primary[theme]['400']}
                 anchorCornerRadius={16}
                 rotateAnchorCursor="grab"
               />
@@ -133,7 +137,7 @@ const BoardStage = observer(() => {
           color="secondary"
           variant="light"
           size="md"
-          className="invisible absolute right-16 bottom-4 z-50 font-semibold sm:visible"
+          className="invisible absolute right-24 bottom-4 z-50 font-semibold sm:visible"
         >
           <MaximizeIcon />
         </Button>

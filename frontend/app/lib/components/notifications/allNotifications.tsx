@@ -110,7 +110,12 @@ const AllNotifications = observer(() => {
     <div className="w-72">
       <NotificationsContext.Provider value={{ onAnswer, onDelete }}>
         <ContentSection
-          data={notificationsStore.notifications.slice()}
+          data={notificationsStore.notifications.map((notification, index) => {
+            return {
+              ...notification,
+              isNew: index < notificationsStore.unreadNumber,
+            };
+          })}
           DataCard={NotificationCard}
           emptyState={{
             title: settingsStore.t.notifications.empty.title,
