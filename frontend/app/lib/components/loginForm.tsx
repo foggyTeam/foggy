@@ -96,7 +96,7 @@ const LoginForm = observer(() => {
 
   return (
     <Form
-      className={'flex min-w-24 flex-col gap-2 sm:w-80'}
+      className="flex w-full min-w-24 flex-col gap-2 sm:w-80"
       onSubmit={onSubmit}
       validationErrors={errors}
     >
@@ -170,13 +170,13 @@ const LoginForm = observer(() => {
         classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
-      <div className="mt-1 flex w-full items-center justify-between gap-2">
+      <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-2 sm:max-w-80 sm:flex-nowrap">
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           isDisabled={!!Object.keys(errors).length || loginButtonLoading}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
           isLoading={signInButtonLoading}
-          variant="bordered"
+          variant="ghost"
           color="primary"
           size="md"
           className="w-full"
@@ -192,6 +192,7 @@ const LoginForm = observer(() => {
           variant="solid"
           color="primary"
           size="md"
+          className="w-full sm:w-fit"
         >
           {settingsStore.t.login.signInButton}
         </FButton>
