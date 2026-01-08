@@ -63,7 +63,7 @@ export default function NotificationCard(
     <>
       <div
         className={clsx(
-          'py-auto shadow-container relative box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2',
+          'py-auto shadow-container relative box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2 sm:w-[98%] sm:max-w-72',
           el_animation,
           isExpanded ? 'h-fit py-2' : 'h-8 cursor-pointer',
           isExpanded ? notification_tile_exp : notification_tile,
