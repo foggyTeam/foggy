@@ -111,7 +111,7 @@ export default function NotificationCard(
             <Button
               isIconOnly
               onPress={() => onDelete(notification.id)}
-              variant="flat"
+              variant="light"
               color="danger"
               radius="full"
               size="sm"
