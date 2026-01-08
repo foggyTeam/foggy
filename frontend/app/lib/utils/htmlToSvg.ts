@@ -44,18 +44,8 @@ const HtmlToSvg = (
         h1, h2, h3, h4, h5, h6 {
           font-weight: 400;
         }
-        a {
-          color: ${foggy_accent.light.DEFAULT};
-        }
-        p {
-          margin: 0;
-        }
-        ul, ol {
-          list-style-position: inside;
-        }
-
+        a { color: ${foggy_accent.light.DEFAULT}; }
         p { margin: 0; }
-
         ul, ol { list-style-position: inside; }
 
         .ql-align-center { text-align: center; }

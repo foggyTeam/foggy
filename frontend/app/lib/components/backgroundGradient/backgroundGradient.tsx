@@ -271,7 +271,7 @@ const BackgroundGradient = () => {
   return (
     <div
       className={clsx(
-        'transition-background absolute top-0 left-0 -z-10 h-full w-full overflow-hidden',
+        'absolute top-0 left-0 -z-10 h-full w-full overflow-hidden transition-colors',
         resolvedTheme === 'dark'
           ? 'bg-default-100 opacity-50'
           : 'bg-default-200',

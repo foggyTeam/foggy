@@ -4,6 +4,7 @@ import { Button } from '@heroui/button';
 import React, { useEffect, useState } from 'react';
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { Skeleton } from '@heroui/skeleton';
 
 export default function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
@@ -19,7 +20,12 @@ export default function ThemeSwitcher() {
     setTheme(newTheme);
   }
 
-  if (!mounted) return null;
+  if (!mounted)
+    return (
+      <Skeleton className="rounded-lg">
+        <Button isIconOnly size="md" />
+      </Skeleton>
+    );
 
   return (
     <Button
@@ -28,7 +34,6 @@ export default function ThemeSwitcher() {
       variant="light"
       size="md"
       color="secondary"
-      className="font-semibold"
     >
       {theme === 'light' ? (
         <MoonIcon className="stroke-secondary" />

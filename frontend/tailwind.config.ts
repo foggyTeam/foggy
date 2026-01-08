@@ -53,7 +53,7 @@ export const foggy_accent = {
     200: '#4A2887',
     100: '#33186F',
     50: '#2e185d',
-    foreground: '##2e185d',
+    foreground: '#2e185d',
     DEFAULT: '#B67FE9',
   },
   hsl_palette: {},
