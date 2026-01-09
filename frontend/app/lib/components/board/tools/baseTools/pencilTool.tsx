@@ -12,12 +12,14 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
 import debounce from 'lodash/debounce';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function PencilTool({
   pencilParams,
 }: {
   pencilParams: PencilParams;
 }) {
+  const { buttonSize } = useAdaptiveParams();
   const {
     stageRef,
     activeTool,
@@ -77,7 +79,7 @@ export default function PencilTool({
         variant={activeTool === 'pencil' ? 'flat' : 'light'}
         color={activeTool === 'pencil' ? 'primary' : 'default'}
         isIconOnly
-        size="md"
+        size={buttonSize}
       >
         <PencilIcon
           className={

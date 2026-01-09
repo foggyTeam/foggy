@@ -13,9 +13,11 @@ import notificationsStore from '@/app/stores/notificationsStore';
 import React, { useEffect, useState } from 'react';
 import { Navbar, NavbarMenu, NavbarMenuToggle } from '@heroui/navbar';
 import OpenedRightSideBarContent from '@/app/lib/components/menu/rightSideBar/openedRightSideBarContent';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function NavBar() {
   const router = useRouter();
+  const { buttonSize, badgeSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'projects' | 'teams' | 'notifications'
@@ -27,15 +29,15 @@ export default function NavBar() {
 
   return (
     <Navbar
+      height={48}
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      height="40px"
       className={clsx(
         bg_container_no_padding,
         'border-x-none rounded-t-none rounded-b-none border-t-0 px-4 py-3',
       )}
     >
-      <div className="flex h-10 w-fit items-center gap-6">
+      <div className="flex h-12 w-fit items-center gap-6">
         <NavbarMenuToggle />
 
         <Link href="/">
@@ -43,11 +45,11 @@ export default function NavBar() {
         </Link>
       </div>
 
-      <div className="flex h-10 w-fit items-center gap-2">
+      <div className="flex h-12 w-fit items-center gap-2">
         <Badge
           showOutline={false}
           isInvisible={!notificationsStore.unreadNumber}
-          size="sm"
+          size={badgeSize}
           color="success"
           content={
             notificationsStore.unreadNumber < 100
@@ -64,7 +66,7 @@ export default function NavBar() {
             }}
             isIconOnly
             variant="light"
-            size="md"
+            size={buttonSize}
           >
             <BellIcon className="stroke-default-500" />
           </Button>
@@ -79,12 +81,10 @@ export default function NavBar() {
         >
           <Avatar
             showFallback
-            icon={
-              <User2Icon className="stroke-default-200 h-40 w-40 sm:h-64 sm:w-64" />
-            }
+            icon={<User2Icon className="stroke-default-200 h-64 w-64" />}
             name={userStore.user?.name || undefined}
             src={userStore.user?.image || undefined}
-            size="md"
+            className="h-12 w-12"
             color="default"
           />
         </Button>

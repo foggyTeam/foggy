@@ -1,13 +1,19 @@
+export const default_padding = 'px-4 py-3 sm:px-6';
+export const default_gap = 'gap-2';
+export const container_padding = 'px-1 py-12';
+
 export const bg_container_no_padding: string =
-  'overflow-clip border light:border-[hsl(var(--heroui-background)/0.1)] dark:border-[hsl(var(--heroui-foreground)/0.08)] bg-[hsl(var(--heroui-background)/0.5)]' +
+  'overflow-clip border light:border-[hsl(var(--heroui-background)/0.1)] ' +
+  'dark:border-[hsl(var(--heroui-foreground)/0.08)] bg-[hsl(var(--heroui-background)/0.5)]' +
   ' backdrop-blur-3xl rounded-xl shadow-container';
-export const bg_container: string = bg_container_no_padding + ' px-1 py-12';
+export const bg_container: string = ` ${bg_container_no_padding} ${container_padding}`;
+
 export const right_sidebar_layout: string =
   'absolute right-0 top-8 z-50 rounded-r-none rounded-bl-[64px] ' +
-  'rounded-tl-2xl px-1 py-12 overflow-visible';
+  `rounded-tl-2xl ${container_padding} overflow-visible`;
 export const left_sidebar_layout: string =
   'absolute left-0 top-8 z-50 rounded-l-none rounded-br-[64px] ' +
-  'rounded-tr-2xl px-1 py-12 overflow-visible';
+  `rounded-tr-2xl ${container_padding} overflow-visible`;
 
 export const el_animation: string =
   'transform transition-all hover:-translate-y-0.5';

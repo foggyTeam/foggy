@@ -14,8 +14,11 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function LayerTool() {
+  const { buttonSize } = useAdaptiveParams();
+
   const { selectedElement, allToolsDisabled } = useBoardContext();
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
@@ -56,7 +59,7 @@ export default function LayerTool() {
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={buttonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.layerTool}>
             <LayersIcon className="stroke-default-500" />
@@ -72,7 +75,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={buttonSize}
             >
               <ArrowBigDownDashIcon className="stroke-default-500" />
             </Button>
@@ -84,7 +87,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={buttonSize}
             >
               <ArrowBigDownIcon className="stroke-default-500" />
             </Button>
@@ -96,7 +99,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={buttonSize}
             >
               <ArrowBigUpIcon className="stroke-default-500" />
             </Button>
@@ -108,7 +111,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={buttonSize}
             >
               <ArrowBigUpDashIcon className="stroke-default-500" />
             </Button>

@@ -15,8 +15,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import { BoardElement } from '@/app/lib/types/definitions';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function SizeTool() {
+  const { buttonSize } = useAdaptiveParams();
+
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
 
@@ -74,7 +77,7 @@ export default function SizeTool() {
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={buttonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.sizeTool}>
             <RulerIcon className="stroke-default-500" />

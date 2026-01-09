@@ -8,6 +8,7 @@ import ColorPicker from '@/app/lib/components/board/tools/colorPicker';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function ColorTool({
   color,
@@ -16,6 +17,7 @@ export default function ColorTool({
   color: string;
   setColor: (newColor: string) => void;
 }) {
+  const { buttonSize } = useAdaptiveParams();
   const { allToolsDisabled } = useBoardContext();
 
   return (
@@ -26,7 +28,7 @@ export default function ColorTool({
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={buttonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.pencilColor}>
             <CircleIcon fill={color} stroke={`rgba(${to_rgb(color)}, .48)`} />

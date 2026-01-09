@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const to_rgba = (hex: string): string => {
   hex = hex.replace(/^#/, '');
@@ -65,6 +66,7 @@ export default function EditorToolButton({
   popover?: boolean;
   PopoverInnerContent?: any;
 }) {
+  const { buttonSize } = useAdaptiveParams();
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
@@ -101,11 +103,10 @@ export default function EditorToolButton({
           id={id}
           variant="light"
           isIconOnly
-          size="sm"
+          size={buttonSize}
         >
           <Icon
             className={clsx(
-              'h-5 w-5',
               isAccent ? 'stroke-f_accent' : 'stroke-default-500',
             )}
           />
@@ -126,13 +127,10 @@ export default function EditorToolButton({
       onPress={() => handleClick(id, value)}
       variant="light"
       isIconOnly
-      size="sm"
+      size={buttonSize}
     >
       <Icon
-        className={clsx(
-          'h-5 w-5',
-          isAccent ? 'stroke-f_accent' : 'stroke-default-500',
-        )}
+        className={clsx(isAccent ? 'stroke-f_accent' : 'stroke-default-500')}
       />
     </Button>
   );

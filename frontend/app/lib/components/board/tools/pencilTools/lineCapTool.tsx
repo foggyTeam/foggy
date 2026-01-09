@@ -8,6 +8,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Listbox, ListboxItem } from '@heroui/listbox';
 import { ReactNode } from 'react';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function LineCapTool({
   value,
@@ -16,6 +17,7 @@ export default function LineCapTool({
   value: 'butt' | 'round' | 'square';
   setValue: (newValue: 'butt' | 'round' | 'square') => void;
 }) {
+  const { buttonSize } = useAdaptiveParams();
   const { allToolsDisabled } = useBoardContext();
   const options = {
     round: {
@@ -37,7 +39,7 @@ export default function LineCapTool({
     return (
       <Icon
         className={clsx(
-          'fill-default-500 stroke-default-500 h-4 w-4',
+          'fill-default-500 stroke-default-500',
           value !== 'butt' && 'scale-x-75',
         )}
       />
@@ -52,7 +54,7 @@ export default function LineCapTool({
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={buttonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.pencilCap}>
             {getIcon(value)}

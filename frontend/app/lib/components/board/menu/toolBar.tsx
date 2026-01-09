@@ -30,6 +30,7 @@ export type ToolProps = {
 
 export default function ToolBar() {
   const { resolvedTheme } = useTheme();
+
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
   const DEFAULT_PENCIL: PencilParams = {
@@ -49,7 +50,7 @@ export default function ToolBar() {
   return (
     <div
       className={clsx(
-        'absolute right-0 bottom-0 left-0 z-50 w-full justify-self-center px-2 py-3',
+        'absolute right-0 bottom-0 left-0 z-30 w-full justify-self-center px-4 py-3 sm:z-50',
         'sm:right-auto sm:bottom-4 sm:left-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
         bg_container_no_padding,
         'flex flex-col justify-center gap-1 rounded-t-none rounded-l-none rounded-r-none',
