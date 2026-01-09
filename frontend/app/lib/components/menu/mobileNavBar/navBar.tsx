@@ -14,6 +14,8 @@ import React, { useEffect, useState } from 'react';
 import { Navbar, NavbarMenu, NavbarMenuToggle } from '@heroui/navbar';
 import OpenedRightSideBarContent from '@/app/lib/components/menu/rightSideBar/openedRightSideBarContent';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import ThemeSwitcher from '@/app/lib/components/menu/rightBottomBar/themeSwitcher';
+import LocaleSwitcher from '@/app/lib/components/menu/rightBottomBar/localeSwitcher';
 
 export default function NavBar() {
   const router = useRouter();
@@ -91,11 +93,15 @@ export default function NavBar() {
       </div>
 
       <NavbarMenu>
-        <div className="py-8">
+        <div className="flex flex-col gap-2 py-8">
           <OpenedRightSideBarContent
             activeTab={activeTab}
             setActiveTab={setActiveTab}
           />
+          <div className="flex w-full items-center justify-between gap-2">
+            <ThemeSwitcher />
+            <LocaleSwitcher />
+          </div>
         </div>
       </NavbarMenu>
     </Navbar>
