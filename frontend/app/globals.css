@@ -24,17 +24,21 @@
 }
 
 :root {
-  font-size: 1em;
-  --background: #fafafa;
+  --background:#e4e4e7;
   --foreground: #18181b;
 }
 
 html.dark {
-  --background: #18181b;
+  --background: #27272a;
   --foreground: #fafafa;
 }
 
 body {
   color: var(--foreground);
   font-family: Montserrat, sans-serif;
+}
+
+.bg-gradient {
+  pointer-events: none;
+  will-change: transform, opacity;
 }

@@ -63,13 +63,14 @@ export default async function MainLayout({
       <NotificationsLoader />
       <BoardLoadingCard />
 
-      <template className="hidden sm:block">
+      <section className="hidden sm:block">
         <LeftSideBar />
         <RightSideBar />
-      </template>
-      <template className="block sm:hidden">
+      </section>
+
+      <section className="block sm:hidden">
         <NavBar />
-      </template>
+      </section>
 
       {children}
     </>

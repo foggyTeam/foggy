@@ -27,7 +27,7 @@
   will-change: transform;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 640px) {
   .circle {
     animation: none;
   }

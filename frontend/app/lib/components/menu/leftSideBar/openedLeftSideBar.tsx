@@ -203,7 +203,7 @@ const OpenedLeftSideBar = observer(
       <>
         <Drawer
           isOpen={isOpened}
-          onClick={closeSideBar}
+          onPress={closeSideBar}
           onClose={closeSideBar}
           placement="left"
           backdrop="transparent"

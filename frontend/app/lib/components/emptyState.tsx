@@ -97,13 +97,13 @@ export default function EmptyState({
               size="md"
               variant="light"
               color="primary"
-              onClick={leftButton.callback}
+              onPress={leftButton.callback}
             >
               {leftButton.title}
             </FButton>
           )}
           {!!rightButton && (
-            <FButton size="md" color="primary" onClick={rightButton.callback}>
+            <FButton size="md" color="primary" onPress={rightButton.callback}>
               {rightButton.title}
             </FButton>
           )}
