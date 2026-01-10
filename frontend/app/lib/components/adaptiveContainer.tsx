@@ -2,44 +2,50 @@
 
 import React, { ReactElement, useMemo } from 'react';
 import { Tab, Tabs } from '@heroui/tabs';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { observer } from 'mobx-react-lite';
+import settingsStore from '@/app/stores/settingsStore';
 
-interface MobileTabsProps {
+interface MobileTabProps {
   key: string;
+  titleKey: string;
 }
 
-export default function AdaptiveContainer({
-  children,
-  mobileTabs,
-}: Readonly<{
-  children: React.ReactNode;
-  mobileTabs: MobileTabsProps[];
-}>) {
-  const childMap = useMemo(() => {
-    const map = new Map<string, ReactElement>();
+const AdaptiveContainer = observer(
+  ({
+    children,
+    mobileTabs,
+  }: Readonly<{
+    children: React.ReactNode;
+    mobileTabs: MobileTabProps[];
+  }>) => {
+    const { isMobile } = useAdaptiveParams();
 
-    const childrenArray = children as any;
+    const childMap = useMemo(() => {
+      const map = new Map<string, ReactElement>();
 
-    const a = Array.isArray(childrenArray) ? childrenArray : [childrenArray];
+      const childrenArray = children as any;
 
-    a.forEach((child: any) => {
-      if (!child || typeof child !== 'object') return;
+      const a = Array.isArray(childrenArray) ? childrenArray : [childrenArray];
 
-      const key = child.key as string | null;
-      if (!key) return;
+      a.forEach((child: any) => {
+        if (!child || typeof child !== 'object') return;
 
-      const normalizedKey = key.startsWith('.$')
-        ? key.slice(2)
-        : key.replace(/^\./, '');
-      map.set(normalizedKey, child);
-    });
+        const key = child.key as string | null;
+        if (!key) return;
 
-    return map;
-  }, [children]);
+        const normalizedKey = key.startsWith('.$')
+          ? key.slice(2)
+          : key.replace(/^\./, '');
+        map.set(normalizedKey, child);
+      });
 
-  return (
-    <>
-      <section className="hidden sm:block">{children}</section>
-      <div className="flex h-full w-full flex-col gap-2 pb-4 sm:hidden">
+      return map;
+    }, [children]);
+
+    if (!isMobile) return children;
+    return (
+      <div className="flex h-full w-full flex-col gap-2 pb-4">
         <Tabs
           variant="bordered"
           color="primary"
@@ -50,15 +56,16 @@ export default function AdaptiveContainer({
             panel: 'p-0 h-full',
           }}
         >
-          {(tab) => {
+          {(tab: MobileTabProps) => {
             return (
-              <Tab key={tab.key} title={tab.key}>
+              <Tab key={tab.key} title={settingsStore.t.main[tab.titleKey]}>
                 {childMap.get(tab.key)}
               </Tab>
             );
           }}
         </Tabs>
       </div>
-    </>
-  );
-}
+    );
+  },
+);
+export default AdaptiveContainer;

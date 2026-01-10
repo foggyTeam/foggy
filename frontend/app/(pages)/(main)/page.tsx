@@ -9,7 +9,10 @@ export default async function MainPage() {
   return (
     <div className="flex h-full max-h-screen w-full flex-col items-center justify-center gap-8 p-4 sm:px-24 sm:py-8">
       <AdaptiveContainer
-        mobileTabs={[{ key: 'allProjects' }, { key: 'allTeams' }]}
+        mobileTabs={[
+          { key: 'allProjects', titleKey: 'myProjects' },
+          { key: 'allTeams', titleKey: 'myTeams' },
+        ]}
       >
         <div
           key="allProjects"
