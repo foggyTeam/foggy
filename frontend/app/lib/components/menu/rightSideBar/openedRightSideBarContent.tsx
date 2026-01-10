@@ -26,10 +26,10 @@ const OpenedRightSideBarContent = observer(
         className="w-full font-medium sm:w-fit sm:pl-0"
         classNames={{
           base: 'w-full max-w-full sm:w-fit overflow-x-auto scrollbar-hide',
-          tabList: 'sm:gap-2 gap-1 w-full min-w-fit  sm:w-fit',
+          tabList: 'gap-1 w-full min-w-fit  sm:w-fit',
           panel: 'sm:py-0 p-0 h-full',
           cursor: 'invisible',
-          tab: 'sm:pl-0 sm:pr-10 px-2',
+          tab: 'sm:pl-0 px-2',
         }}
       >
         <Tab key="projects" title={settingsStore.t.menu.tabs.projects}>

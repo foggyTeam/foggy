@@ -80,7 +80,7 @@ const OpenedRightSideBar = observer(
               <UserCog2Icon className="stroke-default-500" />
             </Button>
           </DrawerHeader>
-          <DrawerBody className="gap-2 py-0">
+          <DrawerBody className="w-full max-w-[356px] gap-2 py-0">
             <OpenedRightSideBarContent
               activeTab={activeTab}
               setActiveTab={setActiveTab}

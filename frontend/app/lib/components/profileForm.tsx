@@ -163,9 +163,13 @@ const ProfileForm = observer((userData: ProfileData) => {
 
   return (
     <>
-      <Form className={'flex w-[736px] min-w-24 flex-col gap-6'}>
+      <Form className="flex w-full flex-col gap-6 sm:w-[736px] sm:min-w-24">
         <div className="items-top flex w-full justify-between gap-2">
           <UploadAvatarButton
+            classNames={{
+              icon: 'w-32 h-32 sm:w-full sm:h-full',
+              avatar: 'w-32 h-32 sm:w-full sm:h-full',
+            }}
             isLoading={isAvatarLoading}
             handleImageUpload={handleImageUpload}
             name={userStore.user?.name as string}
@@ -174,7 +178,7 @@ const ProfileForm = observer((userData: ProfileData) => {
           />
           <Button
             onPress={onSignOut}
-            type={'button'}
+            type="button"
             variant="light"
             size="md"
             color="secondary"
@@ -182,7 +186,7 @@ const ProfileForm = observer((userData: ProfileData) => {
             {settingsStore.t.profile.signOutButton}
           </Button>
         </div>
-        <div className="flex w-full justify-between gap-6">
+        <div className="flex w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
           <div className="flex h-fit w-full flex-col gap-2">
             <Input
               isInvalid={errors.nickname}
@@ -234,7 +238,7 @@ const ProfileForm = observer((userData: ProfileData) => {
             />
           </div>
         </div>
-        <div className="flex w-full justify-between gap-6">
+        <div className="flex w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
           <div className="flex w-full flex-col gap-2">
             <Checkbox
               isSelected={checkboxes.team}
