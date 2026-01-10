@@ -26,7 +26,9 @@ export default function RootLayout({
         className={`${montserrat.className} antialiased`}
       >
         <Providers>
-          <main className="h-screen w-screen">{children}</main>
+          <div className="flex h-screen w-full flex-col overflow-hidden">
+            <main className="w-full flex-1 overflow-hidden">{children}</main>
+          </div>
 
           <BackgroundWrapper />
 

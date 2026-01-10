@@ -6,7 +6,7 @@ import AllTeamProjects from '@/app/lib/components/teams/allTeamProjects';
 
 export default async function TeamPage() {
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-24 py-8">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-8 px-24 py-8">
       <div
         className={clsx(
           'flex h-full min-h-56 w-full flex-col items-center justify-center',

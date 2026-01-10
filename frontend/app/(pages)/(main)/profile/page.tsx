@@ -37,7 +37,7 @@ async function getUserData() {
 export default async function ProfilePage() {
   const userData = await getUserData();
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <div
         className={clsx(
           'flex h-fit w-auto flex-col items-center justify-center',

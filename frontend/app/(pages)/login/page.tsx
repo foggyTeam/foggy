@@ -10,7 +10,7 @@ import FoggySmall from '@/app/lib/components/svg/foggySmall';
 const LoginPage = () => {
   return (
     <>
-      <div className="flex h-screen w-screen items-center justify-center p-4">
+      <div className="flex h-full w-full items-center justify-center p-4">
         <div
           className={clsx(
             'flex h-fit w-full px-4 transition-transform sm:w-fit sm:px-16',
