@@ -33,6 +33,10 @@ html.dark {
   --foreground: #fafafa;
 }
 
+html {
+  background-color: var(--background);
+}
+
 body {
   color: var(--foreground);
   font-family: Montserrat, sans-serif;

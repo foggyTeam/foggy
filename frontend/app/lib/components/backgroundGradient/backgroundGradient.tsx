@@ -234,7 +234,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
 export default function BackgroundGradient() {
   const { isMobile } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
-  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+  const [theme, setTheme] = useState('light');
 
   const [isBoardPage, setIsBoardPage] = useState(false);
   const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
@@ -245,16 +245,18 @@ export default function BackgroundGradient() {
   );
 
   useEffect(() => {
+    setTheme((resolvedTheme as 'light' | 'dark') ?? 'light');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
     setIsBoardPage(!!path.match(boardPageRegex));
   }, [path]);
 
   return (
     <div
       className={clsx(
-        'bg-gradient fixed inset-0 -z-10 h-full w-full overflow-hidden transition-colors',
-        resolvedTheme === 'dark'
-          ? 'bg-default-100 opacity-50'
-          : 'bg-default-200',
+        'bg-gradient fixed inset-0 -z-10 overflow-hidden transition-colors',
+        theme === 'dark' ? 'bg-default-100 opacity-50' : 'bg-default-200',
       )}
     >
       {currentCircles.map((circle, index) => (
