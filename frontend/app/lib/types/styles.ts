@@ -1,5 +1,6 @@
 export const default_padding = 'px-4 py-3 sm:px-6';
 export const default_gap = 'gap-2';
+export const default_text_size = 'sm:font-medium';
 export const container_padding = 'px-1 py-12';
 
 export const bg_container_no_padding: string =

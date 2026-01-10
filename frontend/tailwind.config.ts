@@ -406,10 +406,10 @@ export default {
       },
       layout: {
         fontSize: {
-          tiny: '10px', // text-tiny
-          small: '14px', // text-small
-          medium: '18px', // text-medium
-          large: '20px', // text-large
+          tiny: '0.7em',
+          small: '1em',
+          medium: '1.3em',
+          large: '1.4em',
         },
         disabledOpacity: '0.3',
         radius: {
