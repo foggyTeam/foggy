@@ -7,8 +7,10 @@ import teamsStore from '@/app/stores/teamsStore';
 import { useDisclosure } from '@heroui/modal';
 import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
 import { observer } from 'mobx-react-lite';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AllTeamProjects = observer(() => {
+  const { isMobile } = useAdaptiveParams();
   const {
     isOpen: isCreateProjectOpen,
     onOpen: onCreateProjectOpen,
@@ -18,6 +20,7 @@ const AllTeamProjects = observer(() => {
   return (
     <>
       <ContentSection
+        hideTitle={isMobile}
         sectionTitle={settingsStore.t.team.teamProject.replace(
           '_',
           (teamsStore.activeTeam?.name ?? '').toUpperCase(),

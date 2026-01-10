@@ -6,8 +6,10 @@ import ContentSection from '@/app/lib/components/contentSection';
 import TeamCard from '@/app/lib/components/teams/teamCard';
 import { useDisclosure } from '@heroui/modal';
 import TeamSettingsModal from '@/app/lib/components/teams/teamSettingsModal';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AllTeams = observer(() => {
+  const { isMobile } = useAdaptiveParams();
   const {
     isOpen: isCreateTeamOpen,
     onOpen: onCreateTeamOpen,
@@ -17,6 +19,7 @@ const AllTeams = observer(() => {
   return (
     <>
       <ContentSection
+        hideTitle={isMobile}
         sectionTitle={settingsStore.t.main.myTeams}
         data={teamsStore.allTeams.slice()}
         DataCard={TeamCard}

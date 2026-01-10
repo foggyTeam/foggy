@@ -230,8 +230,8 @@ const ProjectSettingsModal = observer(
           {() =>
             (
               <ModalBody className="flex h-fit w-full max-w-2xl gap-2 p-0">
-                <Form className={'flex h-fit w-full min-w-24 flex-col gap-6'}>
-                  <div className="items-top -mt-12 flex w-1/2 justify-center">
+                <Form className="flex h-fit w-full min-w-24 flex-col gap-6">
+                  <div className="items-top -mt-12 flex w-full justify-center sm:w-1/2">
                     <UploadAvatarButton
                       handleImageUpload={handleImageUpload}
                       name={name}

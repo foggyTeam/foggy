@@ -16,8 +16,10 @@ import {
 import { addToast } from '@heroui/toast';
 import { useRouter } from 'next/navigation';
 import MembersContext from '@/app/lib/hooks/useMembersContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AllProjectMembers = observer(() => {
+  const { isMobile } = useAdaptiveParams();
   const router = useRouter();
   const myRole: Role | null = projectsStore.myRole ?? null;
   const {
@@ -87,6 +89,7 @@ const AllProjectMembers = observer(() => {
         }}
       >
         <ContentSection
+          hideTitle={isMobile}
           sectionTitle={settingsStore.t.projects.projectMembers}
           data={
             projectsStore.activeProject?.members.toSorted(CompareByRole) || []

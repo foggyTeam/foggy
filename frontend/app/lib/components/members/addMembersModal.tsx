@@ -180,13 +180,14 @@ const AddMembersModal = observer(
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
+              <ModalFooter className="flex w-full flex-wrap justify-between gap-4 p-0 pt-2">
                 {/*TODO: add link*/}
                 <Button
                   isLoading={isGeneratingLink}
                   onPress={handleCopyInvitationLink}
                   isDisabled={!role}
                   size="md"
+                  className="w-full sm:w-fit"
                   variant="light"
                 >
                   {settingsStore.t.members.addMember.modalCopyLink}
@@ -196,6 +197,7 @@ const AddMembersModal = observer(
                   isLoading={isLoading}
                   onPress={handleAddMembers}
                   size="md"
+                  className="w-full sm:w-fit"
                   color="primary"
                 >
                   {settingsStore.t.members.addMember.modalSure}

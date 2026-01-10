@@ -25,6 +25,7 @@ import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
 
 interface ContentSectionProps {
   sectionTitle?: string;
+  hideTitle?: boolean;
   sectionAvatar?: string;
   data:
     | Project[]
@@ -90,6 +91,7 @@ function filtersReducer(state: FilterSet, action: FilterReducerAction) {
 // TODO: add loading state
 export default function ContentSection({
   sectionTitle,
+  hideTitle,
   sectionAvatar,
   data,
   DataCard,
@@ -161,7 +163,7 @@ export default function ContentSection({
     <>
       <div className="flex h-full w-full flex-col gap-2 overflow-clip text-sm">
         <div className="flex flex-col gap-1">
-          {sectionTitle && (
+          {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
               {sectionAvatar !== undefined && (
                 <Avatar size="md" name={sectionTitle} src={sectionAvatar} />

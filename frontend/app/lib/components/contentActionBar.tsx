@@ -55,8 +55,8 @@ export default function ContentActionBar({
   };
   return (
     <div className="flex h-fit w-full flex-col gap-2">
-      <div className="flex h-fit w-full items-center justify-between gap-1">
-        <div className="flex gap-1">
+      <div className="flex h-fit w-full items-start justify-between gap-1 sm:items-center">
+        <div className="flex flex-wrap items-center gap-1">
           <Input
             onValueChange={setSearchValue}
             placeholder={settingsStore.t.main.searchPlaceholder}
@@ -64,7 +64,7 @@ export default function ContentActionBar({
             size="sm"
             variant="flat"
             type="text"
-            className="m-0 max-w-64 p-0"
+            className="m-0 w-full p-0 sm:max-w-64"
             classNames={{
               inputWrapper:
                 'shadow-none text-sm bg-[hsl(var(--heroui-background))]',
@@ -120,7 +120,7 @@ export default function ContentActionBar({
           )}
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex h-fit gap-1">
           {addNew !== undefined &&
             (type ? CheckAccess(['admin', 'owner'], type) : true) && (
               <Button onPress={addNew} isIconOnly variant="light" size="sm">

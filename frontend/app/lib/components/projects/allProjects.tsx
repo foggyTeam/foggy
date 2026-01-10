@@ -7,8 +7,10 @@ import { observer } from 'mobx-react-lite';
 import ProjectCard from '@/app/lib/components/projects/projectCard';
 import { useDisclosure } from '@heroui/modal';
 import ProjectSettingsModal from '@/app/lib/components/projects/projectSettingsModal';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AllProjects = observer(() => {
+  const { isMobile } = useAdaptiveParams();
   const {
     isOpen: isCreateProjectOpen,
     onOpen: onCreateProjectOpen,
@@ -18,6 +20,7 @@ const AllProjects = observer(() => {
   return (
     <>
       <ContentSection
+        hideTitle={isMobile}
         sectionTitle={settingsStore.t.main.myProjects}
         data={projectsStore.allProjects.slice()}
         DataCard={ProjectCard}
