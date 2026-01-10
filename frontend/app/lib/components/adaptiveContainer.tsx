@@ -53,12 +53,15 @@ const AdaptiveContainer = observer(
           items={mobileTabs}
           classNames={{
             tabList: 'w-full rounded-xl',
-            panel: 'p-0 h-full',
+            panel: 'p-0 h-full font-medium',
           }}
         >
           {(tab: MobileTabProps) => {
             return (
-              <Tab key={tab.key} title={settingsStore.t.main[tab.titleKey]}>
+              <Tab
+                key={tab.key}
+                title={settingsStore.t.main.mobileTitles[tab.titleKey]}
+              >
                 {childMap.get(tab.key)}
               </Tab>
             );

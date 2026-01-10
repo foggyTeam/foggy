@@ -7,7 +7,7 @@ import { Button } from '@heroui/button';
 import { Avatar } from '@heroui/avatar';
 import { BellIcon, User2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Badge } from '@heroui/badge';
 import notificationsStore from '@/app/stores/notificationsStore';
 import React, { useEffect, useState } from 'react';
@@ -19,6 +19,8 @@ import LocaleSwitcher from '@/app/lib/components/menu/rightBottomBar/localeSwitc
 
 export default function NavBar() {
   const router = useRouter();
+  const path = usePathname();
+
   const { buttonSize, badgeSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
@@ -28,6 +30,9 @@ export default function NavBar() {
   useEffect(() => {
     if (!isMenuOpen) setActiveTab('projects');
   }, [isMenuOpen]);
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [path]);
 
   return (
     <Navbar
@@ -40,7 +45,7 @@ export default function NavBar() {
       )}
     >
       <div className="flex h-12 w-fit items-center gap-6">
-        <NavbarMenuToggle />
+        <NavbarMenuToggle className="text-default-500" />
 
         <Link href="/">
           <FoggySmall height={40} width={40} className="fill-primary" />
@@ -93,12 +98,14 @@ export default function NavBar() {
       </div>
 
       <NavbarMenu>
-        <div className="flex flex-col gap-2 py-8">
-          <OpenedRightSideBarContent
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-          />
-          <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex h-full flex-col justify-between gap-2 py-8">
+          <div className="h-full w-full overflow-x-auto overflow-y-clip">
+            <OpenedRightSideBarContent
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+          </div>
+          <div className="flex h-fit w-full items-center justify-between gap-2">
             <ThemeSwitcher />
             <LocaleSwitcher />
           </div>

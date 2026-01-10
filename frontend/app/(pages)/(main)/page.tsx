@@ -17,9 +17,10 @@ export default async function MainPage() {
         <div
           key="allProjects"
           className={clsx(
-            'flex h-full w-full flex-col items-center justify-center sm:min-h-56',
+            'flex h-full w-full flex-col items-center justify-center',
+            'sm:min-h-56 sm:rounded-bl-[64px] sm:px-8 sm:pt-8',
+            'px-4 pt-4',
             bg_container_no_padding,
-            'px-4 pt-4 sm:rounded-bl-[64px] sm:px-8 sm:pt-8',
           )}
         >
           <AllProjects />
@@ -27,9 +28,10 @@ export default async function MainPage() {
         <div
           key="allTeams"
           className={clsx(
-            'flex h-full w-full flex-col items-center justify-center sm:max-h-72 sm:min-h-52',
+            'flex h-full w-full flex-col items-center justify-center',
+            'sm:max-h-72 sm:min-h-52 sm:rounded-tr-[64px] sm:px-8 sm:pt-8',
+            'px-4 pt-4',
             bg_container_no_padding,
-            'px-4 pt-4 sm:rounded-tr-[64px] sm:px-8 sm:pt-8',
           )}
         >
           <AllTeams />

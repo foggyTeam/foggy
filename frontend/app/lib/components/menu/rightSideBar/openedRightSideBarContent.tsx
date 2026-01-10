@@ -23,11 +23,13 @@ const OpenedRightSideBarContent = observer(
         selectedKey={activeTab}
         onSelectionChange={setActiveTab}
         variant="underlined"
-        className="pl-0 font-medium"
+        className="w-full font-medium sm:w-fit sm:pl-0"
         classNames={{
-          panel: 'py-0',
+          base: 'w-full max-w-full sm:w-fit overflow-x-auto scrollbar-hide',
+          tabList: 'sm:gap-2 gap-1 w-full min-w-fit  sm:w-fit',
+          panel: 'sm:py-0 p-0 h-full',
           cursor: 'invisible',
-          tab: 'pl-0',
+          tab: 'sm:pl-0 sm:pr-10 px-2',
         }}
       >
         <Tab key="projects" title={settingsStore.t.menu.tabs.projects}>
