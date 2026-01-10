@@ -63,16 +63,18 @@ export default async function MainLayout({
       <NotificationsLoader />
       <BoardLoadingCard />
 
-      <section className="hidden sm:block">
-        <LeftSideBar />
-        <RightSideBar />
-      </section>
+      <div className="flex h-full w-full flex-col">
+        <section className="hidden sm:block">
+          <LeftSideBar />
+          <RightSideBar />
+        </section>
 
-      <section className="block sm:hidden">
-        <NavBar />
-      </section>
+        <section className="block sm:hidden">
+          <NavBar />
+        </section>
 
-      {children}
+        <div className="w-full flex-1 overflow-hidden">{children}</div>
+      </div>
     </>
   );
 }
