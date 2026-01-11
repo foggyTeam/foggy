@@ -408,14 +408,14 @@ export default {
         fontSize: {
           tiny: '10px', // text-tiny
           small: '14px', // text-small
-          medium: '18px', // text-medium
+          medium: '16px', // text-medium
           large: '20px', // text-large
         },
         disabledOpacity: '0.3',
         radius: {
           small: '8px', // rounded-small
           medium: '16px', // rounded-medium
-          large: '32px', // rounded-large
+          large: '18px', // rounded-large
         },
         borderWidth: {
           small: '1px', // border-small

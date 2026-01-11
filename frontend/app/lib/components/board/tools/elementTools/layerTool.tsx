@@ -17,7 +17,7 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function LayerTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
 
   const { selectedElement, allToolsDisabled } = useBoardContext();
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
@@ -59,7 +59,7 @@ export default function LayerTool() {
           variant="light"
           color="default"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.layerTool}>
             <LayersIcon className="stroke-default-500" />
@@ -75,7 +75,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size={buttonSize}
+              size={commonSize}
             >
               <ArrowBigDownDashIcon className="stroke-default-500" />
             </Button>
@@ -87,7 +87,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size={buttonSize}
+              size={commonSize}
             >
               <ArrowBigDownIcon className="stroke-default-500" />
             </Button>
@@ -99,7 +99,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size={buttonSize}
+              size={commonSize}
             >
               <ArrowBigUpIcon className="stroke-default-500" />
             </Button>
@@ -111,7 +111,7 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size={buttonSize}
+              size={commonSize}
             >
               <ArrowBigUpDashIcon className="stroke-default-500" />
             </Button>

@@ -8,7 +8,7 @@ import { Skeleton } from '@heroui/skeleton';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function ThemeSwitcher() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme: theme, setTheme } = useTheme();
 
@@ -34,7 +34,7 @@ export default function ThemeSwitcher() {
       onPress={switchTheme}
       isIconOnly
       variant="light"
-      size={buttonSize}
+      size={commonSize}
       color="secondary"
     >
       {theme === 'light' ? (

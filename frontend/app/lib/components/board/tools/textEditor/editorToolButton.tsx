@@ -66,7 +66,7 @@ export default function EditorToolButton({
   popover?: boolean;
   PopoverInnerContent?: any;
 }) {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
@@ -103,7 +103,7 @@ export default function EditorToolButton({
           id={id}
           variant="light"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <Icon
             className={clsx(
@@ -127,7 +127,7 @@ export default function EditorToolButton({
       onPress={() => handleClick(id, value)}
       variant="light"
       isIconOnly
-      size={buttonSize}
+      size={commonSize}
     >
       <Icon
         className={clsx(isAccent ? 'stroke-f_accent' : 'stroke-default-500')}

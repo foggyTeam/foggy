@@ -14,7 +14,7 @@ import debounce from 'lodash/debounce';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EraserTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     toolsDisabled,
@@ -65,7 +65,7 @@ export default function EraserTool() {
         variant={activeTool === 'eraser' ? 'flat' : 'light'}
         color={activeTool === 'eraser' ? 'primary' : 'default'}
         isIconOnly
-        size={buttonSize}
+        size={commonSize}
       >
         <EraserIcon
           className={

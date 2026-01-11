@@ -17,7 +17,7 @@ export default function LineCapTool({
   value: 'butt' | 'round' | 'square';
   setValue: (newValue: 'butt' | 'round' | 'square') => void;
 }) {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const { allToolsDisabled } = useBoardContext();
   const options = {
     round: {
@@ -54,7 +54,7 @@ export default function LineCapTool({
           variant="light"
           color="default"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.pencilCap}>
             {getIcon(value)}

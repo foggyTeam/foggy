@@ -14,8 +14,10 @@ import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
 import { observer } from 'mobx-react-lite';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const RootSectionCard = observer(({ id }: { id: string }) => {
+  const { smallerSize } = useAdaptiveParams();
   const section = projectsStore.getProjectChild(id, []) as ProjectSection;
   const { activeNodes, setActiveNodes, removeNode, addNode } =
     useActiveSectionContext();
@@ -65,7 +67,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           )
         }
         className={clsx(
-          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-1',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-0.5 sm:p-1',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == section.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
@@ -76,7 +78,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
             isIconOnly
             onPress={() => setIsExpanded(!isExpanded)}
             variant="light"
-            size="sm"
+            size={smallerSize}
           >
             <ChevronRightIcon
               className={clsx(
@@ -106,7 +108,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
                 isIconOnly
                 onPress={() => addNode([section.id])}
                 variant="light"
-                size="sm"
+                size={smallerSize}
               >
                 <PlusIcon className="stroke-default-500" />
               </Button>
@@ -115,7 +117,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
                 onPress={() => removeNode(section.id, [], true)}
                 variant="light"
                 color="danger"
-                size="sm"
+                size={smallerSize}
               >
                 <TrashIcon className="stroke-danger-500" />
               </Button>

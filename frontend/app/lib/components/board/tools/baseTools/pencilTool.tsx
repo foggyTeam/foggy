@@ -19,7 +19,7 @@ export default function PencilTool({
 }: {
   pencilParams: PencilParams;
 }) {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     activeTool,
@@ -79,7 +79,7 @@ export default function PencilTool({
         variant={activeTool === 'pencil' ? 'flat' : 'light'}
         color={activeTool === 'pencil' ? 'primary' : 'default'}
         isIconOnly
-        size={buttonSize}
+        size={commonSize}
       >
         <PencilIcon
           className={

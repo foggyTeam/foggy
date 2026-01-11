@@ -25,7 +25,7 @@ export default function EditorToolDropdown({
   handleClick: any;
   isAccent: boolean;
 }) {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const [selectedOption, setSelectedOption] = useState(activeOption);
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function EditorToolDropdown({
       onClose={() => requestAnimationFrame(reset)}
     >
       <DropdownTrigger>
-        <Button id={id} variant="light" isIconOnly size={buttonSize}>
+        <Button id={id} variant="light" isIconOnly size={commonSize}>
           <Icon
             className={clsx(
               isAccent ? 'stroke-f_accent' : 'stroke-default-500',

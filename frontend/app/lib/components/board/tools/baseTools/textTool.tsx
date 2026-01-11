@@ -12,7 +12,7 @@ import useTool from '@/app/lib/hooks/useTool';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function TextTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     activeTool,
@@ -67,7 +67,7 @@ export default function TextTool() {
           variant={activeTool === 'text' ? 'flat' : 'light'}
           color={activeTool === 'text' ? 'primary' : 'default'}
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <TypeIcon
             className={

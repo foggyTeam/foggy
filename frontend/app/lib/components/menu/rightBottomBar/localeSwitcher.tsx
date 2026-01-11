@@ -9,7 +9,7 @@ import { addToast } from '@heroui/toast';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const LocaleSwitcher = observer(() => {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   useEffect(() => {
     try {
       getLocale().then((l) => {
@@ -33,7 +33,7 @@ const LocaleSwitcher = observer(() => {
       isIconOnly
       color="secondary"
       variant="light"
-      size={buttonSize}
+      size={commonSize}
       className="font-semibold"
     >
       {settingsStore.locale.toUpperCase()}

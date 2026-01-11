@@ -13,7 +13,7 @@ import useTool from '@/app/lib/hooks/useTool';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function RectTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     activeTool,
@@ -67,7 +67,7 @@ export default function RectTool() {
         variant={activeTool === 'rect' ? 'flat' : 'light'}
         color={activeTool === 'rect' ? 'primary' : 'default'}
         isIconOnly
-        size={buttonSize}
+        size={commonSize}
       >
         <SquareIcon
           className={

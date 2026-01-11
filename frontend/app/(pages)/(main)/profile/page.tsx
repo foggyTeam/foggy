@@ -42,7 +42,7 @@ export default async function ProfilePage() {
         className={clsx(
           'flex h-full w-full items-start justify-center sm:h-fit sm:w-auto sm:items-center',
           bg_container,
-          'sm:rounded-bl-[64px] sm:px-12',
+          'overflow-y-auto sm:rounded-bl-[64px] sm:px-12',
         )}
       >
         {userData ? <ProfileForm {...userData} /> : <ProfileFormSkeleton />}

@@ -13,9 +13,11 @@ import { Spinner } from '@heroui/spinner';
 import { observer } from 'mobx-react-lite';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const SubSectionCard = observer(
   ({ parentList, id }: { parentList: string[]; id: string }) => {
+    const { smallerSize } = useAdaptiveParams();
     const subSection = projectsStore.getProjectChild(
       id,
       parentList,
@@ -50,7 +52,7 @@ const SubSectionCard = observer(
     return (
       <div
         className={clsx(
-          'flex max-h-16 w-full flex-col items-start justify-start p-1 pr-0 pl-10 transition-all duration-500',
+          'flex max-h-16 w-full flex-col items-start justify-start py-0.5 pr-0 pl-5 transition-all duration-500 sm:py-1 sm:pl-10',
           isExpanded && 'max-h-[1000px]',
         )}
       >
@@ -63,7 +65,7 @@ const SubSectionCard = observer(
             )
           }
           className={clsx(
-            'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0',
+            'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-0.5 pr-0 sm:p-1',
             activeNodes.length &&
               activeNodes.findIndex((node) => node.id == subSection.id) > -1 &&
               'bg-primary-100 hover:bg-primary-100',
@@ -78,7 +80,7 @@ const SubSectionCard = observer(
                 setIsExpanded(!isExpanded);
               }}
               variant="light"
-              size="sm"
+              size={smallerSize}
             >
               <ChevronRightIcon
                 className={clsx(
@@ -104,7 +106,7 @@ const SubSectionCard = observer(
                 isIconOnly
                 onPress={() => addNode([...parentList, subSection.id])}
                 variant="light"
-                size="sm"
+                size={smallerSize}
               >
                 <PlusIcon className="stroke-default-500" />
               </Button>
@@ -122,7 +124,7 @@ const SubSectionCard = observer(
         </div>
         {isExpanded &&
           (subSection.childrenNumber !== subSection.children.size ? (
-            <Spinner className="w-full p-1" size="sm" />
+            <Spinner className="w-full p-1" size={smallerSize} />
           ) : (
             Array.from(subSection.children.values()).map((child) => {
               return 'type' in child ? (

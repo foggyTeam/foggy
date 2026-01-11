@@ -20,6 +20,7 @@ import {
 } from '@/app/lib/server/actions/userServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { useTheme } from 'next-themes';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 enum ButtonAction {
   UNDEFINED,
@@ -28,6 +29,7 @@ enum ButtonAction {
 }
 
 const LoginForm = observer(() => {
+  const { commonSize } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -110,7 +112,7 @@ const LoginForm = observer(() => {
         name="email"
         type="email"
         autoComplete="email"
-        size="md"
+        size={commonSize}
         value={email}
         onValueChange={setEmail}
         endContent={
@@ -121,7 +123,7 @@ const LoginForm = observer(() => {
               type="button"
               onClick={() => setEmail('')}
             >
-              <X className="stroke-default-400" />
+              <X className="stroke-default-500" />
             </button>
           )
         }
@@ -165,7 +167,7 @@ const LoginForm = observer(() => {
             )}
           </div>
         }
-        size="md"
+        size={commonSize}
         autoComplete="current-password"
         classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
@@ -178,7 +180,7 @@ const LoginForm = observer(() => {
           isLoading={signInButtonLoading}
           variant="ghost"
           color="primary"
-          size="md"
+          size={commonSize}
           className="w-full"
         >
           {settingsStore.t.login.signUpButton}
@@ -191,7 +193,7 @@ const LoginForm = observer(() => {
           type="submit"
           variant="solid"
           color="primary"
-          size="md"
+          size={commonSize}
           className="w-full sm:w-fit"
         >
           {settingsStore.t.login.signInButton}
@@ -204,7 +206,7 @@ const LoginForm = observer(() => {
           isIconOnly
           variant="light"
           color="secondary"
-          size="md"
+          size={commonSize}
         >
           <GoogleIcon
             alt="Google"
@@ -213,13 +215,12 @@ const LoginForm = observer(() => {
             stroke={primary[theme].DEFAULT}
           />
         </Button>
-
         <Button
           onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
           isIconOnly
           variant="light"
           color="secondary"
-          size="md"
+          size={commonSize}
         >
           <YandexIcon
             alt="Yandex"

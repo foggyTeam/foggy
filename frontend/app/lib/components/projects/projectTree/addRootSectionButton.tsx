@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { el_animation } from '@/app/lib/types/styles';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function AddRootSectionButton({
   title,
@@ -10,8 +11,10 @@ export default function AddRootSectionButton({
   title: string;
   onPress: any;
 }) {
+  const { commonSize } = useAdaptiveParams();
   return (
     <Button
+      size={commonSize}
       onPress={() => onPress([])}
       className={clsx(
         'flex items-center justify-start rounded-2xl',

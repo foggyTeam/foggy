@@ -13,6 +13,7 @@ import FunnelIcon from '@/app/lib/components/svg/funnelIcon';
 import AllFilters from '@/app/lib/components/filters/allFilters';
 import { FilterSet } from '@/app/lib/types/definitions';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export interface ActionBarProps {
   setSearchValue: any;
@@ -45,6 +46,7 @@ export default function ContentActionBar({
   openSettings,
   type,
 }: ActionBarProps) {
+  const { smallerSize } = useAdaptiveParams();
   const hasFilters = () => {
     return [
       filters?.role?.size,
@@ -61,7 +63,7 @@ export default function ContentActionBar({
             onValueChange={setSearchValue}
             placeholder={settingsStore.t.main.searchPlaceholder}
             radius="full"
-            size="sm"
+            size={smallerSize}
             variant="flat"
             type="text"
             className="m-0 w-full p-0 sm:max-w-64"
@@ -79,7 +81,7 @@ export default function ContentActionBar({
               isIconOnly
               variant={hasFilters() ? 'flat' : 'light'}
               color={hasFilters() ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <FunnelIcon
                 className={
@@ -94,7 +96,7 @@ export default function ContentActionBar({
               isIconOnly
               variant={favorite ? 'flat' : 'light'}
               color={favorite ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <StarIcon
                 className={
@@ -109,7 +111,7 @@ export default function ContentActionBar({
               isIconOnly
               variant={withNotification ? 'flat' : 'light'}
               color={withNotification ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <BellIcon
                 className={
@@ -123,12 +125,22 @@ export default function ContentActionBar({
         <div className="flex h-fit gap-1">
           {addNew !== undefined &&
             (type ? CheckAccess(['admin', 'owner'], type) : true) && (
-              <Button onPress={addNew} isIconOnly variant="light" size="sm">
+              <Button
+                onPress={addNew}
+                isIconOnly
+                variant="light"
+                size={smallerSize}
+              >
                 <PlusIcon className="stroke-default-500" />
               </Button>
             )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
-            <Button onPress={addMember} isIconOnly variant="light" size="sm">
+            <Button
+              onPress={addMember}
+              isIconOnly
+              variant="light"
+              size={smallerSize}
+            >
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
@@ -138,7 +150,7 @@ export default function ContentActionBar({
                 onPress={openSettings}
                 isIconOnly
                 variant="light"
-                size="sm"
+                size={smallerSize}
               >
                 <SettingsIcon className="stroke-default-500" />
               </Button>

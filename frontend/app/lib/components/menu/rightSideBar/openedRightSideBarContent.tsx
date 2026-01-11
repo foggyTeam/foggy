@@ -8,6 +8,7 @@ import RightSideBarElementCard from '@/app/lib/components/menu/rightSideBar/righ
 import React, { Dispatch, SetStateAction } from 'react';
 import teamsStore from '@/app/stores/teamsStore';
 import AllNotifications from '@/app/lib/components/notifications/allNotifications';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const OpenedRightSideBarContent = observer(
   ({
@@ -17,8 +18,10 @@ const OpenedRightSideBarContent = observer(
     activeTab: 'projects' | 'teams' | 'notifications';
     setActiveTab: Dispatch<SetStateAction<any>>;
   }) => {
+    const { commonSize } = useAdaptiveParams();
     return (
       <Tabs
+        size={commonSize}
         defaultSelectedKey={activeTab}
         selectedKey={activeTab}
         onSelectionChange={setActiveTab}

@@ -13,7 +13,7 @@ import useTool from '@/app/lib/hooks/useTool';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EllipseTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     toolsDisabled,
@@ -67,7 +67,7 @@ export default function EllipseTool() {
         variant={activeTool === 'ellipse' ? 'flat' : 'light'}
         color={activeTool === 'ellipse' ? 'primary' : 'default'}
         isIconOnly
-        size={buttonSize}
+        size={commonSize}
       >
         <CircleIcon
           className={

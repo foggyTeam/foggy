@@ -18,7 +18,7 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function SizeTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
 
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
@@ -77,7 +77,7 @@ export default function SizeTool() {
           variant="light"
           color="default"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.sizeTool}>
             <RulerIcon className="stroke-default-500" />

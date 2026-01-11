@@ -6,7 +6,7 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function DeleteTool() {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
 
   const { selectedElement, removeElement, allToolsDisabled } =
     useBoardContext();
@@ -17,7 +17,7 @@ export default function DeleteTool() {
       variant="light"
       color="danger"
       isIconOnly
-      size={buttonSize}
+      size={commonSize}
     >
       <FTooltip content={settingsStore.t.toolTips.tools.deleteTool}>
         <TrashIcon className="stroke-danger-500" />

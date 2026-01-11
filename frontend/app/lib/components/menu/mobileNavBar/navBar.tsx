@@ -21,7 +21,7 @@ export default function NavBar() {
   const router = useRouter();
   const path = usePathname();
 
-  const { buttonSize, badgeSize } = useAdaptiveParams();
+  const { commonSize, smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'projects' | 'teams' | 'notifications'
@@ -41,11 +41,11 @@ export default function NavBar() {
       onMenuOpenChange={setIsMenuOpen}
       className={clsx(
         bg_container_no_padding,
-        'border-x-none rounded-t-none rounded-b-none border-t-0 px-4 py-3',
+        'border-x-none rounded-t-none rounded-b-none border-t-0 py-3',
       )}
     >
-      <div className="flex h-12 w-fit items-center gap-6">
-        <NavbarMenuToggle className="text-default-500" />
+      <div className="flex h-12 w-fit items-center gap-2">
+        <NavbarMenuToggle className="text-default-600 px-6 font-black" />
 
         <Link href="/">
           <FoggySmall height={40} width={40} className="fill-primary" />
@@ -56,7 +56,7 @@ export default function NavBar() {
         <Badge
           showOutline={false}
           isInvisible={!notificationsStore.unreadNumber}
-          size={badgeSize}
+          size={smallerSize}
           color="success"
           content={
             notificationsStore.unreadNumber < 100
@@ -73,9 +73,9 @@ export default function NavBar() {
             }}
             isIconOnly
             variant="light"
-            size={buttonSize}
+            size={commonSize}
           >
-            <BellIcon className="stroke-default-500" />
+            <BellIcon className="stroke-default-600" />
           </Button>
         </Badge>
 

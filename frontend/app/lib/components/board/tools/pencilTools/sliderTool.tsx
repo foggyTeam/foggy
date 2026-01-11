@@ -18,7 +18,7 @@ export default function SliderTool({
   value: number;
   setValue: (newValue: number) => void;
 }) {
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
   const { allToolsDisabled } = useBoardContext();
   const boundary = {
     width: { min: 1, max: 20, step: 0.5 },
@@ -33,7 +33,7 @@ export default function SliderTool({
           variant="light"
           color="default"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           {type === 'width' ? (
             <FTooltip content={settingsStore.t.toolTips.tools.pencilWidth}>
@@ -64,7 +64,7 @@ export default function SliderTool({
           minValue={boundary[type].min}
           step={boundary[type].step}
           className="h-24"
-          size={buttonSize}
+          size={commonSize}
           orientation="vertical"
           showOutline
           showTooltip

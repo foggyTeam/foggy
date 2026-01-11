@@ -58,7 +58,7 @@ export default function BoardCard({
           `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
         );
       }}
-      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0 pl-10"
+      className="flex max-h-16 w-full items-center justify-between gap-2 p-0.5 pr-0 pl-5 sm:p-1 sm:pl-10"
     >
       <div
         onClick={(event) =>
@@ -69,7 +69,7 @@ export default function BoardCard({
           )
         }
         className={clsx(
-          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-0.5 pr-0 transition-colors sm:p-1',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == board.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',

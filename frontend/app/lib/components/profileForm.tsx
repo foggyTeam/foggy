@@ -23,8 +23,10 @@ import {
   UpdateUserData,
 } from '@/app/lib/server/actions/userServerActions';
 import { addToast } from '@heroui/toast';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const ProfileForm = observer((userData: ProfileData) => {
+  const { smallerSize, commonSize } = useAdaptiveParams();
   const [isSaving, setIsSaving] = useState(false);
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -164,7 +166,7 @@ const ProfileForm = observer((userData: ProfileData) => {
   return (
     <>
       <Form className="flex w-full flex-col gap-6 sm:w-[736px] sm:min-w-24">
-        <div className="items-top flex w-full justify-between gap-2">
+        <div className="items-top flex h-fit w-full justify-between gap-2">
           <UploadAvatarButton
             classNames={{
               icon: 'w-32 h-32 sm:w-full sm:h-full',
@@ -180,13 +182,13 @@ const ProfileForm = observer((userData: ProfileData) => {
             onPress={onSignOut}
             type="button"
             variant="light"
-            size="md"
+            size={commonSize}
             color="secondary"
           >
             {settingsStore.t.profile.signOutButton}
           </Button>
         </div>
-        <div className="flex w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
+        <div className="flex h-fit w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
           <div className="flex h-fit w-full flex-col gap-2">
             <Input
               isInvalid={errors.nickname}
@@ -196,7 +198,7 @@ const ProfileForm = observer((userData: ProfileData) => {
               name="nickname"
               type="nickname"
               autoComplete="nickname"
-              size="md"
+              size={commonSize}
               value={nickname}
               onValueChange={setNickname}
               classNames={{
@@ -212,7 +214,7 @@ const ProfileForm = observer((userData: ProfileData) => {
               name="email"
               type="email"
               autoComplete="email"
-              size="md"
+              size={commonSize}
               value={email}
               classNames={{
                 inputWrapper: 'bg-[hsl(var(--heroui-background))]',
@@ -229,7 +231,7 @@ const ProfileForm = observer((userData: ProfileData) => {
               name="about"
               type="about"
               autoComplete="about"
-              size="md"
+              size={commonSize}
               value={about}
               onValueChange={setAbout}
               classNames={{
@@ -238,14 +240,14 @@ const ProfileForm = observer((userData: ProfileData) => {
             />
           </div>
         </div>
-        <div className="flex w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
+        <div className="flex h-fit w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
           <div className="flex w-full flex-col gap-2">
             <Checkbox
               isSelected={checkboxes.team}
               onValueChange={(value) =>
                 setCheckboxes({ ...checkboxes, team: value })
               }
-              size="sm"
+              size={smallerSize}
             >
               {settingsStore.t.profile.teamInvitations}
             </Checkbox>
@@ -254,7 +256,7 @@ const ProfileForm = observer((userData: ProfileData) => {
               onValueChange={(value) =>
                 setCheckboxes({ ...checkboxes, project: value })
               }
-              size="sm"
+              size={smallerSize}
             >
               {settingsStore.t.profile.projectNotifications}
             </Checkbox>
@@ -266,19 +268,20 @@ const ProfileForm = observer((userData: ProfileData) => {
               onValueChange={(value) =>
                 setCheckboxes({ ...checkboxes, email: value })
               }
-              size="sm"
+              size={smallerSize}
             >
               {settingsStore.t.profile.emailNotifications}
             </Checkbox>
           </div>
         </div>
-        <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex h-fit w-full flex-col items-center gap-2 sm:flex-row sm:justify-between">
           <FButton
             onPress={onOpen}
             type={'button'}
             variant="bordered"
             color="danger"
-            size="md"
+            className="w-full sm:w-fit"
+            size={commonSize}
           >
             {settingsStore.t.profile.deleteButton}
           </FButton>
@@ -287,8 +290,9 @@ const ProfileForm = observer((userData: ProfileData) => {
             isLoading={isSaving}
             onPress={onSubmit}
             variant="solid"
+            className="w-full sm:w-fit"
             color="primary"
-            size="md"
+            size={commonSize}
           >
             {settingsStore.t.profile.saveButton}
           </FButton>

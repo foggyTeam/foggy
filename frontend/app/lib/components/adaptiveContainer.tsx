@@ -19,7 +19,7 @@ const AdaptiveContainer = observer(
     children: React.ReactNode;
     mobileTabs: MobileTabProps[];
   }>) => {
-    const { isMobile } = useAdaptiveParams();
+    const { isMobile, commonSize } = useAdaptiveParams();
 
     const childMap = useMemo(() => {
       const map = new Map<string, ReactElement>();
@@ -47,6 +47,7 @@ const AdaptiveContainer = observer(
     return (
       <div className="flex h-full w-full flex-col gap-2 pb-4">
         <Tabs
+          size={commonSize}
           variant="bordered"
           color="primary"
           aria-label="Tabs"

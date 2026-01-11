@@ -17,7 +17,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function FillTool() {
   const { resolvedTheme } = useTheme();
-  const { buttonSize } = useAdaptiveParams();
+  const { commonSize } = useAdaptiveParams();
 
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -71,7 +71,7 @@ export default function FillTool() {
           variant="light"
           color="default"
           isIconOnly
-          size={buttonSize}
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.fillTool}>
             <CircleIcon

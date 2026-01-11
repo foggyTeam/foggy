@@ -12,8 +12,10 @@ import settingsStore from '@/app/stores/settingsStore';
 import React from 'react';
 import ProjectTree from '@/app/lib/components/projects/projectTree/projectTree';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const ProjectStructure = observer(() => {
+  const { commonSize } = useAdaptiveParams();
   const {
     isOpen: isSettingsOpen,
     onOpen: onSettingsOpen,
@@ -37,7 +39,12 @@ const ProjectStructure = observer(() => {
               </h1>
             </div>
             {CheckAccess(['admin', 'owner'], 'project') && (
-              <Button onPress={onSettingsOpen} isIconOnly variant="light">
+              <Button
+                size={commonSize}
+                onPress={onSettingsOpen}
+                isIconOnly
+                variant="light"
+              >
                 <SettingsIcon className="stroke-default-500" />
               </Button>
             )}
