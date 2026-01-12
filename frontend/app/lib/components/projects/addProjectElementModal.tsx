@@ -46,7 +46,12 @@ export default function AddProjectElementModal({
   }, [name, setError]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
         {(onClose) =>
           (

@@ -33,7 +33,12 @@ export default function NotificationCardModal({
   const { onAnswer } = useContext(NotificationsContext);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-full max-w-lg gap-2 p-6">
         {() => (
           <>

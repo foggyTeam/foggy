@@ -164,7 +164,12 @@ export default function FilterModal({
   ]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-full max-w-2xl gap-2 p-6 sm:w-fit">
         {() =>
           (

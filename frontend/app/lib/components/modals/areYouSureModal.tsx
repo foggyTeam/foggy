@@ -28,7 +28,12 @@ export default function AreYouSureModal({
 }) {
   const { commonSize } = useAdaptiveParams();
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent>
         {(onClose) =>
           (

@@ -49,7 +49,12 @@ export default function ChangeRoleModal({
   }, [newRole, changeType, submitRoleType, submitRole]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-2xl gap-4 p-6">
         {(onClose) =>
           (

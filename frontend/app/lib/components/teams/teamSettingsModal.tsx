@@ -207,7 +207,12 @@ const TeamSettingsModal = observer(
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-md gap-2 overflow-visible p-6">
           {() =>
             (

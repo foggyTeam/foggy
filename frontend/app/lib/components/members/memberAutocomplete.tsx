@@ -76,6 +76,7 @@ export default function MemberAutocomplete({
             bg_container_no_padding,
             'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/90 border-default',
           ),
+          input: 'sm:text-small text-medium',
         }}
         listboxProps={{
           selectionMode: 'multiple',

@@ -116,7 +116,12 @@ const AddMembersModal = observer(
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-lg gap-2 p-6">
           {() => (
             <>
@@ -129,14 +134,14 @@ const AddMembersModal = observer(
                   memberType={type}
                   setSelectedId={setSelectedMembers}
                 />
-                <div className="flex w-full flex-nowrap justify-between gap-2">
+                <div className="flex w-full flex-col flex-nowrap justify-between gap-2 sm:flex-row">
                   <SelectRole
                     role={role}
                     setRole={setRole}
-                    style={'bordered'}
-                    className={'w-48'}
+                    style="bordered"
+                    className="w-full sm:w-48"
                   />
-                  <div className="flex w-fit items-center gap-1">
+                  <div className="flex w-full items-center gap-1 sm:w-fit">
                     <div className="flex items-center gap-1">
                       <HistoryIcon className="stroke-default-600" />
                       <p className="text-medium sm:text-sm">
