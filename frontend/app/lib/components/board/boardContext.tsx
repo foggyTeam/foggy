@@ -2,6 +2,7 @@
 
 import React, {
   createContext,
+  MutableRefObject,
   ReactNode,
   RefObject,
   useContext,
@@ -25,6 +26,7 @@ import { observer } from 'mobx-react-lite';
 
 interface BoardContextProps {
   stageRef: RefObject<null | Konva.Stage>;
+  updateGridRef: MutableRefObject<(() => void) | null>;
   // ZOOM
   scale: number;
   setScale: (scale: number) => void;
@@ -56,6 +58,8 @@ const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 export const BoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
     const stageRef: RefObject<null | Konva.Stage> = useRef(null);
+    const updateGridRef = useRef<(() => void) | null>(null);
+
     // ZOOM
     const [scale, setScale] = useState(1);
     // TRANSFORMER
@@ -197,6 +201,7 @@ export const BoardProvider = observer(
       <BoardContext.Provider
         value={{
           stageRef,
+          updateGridRef,
           // ZOOM
           scale,
           setScale,

@@ -9,6 +9,7 @@ export default function UseBoardZoom(
   scale: number,
   setScale: any,
 ) {
+  const { updateGridRef } = useBoardContext();
   useEffect(() => {
     const stage = stageRef.current;
     if (stage) {
@@ -42,6 +43,10 @@ export default function UseBoardZoom(
             };
             stage.position(newPos);
             stage.batchDraw();
+
+            if (updateGridRef.current) {
+              updateGridRef.current();
+            }
           }
         }
       };
