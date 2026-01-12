@@ -80,7 +80,7 @@ export default function SizeTool() {
           size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.sizeTool}>
-            <RulerIcon className="stroke-default-500" />
+            <RulerIcon className="stroke-default-600" />
           </FTooltip>
         </Button>
       </PopoverTrigger>
@@ -96,7 +96,7 @@ export default function SizeTool() {
             maxValue={512}
             value={width}
             onValueChange={setWidth}
-            startContent={<MoveHorizontalIcon className="stroke-default-500" />}
+            startContent={<MoveHorizontalIcon className="stroke-default-600" />}
             label={settingsStore.t.toolBar.width}
             className="max-w-32"
           />
@@ -105,7 +105,7 @@ export default function SizeTool() {
             maxValue={512}
             value={height}
             onValueChange={setHeight}
-            startContent={<MoveVerticalIcon className="stroke-default-500" />}
+            startContent={<MoveVerticalIcon className="stroke-default-600" />}
             label={settingsStore.t.toolBar.height}
             className="max-w-32"
           />
@@ -116,7 +116,7 @@ export default function SizeTool() {
             maxValue={128}
             value={cornerRadius}
             onValueChange={setCornerRadius}
-            startContent={<ScanIcon className="stroke-default-500" />}
+            startContent={<ScanIcon className="stroke-default-600" />}
             label={settingsStore.t.toolBar.cornerRadius}
             className="max-w-32"
           />
@@ -125,7 +125,7 @@ export default function SizeTool() {
             maxValue={359}
             value={rotation}
             onValueChange={setRotation}
-            startContent={<RefreshCwIcon className="stroke-default-500" />}
+            startContent={<RefreshCwIcon className="stroke-default-600" />}
             label={settingsStore.t.toolBar.rotation}
             className="max-w-32"
           />

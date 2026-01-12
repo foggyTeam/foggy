@@ -55,7 +55,7 @@ export default function EditorToolDropdown({
         <Button id={id} variant="light" isIconOnly size={commonSize}>
           <Icon
             className={clsx(
-              isAccent ? 'stroke-f_accent' : 'stroke-default-500',
+              isAccent ? 'stroke-f_accent' : 'stroke-default-600',
             )}
           />
         </Button>
@@ -80,7 +80,7 @@ export default function EditorToolDropdown({
                   className={clsx(
                     activeOption == value
                       ? 'stroke-f_accent'
-                      : 'stroke-default-500',
+                      : 'stroke-default-600',
                   )}
                 />
               }

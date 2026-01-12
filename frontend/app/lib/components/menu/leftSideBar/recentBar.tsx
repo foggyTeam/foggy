@@ -51,7 +51,7 @@ const RecentBar = observer(
           ))}
 
           <Button onPress={onAddOpen} isIconOnly variant="light" size="md">
-            <PlusIcon className="stroke-default-500" />
+            <PlusIcon className="stroke-default-600" />
           </Button>
         </div>
       </>

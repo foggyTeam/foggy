@@ -77,7 +77,7 @@ const OpenedRightSideBar = observer(
               variant="light"
               size="md"
             >
-              <UserCog2Icon className="stroke-default-500" />
+              <UserCog2Icon className="stroke-default-600" />
             </Button>
           </DrawerHeader>
           <DrawerBody className="w-full max-w-[356px] gap-2 py-0">

@@ -62,7 +62,7 @@ export default function LayerTool() {
           size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.layerTool}>
-            <LayersIcon className="stroke-default-500" />
+            <LayersIcon className="stroke-default-600" />
           </FTooltip>
         </Button>
       </PopoverTrigger>
@@ -77,7 +77,7 @@ export default function LayerTool() {
               isIconOnly
               size={commonSize}
             >
-              <ArrowBigDownDashIcon className="stroke-default-500" />
+              <ArrowBigDownDashIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerBack}>
@@ -89,7 +89,7 @@ export default function LayerTool() {
               isIconOnly
               size={commonSize}
             >
-              <ArrowBigDownIcon className="stroke-default-500" />
+              <ArrowBigDownIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerForward}>
@@ -101,7 +101,7 @@ export default function LayerTool() {
               isIconOnly
               size={commonSize}
             >
-              <ArrowBigUpIcon className="stroke-default-500" />
+              <ArrowBigUpIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerTop}>
@@ -113,7 +113,7 @@ export default function LayerTool() {
               isIconOnly
               size={commonSize}
             >
-              <ArrowBigUpDashIcon className="stroke-default-500" />
+              <ArrowBigUpDashIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
         </div>

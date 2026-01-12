@@ -71,7 +71,7 @@ export default function EraserTool() {
           className={
             activeTool === 'eraser'
               ? 'stroke-primary-500'
-              : 'stroke-default-500'
+              : 'stroke-default-600'
           }
         />
       </Button>

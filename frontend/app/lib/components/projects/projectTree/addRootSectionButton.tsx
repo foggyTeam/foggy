@@ -23,7 +23,7 @@ export default function AddRootSectionButton({
         el_animation,
       )}
     >
-      <PlusIcon className="stroke-default-500 m-2" />
+      <PlusIcon className="stroke-default-600 m-2" />
 
       <p>{title}...</p>
     </Button>

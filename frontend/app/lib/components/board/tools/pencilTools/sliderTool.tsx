@@ -39,12 +39,12 @@ export default function SliderTool({
             <FTooltip content={settingsStore.t.toolTips.tools.pencilWidth}>
               <DotIcon
                 strokeWidth={value - boundary.width.min}
-                className="fill-default-500 stroke-default-500"
+                className="fill-default-500 stroke-default-600"
               />
             </FTooltip>
           ) : (
             <FTooltip content={settingsStore.t.toolTips.tools.pencilTension}>
-              <AudioWaveformIcon className="stroke-default-500" />
+              <AudioWaveformIcon className="stroke-default-600" />
             </FTooltip>
           )}
         </Button>

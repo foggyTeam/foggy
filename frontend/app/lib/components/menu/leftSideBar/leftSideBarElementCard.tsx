@@ -38,7 +38,7 @@ export default function LeftSideBarElementCard({
           <>
             {'children' in element && (
               <Button isIconOnly onPress={addNode} variant="light" size="sm">
-                <PlusIcon className="stroke-default-500" />
+                <PlusIcon className="stroke-default-600" />
               </Button>
             )}
             <Button

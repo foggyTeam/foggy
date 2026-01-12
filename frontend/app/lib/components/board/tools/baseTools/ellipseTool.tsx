@@ -73,7 +73,7 @@ export default function EllipseTool() {
           className={
             activeTool === 'ellipse'
               ? 'stroke-primary-500'
-              : 'stroke-default-500'
+              : 'stroke-default-600'
           }
         />
       </Button>

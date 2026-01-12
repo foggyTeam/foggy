@@ -267,7 +267,7 @@ const OpenedLeftSideBar = observer(
                   variant="light"
                   size="md"
                 >
-                  <SettingsIcon className="stroke-default-500" />
+                  <SettingsIcon className="stroke-default-600" />
                 </Button>
               </div>
               <div

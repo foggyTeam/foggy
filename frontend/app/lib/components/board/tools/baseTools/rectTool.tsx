@@ -71,7 +71,7 @@ export default function RectTool() {
       >
         <SquareIcon
           className={
-            activeTool === 'rect' ? 'stroke-primary-500' : 'stroke-default-500'
+            activeTool === 'rect' ? 'stroke-primary-500' : 'stroke-default-600'
           }
         />
       </Button>

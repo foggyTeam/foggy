@@ -138,7 +138,7 @@ const AddMembersModal = observer(
                   />
                   <div className="flex w-fit items-center gap-1">
                     <div className="flex items-center gap-1">
-                      <HistoryIcon className="stroke-default-500" />
+                      <HistoryIcon className="stroke-default-600" />
                       <p className="text-medium sm:text-sm">
                         {settingsStore.t.members.addMember.expiresIn}
                       </p>

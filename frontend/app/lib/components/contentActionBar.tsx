@@ -72,7 +72,7 @@ export default function ContentActionBar({
                 'shadow-none sm:text-sm text-medium bg-[hsl(var(--heroui-background))]',
               input: 'sm:text-sm text-medium',
             }}
-            endContent={<SearchIcon className="stroke-default-500" />}
+            endContent={<SearchIcon className="stroke-default-600" />}
           />
           {dispatchFilters !== undefined && (
             <Button
@@ -85,7 +85,7 @@ export default function ContentActionBar({
             >
               <FunnelIcon
                 className={
-                  hasFilters() ? 'stroke-primary-500' : 'stroke-default-300'
+                  hasFilters() ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
@@ -100,7 +100,7 @@ export default function ContentActionBar({
             >
               <StarIcon
                 className={
-                  favorite ? 'stroke-primary-500' : 'stroke-default-300'
+                  favorite ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
@@ -115,7 +115,7 @@ export default function ContentActionBar({
             >
               <BellIcon
                 className={
-                  withNotification ? 'stroke-primary-500' : 'stroke-default-300'
+                  withNotification ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
@@ -131,7 +131,7 @@ export default function ContentActionBar({
                 variant="light"
                 size={smallerSize}
               >
-                <PlusIcon className="stroke-default-500" />
+                <PlusIcon className="stroke-default-600" />
               </Button>
             )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
@@ -141,7 +141,7 @@ export default function ContentActionBar({
               variant="light"
               size={smallerSize}
             >
-              <UserRoundPlusIcon className="stroke-default-500" />
+              <UserRoundPlusIcon className="stroke-default-600" />
             </Button>
           )}
           {openSettings !== undefined &&
@@ -152,7 +152,7 @@ export default function ContentActionBar({
                 variant="light"
                 size={smallerSize}
               >
-                <SettingsIcon className="stroke-default-500" />
+                <SettingsIcon className="stroke-default-600" />
               </Button>
             )}
         </div>

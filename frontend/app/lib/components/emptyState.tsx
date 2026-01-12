@@ -82,13 +82,13 @@ export default function EmptyState({
             'line-clamp-1 w-full text-center',
             size === 'full'
               ? 'text-primary text-6xl font-extrabold'
-              : 'text-primary-900 text-small font-medium',
+              : 'text-primary-900 sm:text-small text-medium font-medium',
           )}
         >
           {title.toUpperCase()}
         </p>
         {text && (
-          <p className="text-default-500 text-small w-full text-center">
+          <p className="text-default-500 sm:text-small text-medium w-full text-center">
             {text}
           </p>
         )}

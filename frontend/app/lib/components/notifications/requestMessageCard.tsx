@@ -47,7 +47,7 @@ export default function RequestMessageCard({
             radius="full"
             size={smallerSize}
           >
-            <MoveDiagonalIcon className="stroke-default-400 hover:stroke-default-500 transition-colors" />
+            <MoveDiagonalIcon className="stroke-default-400 hover:stroke-default-600 transition-colors" />
           </Button>
         )}
       </div>

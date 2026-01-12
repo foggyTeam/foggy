@@ -85,7 +85,7 @@ export default function PencilTool({
           className={
             activeTool === 'pencil'
               ? 'stroke-primary-500'
-              : 'stroke-default-500'
+              : 'stroke-default-600'
           }
         />
       </Button>

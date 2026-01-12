@@ -84,7 +84,7 @@ export default function MemberAutocomplete({
         placeholder={
           settingsStore.t.members.addMember.searchPlaceholder[memberType]
         }
-        selectorIcon={<SearchIcon className="stroke-default-500" />}
+        selectorIcon={<SearchIcon className="stroke-default-600" />}
         allowsCustomValue
         menuTrigger="input"
         scrollRef={scrollerRef}
@@ -108,7 +108,7 @@ export default function MemberAutocomplete({
                   />
                   {selectedMembers.find(
                     (selectedMember) => selectedMember.id === member.id,
-                  ) && <CheckIcon className="stroke-default-500" />}
+                  ) && <CheckIcon className="stroke-default-600" />}
                 </div>
               </AutocompleteItem>
             ) as any,

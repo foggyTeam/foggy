@@ -82,7 +82,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           >
             <ChevronRightIcon
               className={clsx(
-                'stroke-default-500 transition-transform',
+                'stroke-default-600 transition-transform',
                 isExpanded && 'rotate-90',
               )}
             />
@@ -110,7 +110,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
                 variant="light"
                 size={smallerSize}
               >
-                <PlusIcon className="stroke-default-500" />
+                <PlusIcon className="stroke-default-600" />
               </Button>
               <Button
                 isIconOnly

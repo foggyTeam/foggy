@@ -39,7 +39,7 @@ export default function LineCapTool({
     return (
       <Icon
         className={clsx(
-          'fill-default-500 stroke-default-500',
+          'fill-default-600 stroke-default-600',
           value !== 'butt' && 'scale-x-75',
         )}
       />

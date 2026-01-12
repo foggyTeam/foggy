@@ -123,7 +123,7 @@ const LoginForm = observer(() => {
               type="button"
               onClick={() => setEmail('')}
             >
-              <X className="stroke-default-500" />
+              <X className="stroke-default-600" />
             </button>
           )
         }
@@ -150,9 +150,9 @@ const LoginForm = observer(() => {
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
               {passwordVisible ? (
-                <Eye className="stroke-default-500" />
+                <Eye className="stroke-default-600" />
               ) : (
-                <EyeClosed className="stroke-default-500" />
+                <EyeClosed className="stroke-default-600" />
               )}
             </button>
             {password && (
