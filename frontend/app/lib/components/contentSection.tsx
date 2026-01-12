@@ -22,6 +22,7 @@ import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 interface ContentSectionProps {
   sectionTitle?: string;
@@ -104,6 +105,7 @@ export default function ContentSection({
   openSettings,
   type,
 }: ContentSectionProps) {
+  const { isMobile } = useAdaptiveParams();
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
     filtersReducer,
@@ -191,7 +193,9 @@ export default function ContentSection({
             <div
               className="grid-rows-auto grid content-between gap-y-2 pb-16"
               style={{
-                gridTemplateColumns: 'sm:repeat(auto-fill, 97px) 1fr',
+                gridTemplateColumns: isMobile
+                  ? '1fr'
+                  : 'repeat(auto-fill, 97px)',
               }}
             >
               {filteredData.map((element) => (
