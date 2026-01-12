@@ -45,7 +45,7 @@ const AdaptiveContainer = observer(
 
     if (!isMobile) return children;
     return (
-      <div className="flex h-full w-full flex-col gap-2 pb-4">
+      <div className="flex h-full max-h-full w-full flex-col gap-2 pb-4">
         <Tabs
           size={commonSize}
           variant="bordered"
@@ -54,7 +54,7 @@ const AdaptiveContainer = observer(
           items={mobileTabs}
           classNames={{
             tabList: 'w-full rounded-xl',
-            panel: 'p-0 h-full font-medium',
+            panel: 'p-0 min-h-0 flex-1 font-medium overflow-clip',
           }}
         >
           {(tab: MobileTabProps) => {

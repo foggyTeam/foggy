@@ -14,6 +14,7 @@ import RequestMessageCard from '@/app/lib/components/notifications/requestMessag
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { Avatar } from '@heroui/avatar';
 import SelectRole from '@/app/lib/components/members/selectRole';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function NotificationCardModal({
   notification,
@@ -28,6 +29,7 @@ export default function NotificationCardModal({
   isOpen: boolean;
   onOpenChange: () => void;
 }) {
+  const { commonSize } = useAdaptiveParams();
   const { onAnswer } = useContext(NotificationsContext);
 
   return (
@@ -91,7 +93,7 @@ export default function NotificationCardModal({
                     onPress={() =>
                       onAnswer(notification.id, notification.type, false)
                     }
-                    size="md"
+                    size={commonSize}
                     variant="bordered"
                     color="danger"
                   >
@@ -115,7 +117,7 @@ export default function NotificationCardModal({
                     onPress={() =>
                       onAnswer(notification.id, notification.type, true, role)
                     }
-                    size="md"
+                    size={commonSize}
                     variant="flat"
                     color="success"
                   >

@@ -16,7 +16,7 @@ export default function TeamCard(team: Team) {
       className={clsx(
         'hover:bg-default-50 accent-link hover:accent-link-hover shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
         el_animation,
-        'h-16 w-[379px] cursor-pointer',
+        'h-16 w-full cursor-pointer sm:w-[379px]',
         team_tile,
       )}
     >

@@ -9,6 +9,7 @@ import { ProjectMember, Team, TeamMember } from '@/app/lib/types/definitions';
 import FilterCard from '@/app/lib/components/filters/filterCard';
 import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
 import { useMembersList } from '@/app/lib/hooks/useMembersList';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function MemberAutocomplete({
   setSelectedId,
@@ -19,6 +20,7 @@ export default function MemberAutocomplete({
   ) => void;
   memberType: 'project' | 'team';
 }) {
+  const { smallerSize } = useAdaptiveParams();
   const [selectedMembers, setSelectedMembers] = useState<
     Array<
       | Pick<ProjectMember, 'id' | 'nickname' | 'avatar'>
@@ -65,7 +67,7 @@ export default function MemberAutocomplete({
         items={membersList}
         onSelectionChange={handleSelectionChange}
         radius="full"
-        size="sm"
+        size={smallerSize}
         variant="flat"
         type="text"
         className="w-full"

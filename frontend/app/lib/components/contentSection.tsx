@@ -161,7 +161,7 @@ export default function ContentSection({
 
   return (
     <>
-      <div className="flex h-full w-full flex-col gap-2 overflow-clip text-sm">
+      <div className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm">
         <div className="flex flex-col gap-1">
           {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
@@ -182,7 +182,7 @@ export default function ContentSection({
 
         <div
           className={clsx(
-            'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
+            'relative h-full w-full flex-1 overflow-x-visible overflow-y-auto pt-0.5',
             'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
             'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
           )}
@@ -191,7 +191,7 @@ export default function ContentSection({
             <div
               className="grid-rows-auto grid content-between gap-y-2 pb-16"
               style={{
-                gridTemplateColumns: 'repeat(auto-fill, 97px)',
+                gridTemplateColumns: 'sm:repeat(auto-fill, 97px) 1fr',
               }}
             >
               {filteredData.map((element) => (

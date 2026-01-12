@@ -25,7 +25,7 @@ export default function ThemeSwitcher() {
   if (!mounted)
     return (
       <Skeleton className="h-10 rounded-lg">
-        <Button variant="light" isIconOnly size="md" />
+        <Button variant="light" isIconOnly size={commonSize} />
       </Skeleton>
     );
 

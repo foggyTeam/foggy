@@ -17,6 +17,8 @@ import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 
+const MAX_MEMBERS = 7;
+
 export default function ProjectCard(
   project: Project & { isDisabled?: boolean; hideFavorite?: boolean },
 ) {
@@ -40,9 +42,9 @@ export default function ProjectCard(
       ref={cardRef}
       onClick={() => (project.isDisabled ? undefined : setIsExpanded(true))}
       className={clsx(
-        'hover:bg-default-50 shadow-container box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
+        'hover:bg-default-50 shadow-container box-border flex w-full flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
         el_animation,
-        isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px]',
+        isExpanded ? 'h-fit sm:w-[576px]' : 'h-[108px] sm:h-24 sm:w-[284px]',
         isExpanded ? project_tile_exp : project_tile,
         !isExpanded && !project.isDisabled ? 'cursor-pointer' : 'cursor-auto',
       )}
@@ -108,21 +110,21 @@ export default function ProjectCard(
           </p>
         </div>
         {isExpanded ? (
-          <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
+          <div className="mt-0.5 grid max-h-full w-full grid-cols-1 gap-1 sm:grid-cols-2">
             {project.members
               .sort(CompareByRole)
-              .slice(0, 7)
+              .slice(0, MAX_MEMBERS)
               .map((member, index) => (
                 <MediumMemberCard key={index} {...member} />
               ))}
-            {project.members.length > 7 && (
+            {project.members.length > MAX_MEMBERS && (
               <a
                 href={`project/${project.id}`}
                 className="accent-link hover:accent-link-hover h-8 content-center justify-start px-4 italic"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
-                  (project.members.length - 7).toString(),
+                  (project.members.length - MAX_MEMBERS).toString(),
                 )}
               </a>
             )}

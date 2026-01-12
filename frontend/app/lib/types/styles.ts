@@ -16,8 +16,12 @@ export const left_sidebar_layout: string =
 export const el_animation: string =
   'transform transition-all hover:-translate-y-0.5';
 
-export const project_tile: string = 'col-span-3 row-span-3';
-export const project_tile_exp: string = 'col-span-6 row-span-9';
-export const team_tile: string = 'col-span-4 row-span-2';
-export const notification_tile: string = 'col-span-4 row-span-1';
-export const notification_tile_exp: string = 'col-span-4 row-span-8';
+export const project_tile: string =
+  'sm:col-span-3 col-span-full sm:row-span-3 row-span-4';
+export const project_tile_exp: string =
+  'sm:col-span-6 col-span-full sm:row-span-9 row-span-9';
+export const team_tile: string = 'sm:col-span-4 col-span-full row-span-2';
+export const notification_tile: string =
+  'sm:col-span-4 col-span-full row-span-1';
+export const notification_tile_exp: string =
+  'sm:col-span-4 col-span-full row-span-8';

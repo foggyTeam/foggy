@@ -5,6 +5,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import RoleCard, { rolesList } from '@/app/lib/components/members/roleCard';
 import React, { Dispatch, SetStateAction } from 'react';
 import { Role } from '@/app/lib/types/definitions';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function SelectRole({
   role,
@@ -25,6 +26,7 @@ export default function SelectRole({
   style?: 'flat' | 'bordered';
   className?: string;
 }) {
+  const { smallerSize } = useAdaptiveParams();
   return (
     <Select
       selectedKeys={role ? [role] : []}
@@ -46,11 +48,11 @@ export default function SelectRole({
       radius="full"
       variant={style}
       aria-label="select-role"
-      size="sm"
+      size={smallerSize}
       className={clsx('w-full', className)}
       classNames={{
-        innerWrapper: 'text-sm',
-        value: 'text-sm',
+        innerWrapper: 'sm:text-sm text-medium',
+        value: 'sm:text-sm text-medium',
         popoverContent: clsx(
           bg_container_no_padding,
           'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',

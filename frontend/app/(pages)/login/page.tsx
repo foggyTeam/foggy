@@ -33,7 +33,7 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-      <p className="text-secondary-500 absolute bottom-4 left-4 z-50 flex h-10 items-center gap-1 text-sm">
+      <p className="text-secondary-500 text-medium absolute bottom-4 left-4 z-50 flex h-10 items-center gap-1 sm:text-sm">
         Icons by
         <a href="https://icons8.com" className="hover:underline">
           Icons8

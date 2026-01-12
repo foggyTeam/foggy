@@ -13,6 +13,7 @@ import { Select, SelectItem } from '@heroui/select';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Alert } from '@heroui/alert';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function RemoveTeamMemberModal({
   member,
@@ -27,6 +28,7 @@ export default function RemoveTeamMemberModal({
   onOpenChange: any;
   action: () => void;
 }) {
+  const { commonSize, smallerSize } = useAdaptiveParams();
   const removeTypes = {
     breakup: settingsStore.t.members.removeTeamMember.breakup.option,
     entire: settingsStore.t.members.removeTeamMember.entire.option,
@@ -56,11 +58,11 @@ export default function RemoveTeamMemberModal({
                 <Select
                   color="primary"
                   radius="full"
-                  size="sm"
+                  size={smallerSize}
                   className="m-0 w-full p-0"
                   classNames={{
-                    innerWrapper: 'text-sm',
-                    value: 'text-sm',
+                    innerWrapper: 'sm:text-sm text-medium',
+                    value: 'sm:text-sm text-medium',
                     popoverContent: clsx(
                       bg_container_no_padding,
                       'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',
@@ -105,7 +107,7 @@ export default function RemoveTeamMemberModal({
                 <FButton
                   color="primary"
                   variant="light"
-                  size="md"
+                  size={commonSize}
                   className="w-fit"
                   onPress={onClose}
                 >
@@ -115,7 +117,7 @@ export default function RemoveTeamMemberModal({
                 <FButton
                   onPress={action}
                   color="primary"
-                  size="md"
+                  size={commonSize}
                   className="w-full"
                 >
                   {settingsStore.t.members.removeTeamMember.modalSure}

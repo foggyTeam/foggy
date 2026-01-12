@@ -25,7 +25,7 @@ export default function LeftSideBarElementCard({
       }}
       className="hover:bg-default-100 group flex max-h-16 w-full cursor-pointer items-center justify-between gap-2 rounded-xl p-1 transition-colors"
     >
-      <div className="flex h-full w-full items-center gap-3 text-sm">
+      <div className="text-medium flex h-full w-full items-center gap-3 sm:text-sm">
         <ElementIcon
           elementType={'type' in element ? element.type : 'SECTION'}
         />

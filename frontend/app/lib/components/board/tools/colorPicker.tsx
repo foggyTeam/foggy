@@ -3,6 +3,7 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function ColorPicker({
   value,
@@ -11,6 +12,8 @@ export default function ColorPicker({
   value: string;
   changeValue: any;
 }) {
+  const { commonSize } = useAdaptiveParams();
+
   return (
     <>
       <HexAlphaColorPicker
@@ -23,7 +26,7 @@ export default function ColorPicker({
         onValueChange={changeValue}
         color={'primary'}
         variant="underlined"
-        size="sm"
+        size={commonSize}
         className="w-[89.2%]"
         classNames={{
           input: 'text-default-500 font-medium',
@@ -34,7 +37,7 @@ export default function ColorPicker({
               CopyToClipboard(value);
             }}
             isIconOnly
-            size="sm"
+            size={commonSize}
             variant="light"
           >
             <CopyIcon className="stroke-default-500 h-5 w-5" />

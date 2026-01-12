@@ -19,10 +19,12 @@ import { useDisclosure } from '@heroui/modal';
 import NotificationCardModal from '@/app/lib/components/notifications/notificationCardModal';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import { Badge } from '@heroui/badge';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function NotificationCard(
   notification: Notification & { isNew?: boolean },
 ) {
+  const { smallerSize } = useAdaptiveParams();
   const { onAnswer, onDelete } = useContext(NotificationsContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -63,9 +65,9 @@ export default function NotificationCard(
     <>
       <div
         className={clsx(
-          'py-auto shadow-container relative box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2 sm:w-[98%] sm:max-w-72',
+          'py-auto shadow-container relative box-border flex w-[98%] max-w-full flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2 sm:max-w-72',
           el_animation,
-          isExpanded ? 'h-fit py-2' : 'h-8 cursor-pointer',
+          isExpanded ? 'h-fit py-2' : 'h-10 cursor-pointer sm:h-8',
           isExpanded ? notification_tile_exp : notification_tile,
         )}
         ref={cardRef}
@@ -78,7 +80,7 @@ export default function NotificationCard(
           <Badge
             showOutline={false}
             isInvisible={!notification.isNew}
-            size="sm"
+            size={smallerSize}
             content=""
             color="success"
             variant="shadow"
@@ -114,7 +116,7 @@ export default function NotificationCard(
               variant="light"
               color="danger"
               radius="full"
-              size="sm"
+              size={smallerSize}
             >
               <TrashIcon className="stroke-default-300 hover:stroke-danger transition-colors" />
             </Button>
@@ -167,7 +169,7 @@ export default function NotificationCard(
                       }
                       variant="bordered"
                       color="danger"
-                      size="sm"
+                      size={smallerSize}
                       className="text-small"
                       radius="full"
                     >
@@ -196,7 +198,7 @@ export default function NotificationCard(
                       }
                       variant="flat"
                       color="success"
-                      size="sm"
+                      size={smallerSize}
                       className="text-small"
                       radius="full"
                     >

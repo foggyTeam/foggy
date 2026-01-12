@@ -117,7 +117,7 @@ export default function StrokeTool() {
           }
           label={settingsStore.t.toolBar.strokeWidth}
           className="w-[89.2%]"
-          size="md"
+          size={commonSize}
           showOutline
           showTooltip
           maxValue={20}

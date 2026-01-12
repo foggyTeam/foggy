@@ -15,9 +15,11 @@ import {
 } from '@/app/lib/server/actions/notificationsServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { requestMessageFormSchema } from '@/app/lib/types/schemas';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const RequestForm = observer(
   ({ id, type }: { id: string | undefined; type: 'project' | 'team' }) => {
+    const { commonSize } = useAdaptiveParams();
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({} as any);
 
@@ -92,7 +94,7 @@ const RequestForm = observer(
           placeholder={settingsStore.t.notifications.sendRequest.placeholder}
           type="message"
           autoComplete="message"
-          size="md"
+          size={commonSize}
           value={message}
           onValueChange={setMessage}
           classNames={{
@@ -113,7 +115,7 @@ const RequestForm = observer(
             variant="solid"
             color="primary"
             isDisabled={isSendDisabled}
-            size="md"
+            size={commonSize}
           >
             {isSendDisabled
               ? settingsStore.t.notifications.sendRequest.alreadySentButton

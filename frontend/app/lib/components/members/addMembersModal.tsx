@@ -25,6 +25,7 @@ import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import teamsStore from '@/app/stores/teamsStore';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AddMembersModal = observer(
   ({
@@ -36,6 +37,7 @@ const AddMembersModal = observer(
     onOpenChange: () => void;
     type: 'project' | 'team';
   }) => {
+    const { commonSize, smallerSize } = useAdaptiveParams();
     const expirationTimes = {
       '24h': `24 ${settingsStore.t.time.hours.toLowerCase()}`,
       '7d': `7 ${settingsStore.t.time.days.toLowerCase()}`,
@@ -137,7 +139,7 @@ const AddMembersModal = observer(
                   <div className="flex w-fit items-center gap-1">
                     <div className="flex items-center gap-1">
                       <HistoryIcon className="stroke-default-500" />
-                      <p className="text-sm">
+                      <p className="text-medium sm:text-sm">
                         {settingsStore.t.members.addMember.expiresIn}
                       </p>
                     </div>
@@ -145,7 +147,7 @@ const AddMembersModal = observer(
                       radius="full"
                       className="w-fit"
                       variant="flat"
-                      size="sm"
+                      size={smallerSize}
                       classNames={{
                         popoverContent: clsx(
                           bg_container_no_padding,
@@ -186,7 +188,7 @@ const AddMembersModal = observer(
                   isLoading={isGeneratingLink}
                   onPress={handleCopyInvitationLink}
                   isDisabled={!role}
-                  size="md"
+                  size={commonSize}
                   className="w-full sm:w-fit"
                   variant="light"
                 >
@@ -196,7 +198,7 @@ const AddMembersModal = observer(
                   isDisabled={!selectedMembers.length || !role}
                   isLoading={isLoading}
                   onPress={handleAddMembers}
-                  size="md"
+                  size={commonSize}
                   className="w-full sm:w-fit"
                   color="primary"
                 >
