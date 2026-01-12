@@ -102,7 +102,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           />
         </div>
         {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
-          <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
+          <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
             <>
               <Button
                 isIconOnly

@@ -101,7 +101,7 @@ const SubSectionCard = observer(
             />
           </div>
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
-            <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
+            <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
               <Button
                 isIconOnly
                 onPress={() => addNode([...parentList, subSection.id])}
@@ -115,7 +115,7 @@ const SubSectionCard = observer(
                 onPress={() => removeNode(subSection.id, parentList, true)}
                 variant="light"
                 color="danger"
-                size="sm"
+                size={smallerSize}
               >
                 <TrashIcon className="stroke-danger-500" />
               </Button>
