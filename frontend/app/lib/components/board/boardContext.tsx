@@ -146,6 +146,9 @@ export const BoardProvider = observer(
           stage.scale({ x: 1, y: 1 });
           stage.batchDraw();
         }
+        if (updateGridRef.current) {
+          updateGridRef.current();
+        }
       }
     };
 
