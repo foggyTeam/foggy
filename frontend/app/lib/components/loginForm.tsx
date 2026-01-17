@@ -180,6 +180,7 @@ const LoginForm = observer(() => {
           color="primary"
           size="md"
           className="w-full"
+          data-testid="signin-btn"
         >
           {settingsStore.t.login.signUpButton}
         </FButton>
@@ -192,6 +193,7 @@ const LoginForm = observer(() => {
           variant="solid"
           color="primary"
           size="md"
+          data-testid="login-btn"
         >
           {settingsStore.t.login.signInButton}
         </FButton>

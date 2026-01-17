@@ -9,13 +9,17 @@
     "frontend": "cd frontend && pnpm start",
     "backend": "cd backend && pnpm start",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
-    "docker": "docker-compose up --build"
+    "docker": "docker-compose up --build",
+    "e2e": "pnpm exec playwright test",
+    "e2e-ui": "pnpm exec playwright test --ui"
   },
   "workspaces": [
     "frontend",
     "backend"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.9",
     "concurrently": "^9.2.1",
     "husky": "^9.1.7"
   },
