@@ -187,6 +187,7 @@ export default function ContentSection({
         >
           {!!filteredData.length && (
             <div
+              data-testid='content-section-content'
               className="grid-rows-auto grid content-between gap-y-2 pb-16"
               style={{
                 gridTemplateColumns: 'repeat(auto-fill, 97px)',

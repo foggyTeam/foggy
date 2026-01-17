@@ -31,7 +31,6 @@ export default defineConfig({
     storageState: './e2e/.auth_state.json',
   },
 
-
   /* Configure projects for major browsers */
   projects: [
     {
@@ -74,6 +73,6 @@ export default defineConfig({
     command: 'pnpm dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 30 * 1000 // 30 s
+    timeout: 60 * 1000, // 60 s
   },
 });

@@ -205,6 +205,7 @@ const LoginForm = observer(() => {
           isIconOnly
           variant="light"
           color="secondary"
+          data-testid="google-btn"
           size="md"
         >
           <GoogleIcon
@@ -216,6 +217,7 @@ const LoginForm = observer(() => {
         </Button>
 
         <Button
+          data-testid="yandex-btn"
           onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
           isIconOnly
           variant="light"
