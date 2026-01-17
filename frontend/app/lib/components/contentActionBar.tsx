@@ -54,7 +54,10 @@ export default function ContentActionBar({
     ].some((size) => !!size);
   };
   return (
-    <div data-testid='content-section-head' className="flex h-fit w-full flex-col gap-2">
+    <div
+      data-testid="content-section-head"
+      className="flex h-fit w-full flex-col gap-2"
+    >
       <div className="flex h-fit w-full items-center justify-between gap-1">
         <div className="flex gap-1">
           <Input
@@ -77,7 +80,7 @@ export default function ContentActionBar({
               isDisabled={filtersDisabled}
               onPress={openFilters}
               isIconOnly
-              data-testid='filters-btn'
+              data-testid="filters-btn"
               variant={hasFilters() ? 'flat' : 'light'}
               color={hasFilters() ? 'primary' : 'default'}
               size="sm"
@@ -93,7 +96,7 @@ export default function ContentActionBar({
             <Button
               onPress={() => setFavorite(!favorite)}
               isIconOnly
-              data-testid='favorite-btn'
+              data-testid="favorite-btn"
               variant={favorite ? 'flat' : 'light'}
               color={favorite ? 'primary' : 'default'}
               size="sm"
@@ -109,7 +112,7 @@ export default function ContentActionBar({
             <Button
               onPress={() => setWithNotification(!withNotification)}
               isIconOnly
-              data-testid='with-notification-btn'
+              data-testid="with-notification-btn"
               variant={withNotification ? 'flat' : 'light'}
               color={withNotification ? 'primary' : 'default'}
               size="sm"
@@ -126,19 +129,31 @@ export default function ContentActionBar({
         <div className="flex gap-1">
           {addNew !== undefined &&
             (type ? CheckAccess(['admin', 'owner'], type) : true) && (
-              <Button  data-testid='add-new-btn' onPress={addNew} isIconOnly variant="light" size="sm">
+              <Button
+                data-testid="add-new-btn"
+                onPress={addNew}
+                isIconOnly
+                variant="light"
+                size="sm"
+              >
                 <PlusIcon className="stroke-default-500" />
               </Button>
             )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
-            <Button  data-testid='add-member-btn' onPress={addMember} isIconOnly variant="light" size="sm">
+            <Button
+              data-testid="add-member-btn"
+              onPress={addMember}
+              isIconOnly
+              variant="light"
+              size="sm"
+            >
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
           {openSettings !== undefined &&
             CheckAccess(['admin', 'owner'], type) && (
               <Button
-                data-testid='settings-btn'
+                data-testid="settings-btn"
                 onPress={openSettings}
                 isIconOnly
                 variant="light"
