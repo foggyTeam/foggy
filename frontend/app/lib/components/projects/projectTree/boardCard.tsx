@@ -51,7 +51,7 @@ export default function BoardCard({
 
   return (
     <div
-      data-testid='board-card'
+      data-testid="board-card"
       onDoubleClick={() => {
         start();
         settingsStore.startLoading();

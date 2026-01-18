@@ -23,13 +23,13 @@ export class ContentSectionFixture {
     this.head = section.getByTestId('content-section-head');
     this.content = section.getByTestId('content-section-content');
 
-    this.searchInput = section.locator('input[type="text"]');
-    this.addNewButton = section.getByTestId('add-new-btn');
-    this.addMemberButton = section.getByTestId('add-member-btn');
-    this.settingsButton = section.getByTestId('settings-btn');
-    this.filterButton = section.getByTestId('filters-btn');
-    this.favoriteButton = section.getByTestId('favorite-btn');
-    this.notificationButton = section.getByTestId('with-notification-btn');
+    this.searchInput = this.head.locator('input[type="text"]');
+    this.addNewButton = this.head.getByTestId('add-new-btn');
+    this.addMemberButton = this.head.getByTestId('add-member-btn');
+    this.settingsButton = this.head.getByTestId('settings-btn');
+    this.filterButton = this.head.getByTestId('filters-btn');
+    this.favoriteButton = this.head.getByTestId('favorite-btn');
+    this.notificationButton = this.head.getByTestId('with-notification-btn');
   }
 
   async search(value: string) {

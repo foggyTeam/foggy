@@ -9,6 +9,7 @@ export default class MainPageFixture {
 
   constructor(public readonly page: Page) {
     this.allProjectsSection = new ContentSectionFixture(page, 'all-projects');
+
     this.allTeamsSection = new ContentSectionFixture(page, 'all-teams');
   }
 
@@ -19,12 +20,25 @@ export default class MainPageFixture {
   async getAllProjects() {
     return await this.allProjectsSection.getDataCards('project-card');
   }
+  async fillSearch(search: string) {
+    await this.allProjectsSection.search(search);
+  }
   async openProject(name: string, createIfNotExist: boolean = false) {
     const allProjects = await this.getAllProjects();
+
     try {
-      await allProjects.getByRole('link', { name }).click();
-      await this.page.waitForURL('**/project/*');
-      return true;
+      const link = allProjects.getByRole('link', { name });
+
+      const exists = (await link.count()) > 0;
+
+      console.log('has link');
+      if (exists) {
+        await Promise.all([
+          this.page.waitForURL('**/project/*'),
+          link.first().click(),
+        ]);
+        return true;
+      }
     } catch (e: any) {
       console.error(`Failed to open project ${name}`);
     }

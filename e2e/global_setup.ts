@@ -22,29 +22,7 @@ export default async function globalSetup(config) {
   await loginPage.authorize(USER.email, USER.password);
   await page.context().storageState({ path: CONTEXT_STORAGE_PATH });
 
-  await checkEntities(page);
-
   log('SETUP FINISHED');
 
   await browser.close();
-}
-
-async function checkEntities(page: any) {
-  const needToCreate = {
-    project: true,
-    team: true,
-    section: true,
-    board: true,
-  };
-
-  log('Check project');
-  {
-    const projectCard = page
-      .locator('[data-testid="project-card"]')
-      .filter({ hasText: PROJECT.name });
-
-    console.log(projectCard);
-  }
-
-  log('Check team');
 }

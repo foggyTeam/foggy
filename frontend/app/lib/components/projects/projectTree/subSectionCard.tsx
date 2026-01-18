@@ -49,7 +49,7 @@ const SubSectionCard = observer(
 
     return (
       <div
-        data-testid='section-card'
+        data-testid="section-card"
         className={clsx(
           'flex max-h-16 w-full flex-col items-start justify-start p-1 pr-0 pl-10 transition-all duration-500',
           isExpanded && 'max-h-[1000px]',

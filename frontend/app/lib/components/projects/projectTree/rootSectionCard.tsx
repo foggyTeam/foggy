@@ -46,7 +46,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
 
   return (
     <div
-      data-testid='root-section-card'
+      data-testid="root-section-card"
       tabIndex={0}
       onBlur={() => setActiveNodes([])}
       className={clsx(
