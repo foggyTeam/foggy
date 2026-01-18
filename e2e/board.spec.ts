@@ -7,7 +7,8 @@ test.describe('Board', () => {
     const mainPage = new MainPageFixture(page);
     await mainPage.goto();
 
-    await page.waitForTimeout(3000); // loading contents
+    await page.waitForTimeout(3000); // loading page contents
+
     const isProjectOpened = await mainPage.openProject(PROJECT.name, true);
     expect(isProjectOpened).toBeTruthy();
   });

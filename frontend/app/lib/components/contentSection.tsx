@@ -1,10 +1,25 @@
 'use client';
 
-import { FilterSet, Notification, Project, ProjectMember, Team, TeamMember } from '@/app/lib/types/definitions';
-import { ComponentType, HTMLAttributes, useMemo, useReducer, useState } from 'react';
+import {
+  FilterSet,
+  Notification,
+  Project,
+  ProjectMember,
+  Team,
+  TeamMember,
+} from '@/app/lib/types/definitions';
+import {
+  ComponentType,
+  HTMLAttributes,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 
 import { Avatar } from '@heroui/avatar';
-import ContentActionBar, { ActionBarProps } from '@/app/lib/components/contentActionBar';
+import ContentActionBar, {
+  ActionBarProps,
+} from '@/app/lib/components/contentActionBar';
 import clsx from 'clsx';
 import userStore from '@/app/stores/userStore';
 import { useDisclosure } from '@heroui/modal';
@@ -92,8 +107,8 @@ export default function ContentSection({
   addMember,
   openSettings,
   type,
-                                         ...rest
-                                       }: ContentSectionProps & HTMLAttributes<HTMLDivElement>) {
+  ...rest
+}: ContentSectionProps & HTMLAttributes<HTMLDivElement>) {
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
     filtersReducer,
@@ -151,7 +166,10 @@ export default function ContentSection({
 
   return (
     <>
-      <div {...rest} className="flex h-full w-full flex-col gap-2 overflow-clip text-sm">
+      <div
+        {...rest}
+        className="flex h-full w-full flex-col gap-2 overflow-clip text-sm"
+      >
         <div className="flex flex-col gap-1">
           {sectionTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
