@@ -18,6 +18,7 @@ const AllProjects = observer(() => {
   return (
     <>
       <ContentSection
+        data-testid='all-projects'
         sectionTitle={settingsStore.t.main.myProjects}
         data={projectsStore.allProjects.slice()}
         DataCard={ProjectCard}

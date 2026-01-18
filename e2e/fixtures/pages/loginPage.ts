@@ -9,7 +9,7 @@ export default class LoginPageFixture {
   private readonly googleButton: Locator;
   private readonly yandexButton: Locator;
 
-  private isAuthorized: boolean;
+  public isAuthorized: boolean;
   constructor(public readonly page: Page) {
     this.loginInput = this.page.locator('input[type="email"]');
     this.passwordInput = this.page.locator('input[type="password"]');

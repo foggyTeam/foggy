@@ -18,6 +18,7 @@ const AllTeamProjects = observer(() => {
   return (
     <>
       <ContentSection
+        data-testid='all-team-projects'
         sectionTitle={settingsStore.t.team.teamProject.replace(
           '_',
           (teamsStore.activeTeam?.name ?? '').toUpperCase(),

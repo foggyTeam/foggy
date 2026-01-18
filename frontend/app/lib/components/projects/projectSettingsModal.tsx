@@ -225,7 +225,7 @@ const ProjectSettingsModal = observer(
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal data-testid='project-settings-modal' isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
         <ModalContent className="flex w-full max-w-2xl gap-2 overflow-visible p-6">
           {() =>
             (
@@ -277,6 +277,7 @@ const ProjectSettingsModal = observer(
                     </div>
                     <div className="flex h-fit w-full flex-col items-start justify-start gap-2">
                       <Checkbox
+                        data-testid='allow-requests-chb'
                         isSelected={checkboxes.allowRequests}
                         onValueChange={(value) =>
                           setCheckboxes({
@@ -289,6 +290,7 @@ const ProjectSettingsModal = observer(
                         {settingsStore.t.projects.projectSettings.allowRequests}
                       </Checkbox>
                       <Checkbox
+                        data-testid='public-chb'
                         isSelected={checkboxes.isPublic}
                         onValueChange={(value) =>
                           setCheckboxes({ ...checkboxes, isPublic: value })
@@ -298,6 +300,7 @@ const ProjectSettingsModal = observer(
                         {settingsStore.t.projects.projectSettings.isPublic}
                       </Checkbox>
                       <Checkbox
+                        data-testid='members-public-chb'
                         className="align-top"
                         isSelected={checkboxes.memberListIsPublic}
                         onValueChange={(value) =>
@@ -325,6 +328,7 @@ const ProjectSettingsModal = observer(
                   >
                     {!isNewProject && CheckAccess(['owner'], 'project') && (
                       <FButton
+                        data-testid='delete-btn'
                         onPress={onDeleteProjectOpen}
                         isDisabled={isSaving}
                         variant="bordered"
@@ -336,6 +340,7 @@ const ProjectSettingsModal = observer(
                     )}
 
                     <FButton
+                      data-testid='save-btn'
                       isLoading={isSaving}
                       isDisabled={!!Object.keys(errors).length}
                       onPress={onSubmit}

@@ -33,6 +33,7 @@ export default function UploadAvatarButton({
   return (
     <FTooltip content={tooltipContent} placement="right">
       <Button
+        data-testid='upload-avatar-btn'
         isDisabled={isLoading}
         onPress={handleClick}
         variant="bordered"

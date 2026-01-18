@@ -77,6 +77,7 @@ const AllTeamMembers = observer(() => {
         }}
       >
         <ContentSection
+          data-testid='all-team-members'
           sectionAvatar={teamsStore.activeTeam?.avatar}
           sectionTitle={teamsStore.activeTeam?.name.toUpperCase()}
           data={teamsStore.activeTeam?.members?.slice() ?? []}
