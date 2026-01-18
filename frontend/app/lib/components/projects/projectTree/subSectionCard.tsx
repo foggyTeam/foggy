@@ -49,6 +49,7 @@ const SubSectionCard = observer(
 
     return (
       <div
+        aria-expanded={isExpanded}
         data-testid="section-card"
         className={clsx(
           'flex max-h-16 w-full flex-col items-start justify-start p-1 pr-0 pl-10 transition-all duration-500',
@@ -72,7 +73,7 @@ const SubSectionCard = observer(
         >
           <div className="flex h-full w-full items-center">
             <Button
-              data-testid='expand-btn'
+              data-testid="expand-btn"
               isIconOnly
               onPress={() => {
                 if (subSection.childrenNumber !== subSection.children.size)
@@ -103,7 +104,7 @@ const SubSectionCard = observer(
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
               <Button
-                data-testid='add-child-btn'
+                data-testid="add-child-btn"
                 isIconOnly
                 onPress={() => addNode([...parentList, subSection.id])}
                 variant="light"
@@ -112,7 +113,7 @@ const SubSectionCard = observer(
                 <PlusIcon className="stroke-default-500" />
               </Button>
               <Button
-                data-testid='delete-btn'
+                data-testid="delete-btn"
                 isIconOnly
                 onPress={() => removeNode(subSection.id, parentList, true)}
                 variant="light"

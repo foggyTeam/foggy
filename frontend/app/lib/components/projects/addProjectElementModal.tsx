@@ -44,7 +44,12 @@ export default function AddProjectElementModal({
   }, [name, setError]);
 
   return (
-    <Modal data-testid='add-project-element-modal' isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      data-testid="add-project-element-modal"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
         {(onClose) =>
           (
@@ -106,7 +111,7 @@ export default function AddProjectElementModal({
                 />
                 {/* Maybe some presets here*/}
                 <Button
-                  data-testid='create-btn'
+                  data-testid="create-btn"
                   onPress={() => action(name, filetype)}
                   isDisabled={error.name}
                   color="primary"

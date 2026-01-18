@@ -9,20 +9,19 @@ test.describe('Board', () => {
     const mainPage = new MainPageFixture(page);
     await mainPage.goto();
 
-    await page.waitForTimeout(3000); // loading page contents
+    await page.waitForTimeout(1500); // loading page contents
 
     const isProjectOpened = await mainPage.openProject(PROJECT.name, true);
     expect(isProjectOpened).toBeTruthy();
 
     // CREATING BOARD
     const projectPage = new ProjectPageFixture(page);
-    await page.waitForTimeout(3000); // loading page contents
+    await page.waitForTimeout(1500); // loading page contents
 
-    await projectPage.addSection(PROJECT.section, []);
-    await projectPage.addBoard(SIMPLE_BOARD.name, [PROJECT.section]);
-    const isBoardOpened = await projectPage.openBoard(SIMPLE_BOARD.name, [
-      PROJECT.section,
-    ]);
+    const isBoardOpened = await projectPage.openBoardWithCreatePath(
+      SIMPLE_BOARD.name,
+      [PROJECT.section],
+    );
     expect(isBoardOpened).toBeTruthy();
   });
 });

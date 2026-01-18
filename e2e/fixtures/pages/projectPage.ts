@@ -72,13 +72,14 @@ export default class ProjectPageFixture {
 
       for (let i = 0; i < sectionsCount; i++) {
         const section = allSections.nth(i);
-        const nameInput = section.locator('input[readonly]');
+        const nameInput = section.locator('input[readonly]').first();
         let inputValue = '';
         if (await nameInput.isVisible()) {
           inputValue = await nameInput.inputValue();
         }
         if (inputValue === name) {
-          if (step < lastIndex) {
+          const isExpanded = await section.getAttribute('aria-expanded');
+          if (step < lastIndex && isExpanded === 'false') {
             const expandBtn = section.getByTestId('expand-btn');
             if (await expandBtn.isVisible()) await expandBtn.click();
           }
@@ -90,7 +91,7 @@ export default class ProjectPageFixture {
       if (step === lastIndex) {
         for (let i = 0; i < boardsCount; i++) {
           const board = allBoards.nth(i);
-          const nameInput = board.locator('input[readonly]');
+          const nameInput = board.locator('input[readonly]').first();
           let inputValue = '';
           if (await nameInput.isVisible()) {
             inputValue = await nameInput.inputValue();
@@ -143,8 +144,24 @@ export default class ProjectPageFixture {
       ]);
       return true;
     } catch (e: any) {
-      console.error('Failed to open board ');
+      console.error('Failed to open board');
       return false;
     }
+  }
+
+  async openBoardWithCreatePath(
+    name: string,
+    path: string[],
+    type: 'simple' | 'graph' | 'tree' = 'simple',
+  ) {
+    try {
+      await this.findProjectElement([...path, name]);
+    } catch (e: any) {
+      for (let i = 0; i < path.length; i++) {
+        await this.addSection(path[i], path.slice(path.length - i));
+      }
+      await this.addBoard(name, path, type);
+    }
+    return await this.openBoard(name, path);
   }
 }

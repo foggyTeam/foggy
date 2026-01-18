@@ -22,7 +22,10 @@ const ProjectStructure = observer(() => {
 
   return (
     <>
-      <div data-testid='project-structure' className="flex h-full w-full flex-col gap-4 overflow-clip text-sm">
+      <div
+        data-testid="project-structure"
+        className="flex h-full w-full flex-col gap-4 overflow-clip text-sm"
+      >
         <div className="flex flex-col gap-4">
           <div className="flex h-fit w-full items-center justify-between gap-4">
             <div className="flex h-fit items-center justify-start gap-4">
@@ -37,7 +40,12 @@ const ProjectStructure = observer(() => {
               </h1>
             </div>
             {CheckAccess(['admin', 'owner'], 'project') && (
-              <Button data-testid='settings-btn' onPress={onSettingsOpen} isIconOnly variant="light">
+              <Button
+                data-testid="settings-btn"
+                onPress={onSettingsOpen}
+                isIconOnly
+                variant="light"
+              >
                 <SettingsIcon className="stroke-default-500" />
               </Button>
             )}

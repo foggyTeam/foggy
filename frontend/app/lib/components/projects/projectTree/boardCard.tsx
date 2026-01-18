@@ -94,7 +94,7 @@ export default function BoardCard({
         <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <Button
-              data-testid='delete-btn'
+              data-testid="delete-btn"
               isIconOnly
               onPress={() => removeNode(board.id, parentList)}
               variant="light"
