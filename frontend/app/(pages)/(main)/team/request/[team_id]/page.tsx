@@ -24,7 +24,7 @@ export default async function TeamRequestPage({
   const teamData = await getTeamInfo(team_id);
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center px-24 py-8">
+    <div className="flex h-full w-full items-center justify-center px-24 py-8">
       <div
         className={clsx(
           'flex h-fit min-h-56 w-full max-w-xl items-center justify-center',

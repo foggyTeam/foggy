@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Slider } from '@heroui/slider';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function SliderTool({
   type,
@@ -17,6 +18,7 @@ export default function SliderTool({
   value: number;
   setValue: (newValue: number) => void;
 }) {
+  const { commonSize } = useAdaptiveParams();
   const { allToolsDisabled } = useBoardContext();
   const boundary = {
     width: { min: 1, max: 20, step: 0.5 },
@@ -31,18 +33,18 @@ export default function SliderTool({
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={commonSize}
         >
           {type === 'width' ? (
             <FTooltip content={settingsStore.t.toolTips.tools.pencilWidth}>
               <DotIcon
                 strokeWidth={value - boundary.width.min}
-                className="fill-default-500 stroke-default-500"
+                className="fill-default-500 stroke-default-600"
               />
             </FTooltip>
           ) : (
             <FTooltip content={settingsStore.t.toolTips.tools.pencilTension}>
-              <AudioWaveformIcon className="stroke-default-500" />
+              <AudioWaveformIcon className="stroke-default-600" />
             </FTooltip>
           )}
         </Button>
@@ -62,7 +64,7 @@ export default function SliderTool({
           minValue={boundary[type].min}
           step={boundary[type].step}
           className="h-24"
-          size="md"
+          size={commonSize}
           orientation="vertical"
           showOutline
           showTooltip

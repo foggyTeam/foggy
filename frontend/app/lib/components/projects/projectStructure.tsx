@@ -12,8 +12,10 @@ import settingsStore from '@/app/stores/settingsStore';
 import React from 'react';
 import ProjectTree from '@/app/lib/components/projects/projectTree/projectTree';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const ProjectStructure = observer(() => {
+  const { commonSize } = useAdaptiveParams();
   const {
     isOpen: isSettingsOpen,
     onOpen: onSettingsOpen,
@@ -22,10 +24,7 @@ const ProjectStructure = observer(() => {
 
   return (
     <>
-      <div
-        data-testid="project-structure"
-        className="flex h-full w-full flex-col gap-4 overflow-clip text-sm"
-      >
+      <div data-testid="project-structure" className="text-medium flex h-full w-full flex-col gap-4 overflow-clip sm:text-sm">
         <div className="flex flex-col gap-4">
           <div className="flex h-fit w-full items-center justify-between gap-4">
             <div className="flex h-fit items-center justify-start gap-4">
@@ -42,11 +41,12 @@ const ProjectStructure = observer(() => {
             {CheckAccess(['admin', 'owner'], 'project') && (
               <Button
                 data-testid="settings-btn"
+                size={commonSize}
                 onPress={onSettingsOpen}
                 isIconOnly
                 variant="light"
               >
-                <SettingsIcon className="stroke-default-500" />
+                <SettingsIcon className="stroke-default-600" />
               </Button>
             )}
           </div>

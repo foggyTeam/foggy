@@ -14,8 +14,10 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
 import { useTheme } from 'next-themes';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function StrokeTool() {
+  const { commonSize } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -93,7 +95,7 @@ export default function StrokeTool() {
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.strokeTool}>
             <CircleDashedIcon
@@ -115,7 +117,7 @@ export default function StrokeTool() {
           }
           label={settingsStore.t.toolBar.strokeWidth}
           className="w-[89.2%]"
-          size="md"
+          size={commonSize}
           showOutline
           showTooltip
           maxValue={20}

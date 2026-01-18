@@ -4,6 +4,9 @@ import clsx from 'clsx';
 import BackgroundCircle from '@/app/lib/components/backgroundGradient/backgroundCircle';
 import { useTheme } from 'next-themes';
 import { foggy_accent } from '@/tailwind.config';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export interface circleParams {
   width: number;
@@ -17,9 +20,7 @@ export interface circleParams {
 
 const circles: { light: circleParams[]; dark: circleParams[] } = {
   light: [
-    // ===== LIGHT: ВЕРХНЯЯ ЧАСТЬ =====
     {
-      // Левый верх — чуть правее и немного ниже
       width: 820,
       height: 480,
       rotation: -16,
@@ -29,7 +30,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-500)/0.8)',
     } as circleParams,
     {
-      // Верхний центр — secondary
       width: 900,
       height: 460,
       rotation: 10,
@@ -39,7 +39,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-secondary-400)/0.7)',
     } as circleParams,
     {
-      // Правый верх — светлый primary
       width: 620,
       height: 420,
       rotation: -8,
@@ -49,9 +48,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-400)/0.75)',
     } as circleParams,
 
-    // ===== LIGHT: БОКОВЫЕ ЧАСТИ =====
     {
-      // Левый край — вертикальный primary
       width: 520,
       height: 820,
       rotation: 18,
@@ -61,7 +58,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-300)/0.6)',
     } as circleParams,
     {
-      // Тёплое пятно слева — осторожный danger
       width: 420,
       height: 520,
       rotation: -24,
@@ -72,7 +68,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
     } as circleParams,
 
     {
-      // Правый край — vertical secondary
       width: 540,
       height: 840,
       rotation: -16,
@@ -82,7 +77,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-secondary-500)/0.65)',
     } as circleParams,
     {
-      // Справа ближе к центру — secondary поменьше
       width: 460,
       height: 520,
       rotation: 22,
@@ -92,9 +86,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-secondary-400)/0.8)',
     } as circleParams,
 
-    // ===== LIGHT: НИЖНЯЯ ЧАСТЬ =====
     {
-      // Левый низ — крупный primary
       width: 880,
       height: 500,
       rotation: 14,
@@ -104,7 +96,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-500)/0.8)',
     } as circleParams,
     {
-      // Нижний центр — более светлый primary
       width: 820,
       height: 520,
       rotation: -10,
@@ -114,7 +105,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-300)/0.75)',
     } as circleParams,
     {
-      // Правый низ — secondary
       width: 700,
       height: 480,
       rotation: 12,
@@ -124,7 +114,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-secondary-500)/0.7)',
     } as circleParams,
 
-    // Маленький warning — на краю, как лёгкое свечение
     {
       width: 320,
       height: 260,
@@ -137,11 +126,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
   ],
 
   dark: [
-    // === DARK: крупная "рамка" максимально геометрически близка к light ===
-
-    // ВЕРХ
     {
-      // Левый верх — акцентный, примерно на тех же координатах
       width: 860,
       height: 480,
       rotation: -14,
@@ -151,7 +136,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['500']}BF`, // ~75%
     } as circleParams,
     {
-      // Верхний центр — ближе к primary, чуть меньше
       width: 820,
       height: 440,
       rotation: 6,
@@ -161,7 +145,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: 'hsl(var(--heroui-primary-300)/0.7)',
     } as circleParams,
     {
-      // Правый верх — тёмный accent
       width: 640,
       height: 400,
       rotation: -10,
@@ -171,9 +154,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['600']}B3`,
     } as circleParams,
 
-    // БОКА
     {
-      // Левый край
       width: 500,
       height: 780,
       rotation: 18,
@@ -183,7 +164,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['500']}80`,
     } as circleParams,
     {
-      // Правый край
       width: 520,
       height: 820,
       rotation: -18,
@@ -193,9 +173,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['600']}80`,
     } as circleParams,
 
-    // НИЗ
     {
-      // Левый низ — крупный accent
       width: 860,
       height: 480,
       rotation: 14,
@@ -205,7 +183,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['500']}B3`,
     } as circleParams,
     {
-      // Нижний центр — мягкий accent+primary
       width: 820,
       height: 500,
       rotation: -10,
@@ -215,7 +192,6 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['400']}99`,
     } as circleParams,
     {
-      // Правый низ — тёмный accent
       width: 700,
       height: 460,
       rotation: 12,
@@ -225,10 +201,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       color: `${foggy_accent.light['600']}99`,
     } as circleParams,
 
-    // === DARK: внутренние "огоньки", порядок — поверх рамки ===
-
     {
-      // Secondary в верхнем центре — чуть крупнее, чтобы не терялся
       width: 460,
       height: 460,
       rotation: 16,
@@ -237,9 +210,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       duration: 20,
       color: 'hsl(var(--heroui-secondary-300)/0.6)',
     } as circleParams,
-
     {
-      // Небольшой primary-подобный огонёк слева ближе к центру
       width: 340,
       height: 360,
       rotation: -18,
@@ -248,9 +219,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
       duration: 22,
       color: 'hsl(var(--heroui-primary-200)/0.6)',
     } as circleParams,
-
     {
-      // Danger внизу — ЧУТЬ МЕНЬШЕ, яркий, но компактный
       width: 360,
       height: 380,
       rotation: 14,
@@ -262,26 +231,41 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
   ],
 };
 
-const BackgroundGradient = () => {
+export default function BackgroundGradient() {
+  const { isMobile } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
-  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+  const [theme, setTheme] = useState('light');
 
-  const currentCircles = circles[theme];
+  const [isBoardPage, setIsBoardPage] = useState(false);
+  const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
+  const path = usePathname();
+
+  const currentCircles = circles[theme].filter((_, i) =>
+    isMobile ? i % 2 === 0 : true,
+  );
+
+  useEffect(() => {
+    setTheme((resolvedTheme as 'light' | 'dark') ?? 'light');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    setIsBoardPage(!!path.match(boardPageRegex));
+  }, [path]);
 
   return (
     <div
       className={clsx(
-        'absolute top-0 left-0 -z-10 h-full w-full overflow-hidden transition-colors',
-        resolvedTheme === 'dark'
-          ? 'bg-default-100 opacity-50'
-          : 'bg-default-200',
+        'bg-gradient fixed inset-0 -z-10 overflow-hidden transition-colors',
+        theme === 'dark' ? 'bg-default-100 opacity-50' : 'bg-default-200',
       )}
     >
       {currentCircles.map((circle, index) => (
-        <BackgroundCircle key={index} params={circle} />
+        <BackgroundCircle
+          isBoardPage={isBoardPage}
+          key={index}
+          params={circle}
+        />
       ))}
     </div>
   );
-};
-
-export default BackgroundGradient;
+}

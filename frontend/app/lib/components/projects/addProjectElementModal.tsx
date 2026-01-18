@@ -8,6 +8,7 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { projectElementNameSchema } from '@/app/lib/types/schemas';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function AddProjectElementModal({
   isOpen,
@@ -22,6 +23,7 @@ export default function AddProjectElementModal({
   boardOnly?: boolean;
   sectionOnly?: boolean;
 }) {
+  const { smallerSize } = useAdaptiveParams();
   const [name, setName] = useState<string>('');
   const [error, setError] = useState({} as any);
   const [filetype, setFiletype] = useState<ProjectElementTypes>(
@@ -63,7 +65,7 @@ export default function AddProjectElementModal({
                   variant="light"
                   disabledKeys={disabledKeys}
                   aria-label="Filtypes"
-                  size="lg"
+                  size={smallerSize}
                 >
                   {filetypeTabs.map((filetype) => (
                     <Tab
@@ -92,12 +94,12 @@ export default function AddProjectElementModal({
                   isInvalid={error.name}
                   errorMessage={error.name}
                   radius="full"
-                  size="sm"
+                  size={smallerSize}
                   type="text"
                   className="m-0 w-56 p-0"
                   classNames={{
-                    inputWrapper: 'text-sm',
-                    input: 'text-sm',
+                    inputWrapper: 'sm:text-sm text-medium',
+                    input: 'sm:text-sm text-medium',
                   }}
                   placeholder={
                     settingsStore.t.projects.addElement[

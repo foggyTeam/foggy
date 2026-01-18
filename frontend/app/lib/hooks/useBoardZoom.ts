@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
@@ -9,6 +10,7 @@ export default function UseBoardZoom(
   scale: number,
   setScale: any,
 ) {
+  const { updateGridRef } = useBoardContext();
   useEffect(() => {
     const stage = stageRef.current;
     if (stage) {
@@ -42,6 +44,10 @@ export default function UseBoardZoom(
             };
             stage.position(newPos);
             stage.batchDraw();
+
+            if (updateGridRef.current) {
+              updateGridRef.current();
+            }
           }
         }
       };

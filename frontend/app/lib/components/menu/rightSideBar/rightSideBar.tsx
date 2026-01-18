@@ -2,13 +2,20 @@
 
 import ClosedRightSideBar from '@/app/lib/components/menu/rightSideBar/closedRightSideBar';
 import OpenedRightSideBar from '@/app/lib/components/menu/rightSideBar/openedRightSideBar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export default function RightSideBar() {
+  const path = usePathname();
+
   const [isOpened, setIsOpened] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'projects' | 'teams' | 'notifications'
   >('projects');
+
+  useEffect(() => {
+    setIsOpened(false);
+  }, [path]);
 
   return (
     <>

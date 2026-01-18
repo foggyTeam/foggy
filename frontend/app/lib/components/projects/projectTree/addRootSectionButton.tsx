@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { el_animation } from '@/app/lib/types/styles';
 import { Button } from '@heroui/button';
 import { PlusIcon } from 'lucide-react';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function AddRootSectionButton({
   title,
@@ -10,8 +11,10 @@ export default function AddRootSectionButton({
   title: string;
   onPress: any;
 }) {
+  const { commonSize } = useAdaptiveParams();
   return (
     <Button
+      size={commonSize}
       data-testid="add-root-section-btn"
       onPress={() => onPress([])}
       className={clsx(
@@ -21,7 +24,7 @@ export default function AddRootSectionButton({
         el_animation,
       )}
     >
-      <PlusIcon className="stroke-default-500 m-2" />
+      <PlusIcon className="stroke-default-600 m-2" />
 
       <p>{title}...</p>
     </Button>

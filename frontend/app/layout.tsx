@@ -6,7 +6,7 @@ import { Providers } from '@/app/providers';
 import NextTopLoader from 'nextjs-toploader';
 import { primary } from '@/tailwind.config';
 import RightBottomBar from '@/app/lib/components/menu/rightBottomBar/rightBottomBar';
-import BackgroundWrapper from '@/app/lib/components/backgroundGradient/backgroundWrapper';
+import BackgroundGradient from '@/app/lib/components/backgroundGradient/backgroundGradient';
 
 export const metadata: Metadata = {
   title: { template: `foggy | %s`, default: 'foggy' },
@@ -26,9 +26,11 @@ export default function RootLayout({
         className={`${montserrat.className} antialiased`}
       >
         <Providers>
-          <main className="h-screen w-screen">{children}</main>
+          <div className="flex h-screen w-full flex-col overflow-hidden">
+            <main className="w-full flex-1 overflow-hidden">{children}</main>
+          </div>
 
-          <BackgroundWrapper />
+          <BackgroundGradient />
 
           <NextTopLoader color={primary.light.DEFAULT} showSpinner={false} />
 

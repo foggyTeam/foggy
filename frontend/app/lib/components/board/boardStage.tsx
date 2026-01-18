@@ -2,7 +2,6 @@
 
 import React, { ReactNode, useRef } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
-import GridLayer from '@/app/lib/components/board/gridLayer';
 import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
@@ -20,6 +19,7 @@ import { createPortal } from 'react-dom';
 import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { useTheme } from 'next-themes';
+import GridBackground from '@/app/lib/components/backgroundGrid';
 
 const GRID_SIZE = 24;
 export const STAGE_SIZE = 3000;
@@ -47,15 +47,14 @@ const BoardStage = observer(() => {
   UseBoardZoom(stageRef, scale, setScale);
 
   return (
-    <div className="h-screen w-screen overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden">
+      <GridBackground gridSize={GRID_SIZE} />
       <Stage
         width={STAGE_SIZE}
         height={STAGE_SIZE}
         ref={stageRef}
         onClick={handleSelect}
       >
-        <GridLayer gridSize={GRID_SIZE} />
-
         {projectsStore.activeBoard?.layers?.map((layer, index) => (
           <BoardLayer
             key={index}

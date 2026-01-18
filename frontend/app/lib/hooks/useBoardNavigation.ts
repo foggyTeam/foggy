@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { STAGE_SIZE } from '@/app/lib/components/board/boardStage';
+import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const MAX_X = 1000;
 const MAX_Y = 1000;
@@ -66,6 +67,7 @@ export const fitElementCoordinates = (
 };
 
 export default function UseBoardNavigation(stageRef: any, scale: number) {
+  const { updateGridRef } = useBoardContext();
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -93,6 +95,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           stage.x(fit.x);
           stage.y(fit.y);
           stage.batchDraw();
+          if (updateGridRef.current) updateGridRef.current();
         }
       };
       const handleMouseUp = () => {
@@ -120,6 +123,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           stage.x(fit.x);
           stage.y(fit.y);
           stage.batchDraw();
+          if (updateGridRef.current) updateGridRef.current();
         }
       };
       stage.on('wheel', handleWheel);
@@ -151,6 +155,7 @@ export default function UseBoardNavigation(stageRef: any, scale: number) {
           stage.x(fit.x);
           stage.y(fit.y);
           stage.batchDraw();
+          if (updateGridRef.current) updateGridRef.current();
         }
       };
       const handleTouchEnd = () => {

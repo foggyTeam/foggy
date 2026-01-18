@@ -14,6 +14,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { Select, SelectItem } from '@heroui/select';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import projectsStore from '@/app/stores/projectsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function SelectOwnerModal({
   member,
@@ -30,6 +31,7 @@ export default function SelectOwnerModal({
   onOpenChange: any;
   action: () => void;
 }) {
+  const { commonSize } = useAdaptiveParams();
   const projectMembersList =
     (projectsStore.activeProject &&
       projectsStore.activeProject.members.filter(
@@ -47,7 +49,12 @@ export default function SelectOwnerModal({
   }, [selectedOwner, submitOwnerId]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-2xl gap-4 p-6">
         {(onClose) =>
           (
@@ -86,7 +93,7 @@ export default function SelectOwnerModal({
                 <FButton
                   color="primary"
                   variant="light"
-                  size="md"
+                  size={commonSize}
                   className="w-fit"
                   onPress={onClose}
                 >
@@ -96,7 +103,7 @@ export default function SelectOwnerModal({
                 <FButton
                   onPress={action}
                   color="primary"
-                  size="md"
+                  size={commonSize}
                   isDisabled={!selectedOwner[0]}
                   className="w-full"
                 >

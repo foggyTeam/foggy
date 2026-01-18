@@ -28,9 +28,11 @@ import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 interface ContentSectionProps {
   sectionTitle?: string;
+  hideTitle?: boolean;
   sectionAvatar?: string;
   data:
     | Project[]
@@ -96,6 +98,7 @@ function filtersReducer(state: FilterSet, action: FilterReducerAction) {
 // TODO: add loading state
 export default function ContentSection({
   sectionTitle,
+  hideTitle,
   sectionAvatar,
   data,
   DataCard,
@@ -109,6 +112,7 @@ export default function ContentSection({
   type,
   ...rest
 }: ContentSectionProps & HTMLAttributes<HTMLDivElement>) {
+  const { isMobile } = useAdaptiveParams();
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
     filtersReducer,
@@ -166,12 +170,9 @@ export default function ContentSection({
 
   return (
     <>
-      <div
-        {...rest}
-        className="flex h-full w-full flex-col gap-2 overflow-clip text-sm"
-      >
+      <div {...rest} className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm">
         <div className="flex flex-col gap-1">
-          {sectionTitle && (
+          {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
               {sectionAvatar !== undefined && (
                 <Avatar size="md" name={sectionTitle} src={sectionAvatar} />
@@ -190,7 +191,7 @@ export default function ContentSection({
 
         <div
           className={clsx(
-            'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
+            'relative h-full w-full flex-1 overflow-x-visible overflow-y-auto pt-0.5',
             'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
             'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
           )}
@@ -200,7 +201,9 @@ export default function ContentSection({
               data-testid="content-section-content"
               className="grid-rows-auto grid content-between gap-y-2 pb-16"
               style={{
-                gridTemplateColumns: 'repeat(auto-fill, 97px)',
+                gridTemplateColumns: isMobile
+                  ? '1fr'
+                  : 'repeat(auto-fill, 97px)',
               }}
             >
               {filteredData.map((element) => (

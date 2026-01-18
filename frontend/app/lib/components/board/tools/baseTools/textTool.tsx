@@ -9,8 +9,10 @@ import 'react-quill-new/dist/quill.snow.css';
 import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function TextTool() {
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     activeTool,
@@ -65,13 +67,13 @@ export default function TextTool() {
           variant={activeTool === 'text' ? 'flat' : 'light'}
           color={activeTool === 'text' ? 'primary' : 'default'}
           isIconOnly
-          size="md"
+          size={commonSize}
         >
           <TypeIcon
             className={
               activeTool === 'text'
                 ? 'stroke-primary-500'
-                : 'stroke-default-500'
+                : 'stroke-default-600'
             }
           />
         </Button>

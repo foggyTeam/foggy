@@ -26,6 +26,7 @@
     "@heroui/input": "2.4.10",
     "@heroui/listbox": "^2.3.26",
     "@heroui/modal": "^2.2.24",
+    "@heroui/navbar": "^2.2.27",
     "@heroui/number-input": "^2.0.18",
     "@heroui/popover": "^2.3.27",
     "@heroui/progress": "^2.2.22",

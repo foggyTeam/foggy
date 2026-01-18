@@ -14,8 +14,11 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function LayerTool() {
+  const { commonSize } = useAdaptiveParams();
+
   const { selectedElement, allToolsDisabled } = useBoardContext();
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
@@ -56,10 +59,10 @@ export default function LayerTool() {
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.layerTool}>
-            <LayersIcon className="stroke-default-500" />
+            <LayersIcon className="stroke-default-600" />
           </FTooltip>
         </Button>
       </PopoverTrigger>
@@ -72,9 +75,9 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={commonSize}
             >
-              <ArrowBigDownDashIcon className="stroke-default-500" />
+              <ArrowBigDownDashIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerBack}>
@@ -84,9 +87,9 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={commonSize}
             >
-              <ArrowBigDownIcon className="stroke-default-500" />
+              <ArrowBigDownIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerForward}>
@@ -96,9 +99,9 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={commonSize}
             >
-              <ArrowBigUpIcon className="stroke-default-500" />
+              <ArrowBigUpIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
           <FTooltip content={settingsStore.t.toolTips.tools.layerTop}>
@@ -108,9 +111,9 @@ export default function LayerTool() {
               variant="light"
               color="default"
               isIconOnly
-              size="md"
+              size={commonSize}
             >
-              <ArrowBigUpDashIcon className="stroke-default-500" />
+              <ArrowBigUpDashIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
         </div>

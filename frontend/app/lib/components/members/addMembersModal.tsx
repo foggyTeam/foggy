@@ -25,6 +25,7 @@ import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import teamsStore from '@/app/stores/teamsStore';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AddMembersModal = observer(
   ({
@@ -36,6 +37,7 @@ const AddMembersModal = observer(
     onOpenChange: () => void;
     type: 'project' | 'team';
   }) => {
+    const { commonSize, smallerSize } = useAdaptiveParams();
     const expirationTimes = {
       '24h': `24 ${settingsStore.t.time.hours.toLowerCase()}`,
       '7d': `7 ${settingsStore.t.time.days.toLowerCase()}`,
@@ -114,7 +116,12 @@ const AddMembersModal = observer(
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-lg gap-2 p-6">
           {() => (
             <>
@@ -127,17 +134,17 @@ const AddMembersModal = observer(
                   memberType={type}
                   setSelectedId={setSelectedMembers}
                 />
-                <div className="flex w-full flex-nowrap justify-between gap-2">
+                <div className="flex w-full flex-col flex-nowrap justify-between gap-2 sm:flex-row">
                   <SelectRole
                     role={role}
                     setRole={setRole}
-                    style={'bordered'}
-                    className={'w-48'}
+                    style="bordered"
+                    className="w-full sm:w-48"
                   />
-                  <div className="flex w-fit items-center gap-1">
+                  <div className="flex w-full items-center gap-1 sm:w-fit">
                     <div className="flex items-center gap-1">
-                      <HistoryIcon className="stroke-default-500" />
-                      <p className="text-sm">
+                      <HistoryIcon className="stroke-default-600" />
+                      <p className="text-medium sm:text-sm">
                         {settingsStore.t.members.addMember.expiresIn}
                       </p>
                     </div>
@@ -145,7 +152,7 @@ const AddMembersModal = observer(
                       radius="full"
                       className="w-fit"
                       variant="flat"
-                      size="sm"
+                      size={smallerSize}
                       classNames={{
                         popoverContent: clsx(
                           bg_container_no_padding,
@@ -180,13 +187,14 @@ const AddMembersModal = observer(
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
+              <ModalFooter className="flex w-full flex-wrap justify-between gap-4 p-0 pt-2">
                 {/*TODO: add link*/}
                 <Button
                   isLoading={isGeneratingLink}
                   onPress={handleCopyInvitationLink}
                   isDisabled={!role}
-                  size="md"
+                  size={commonSize}
+                  className="w-full sm:w-fit"
                   variant="light"
                 >
                   {settingsStore.t.members.addMember.modalCopyLink}
@@ -195,7 +203,8 @@ const AddMembersModal = observer(
                   isDisabled={!selectedMembers.length || !role}
                   isLoading={isLoading}
                   onPress={handleAddMembers}
-                  size="md"
+                  size={commonSize}
+                  className="w-full sm:w-fit"
                   color="primary"
                 >
                   {settingsStore.t.members.addMember.modalSure}

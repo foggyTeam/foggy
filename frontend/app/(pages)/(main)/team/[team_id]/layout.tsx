@@ -1,7 +1,6 @@
 import React from 'react';
-import { RawTeam, TeamSettings } from '@/app/lib/types/definitions';
+import { RawTeam } from '@/app/lib/types/definitions';
 import { notFound, redirect } from 'next/navigation';
-import activeTeam from '@/app/mockData/team.json';
 import TeamLoader from '@/app/lib/components/dataLoaders/teamLoader';
 import { GetTeam } from '@/app/lib/server/actions/teamServerActions';
 

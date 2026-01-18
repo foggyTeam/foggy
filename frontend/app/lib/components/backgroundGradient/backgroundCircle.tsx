@@ -1,23 +1,14 @@
-'use client';
-
 import styles from '@/app/lib/components/backgroundGradient/backgroundGradient.module.css';
 import { circleParams } from '@/app/lib/components/backgroundGradient/backgroundGradient';
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 
-export default function BackgroundCircle({ params }: { params: circleParams }) {
-  const [isBoardPage, setIsBoardPage] = useState(false);
-  const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
-  const path = usePathname();
-
-  const position = (initial: number) => {
-    if (!isBoardPage) return initial;
-    return initial > 34 ? 100 : -48;
-  };
-
-  useEffect(() => {
-    setIsBoardPage(!!path.match(boardPageRegex));
-  }, [path]);
+export default function BackgroundCircle({
+  params,
+  isBoardPage,
+}: {
+  params: circleParams;
+  isBoardPage: boolean;
+}) {
+  const top = !isBoardPage ? params.top : params.top > 34 ? 100 : -48;
 
   return (
     <div
@@ -27,7 +18,7 @@ export default function BackgroundCircle({ params }: { params: circleParams }) {
           width: `${params.width}px`,
           height: `${params.height}px`,
           rotate: `${params.rotation}deg`,
-          top: `${position(params.top)}%`,
+          top: `${top}%`,
           left: `${params.left}%`,
           animationDuration: `${params.duration}s`,
           '--circle-color': params.color,
