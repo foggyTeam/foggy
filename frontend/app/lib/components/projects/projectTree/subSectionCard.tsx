@@ -72,6 +72,7 @@ const SubSectionCard = observer(
         >
           <div className="flex h-full w-full items-center">
             <Button
+              data-testid='expand-btn'
               isIconOnly
               onPress={() => {
                 if (subSection.childrenNumber !== subSection.children.size)
@@ -102,6 +103,7 @@ const SubSectionCard = observer(
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
               <Button
+                data-testid='add-child-btn'
                 isIconOnly
                 onPress={() => addNode([...parentList, subSection.id])}
                 variant="light"
@@ -110,6 +112,7 @@ const SubSectionCard = observer(
                 <PlusIcon className="stroke-default-500" />
               </Button>
               <Button
+                data-testid='delete-btn'
                 isIconOnly
                 onPress={() => removeNode(subSection.id, parentList, true)}
                 variant="light"

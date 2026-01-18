@@ -9,7 +9,7 @@ export const USER = {
 export const PROJECT = {
   name: 'Test Project',
   description: 'Base project entity for tests.',
-  section: 'Test Section',
+  section: 'TEST SECTION',
 };
 
 export const SIMPLE_BOARD = {

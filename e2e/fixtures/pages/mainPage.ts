@@ -28,10 +28,7 @@ export default class MainPageFixture {
 
     try {
       const link = allProjects.getByRole('link', { name });
-
       const exists = (await link.count()) > 0;
-
-      console.log('has link');
       if (exists) {
         await Promise.all([
           this.page.waitForURL('**/project/*'),

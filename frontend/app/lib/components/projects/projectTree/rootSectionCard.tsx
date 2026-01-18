@@ -46,7 +46,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
 
   return (
     <div
-      data-testid="root-section-card"
+      data-testid="section-card"
       tabIndex={0}
       onBlur={() => setActiveNodes([])}
       className={clsx(
@@ -74,6 +74,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
       >
         <div className="flex h-full w-full items-center">
           <Button
+            data-testid='expand-btn'
             isIconOnly
             onPress={() => setIsExpanded(!isExpanded)}
             variant="light"
@@ -104,6 +105,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
             <>
               <Button
+                data-testid='add-child-btn'
                 isIconOnly
                 onPress={() => addNode([section.id])}
                 variant="light"
@@ -112,6 +114,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
                 <PlusIcon className="stroke-default-500" />
               </Button>
               <Button
+                data-testid='delete-btn'
                 isIconOnly
                 onPress={() => removeNode(section.id, [], true)}
                 variant="light"

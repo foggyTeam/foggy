@@ -12,7 +12,7 @@ export default function AddRootSectionButton({
 }) {
   return (
     <Button
-      data-testid="add-root-section-button"
+      data-testid="add-root-section-btn"
       onPress={() => onPress([])}
       className={clsx(
         'flex items-center justify-start rounded-2xl',
