@@ -26,7 +26,7 @@ export default class AddProjectEntityFixture {
   }
   async submit() {
     await this.container.getByTestId('create-btn').last().click();
-    await this.page.waitForTimeout(500);
+    await this.page.waitForTimeout(1000);
   }
 
   async createEntity(
