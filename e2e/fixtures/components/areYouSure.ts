@@ -15,6 +15,6 @@ export default class AreYouSureFixture {
 
   async submit() {
     await this.sureButton.click();
-    await this.page.waitForTimeout(250);
+    await this.page.waitForTimeout(500);
   }
 }

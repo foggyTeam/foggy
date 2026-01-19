@@ -16,10 +16,14 @@ export default class ProjectPageFixture {
   }
 
   private get projectSettingsButton() {
-    return this.page.getByTestId('settings-btn');
+    return this.page
+      .getByTestId('settings-btn')
+      .filter({ has: this.page.locator(':visible') });
   }
   private get addRootSectionButton() {
-    return this.page.getByTestId('add-root-section-btn');
+    return this.page
+      .getByTestId('add-root-section-btn')
+      .filter({ has: this.page.locator(':visible') });
   }
   get projectSections() {
     return this.page.getByTestId('section-card');

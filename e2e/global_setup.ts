@@ -11,7 +11,7 @@ function log(text: string, step: boolean = true, error: boolean = false) {
 }
 
 export default async function globalSetup(config) {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch();
   const page = await browser.newPage();
 
   log('START SETUP');

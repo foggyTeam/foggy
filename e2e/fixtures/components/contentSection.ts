@@ -1,4 +1,4 @@
-import type { Page, Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export class ContentSectionFixture {
   private readonly head: Locator;
@@ -24,12 +24,24 @@ export class ContentSectionFixture {
     this.content = section.getByTestId('content-section-content');
 
     this.searchInput = this.head.locator('input[type="text"]');
-    this.addNewButton = this.head.getByTestId('add-new-btn');
-    this.addMemberButton = this.head.getByTestId('add-member-btn');
-    this.settingsButton = this.head.getByTestId('settings-btn');
-    this.filterButton = this.head.getByTestId('filters-btn');
-    this.favoriteButton = this.head.getByTestId('favorite-btn');
-    this.notificationButton = this.head.getByTestId('with-notification-btn');
+    this.addNewButton = this.head
+      .getByTestId('add-new-btn')
+      .filter({ has: this.page.locator(':visible') });
+    this.addMemberButton = this.head
+      .getByTestId('add-member-btn')
+      .filter({ has: this.page.locator(':visible') });
+    this.settingsButton = this.head
+      .getByTestId('settings-btn')
+      .filter({ has: this.page.locator(':visible') });
+    this.filterButton = this.head
+      .getByTestId('filters-btn')
+      .filter({ has: this.page.locator(':visible') });
+    this.favoriteButton = this.head
+      .getByTestId('favorite-btn')
+      .filter({ has: this.page.locator(':visible') });
+    this.notificationButton = this.head
+      .getByTestId('with-notification-btn')
+      .filter({ has: this.page.locator(':visible') });
   }
 
   async search(value: string) {
