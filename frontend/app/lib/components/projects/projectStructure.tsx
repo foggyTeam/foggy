@@ -24,7 +24,10 @@ const ProjectStructure = observer(() => {
 
   return (
     <>
-      <div data-testid="project-structure" className="text-medium flex h-full w-full flex-col gap-4 overflow-clip sm:text-sm">
+      <div
+        data-testid="project-structure"
+        className="text-medium flex h-full w-full flex-col gap-4 overflow-clip sm:text-sm"
+      >
         <div className="flex flex-col gap-4">
           <div className="flex h-fit w-full items-center justify-between gap-4">
             <div className="flex h-fit items-center justify-start gap-4">

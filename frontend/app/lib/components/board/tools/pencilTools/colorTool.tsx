@@ -24,6 +24,7 @@ export default function ColorTool({
     <Popover>
       <PopoverTrigger>
         <Button
+          data-testid='color-tool-btn'
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

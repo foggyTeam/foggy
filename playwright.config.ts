@@ -25,10 +25,17 @@ export default defineConfig({
   reporter: process.env.CI ? ['github', 'json'] : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   globalSetup: require.resolve('./e2e/global_setup.ts'),
+
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     storageState: './e2e/.auth_state.json',
+
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+    expect: {
+      timeout: 10_000,
+    },
   },
 
   /* Configure projects for major browsers */

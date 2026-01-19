@@ -3,6 +3,7 @@ import { BASE_URL } from '../data';
 import { ContentSectionFixture } from '../components/contentSection';
 import ProjectSettingsFixture from '../components/projectSettings';
 import AddProjectEntityFixture from '../components/addProjectEntity';
+import AreYouSureFixture from '../components/areYouSure';
 
 export default class ProjectPageFixture {
   private readonly membersSection: ContentSectionFixture;
@@ -139,7 +140,7 @@ export default class ProjectPageFixture {
 
     try {
       await Promise.all([
-        this.page.waitForURL('**/project/*/*/*'),
+        this.page.waitForURL('**/project/*/*/*', { timeout: 10000 }),
         await boardCard.first().dblclick(),
       ]);
       return true;
@@ -149,19 +150,55 @@ export default class ProjectPageFixture {
     }
   }
 
-  async openBoardWithCreatePath(
-    name: string,
+  async checkPathExists(
     path: string[],
-    type: 'simple' | 'graph' | 'tree' = 'simple',
+    type: 'section' | 'simple' | 'graph' | 'tree' = 'simple',
+    create: boolean = true,
   ) {
     try {
-      await this.findProjectElement([...path, name]);
+      await this.findProjectElement(path);
+      return true;
     } catch (e: any) {
-      for (let i = 0; i < path.length; i++) {
-        await this.addSection(path[i], path.slice(path.length - i));
-      }
-      await this.addBoard(name, path, type);
+      if (!create) return false;
+      console.warn('Element not found, creating');
     }
-    return await this.openBoard(name, path);
+    try {
+      for (let i = 0; i < path.length; i++) {
+        let exists;
+        try {
+          await this.findProjectElement([
+            ...path.slice(path.length - i),
+            path[i],
+          ]);
+          exists = true;
+        } catch (e: any) {
+          exists = false;
+        }
+        if (!exists) {
+          if (i == path.length - 1 && type !== 'section')
+            await this.addBoard(path[i], path.slice(path.length - i), type);
+          else await this.addSection(path[i], path.slice(path.length - i));
+        }
+      }
+
+      return true;
+    } catch (e: any) {
+      console.error('Failed to create board');
+    }
+    return false;
+  }
+
+  async deleteElement(path: string[]) {
+    let elementCard: Locator;
+    try {
+      elementCard = await this.findProjectElement(path);
+    } catch (e: any) {
+      return true;
+    }
+    await elementCard.hover();
+    await elementCard.getByTestId('delete-btn').click();
+    const modal = new AreYouSureFixture(this.page);
+    await modal.submit();
+    return true;
   }
 }

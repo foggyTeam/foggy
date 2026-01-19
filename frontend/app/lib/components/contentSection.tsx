@@ -170,7 +170,10 @@ export default function ContentSection({
 
   return (
     <>
-      <div {...rest} className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm">
+      <div
+        {...rest}
+        className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm"
+      >
         <div className="flex flex-col gap-1">
           {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">

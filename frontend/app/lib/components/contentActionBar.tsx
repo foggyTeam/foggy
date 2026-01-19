@@ -56,7 +56,10 @@ export default function ContentActionBar({
     ].some((size) => !!size);
   };
   return (
-    <div  data-testid="content-section-head" className="flex h-fit w-full flex-col gap-2">
+    <div
+      data-testid="content-section-head"
+      className="flex h-fit w-full flex-col gap-2"
+    >
       <div className="flex h-fit w-full items-start justify-between gap-1 sm:items-center">
         <div className="flex flex-wrap items-center gap-1 sm:flex-nowrap">
           <Input

@@ -59,6 +59,7 @@ export default function EllipseTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
       <Button
+        data-testid='ellipse-tool-btn'
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'ellipse') setActiveTool('');

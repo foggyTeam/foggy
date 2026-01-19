@@ -1,4 +1,5 @@
 import { Locator, Page } from '@playwright/test';
+import AreYouSureFixture from './areYouSure';
 
 export default class ProjectSettingsFixture {
   private readonly modal: Locator;
@@ -58,7 +59,8 @@ export default class ProjectSettingsFixture {
   async deleteProject(force: boolean = false) {
     await this.deleteButton.click();
     if (force) {
-      // TODO: click in are you sure dialog
+      const modal = new AreYouSureFixture(this.page);
+      await modal.submit();
     }
   }
 
