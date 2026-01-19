@@ -91,7 +91,7 @@ export default function StrokeTool() {
     <Popover>
       <PopoverTrigger>
         <Button
-          data-testid='stroke-tool-btn'
+          data-testid="stroke-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

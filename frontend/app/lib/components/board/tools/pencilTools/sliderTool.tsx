@@ -29,7 +29,7 @@ export default function SliderTool({
     <Popover>
       <PopoverTrigger>
         <Button
-          data-testid='slider-tool-btn'
+          data-testid="slider-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

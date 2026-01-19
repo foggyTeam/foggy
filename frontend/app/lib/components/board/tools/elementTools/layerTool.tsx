@@ -55,7 +55,7 @@ export default function LayerTool() {
     <Popover>
       <PopoverTrigger>
         <Button
-          data-testid='layer-tool-btn'
+          data-testid="layer-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

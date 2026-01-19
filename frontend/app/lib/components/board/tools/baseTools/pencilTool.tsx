@@ -71,7 +71,7 @@ export default function PencilTool({
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
       <Button
-        data-testid='pencil-tool-btn'
+        data-testid="pencil-tool-btn"
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'pencil') setActiveTool('');

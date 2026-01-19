@@ -59,7 +59,7 @@ export default function RectTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.rectTool}>
       <Button
-        data-testid='rect-tool-btn'
+        data-testid="rect-tool-btn"
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'rect') setActiveTool('');

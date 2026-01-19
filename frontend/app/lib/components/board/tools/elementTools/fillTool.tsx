@@ -67,7 +67,7 @@ export default function FillTool() {
     <Popover>
       <PopoverTrigger>
         <Button
-          data-testid='fill-tool-btn'
+          data-testid="fill-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

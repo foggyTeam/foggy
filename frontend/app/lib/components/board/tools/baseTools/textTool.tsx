@@ -59,7 +59,7 @@ export default function TextTool() {
     <>
       <FTooltip content={settingsStore.t.toolTips.tools.textTool}>
         <Button
-          data-testid='text-tool-btn'
+          data-testid="text-tool-btn"
           isDisabled={toolsDisabled || allToolsDisabled}
           onPress={() => {
             if (activeTool === 'text') setActiveTool('');

@@ -73,7 +73,7 @@ export default function SizeTool() {
     <Popover>
       <PopoverTrigger>
         <Button
-          data-testid='size-tool-btn'
+          data-testid="size-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"
