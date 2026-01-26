@@ -9,9 +9,9 @@ export default function saveResults(metrics: AggregatedMetrics) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  const filePath = path.join(
-    dir,
-    `${new Date().toLocaleString().replace(', ', '_')}.json`,
-  );
+  const date = new Date().toISOString(); // 2026-01-26T12:34:56.789Z
+  const safeDate = date.replace(/[:.]/g, '-'); // 2026-01-26T12-34-56-789Z
+
+  const filePath = path.join(dir, `${safeDate}.json`);
   fs.writeFileSync(filePath, JSON.stringify(metrics, null, 2));
 }

@@ -131,7 +131,7 @@ const BoardStage = observer(() => {
 
       <FTooltip content={settingsStore.t.toolTips.resetStage}>
         <Button
-          data-testid='reset-stage-btn'
+          data-testid="reset-stage-btn"
           onPress={resetStage}
           isIconOnly
           color="secondary"

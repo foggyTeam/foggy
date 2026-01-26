@@ -1,58 +1,71 @@
 import { expect, Page, test } from '@playwright/test';
-import MainPageFixture from './fixtures/pages/mainPage';
 import { BASE_URL, PROJECT, SIMPLE_BOARD } from './fixtures/data';
-import ProjectPageFixture from './fixtures/pages/projectPage';
 import BoardPageFixture from './fixtures/pages/boardPage';
 import PerformanceCollector from './fixtures/utils/performanceCollector';
 import saveResults from './fixtures/utils/saveResults';
 import { generatePath } from './fixtures/utils/boardUtils';
+import {
+  AddBoard,
+  AddNewProject,
+  AddSection,
+  DeleteBoard,
+  GetAllProjects,
+  GetProject,
+} from './fixtures/api/project';
 
 let page: Page;
 let projectId = undefined;
+let sectionId = undefined;
+let boardId = undefined;
 
 test.describe('Board', () => {
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
 
-    // CREATING PROJECT IF NOT EXIST
-    const mainPage = new MainPageFixture(page);
-    await mainPage.goto();
+    const projects = await GetAllProjects();
+    const existing = projects.find((p: any) => p.name === PROJECT.name);
 
-    await page.waitForTimeout(1500); // loading page contents
+    if (existing) projectId = existing.id;
+    else {
+      const result = await AddNewProject({
+        name: PROJECT.name,
+        description: PROJECT.description,
+        settings: PROJECT.settings,
+      });
+      projectId = result?.data.id;
+    }
 
-    const isProjectOpened = await mainPage.openProject(PROJECT.name, true);
-    expect(isProjectOpened).toBeTruthy();
-    projectId = page.url().split('/').pop();
+    expect(projectId).toBeTruthy();
 
-    // CREATING BOARD IF NOT EXIST
-    const projectPage = new ProjectPageFixture(page);
-    await page.waitForTimeout(1500); // loading page contents
+    const project = await GetProject(projectId);
 
-    const pathExists = await projectPage.checkPathExists(
-      [PROJECT.section],
-      'section',
-    );
-    expect(pathExists).toBeTruthy();
+    const section = project.sections.find((s) => s.name === PROJECT.section);
+    if (section) sectionId = section.id;
+    else {
+      const result = await AddSection(projectId, {
+        name: PROJECT.section,
+        parentSectionId: null,
+      });
+      sectionId = result.data.id;
+    }
+
+    expect(sectionId).toBeTruthy();
   });
   test.beforeEach(async () => {
-    const projectPage = new ProjectPageFixture(page);
-    if (page.url() !== `${BASE_URL}/project/${projectId}`) {
-      await projectPage.goto(projectId);
-      await page.waitForTimeout(1500);
+    if (boardId) {
+      await DeleteBoard(boardId);
     }
-    expect(page.url()).toMatch(`${BASE_URL}/project/${projectId}`);
 
-    const deleteResult = await projectPage.deleteElement([
-      PROJECT.section,
-      SIMPLE_BOARD.name,
-    ]);
-    expect(deleteResult).toBeTruthy();
+    const result = await AddBoard(projectId, {
+      sectionId,
+      name: SIMPLE_BOARD.name,
+      type: SIMPLE_BOARD.type,
+    });
+    boardId = result?.data?.id;
 
-    await projectPage.addBoard(SIMPLE_BOARD.name, [PROJECT.section]);
-    const isBoardOpened = await projectPage.openBoard(SIMPLE_BOARD.name, [
-      PROJECT.section,
-    ]);
-    expect(isBoardOpened).toBeTruthy();
+    expect(boardId).toBeTruthy();
+
+    await page.goto(`${BASE_URL}/project/${projectId}/${sectionId}/${boardId}`);
 
     await page.waitForTimeout(1500); // loading contents
   });

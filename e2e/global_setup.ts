@@ -1,6 +1,7 @@
-import { chromium } from '@playwright/test';
-import { USER, PROJECT, SIMPLE_BOARD } from './fixtures/data.ts';
+import { chromium, expect } from '@playwright/test';
+import { saveUserId, USER } from './fixtures/data.ts';
 import LoginPageFixture from './fixtures/pages/loginPage';
+import { AuthorizeUser } from './fixtures/api/user';
 
 const CONTEXT_STORAGE_PATH = './e2e/.auth_state.json';
 
@@ -15,6 +16,12 @@ export default async function globalSetup(config) {
   const page = await browser.newPage();
 
   log('START SETUP');
+
+  const userId = await AuthorizeUser(USER.email, USER.password);
+  expect(userId).toBeTruthy();
+
+  const saveResult = await saveUserId(userId);
+  expect(saveResult).toBeTruthy();
 
   const loginPage = new LoginPageFixture(page);
 
