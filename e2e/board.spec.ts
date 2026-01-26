@@ -52,8 +52,14 @@ test.describe('Board', () => {
     expect(sectionId).toBeTruthy();
   });
   test.beforeEach(async () => {
-    if (boardId) {
-      await DeleteBoard(boardId);
+    const project = await GetProject(projectId);
+    const section = project.sections.find((s) => s.id === sectionId);
+    for (let child of section.children) {
+      if (
+        child.name === SIMPLE_BOARD.name &&
+        child.type.toUpperCase() === SIMPLE_BOARD.type
+      )
+        await DeleteBoard(child.id);
     }
 
     const result = await AddBoard(projectId, {
@@ -61,6 +67,7 @@ test.describe('Board', () => {
       name: SIMPLE_BOARD.name,
       type: SIMPLE_BOARD.type,
     });
+
     boardId = result?.data?.id;
 
     expect(boardId).toBeTruthy();
