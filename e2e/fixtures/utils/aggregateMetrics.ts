@@ -24,68 +24,58 @@ export function aggregateMetrics(
     return sorted[idx];
   };
 
-  const frameDeltas = (raw.frames ?? []).filter(
+  const frames = (raw.frames ?? []).filter(
     (d) => Number.isFinite(d) && d > 0 && d < 1000,
   );
 
-  const avgFrameTime = avg(frameDeltas);
-  const totalTimeMs = sum(frameDeltas);
-  const framesCount = frameDeltas.length;
-
-  const avgFpsFromFrames = avgFrameTime > 0 ? 1000 / avgFrameTime : 0;
+  const totalTimeMs = sum(frames);
+  const framesCount = frames.length;
 
   const effectiveFps = totalTimeMs > 0 ? framesCount / (totalTimeMs / 1000) : 0;
+  const avgFrameTime = avg(frames);
+  const avgFps = avgFrameTime > 0 ? 1000 / avgFrameTime : 0;
 
-  const p95FrameTime = percentile(frameDeltas, 0.95);
-  const p5FrameTime = percentile(frameDeltas, 0.05);
-  const p95FpsFromFrames = p5FrameTime > 0 ? 1000 / p5FrameTime : 0;
+  const minFps = safeMax(frames) > 0 ? 1000 / safeMax(frames) : 0;
+  const maxFps = safeMin(frames) > 0 ? 1000 / safeMin(frames) : 0;
+
+  const p5FrameTime = percentile(frames, 0.05);
+  const p95Fps = p5FrameTime > 0 ? 1000 / p5FrameTime : 0;
 
   const targetFrameMs = 1000 / 60;
   const droppedFrameThresholdMs = targetFrameMs * 2.5;
-  const droppedFrames = frameDeltas.filter(
+  const droppedFrames = frames.filter(
     (d) => d > droppedFrameThresholdMs,
   ).length;
 
-  // TBT
-  const longTasks = (raw.longTasks ?? []).filter(
-    (t) => Number.isFinite(t) && t > 0,
-  );
-  const tbt = longTasks.filter((t) => t > 50).reduce((a, b) => a + (b - 50), 0);
+  const ltAgg = raw.longTasksAgg ?? { count: 0, totalTime: 0, max: 0, tbt: 0 };
 
-  // MEMORY
   const used = (raw.memory?.usedJSHeapSize ?? []).filter((n) =>
     Number.isFinite(n),
   );
   const growth = used.length >= 2 ? used[used.length - 1] - used[0] : 0;
 
-  // INP
   const inpDurations = (raw.interactions?.durations ?? []).filter(
     (n) => Number.isFinite(n) && n > 0,
   );
 
-  const minFpsFromFrames =
-    safeMax(frameDeltas) > 0 ? 1000 / safeMax(frameDeltas) : 0;
-  const maxFpsFromFrames =
-    safeMin(frameDeltas) > 0 ? 1000 / safeMin(frameDeltas) : 0;
-
   return {
     fps: {
       effective: effectiveFps,
-      avg: avgFpsFromFrames,
-      min: minFpsFromFrames,
-      max: maxFpsFromFrames,
-      p95: p95FpsFromFrames,
+      avg: avgFps,
+      min: minFps,
+      max: maxFps,
+      p95: p95Fps,
     },
     frameTime: {
       avg: avgFrameTime,
-      p95: p95FrameTime,
+      p95: percentile(frames, 0.95),
     },
     droppedFrames,
     longTasks: {
-      count: longTasks.length,
-      totalTime: sum(longTasks),
-      max: safeMax(longTasks),
-      tbt,
+      count: ltAgg.count,
+      totalTime: ltAgg.totalTime,
+      max: ltAgg.max,
+      tbt: ltAgg.tbt,
     },
     eventLoopLag: {
       avg: avg(
@@ -104,6 +94,7 @@ export function aggregateMetrics(
     inp: {
       p98: percentile(inpDurations, 0.98),
       samples: inpDurations.length,
+      total: raw.interactions?.totalCount ?? inpDurations.length,
     },
     measures: raw.measures ?? [],
   };

@@ -5,22 +5,26 @@ export type RawPerformanceMetrics = {
   fps: number[];
   frames: number[];
   longTasks: number[];
+  longTasksAgg: {
+    count: number;
+    totalTime: number;
+    max: number;
+    tbt: number;
+  };
   eventLoopLag: number[];
   memory: {
     usedJSHeapSize: number[];
     totalJSHeapSize: number[];
   };
-
   paint: Array<{ name: string; startTime: number; duration: number }>;
   layout: Array<{ name: string; startTime: number; duration: number }>;
-
   cls: {
     value: number;
     entries: Array<{ startTime: number; value: number }>;
   };
-
   interactions: {
     durations: number[];
+    totalCount: number;
     entries: Array<{
       name: string;
       duration: number;
@@ -30,13 +34,11 @@ export type RawPerformanceMetrics = {
       interactionId?: number;
     }>;
   };
-
   measures: Array<{
     name: string;
     duration: number;
     startTime: number;
   }>;
-
   resources: PerformanceEntry[];
   navigation: PerformanceNavigationTiming | null;
 };
@@ -72,7 +74,8 @@ export type AggregatedMetrics = {
   cls: number;
   inp: {
     p98: number;
-    samples: number;
+    samples: number; // сколько значений использовано для percentile
+    total: number;
   };
   measures: Array<{ name: string; duration: number; startTime: number }>;
 };
@@ -86,20 +89,17 @@ export async function setCpuThrottling(page: Page, rate = 4) {
 export type PerformanceCollectorOptions = {
   boardSelector: string;
   eventDurationThreshold?: number;
-
   maxFrameSamples?: number;
-  maxLongTaskSamples?: number;
   maxEventLoopLagSamples?: number;
   maxMemorySamples?: number;
-
+  inpReservoirSize?: number;
+  longTaskReservoirSize?: number;
   collectDebugEntries?: boolean;
   maxDebugEntries?: number;
-
   measureNameAllowlist?: {
     prefixes?: string[];
     exact?: string[];
   } | null;
-
   collectResources?: boolean;
   collectNavigation?: boolean;
 };
@@ -113,13 +113,14 @@ export default class PerformanceCollector {
   async start() {
     const boardSelector = this.options.boardSelector;
 
-    // SETTING OPTIONS
+    // OPTIONS
     const durationThreshold = this.options.eventDurationThreshold ?? 16;
     const maxFrameSamples = this.options.maxFrameSamples ?? 20_000;
-    const maxLongTaskSamples = this.options.maxLongTaskSamples ?? 10_000;
     const maxEventLoopLagSamples =
       this.options.maxEventLoopLagSamples ?? 10_000;
     const maxMemorySamples = this.options.maxMemorySamples ?? 10_000;
+    const inpReservoirSize = this.options.inpReservoirSize ?? 2000;
+    const longTaskReservoirSize = this.options.longTaskReservoirSize ?? 2000;
     const collectDebugEntries = this.options.collectDebugEntries ?? false;
     const maxDebugEntries = this.options.maxDebugEntries ?? 2_000;
     const measureAllow = this.options.measureNameAllowlist ?? {
@@ -134,9 +135,10 @@ export default class PerformanceCollector {
         boardSelector,
         durationThreshold,
         maxFrameSamples,
-        maxLongTaskSamples,
         maxEventLoopLagSamples,
         maxMemorySamples,
+        inpReservoirSize,
+        longTaskReservoirSize,
         collectDebugEntries,
         maxDebugEntries,
         measureAllow,
@@ -147,133 +149,57 @@ export default class PerformanceCollector {
           __timers?: number[];
           __rafId?: number;
           __startedAt?: number;
+          __ring?: Record<
+            string,
+            { cap: number; buf: number[]; idx: number; full: boolean }
+          >;
+          __reservoir?: Record<
+            string,
+            { cap: number; arr: number[]; seen: number }
+          >;
         };
 
-        const pushCapped = <T>(arr: T[], item: T, cap: number) => {
-          if (arr.length >= cap) return;
-          arr.push(item);
-        };
-
-        const perf: PerfState = (window.__perf = {
-          fps: [],
-          frames: [],
-          longTasks: [],
-          eventLoopLag: [],
-          memory: {
-            usedJSHeapSize: [],
-            totalJSHeapSize: [],
-          },
-
-          paint: [],
-          layout: [],
-
-          cls: { value: 0, entries: [] },
-          interactions: { durations: [], entries: [] },
-
-          measures: [],
-          resources: [],
-          navigation: null,
-
-          __timers: [],
-          __rafId: undefined,
-          __startedAt: performance.now(),
+        const createRing = (cap: number) => ({
+          cap,
+          buf: new Array<number>(cap),
+          idx: 0,
+          full: false,
         });
 
-        // FPS
-        let lastFrame = performance.now();
-        const raf = (now: number) => {
-          const delta = now - lastFrame;
-          lastFrame = now;
+        const ringPush = (
+          ring: { cap: number; buf: number[]; idx: number; full: boolean },
+          v: number,
+        ) => {
+          ring.buf[ring.idx] = v;
+          ring.idx = (ring.idx + 1) % ring.cap;
+          if (ring.idx === 0) ring.full = true;
+        };
 
-          // frame time
-          if (delta > 0 && delta < 1000) {
-            pushCapped(perf.frames, delta, maxFrameSamples);
-            pushCapped(perf.fps, 1000 / delta, maxFrameSamples);
+        const ringToArray = (ring: {
+          cap: number;
+          buf: number[];
+          idx: number;
+          full: boolean;
+        }) => {
+          if (!ring.full) return ring.buf.slice(0, ring.idx);
+          return ring.buf.slice(ring.idx).concat(ring.buf.slice(0, ring.idx));
+        };
+
+        // Reservoir sampling (Vitter's Algorithm R)
+        const reservoirPush = (
+          r: { cap: number; arr: number[]; seen: number },
+          v: number,
+        ) => {
+          r.seen += 1;
+          const n = r.seen;
+          if (r.arr.length < r.cap) {
+            r.arr.push(v);
+            return;
           }
-
-          perf.__rafId = requestAnimationFrame(raf);
+          const j = Math.floor(Math.random() * n);
+          if (j < r.cap) r.arr[j] = v;
         };
-        perf.__rafId = requestAnimationFrame(raf);
 
-        // EVENT LOOP LAG
-        let lastTick = performance.now();
-        const lagTimer = window.setInterval(() => {
-          const now = performance.now();
-          const lag = now - lastTick - 100;
-          lastTick = now;
-          pushCapped(
-            perf.eventLoopLag,
-            Math.max(0, lag),
-            maxEventLoopLagSamples,
-          );
-        }, 100);
-        perf.__timers!.push(lagTimer);
-
-        // LONG TASKS
-        try {
-          new PerformanceObserver((list) => {
-            list.getEntries().forEach((e) => {
-              pushCapped(perf.longTasks, e.duration, maxLongTaskSamples);
-            });
-          }).observe({ type: 'longtask', buffered: true } as any);
-        } catch {}
-
-        // PAINT (debug-only)
-        if (collectDebugEntries) {
-          try {
-            new PerformanceObserver((list) => {
-              list.getEntries().forEach((e) => {
-                pushCapped(
-                  perf.paint,
-                  {
-                    name: e.name,
-                    startTime: e.startTime,
-                    duration: e.duration,
-                  },
-                  maxDebugEntries,
-                );
-              });
-            }).observe({ type: 'paint', buffered: true });
-          } catch {}
-        }
-
-        // LAYOUT-SHIFT + CLS
-        try {
-          new PerformanceObserver((list) => {
-            list.getEntries().forEach((e: any) => {
-              // raw entries — только если явно включили
-              if (collectDebugEntries) {
-                pushCapped(
-                  perf.layout,
-                  {
-                    name: e.name,
-                    startTime: e.startTime,
-                    duration: e.duration,
-                  },
-                  maxDebugEntries,
-                );
-              }
-
-              // CLS accumulation
-              if (e.hadRecentInput) return;
-
-              perf.cls.value += e.value;
-
-              // подробности CLS тоже могут разрастаться → cap
-              pushCapped(
-                perf.cls.entries,
-                { startTime: e.startTime, value: e.value },
-                maxDebugEntries,
-              );
-            });
-          }).observe({ type: 'layout-shift', buffered: true } as any);
-        } catch {}
-
-        // INP — Event Timing API
-        const isFromBoard = (target: any) => {
-          if (!target || !target.closest) return false;
-          return !!target.closest(boardSelector);
-        };
         const shouldCollectMeasure = (name: unknown): boolean => {
           if (!measureAllow) return false;
           if (typeof name !== 'string') return false;
@@ -285,6 +211,143 @@ export default class PerformanceCollector {
           return prefixes.some((p) => name.startsWith(p));
         };
 
+        const perf: PerfState = (window.__perf = {
+          fps: [],
+          frames: [],
+          longTasks: [],
+          longTasksAgg: { count: 0, totalTime: 0, max: 0, tbt: 0 },
+          eventLoopLag: [],
+          memory: { usedJSHeapSize: [], totalJSHeapSize: [] },
+
+          paint: [],
+          layout: [],
+
+          cls: { value: 0, entries: [] },
+          interactions: { durations: [], totalCount: 0, entries: [] },
+
+          measures: [],
+          resources: [],
+          navigation: null,
+
+          __timers: [],
+          __rafId: undefined,
+          __startedAt: performance.now(),
+          __ring: {
+            frames: createRing(maxFrameSamples),
+            fps: createRing(maxFrameSamples),
+            lag: createRing(maxEventLoopLagSamples),
+            memUsed: createRing(maxMemorySamples),
+            memTotal: createRing(maxMemorySamples),
+          },
+          __reservoir: {
+            inp: { cap: inpReservoirSize, arr: [], seen: 0 },
+            long: { cap: longTaskReservoirSize, arr: [], seen: 0 },
+          },
+        });
+
+        // FPS / frame times (ring)
+        let lastFrame = performance.now();
+        const raf = (now: number) => {
+          const delta = now - lastFrame;
+          lastFrame = now;
+
+          if (Number.isFinite(delta) && delta > 0 && delta < 1000) {
+            ringPush(perf.__ring!.frames, delta);
+            ringPush(perf.__ring!.fps, 1000 / delta);
+          }
+
+          perf.__rafId = requestAnimationFrame(raf);
+        };
+        perf.__rafId = requestAnimationFrame(raf);
+
+        // EVENT LOOP LAG (ring)
+        let lastTick = performance.now();
+        const lagTimer = window.setInterval(() => {
+          const now = performance.now();
+          const lag = now - lastTick - 100;
+          lastTick = now;
+          ringPush(perf.__ring!.lag, Math.max(0, lag));
+        }, 100);
+        perf.__timers!.push(lagTimer);
+
+        // LONG TASKS
+        try {
+          new PerformanceObserver((list) => {
+            list.getEntries().forEach((e) => {
+              const d = Number(e.duration) || 0;
+              if (d <= 0) return;
+
+              perf.longTasksAgg.count += 1;
+              perf.longTasksAgg.totalTime += d;
+              if (d > perf.longTasksAgg.max) perf.longTasksAgg.max = d;
+              if (d > 50) perf.longTasksAgg.tbt += d - 50;
+
+              reservoirPush(perf.__reservoir!.long, d);
+            });
+          }).observe({ type: 'longtask', buffered: true } as any);
+        } catch {}
+
+        // PAINT / LAYOUT (debug-only)
+        const pushLastN = <T>(arr: T[], item: T, cap: number) => {
+          arr.push(item);
+          if (arr.length > cap) arr.splice(0, arr.length - cap);
+        };
+
+        if (collectDebugEntries) {
+          try {
+            new PerformanceObserver((list) => {
+              list.getEntries().forEach((e) => {
+                pushLastN(
+                  perf.paint,
+                  {
+                    name: e.name,
+                    startTime: e.startTime,
+                    duration: e.duration,
+                  },
+                  maxDebugEntries,
+                );
+              });
+            }).observe({ type: 'paint', buffered: true });
+          } catch {}
+
+          try {
+            new PerformanceObserver((list) => {
+              list.getEntries().forEach((e: any) => {
+                pushLastN(
+                  perf.layout,
+                  {
+                    name: e.name,
+                    startTime: e.startTime,
+                    duration: e.duration,
+                  },
+                  maxDebugEntries,
+                );
+              });
+            }).observe({ type: 'layout-shift', buffered: true } as any);
+          } catch {}
+        }
+
+        // CLS
+        try {
+          new PerformanceObserver((list) => {
+            list.getEntries().forEach((e: any) => {
+              if (e.hadRecentInput) return;
+              perf.cls.value += e.value;
+              pushLastN(
+                perf.cls.entries,
+                { startTime: e.startTime, value: e.value },
+                maxDebugEntries,
+              );
+            });
+          }).observe({ type: 'layout-shift', buffered: true } as any);
+        } catch {}
+
+        // INP — Event Timing API (reservoir)
+        const isFromBoard = (target: any) => {
+          if (!target || !target.closest) return false;
+          return !!target.closest(boardSelector);
+        };
+
         try {
           new PerformanceObserver((list) => {
             list.getEntries().forEach((e: any) => {
@@ -293,14 +356,11 @@ export default class PerformanceCollector {
               const duration = Number(e.duration) || 0;
               if (duration <= 0) return;
 
-              pushCapped(
-                perf.interactions.durations,
-                duration,
-                maxFrameSamples,
-              );
+              perf.interactions.totalCount += 1;
+              reservoirPush(perf.__reservoir!.inp, duration);
 
               if (collectDebugEntries) {
-                pushCapped(
+                pushLastN(
                   perf.interactions.entries,
                   {
                     name: e.name,
@@ -327,8 +387,7 @@ export default class PerformanceCollector {
             new PerformanceObserver((list) => {
               list.getEntries().forEach((e: any) => {
                 if (!shouldCollectMeasure(e.name)) return;
-
-                pushCapped(
+                pushLastN(
                   perf.measures,
                   {
                     name: e.name,
@@ -342,23 +401,15 @@ export default class PerformanceCollector {
           } catch {}
         }
 
-        // MEMORY
+        // MEMORY (ring)
         if ('memory' in performance) {
           const memTimer = window.setInterval(() => {
             // @ts-ignore
             const mem = performance.memory;
             if (!mem) return;
 
-            pushCapped(
-              perf.memory.usedJSHeapSize,
-              mem.usedJSHeapSize,
-              maxMemorySamples,
-            );
-            pushCapped(
-              perf.memory.totalJSHeapSize,
-              mem.totalJSHeapSize,
-              maxMemorySamples,
-            );
+            ringPush(perf.__ring!.memUsed, mem.usedJSHeapSize);
+            ringPush(perf.__ring!.memTotal, mem.totalJSHeapSize);
           }, 200);
           perf.__timers!.push(memTimer);
         }
@@ -376,14 +427,26 @@ export default class PerformanceCollector {
             perf.navigation = nav || null;
           }
         } catch {}
+
+        perf.__materialize = () => {
+          perf.frames = ringToArray(perf.__ring!.frames);
+          perf.fps = ringToArray(perf.__ring!.fps);
+          perf.eventLoopLag = ringToArray(perf.__ring!.lag);
+          perf.memory.usedJSHeapSize = ringToArray(perf.__ring!.memUsed);
+          perf.memory.totalJSHeapSize = ringToArray(perf.__ring!.memTotal);
+
+          perf.interactions.durations = perf.__reservoir!.inp.arr.slice();
+          perf.longTasks = perf.__reservoir!.long.arr.slice();
+        };
       },
       {
         boardSelector,
         durationThreshold,
         maxFrameSamples,
-        maxLongTaskSamples,
         maxEventLoopLagSamples,
         maxMemorySamples,
+        inpReservoirSize,
+        longTaskReservoirSize,
         collectDebugEntries,
         maxDebugEntries,
         measureAllow,
@@ -404,6 +467,10 @@ export default class PerformanceCollector {
         if (Array.isArray(perf?.__timers)) {
           for (const t of perf.__timers) clearInterval(t);
         }
+      } catch {}
+
+      try {
+        perf?.__materialize?.();
       } catch {}
 
       return perf;
