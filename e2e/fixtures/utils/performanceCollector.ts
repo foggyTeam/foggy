@@ -11,10 +11,6 @@ export type RawPerformanceMetrics = {
     totalJSHeapSize: number[];
   };
 
-  /**
-   * Дебаг-данные. По умолчанию отключены/ограничены caps.
-   * Хранить "всё подряд" (layout/paint/resources/interactions.entries) дорого.
-   */
   paint: Array<{ name: string; startTime: number; duration: number }>;
   layout: Array<{ name: string; startTime: number; duration: number }>;
 
@@ -24,10 +20,6 @@ export type RawPerformanceMetrics = {
   };
 
   interactions: {
-    /**
-     * Для INP p98 достаточно durations.
-     * entries по умолчанию выключены (или ограничены cap), чтобы не раздувать память.
-     */
     durations: number[];
     entries: Array<{
       name: string;
@@ -66,7 +58,7 @@ export type AggregatedMetrics = {
     count: number;
     totalTime: number;
     max: number;
-    tbt: number; // Total Blocking Time
+    tbt: number;
   };
   eventLoopLag: {
     avg: number;
@@ -92,77 +84,48 @@ export async function setCpuThrottling(page: Page, rate = 4) {
 }
 
 export type PerformanceCollectorOptions = {
-  /** selector для фильтрации INP (Event Timing entries) */
-  boardSelector?: string;
-  /** threshold для Event Timing API */
+  boardSelector: string;
   eventDurationThreshold?: number;
 
-  /**
-   * Сколько точек кадров хранить. FPS/frameTime при rAF быстро разрастаются.
-   * Можно оставить большим, но cap защищает от "случайно 15 минут гоняли тест".
-   */
   maxFrameSamples?: number;
-
-  /** Максимум longtask samples */
   maxLongTaskSamples?: number;
-
-  /** Event loop lag samples */
   maxEventLoopLagSamples?: number;
-
-  /** Memory samples */
   maxMemorySamples?: number;
 
-  /**
-   * Собираем ли подробные entries (дорого).
-   * По умолчанию: false.
-   */
   collectDebugEntries?: boolean;
-
-  /** Максимум элементов для paint/layout/interactions.entries, если collectDebugEntries=true */
   maxDebugEntries?: number;
 
-  /**
-   * Какие user-timing measure собирать.
-   * По умолчанию: только имена, начинающиеся с "board:".
-   * Поставьте null/undefined чтобы вообще не собирать measures.
-   */
   measureNameAllowlist?: {
     prefixes?: string[];
     exact?: string[];
   } | null;
 
-  /** Если true — собирать resources */
   collectResources?: boolean;
-
-  /** Если true — собирать navigation */
   collectNavigation?: boolean;
 };
 
 export default class PerformanceCollector {
   constructor(
     public readonly page: Page,
-    private options: PerformanceCollectorOptions = {},
+    private options: PerformanceCollectorOptions,
   ) {}
 
   async start() {
-    const boardSelector =
-      this.options.boardSelector ?? '[data-testid="simple-board-stage"]';
-    const durationThreshold = this.options.eventDurationThreshold ?? 16;
+    const boardSelector = this.options.boardSelector;
 
+    // SETTING OPTIONS
+    const durationThreshold = this.options.eventDurationThreshold ?? 16;
     const maxFrameSamples = this.options.maxFrameSamples ?? 20_000;
     const maxLongTaskSamples = this.options.maxLongTaskSamples ?? 10_000;
     const maxEventLoopLagSamples =
       this.options.maxEventLoopLagSamples ?? 10_000;
     const maxMemorySamples = this.options.maxMemorySamples ?? 10_000;
-
     const collectDebugEntries = this.options.collectDebugEntries ?? false;
     const maxDebugEntries = this.options.maxDebugEntries ?? 2_000;
-
     const measureAllow = this.options.measureNameAllowlist ?? {
       prefixes: ['board:'],
       exact: [],
     };
-
     const collectResources = this.options.collectResources ?? false;
     const collectNavigation = this.options.collectNavigation ?? true;
 
@@ -191,7 +154,6 @@ export default class PerformanceCollector {
           arr.push(item);
         };
 
-        // @ts-ignore
         const perf: PerfState = (window.__perf = {
           fps: [],
           frames: [],
@@ -217,9 +179,7 @@ export default class PerformanceCollector {
           __startedAt: performance.now(),
         });
 
-        // -----------------------
-        // FPS (rAF)
-        // -----------------------
+        // FPS
         let lastFrame = performance.now();
         const raf = (now: number) => {
           const delta = now - lastFrame;
@@ -235,9 +195,7 @@ export default class PerformanceCollector {
         };
         perf.__rafId = requestAnimationFrame(raf);
 
-        // -----------------------
         // EVENT LOOP LAG
-        // -----------------------
         let lastTick = performance.now();
         const lagTimer = window.setInterval(() => {
           const now = performance.now();
@@ -251,22 +209,16 @@ export default class PerformanceCollector {
         }, 100);
         perf.__timers!.push(lagTimer);
 
-        // -----------------------
         // LONG TASKS
-        // -----------------------
         try {
           new PerformanceObserver((list) => {
             list.getEntries().forEach((e) => {
               pushCapped(perf.longTasks, e.duration, maxLongTaskSamples);
             });
           }).observe({ type: 'longtask', buffered: true } as any);
-        } catch {
-          // longtask может быть недоступен
-        }
+        } catch {}
 
-        // -----------------------
         // PAINT (debug-only)
-        // -----------------------
         if (collectDebugEntries) {
           try {
             new PerformanceObserver((list) => {
@@ -285,9 +237,7 @@ export default class PerformanceCollector {
           } catch {}
         }
 
-        // -----------------------
         // LAYOUT-SHIFT + CLS
-        // -----------------------
         try {
           new PerformanceObserver((list) => {
             list.getEntries().forEach((e: any) => {
@@ -319,14 +269,11 @@ export default class PerformanceCollector {
           }).observe({ type: 'layout-shift', buffered: true } as any);
         } catch {}
 
-        // -----------------------
         // INP — Event Timing API
-        // -----------------------
         const isFromBoard = (target: any) => {
           if (!target || !target.closest) return false;
           return !!target.closest(boardSelector);
         };
-
         const shouldCollectMeasure = (name: unknown): boolean => {
           if (!measureAllow) return false;
           if (typeof name !== 'string') return false;
@@ -346,14 +293,12 @@ export default class PerformanceCollector {
               const duration = Number(e.duration) || 0;
               if (duration <= 0) return;
 
-              // durations достаточно для p98
               pushCapped(
                 perf.interactions.durations,
                 duration,
                 maxFrameSamples,
               );
 
-              // entries — только если включили дебаг
               if (collectDebugEntries) {
                 pushCapped(
                   perf.interactions.entries,
@@ -374,13 +319,9 @@ export default class PerformanceCollector {
             buffered: true,
             durationThreshold,
           } as any);
-        } catch {
-          // Event Timing может быть недоступен
-        }
+        } catch {}
 
-        // -----------------------
-        // USER TIMINGS (filtered)
-        // -----------------------
+        // USER TIMINGS
         if (measureAllow) {
           try {
             new PerformanceObserver((list) => {
@@ -401,10 +342,7 @@ export default class PerformanceCollector {
           } catch {}
         }
 
-        // -----------------------
         // MEMORY
-        // -----------------------
-        // Важно: performance.memory не стандартизован и есть не везде.
         if ('memory' in performance) {
           const memTimer = window.setInterval(() => {
             // @ts-ignore
@@ -425,12 +363,9 @@ export default class PerformanceCollector {
           perf.__timers!.push(memTimer);
         }
 
-        // -----------------------
         // RESOURCES / NAVIGATION
-        // -----------------------
         try {
           if (collectResources) {
-            // @ts-ignore
             perf.resources = performance.getEntriesByType('resource');
           }
         } catch {}
@@ -438,7 +373,6 @@ export default class PerformanceCollector {
         try {
           if (collectNavigation) {
             const nav = performance.getEntriesByType('navigation')[0];
-            // @ts-ignore
             perf.navigation = nav || null;
           }
         } catch {}
@@ -461,10 +395,8 @@ export default class PerformanceCollector {
 
   async stop(): Promise<AggregatedMetrics> {
     const raw: RawPerformanceMetrics = await this.page.evaluate(() => {
-      // @ts-ignore
       const perf = window.__perf;
 
-      // подчистим таймеры/raf, чтобы не тянулись дальше
       try {
         if (perf?.__rafId) cancelAnimationFrame(perf.__rafId);
       } catch {}
@@ -474,7 +406,6 @@ export default class PerformanceCollector {
         }
       } catch {}
 
-      // @ts-ignore
       return perf;
     });
 
