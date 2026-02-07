@@ -11,7 +11,9 @@
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
     "docker": "docker-compose up --build",
     "e2e": "pnpm exec playwright test",
-    "e2e-ui": "pnpm exec playwright test --ui"
+    "e2e-ui": "pnpm exec playwright test --ui",
+    "performance": "npx playwright test -g \"Performance benchmark\" --project=chromium --headed",
+    "performance-headless": "npx playwright test -g \"Performance benchmark\" --project=chromium"
   },
   "workspaces": [
     "frontend",

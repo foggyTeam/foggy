@@ -9,6 +9,8 @@ export function aggregateMetrics(
   const avg = (arr: number[]) =>
     arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
 
+  const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
+
   const safeMin = (arr: number[]) => (arr.length ? Math.min(...arr) : 0);
   const safeMax = (arr: number[]) => (arr.length ? Math.max(...arr) : 0);
 
@@ -22,40 +24,76 @@ export function aggregateMetrics(
     return sorted[idx];
   };
 
-  const droppedFrames = raw.frames.filter((f) => f > 50).length;
+  const frameDeltas = (raw.frames ?? []).filter(
+    (d) => Number.isFinite(d) && d > 0 && d < 1000,
+  );
 
-  const tbt = raw.longTasks
-    .filter((t) => t > 50)
-    .reduce((a, b) => a + (b - 50), 0);
+  const avgFrameTime = avg(frameDeltas);
+  const totalTimeMs = sum(frameDeltas);
+  const framesCount = frameDeltas.length;
 
-  const used = raw.memory.usedJSHeapSize ?? [];
-  const growth = used.length >= 2 ? used[used.length - 1] - used[0] : 0;
+  const avgFpsFromFrames = avgFrameTime > 0 ? 1000 / avgFrameTime : 0;
 
-  const inpDurations = (raw.interactions?.durations ?? []).filter((n) =>
+  const effectiveFps = totalTimeMs > 0 ? framesCount / (totalTimeMs / 1000) : 0;
+
+  const p95FrameTime = percentile(frameDeltas, 0.95);
+  const p5FrameTime = percentile(frameDeltas, 0.05);
+  const p95FpsFromFrames = p5FrameTime > 0 ? 1000 / p5FrameTime : 0;
+
+  const targetFrameMs = 1000 / 60;
+  const droppedFrameThresholdMs = targetFrameMs * 2.5;
+  const droppedFrames = frameDeltas.filter(
+    (d) => d > droppedFrameThresholdMs,
+  ).length;
+
+  // TBT
+  const longTasks = (raw.longTasks ?? []).filter(
+    (t) => Number.isFinite(t) && t > 0,
+  );
+  const tbt = longTasks.filter((t) => t > 50).reduce((a, b) => a + (b - 50), 0);
+
+  // MEMORY
+  const used = (raw.memory?.usedJSHeapSize ?? []).filter((n) =>
     Number.isFinite(n),
   );
+  const growth = used.length >= 2 ? used[used.length - 1] - used[0] : 0;
+
+  // INP
+  const inpDurations = (raw.interactions?.durations ?? []).filter(
+    (n) => Number.isFinite(n) && n > 0,
+  );
+
+  const minFpsFromFrames =
+    safeMax(frameDeltas) > 0 ? 1000 / safeMax(frameDeltas) : 0;
+  const maxFpsFromFrames =
+    safeMin(frameDeltas) > 0 ? 1000 / safeMin(frameDeltas) : 0;
 
   return {
     fps: {
-      avg: avg(raw.fps),
-      min: safeMin(raw.fps),
-      max: safeMax(raw.fps),
-      p95: percentile(raw.fps, 0.95),
+      effective: effectiveFps,
+      avg: avgFpsFromFrames,
+      min: minFpsFromFrames,
+      max: maxFpsFromFrames,
+      p95: p95FpsFromFrames,
     },
     frameTime: {
-      avg: avg(raw.frames),
-      p95: percentile(raw.frames, 0.95),
+      avg: avgFrameTime,
+      p95: p95FrameTime,
     },
     droppedFrames,
     longTasks: {
-      count: raw.longTasks.length,
-      totalTime: raw.longTasks.reduce((a: number, b: number) => a + b, 0),
-      max: safeMax(raw.longTasks),
+      count: longTasks.length,
+      totalTime: sum(longTasks),
+      max: safeMax(longTasks),
       tbt,
     },
     eventLoopLag: {
-      avg: avg(raw.eventLoopLag),
-      max: safeMax(raw.eventLoopLag),
+      avg: avg(
+        (raw.eventLoopLag ?? []).filter((n) => Number.isFinite(n) && n >= 0),
+      ),
+      max: safeMax(
+        (raw.eventLoopLag ?? []).filter((n) => Number.isFinite(n) && n >= 0),
+      ),
     },
     memory: {
       usedHeapAvg: avg(used),

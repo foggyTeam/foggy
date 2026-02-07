@@ -51,6 +51,7 @@ export type RawPerformanceMetrics = {
 
 export type AggregatedMetrics = {
   fps: {
+    effective: number;
     avg: number;
     min: number;
     max: number;
