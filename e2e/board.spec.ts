@@ -134,11 +134,27 @@ test.describe('Board', () => {
   });
   test('Performance benchmark', async () => {
     test.setTimeout(5 * 60 * 1000);
+    // await setCpuThrottling(page, 4);
 
-    const performanceCollector = new PerformanceCollector(page);
     const boardPage = new BoardPageFixture(page);
+    const performanceCollector = new PerformanceCollector(page, {
+      boardSelector: '[data-testid="simple-board-stage"]',
+      eventDurationThreshold: 16,
+    });
 
     await performanceCollector.start();
+
+    /* ---------- 0. READY-TIME ---------- */
+    await page.evaluate(() => performance.mark('board:ready:start'));
+    await page.waitForSelector('[data-testid="simple-board-stage"]');
+    await page.evaluate(() => {
+      performance.mark('board:ready:end');
+      performance.measure(
+        'board:ready',
+        'board:ready:start',
+        'board:ready:end',
+      );
+    });
 
     {
       /* ---------- 1. WARM-UP ---------- */
@@ -208,6 +224,8 @@ test.describe('Board', () => {
     expect(results.fps.avg).toBeGreaterThan(25);
     expect(results.longTasks.count).toBeLessThan(20);
     expect(results.memory.growth).toBeLessThan(50_000_000);
+    expect(results.inp.p98).toBeLessThan(200);
+    expect(results.cls).toBeLessThan(0.1);
   });
   test.afterAll(async () => {
     await page.close();

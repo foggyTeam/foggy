@@ -1,4 +1,4 @@
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 import { BASE_URL } from '../data';
 
 type AvailableTools =
@@ -54,14 +54,14 @@ export default class BoardPageFixture {
     try {
       switch (type) {
         case 'move':
-          await this.page.mouse.move(x, y, { steps: 10 });
+          await this.page.mouse.move(x, y, { steps: 1 });
           break;
         case 'click':
-          await this.stage.click({ position: { x, y }, button });
+          await this.stage.click({ button });
           break;
         case 'down':
-          await this.page.mouse.move(x, y, { steps: 10 });
-          await this.page.mouse.down({ position: { x, y }, button });
+          await this.page.mouse.move(x, y, { steps: 1 });
+          await this.page.mouse.down({ button });
           break;
         case 'up':
           await this.page.mouse.up({ button });

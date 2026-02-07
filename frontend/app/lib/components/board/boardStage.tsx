@@ -47,7 +47,7 @@ const BoardStage = observer(() => {
   UseBoardZoom(stageRef, scale, setScale);
 
   return (
-    <div className="relative h-full w-full overflow-hidden">
+    <div  data-testid='simple-board-stage' className="relative h-full w-full overflow-hidden">
       <GridBackground gridSize={GRID_SIZE} />
       <Stage
         width={STAGE_SIZE}

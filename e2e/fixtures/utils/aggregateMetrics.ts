@@ -9,22 +9,37 @@ export function aggregateMetrics(
   const avg = (arr: number[]) =>
     arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
 
+  const safeMin = (arr: number[]) => (arr.length ? Math.min(...arr) : 0);
+  const safeMax = (arr: number[]) => (arr.length ? Math.max(...arr) : 0);
+
   const percentile = (arr: number[], p: number) => {
     if (!arr.length) return 0;
     const sorted = [...arr].sort((a, b) => a - b);
-    return sorted[Math.floor(p * sorted.length)];
+    const idx = Math.min(
+      sorted.length - 1,
+      Math.max(0, Math.ceil(p * sorted.length) - 1),
+    );
+    return sorted[idx];
   };
 
   const droppedFrames = raw.frames.filter((f) => f > 50).length;
+
   const tbt = raw.longTasks
     .filter((t) => t > 50)
     .reduce((a, b) => a + (b - 50), 0);
 
+  const used = raw.memory.usedJSHeapSize ?? [];
+  const growth = used.length >= 2 ? used[used.length - 1] - used[0] : 0;
+
+  const inpDurations = (raw.interactions?.durations ?? []).filter((n) =>
+    Number.isFinite(n),
+  );
+
   return {
     fps: {
       avg: avg(raw.fps),
-      min: Math.min(...raw.fps),
-      max: Math.max(...raw.fps),
+      min: safeMin(raw.fps),
+      max: safeMax(raw.fps),
       p95: percentile(raw.fps, 0.95),
     },
     frameTime: {
@@ -35,17 +50,23 @@ export function aggregateMetrics(
     longTasks: {
       count: raw.longTasks.length,
       totalTime: raw.longTasks.reduce((a: number, b: number) => a + b, 0),
-      max: Math.max(0, ...raw.longTasks),
+      max: safeMax(raw.longTasks),
       tbt,
     },
     eventLoopLag: {
       avg: avg(raw.eventLoopLag),
-      max: Math.max(0, ...raw.eventLoopLag),
+      max: safeMax(raw.eventLoopLag),
     },
     memory: {
-      usedHeapAvg: avg(raw.memory.usedJSHeapSize),
-      usedHeapMax: Math.max(0, ...raw.memory.usedJSHeapSize),
-      growth: raw.memory.usedJSHeapSize.at(-1) - raw.memory.usedJSHeapSize[0],
+      usedHeapAvg: avg(used),
+      usedHeapMax: safeMax(used),
+      growth,
     },
+    cls: raw.cls?.value ?? 0,
+    inp: {
+      p98: percentile(inpDurations, 0.98),
+      samples: inpDurations.length,
+    },
+    measures: raw.measures ?? [],
   };
 }
