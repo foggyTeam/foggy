@@ -180,7 +180,6 @@ test.describe('Board', () => {
       }
 
       /* ---------- 3. CAMERA STRESS ---------- */
-      await boardPage.toggleTool('pencil');
       for (let i = 0; i < 8; i++) {
         await boardPage.zoom(3, true);
 
@@ -222,7 +221,7 @@ test.describe('Board', () => {
     }
 
     const results = await performanceCollector.stop();
-    saveResults(results);
+    saveResults('./e2e/performance/board', results);
 
     expect(results.fps.avg).toBeGreaterThan(25);
     expect(results.longTasks.count).toBeLessThan(20);

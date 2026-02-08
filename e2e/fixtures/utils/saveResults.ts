@@ -2,9 +2,7 @@ import fs from 'fs';
 import { AggregatedMetrics } from './performanceCollector';
 import * as path from 'path';
 
-export default function saveResults(metrics: AggregatedMetrics) {
-  const dir = './e2e/performance/board';
-
+export default function saveResults(dir: string, metrics: AggregatedMetrics) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
