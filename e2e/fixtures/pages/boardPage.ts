@@ -47,24 +47,24 @@ export default class BoardPageFixture {
   ) {
     if (!(await this.isStagePoint(x, y)) && !(type === 'up')) {
       console.warn(`Mouse is not over stage [${x}, ${y}]. Mouse up.`);
-      await this.page.mouse.up({ button });
+      await this.releaseAllButtons();
       return;
     }
 
     try {
       switch (type) {
         case 'move':
-          await this.page.mouse.move(x, y, { steps: 1 });
+          await this.page.mouse.move(x, y);
           break;
         case 'click':
-          await this.stage.click({ button });
+          await this.stage.click({ position: { x, y }, button });
           break;
         case 'down':
-          await this.page.mouse.move(x, y, { steps: 1 });
+          await this.page.mouse.move(x, y);
           await this.page.mouse.down({ button });
           break;
         case 'up':
-          await this.page.mouse.up({ button });
+          await this.releaseAllButtons();
           break;
       }
     } catch (e: any) {
@@ -72,16 +72,20 @@ export default class BoardPageFixture {
         `Mouse action (${type}) failed at [${x}, ${y}]:`,
         e.message,
       );
-      await this.page.mouse.up({ button });
+      await this.releaseAllButtons();
     }
+  }
+
+  private async releaseAllButtons() {
+    await this.page.mouse.up({ button: 'left' }).catch(() => {});
+    await this.page.mouse.up({ button: 'right' }).catch(() => {});
+    await this.page.mouse.up({ button: 'middle' }).catch(() => {});
   }
 
   constructor(public readonly page: Page) {
     const viewport = this.page.viewportSize();
     this.viewportWidth = viewport?.width ?? 800;
     this.viewportHeight = viewport?.height ?? 600;
-
-    console.log(viewport);
   }
 
   async goto(projectId: string, sectionId: string, boardId: string) {
@@ -102,7 +106,8 @@ export default class BoardPageFixture {
     for (const point of points.slice(1)) {
       await this.safeMouseInteract(...point);
     }
-    await this.safeMouseInteract(0, 0, 'up');
+
+    await this.releaseAllButtons();
   }
 
   async placeText(text: string, position: { x: number; y: number }) {
@@ -115,6 +120,7 @@ export default class BoardPageFixture {
     await textEditor.fill(text);
 
     await this.safeMouseInteract(position.x - 100, position.y, 'click');
+    await this.releaseAllButtons();
   }
 
   async zoom(times: number = 1, zoomIn: boolean = true) {
@@ -128,11 +134,12 @@ export default class BoardPageFixture {
     await this.safeMouseInteract(points[0][0], points[0][1], 'down', 'right');
 
     for (const point of points.slice(1)) await this.safeMouseInteract(...point);
-    await this.safeMouseInteract(0, 0, 'up');
+
+    await this.releaseAllButtons();
   }
 
   async reset() {
-    await this.page.getByTestId('reset-stage-btn').click();
-    await this.page.waitForTimeout(100);
+    await this.releaseAllButtons();
+    await this.page.getByTestId('reset-stage-btn').click({ button: 'left' });
   }
 }

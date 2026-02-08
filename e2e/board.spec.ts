@@ -50,6 +50,10 @@ test.describe('Board', () => {
     }
 
     expect(sectionId).toBeTruthy();
+
+    await page.addInitScript(() => {
+      document.addEventListener('contextmenu', (e) => e.preventDefault(), true);
+    });
   });
   test.beforeEach(async () => {
     const project = await GetProject(projectId);
@@ -73,11 +77,10 @@ test.describe('Board', () => {
     expect(boardId).toBeTruthy();
 
     await page.goto(`${BASE_URL}/project/${projectId}/${sectionId}/${boardId}`);
-
-    await page.waitForTimeout(1500); // loading contents
   });
   test('Board tools work', async () => {
     const boardPage = new BoardPageFixture(page);
+    await page.waitForSelector('[data-testid="simple-board-stage"]');
 
     await boardPage.toggleTool('pencil');
     await boardPage.drawLine([
@@ -134,7 +137,6 @@ test.describe('Board', () => {
   });
   test('Performance benchmark', async () => {
     test.setTimeout(5 * 60 * 1000);
-    // await setCpuThrottling(page, 4);
 
     const boardPage = new BoardPageFixture(page);
     const performanceCollector = new PerformanceCollector(page, {
@@ -164,22 +166,24 @@ test.describe('Board', () => {
       /* ---------- 2. OBJECT ACCUMULATION ---------- */
       for (let i = 0; i < 20; i++) {
         await boardPage.drawLine(
-          generatePath(200 + i * 20, 200 + i * 5, 10, 30),
+          generatePath(150 + i * 15, 200 + i * 5, 50, 15),
         );
 
         if (i % 5 === 0) {
           await boardPage.toggleTool('rect');
           await boardPage.drawLine([
-            [255 + i * 10, 500],
-            [300 + i * 10, 550],
+            [255 + i * 15, 500],
+            [300 + i * 20, 600],
           ]);
           await boardPage.toggleTool('pencil');
         }
       }
 
       /* ---------- 3. CAMERA STRESS ---------- */
+      await boardPage.toggleTool('pencil');
       for (let i = 0; i < 8; i++) {
         await boardPage.zoom(3, true);
+
         await boardPage.dragBoard([
           [400, 400],
           [200, 200],
@@ -188,30 +192,29 @@ test.describe('Board', () => {
         await boardPage.reset();
       }
 
-      /* ---------- 4. HEAVY INTERACTION AFTER RESET ---------- */
-      await boardPage.toggleTool('ellipse');
+      /* ---------- 4. HEAVY INTERACTION ---------- */
       for (let i = 0; i < 10; i++) {
+        await boardPage.toggleTool('ellipse');
         await boardPage.drawLine([
-          [500 + i * 15, 300],
-          [700 + i * 15, 450],
+          [600 + i * 10, 300],
+          [650 + i * 15, 400],
         ]);
       }
 
       /* ---------- 5. TEXT OVERLOAD ---------- */
-      /*
       for (let i = 0; i < 12; i++) {
         await boardPage.placeText(`Label ${i}`, {
-          x: 150 + i * 70,
-          y: 600,
+          x: 600 + i * 20,
+          y: 350 + i * 20,
         });
-      }*/
+      }
 
       /* ---------- 6. FINAL CAMERA STRESS ---------- */
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 20; i++) {
         await boardPage.zoom(4, true);
         await boardPage.zoom(4, false);
         await boardPage.dragBoard([
-          [500, 500],
+          [350, 700],
           [300, 300],
           [700, 700],
         ]);
