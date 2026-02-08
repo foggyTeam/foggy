@@ -182,6 +182,7 @@ const LoginForm = observer(() => {
           color="primary"
           size={commonSize}
           className="w-full"
+          data-testid="signin-btn"
         >
           {settingsStore.t.login.signUpButton}
         </FButton>
@@ -194,6 +195,7 @@ const LoginForm = observer(() => {
           variant="solid"
           color="primary"
           size={commonSize}
+          data-testid="login-btn"
           className="w-full sm:w-fit"
         >
           {settingsStore.t.login.signInButton}
@@ -206,6 +208,7 @@ const LoginForm = observer(() => {
           isIconOnly
           variant="light"
           color="secondary"
+          data-testid="google-btn"
           size={commonSize}
         >
           <GoogleIcon
@@ -216,6 +219,7 @@ const LoginForm = observer(() => {
           />
         </Button>
         <Button
+          data-testid="yandex-btn"
           onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
           isIconOnly
           variant="light"

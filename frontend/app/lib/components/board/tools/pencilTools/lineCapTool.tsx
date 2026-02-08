@@ -50,6 +50,7 @@ export default function LineCapTool({
     <Popover>
       <PopoverTrigger>
         <Button
+          data-testid="line-cap-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"

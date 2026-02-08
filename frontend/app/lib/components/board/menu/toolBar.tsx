@@ -49,6 +49,7 @@ export default function ToolBar() {
 
   return (
     <div
+      data-testid="board-toolbar"
       className={clsx(
         'absolute right-0 bottom-0 left-0 z-30 w-full justify-self-center px-4 py-3 sm:z-50',
         'sm:right-auto sm:bottom-4 sm:left-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',

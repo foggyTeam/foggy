@@ -39,6 +39,7 @@ export default function ProjectCard(
 
   return (
     <div
+      data-testid="project-card"
       ref={cardRef}
       onClick={() => (project.isDisabled ? undefined : setIsExpanded(true))}
       className={clsx(

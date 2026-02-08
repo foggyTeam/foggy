@@ -21,6 +21,7 @@ const AllProjects = observer(() => {
     <>
       <ContentSection
         hideTitle={isMobile}
+        data-testid="all-projects"
         sectionTitle={settingsStore.t.main.myProjects}
         data={projectsStore.allProjects.slice()}
         DataCard={ProjectCard}

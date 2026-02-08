@@ -48,6 +48,8 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
 
   return (
     <div
+      aria-expanded={isExpanded}
+      data-testid="section-card"
       tabIndex={0}
       onBlur={() => setActiveNodes([])}
       className={clsx(
@@ -75,6 +77,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
       >
         <div className="flex h-full w-full items-center">
           <Button
+            data-testid="expand-btn"
             isIconOnly
             onPress={() => setIsExpanded(!isExpanded)}
             variant="light"
@@ -105,6 +108,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
             <>
               <Button
+                data-testid="add-child-btn"
                 isIconOnly
                 onPress={() => addNode([section.id])}
                 variant="light"
@@ -113,6 +117,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
                 <PlusIcon className="stroke-default-600" />
               </Button>
               <Button
+                data-testid="delete-btn"
                 isIconOnly
                 onPress={() => removeNode(section.id, [], true)}
                 variant="light"

@@ -90,6 +90,7 @@ const AllProjectMembers = observer(() => {
       >
         <ContentSection
           hideTitle={isMobile}
+          data-testid="all-project-members"
           sectionTitle={settingsStore.t.projects.projectMembers}
           data={
             projectsStore.activeProject?.members.toSorted(CompareByRole) || []

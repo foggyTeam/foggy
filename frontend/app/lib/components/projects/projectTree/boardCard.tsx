@@ -73,6 +73,7 @@ export default function BoardCard({
 
   return (
     <div
+      data-testid="board-card"
       onDoubleClick={handleDoubleClick}
       className="flex max-h-16 w-full items-center justify-between gap-2 py-0.5 pr-0 pl-5 sm:p-1 sm:pl-10"
     >
@@ -103,6 +104,7 @@ export default function BoardCard({
         <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <Button
+              data-testid="delete-btn"
               isIconOnly
               onPress={() => removeNode(board.id, parentList)}
               variant="light"

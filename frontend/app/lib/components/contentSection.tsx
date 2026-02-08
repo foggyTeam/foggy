@@ -8,7 +8,13 @@ import {
   Team,
   TeamMember,
 } from '@/app/lib/types/definitions';
-import { ComponentType, useMemo, useReducer, useState } from 'react';
+import {
+  ComponentType,
+  HTMLAttributes,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 
 import { Avatar } from '@heroui/avatar';
 import ContentActionBar, {
@@ -104,7 +110,8 @@ export default function ContentSection({
   addMember,
   openSettings,
   type,
-}: ContentSectionProps) {
+  ...rest
+}: ContentSectionProps & HTMLAttributes<HTMLDivElement>) {
   const { isMobile } = useAdaptiveParams();
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
@@ -163,7 +170,10 @@ export default function ContentSection({
 
   return (
     <>
-      <div className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm">
+      <div
+        {...rest}
+        className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm"
+      >
         <div className="flex flex-col gap-1">
           {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
@@ -191,6 +201,7 @@ export default function ContentSection({
         >
           {!!filteredData.length && (
             <div
+              data-testid="content-section-content"
               className="grid-rows-auto grid content-between gap-y-2 pb-16"
               style={{
                 gridTemplateColumns: isMobile

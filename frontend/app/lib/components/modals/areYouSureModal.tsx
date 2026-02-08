@@ -48,6 +48,7 @@ export default function AreYouSureModal({
               )}
               <ModalFooter className="flex w-full justify-between">
                 <FButton
+                  data-testid="sure-btn"
                   color="danger"
                   variant="light"
                   size={commonSize}
@@ -56,6 +57,7 @@ export default function AreYouSureModal({
                   {sure}
                 </FButton>
                 <FButton
+                  data-testid="dismiss-btn"
                   color="primary"
                   variant="bordered"
                   size={commonSize}

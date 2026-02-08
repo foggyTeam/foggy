@@ -110,6 +110,7 @@ const AllNotifications = observer(() => {
     <div className="h-full w-full sm:w-72">
       <NotificationsContext.Provider value={{ onAnswer, onDelete }}>
         <ContentSection
+          data-testid="all-notifications"
           data={notificationsStore.notifications.map((notification, index) => {
             return {
               ...notification,

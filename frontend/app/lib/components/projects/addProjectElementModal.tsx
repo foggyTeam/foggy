@@ -47,7 +47,7 @@ export default function AddProjectElementModal({
 
   return (
     <Modal
-      placement="center"
+      data-testid="add-project-element-modal"
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
@@ -69,6 +69,7 @@ export default function AddProjectElementModal({
                 >
                   {filetypeTabs.map((filetype) => (
                     <Tab
+                      data-testid={`${filetype.toLowerCase()}-btn`}
                       key={filetype}
                       title={<ElementIcon elementType={filetype} />}
                     />
@@ -112,6 +113,7 @@ export default function AddProjectElementModal({
                 />
                 {/* Maybe some presets here*/}
                 <Button
+                  data-testid="create-btn"
                   onPress={() => action(name, filetype)}
                   isDisabled={error.name}
                   color="primary"

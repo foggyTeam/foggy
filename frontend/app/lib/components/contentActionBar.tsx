@@ -56,7 +56,10 @@ export default function ContentActionBar({
     ].some((size) => !!size);
   };
   return (
-    <div className="flex h-fit w-full flex-col gap-2">
+    <div
+      data-testid="content-section-head"
+      className="flex h-fit w-full flex-col gap-2"
+    >
       <div className="flex h-fit w-full items-start justify-between gap-1 sm:items-center">
         <div className="flex flex-wrap items-center gap-1 sm:flex-nowrap">
           <Input
@@ -79,6 +82,7 @@ export default function ContentActionBar({
               isDisabled={filtersDisabled}
               onPress={openFilters}
               isIconOnly
+              data-testid="filters-btn"
               variant={hasFilters() ? 'flat' : 'light'}
               color={hasFilters() ? 'primary' : 'default'}
               size={smallerSize}
@@ -94,6 +98,7 @@ export default function ContentActionBar({
             <Button
               onPress={() => setFavorite(!favorite)}
               isIconOnly
+              data-testid="favorite-btn"
               variant={favorite ? 'flat' : 'light'}
               color={favorite ? 'primary' : 'default'}
               size={smallerSize}
@@ -109,6 +114,7 @@ export default function ContentActionBar({
             <Button
               onPress={() => setWithNotification(!withNotification)}
               isIconOnly
+              data-testid="with-notification-btn"
               variant={withNotification ? 'flat' : 'light'}
               color={withNotification ? 'primary' : 'default'}
               size={smallerSize}
@@ -126,27 +132,30 @@ export default function ContentActionBar({
           {addNew !== undefined &&
             (type ? CheckAccess(['admin', 'owner'], type) : true) && (
               <Button
+                data-testid="add-new-btn"
                 onPress={addNew}
                 isIconOnly
                 variant="light"
                 size={smallerSize}
               >
-                <PlusIcon className="stroke-default-600" />
+                <PlusIcon className="stroke-default-500" />
               </Button>
             )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
             <Button
+              data-testid="add-member-btn"
               onPress={addMember}
               isIconOnly
               variant="light"
               size={smallerSize}
             >
-              <UserRoundPlusIcon className="stroke-default-600" />
+              <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
           {openSettings !== undefined &&
             CheckAccess(['admin', 'owner'], type) && (
               <Button
+                data-testid="settings-btn"
                 onPress={openSettings}
                 isIconOnly
                 variant="light"

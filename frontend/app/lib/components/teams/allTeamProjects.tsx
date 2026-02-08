@@ -21,6 +21,7 @@ const AllTeamProjects = observer(() => {
     <>
       <ContentSection
         hideTitle={isMobile}
+        data-testid="all-team-projects"
         sectionTitle={settingsStore.t.team.teamProject.replace(
           '_',
           (teamsStore.activeTeam?.name ?? '').toUpperCase(),

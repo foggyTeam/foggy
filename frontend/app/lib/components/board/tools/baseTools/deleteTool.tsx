@@ -12,6 +12,7 @@ export default function DeleteTool() {
     useBoardContext();
   return (
     <Button
+      data-testid="delete-tool-btn"
       onPress={() => removeElement(selectedElement.attrs.id)}
       isDisabled={allToolsDisabled}
       variant="light"

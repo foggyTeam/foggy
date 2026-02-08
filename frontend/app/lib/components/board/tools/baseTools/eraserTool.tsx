@@ -57,6 +57,7 @@ export default function EraserTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.eraserTool}>
       <Button
+        data-testid="eraser-tool-btn"
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'eraser') setActiveTool('');

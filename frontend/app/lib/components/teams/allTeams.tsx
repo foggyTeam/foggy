@@ -20,6 +20,7 @@ const AllTeams = observer(() => {
     <>
       <ContentSection
         hideTitle={isMobile}
+        data-testid="all-teams"
         sectionTitle={settingsStore.t.main.myTeams}
         data={teamsStore.allTeams.slice()}
         DataCard={TeamCard}
