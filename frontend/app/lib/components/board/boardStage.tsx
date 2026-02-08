@@ -53,6 +53,7 @@ const BoardStage = observer(() => {
     >
       <GridBackground gridSize={GRID_SIZE} />
       <Stage
+        style={{ touchAction: 'none' }}
         width={STAGE_SIZE}
         height={STAGE_SIZE}
         ref={stageRef}
