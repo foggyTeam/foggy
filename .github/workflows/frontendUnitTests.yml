@@ -1,0 +1,34 @@
+name: Frontend unit tests
+run-name: Running frontend unit tests...
+on:
+  pull_request:
+    branches: [develop, master]
+
+jobs:
+  Unit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm test
+
+      - run: echo "Frontend unit tests / ${{ job.status }}."
