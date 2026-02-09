@@ -67,8 +67,8 @@ export const fitElementCoordinates = (
 
 export default function UseBoardNavigation(
   stageRef: any,
-  viewPort: ViewportSize,
   scale: number,
+  viewPort: ViewportSize,
 ) {
   const { updateGridRef } = useBoardContext();
   const isDragging = useRef(false);
@@ -94,8 +94,7 @@ export default function UseBoardNavigation(
 
         const fit = fitBoardCoordinates(newX, newY, viewPort, scale);
 
-        stage.x(fit.x);
-        stage.y(fit.y);
+        stage.position(fit);
         stage.batchDraw();
         requestGridUpdate();
       }

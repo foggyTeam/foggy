@@ -49,12 +49,14 @@ const BoardStage = observer(() => {
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  UseBoardNavigation(
-    stageRef,
-    { width: viewportWidth, height: viewportHeight },
-    scale,
-  );
-  UseBoardZoom(stageRef, scale, setScale);
+  UseBoardNavigation(stageRef, scale, {
+    width: viewportWidth,
+    height: viewportHeight,
+  });
+  UseBoardZoom(stageRef, setScale, {
+    width: viewportWidth,
+    height: viewportHeight,
+  });
 
   const stageSize = useMemo(
     () => ({
