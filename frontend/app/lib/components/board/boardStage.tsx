@@ -5,8 +5,6 @@ import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
-import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
-import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
 import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
@@ -18,10 +16,12 @@ import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { useTheme } from 'next-themes';
 import GridBackground from '@/app/lib/components/backgroundGrid';
-import useStageContainerSize from '@/app/lib/hooks/useStageSize';
+import useStageContainerSize from '@/app/lib/hooks/boardNavigation/useStageSize';
+import UseMouseEvent from '@/app/lib/hooks/boardNavigation/useMouseEvent';
+import UseWheelEvent from '@/app/lib/hooks/boardNavigation/useWheelEvent';
+import UseTouchEvent from '@/app/lib/hooks/boardNavigation/useTouchEvent';
 
 const GRID_SIZE = 24;
-export const STAGE_SIZE = 3000;
 
 const BoardStage = observer(() => {
   const { resolvedTheme } = useTheme();
@@ -47,11 +47,15 @@ const BoardStage = observer(() => {
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  UseBoardNavigation(stageRef, scale, {
+  UseMouseEvent(stageRef, scale, {
     width: viewportWidth,
     height: viewportHeight,
   });
-  UseBoardZoom(stageRef, setScale, {
+  UseWheelEvent(stageRef, setScale, {
+    width: viewportWidth,
+    height: viewportHeight,
+  });
+  UseTouchEvent(stageRef, scale, {
     width: viewportWidth,
     height: viewportHeight,
   });

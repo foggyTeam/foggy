@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
-
-type ViewportSize = { width: number; height: number };
+import { useEffect, useRef } from 'react';
 
 function getTouchesCenter(t1: Touch, t2: Touch) {
   return {
@@ -12,40 +10,26 @@ function getTouchesCenter(t1: Touch, t2: Touch) {
   };
 }
 
-export default function UseBoardNavigation(
+export default function UseTouchEvent(
   stageRef: any,
   scale: number,
-  viewPort: ViewportSize,
+  viewPort: { width: number; height: number },
 ) {
   const { updateGridRef } = useBoardContext();
   const isDragging = useRef(false);
   const prevTouchCenter = useRef<{ x: number; y: number } | null>(null);
 
+  const requestGridUpdate = () => updateGridRef.current?.();
+
   useEffect(() => {
     const stage: any = stageRef.current;
     if (!stage) return;
-
-    const requestGridUpdate = () => updateGridRef.current?.();
 
     const safeSetPosition = (x: number, y: number) => {
       if (!Number.isFinite(x) || !Number.isFinite(y)) return;
       stage.position({ x, y });
       stage.batchDraw();
       requestGridUpdate();
-    };
-
-    // MOUSE NAVIGATION
-    const handleMouseDown = (e: any) => {
-      if (e.evt.button === 2) isDragging.current = true;
-    };
-
-    const handleMouseMove = (e: any) => {
-      if (!isDragging.current) return;
-      safeSetPosition(stage.x() + e.evt.movementX, stage.y() + e.evt.movementY);
-    };
-
-    const handleMouseUp = () => {
-      isDragging.current = false;
     };
 
     // TOUCH NAVIGATION
@@ -56,7 +40,6 @@ export default function UseBoardNavigation(
         prevTouchCenter.current = getTouchesCenter(t1, t2);
       }
     };
-
     const handleTouchMove = (e: any) => {
       if (!(isDragging.current && e.evt.touches.length === 2)) return;
 
@@ -76,35 +59,21 @@ export default function UseBoardNavigation(
 
       safeSetPosition(stage.x() + dx, stage.y() + dy);
     };
-
     const stopTouchDragging = () => {
       isDragging.current = false;
       prevTouchCenter.current = null;
     };
-
-    stage.on('mousedown', handleMouseDown);
-    stage.on('mousemove', handleMouseMove);
-    stage.on('mouseup', handleMouseUp);
 
     stage.on('touchstart', handleTouchStart);
     stage.on('touchmove', handleTouchMove);
     stage.on('touchend', stopTouchDragging);
     stage.on('touchcancel', stopTouchDragging);
 
-    const preventContextMenu = (e: any) => e.preventDefault();
-    stage.container().addEventListener('contextmenu', preventContextMenu);
-
     return () => {
-      stage.off('mousedown', handleMouseDown);
-      stage.off('mousemove', handleMouseMove);
-      stage.off('mouseup', handleMouseUp);
-
       stage.off('touchstart', handleTouchStart);
       stage.off('touchmove', handleTouchMove);
       stage.off('touchend', stopTouchDragging);
       stage.off('touchcancel', stopTouchDragging);
-
-      stage.container().removeEventListener('contextmenu', preventContextMenu);
     };
   }, [stageRef, scale, viewPort.width, viewPort.height, updateGridRef]);
 }

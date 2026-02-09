@@ -18,7 +18,7 @@ const BoardLoadingCard = observer(() => {
             'px-12',
           )}
         >
-          <div className="flex h-fit w-full flex-col items-center justify-center gap-4">
+          <div className="flex h-fit w-full flex-col items-center justify-center gap-4 px-2">
             <FoggySmall
               width={128}
               height={128}

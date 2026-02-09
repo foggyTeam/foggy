@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
@@ -5,15 +7,25 @@ const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
 const WHEEL_DELTA = 50;
 
-export default function UseBoardZoom(
+export default function UseWheelEvent(
   stageRef: any,
   setScale: any,
   viewPort: { width: number; height: number },
 ) {
   const { updateGridRef } = useBoardContext();
+
+  const requestGridUpdate = () => updateGridRef.current?.();
+
   useEffect(() => {
-    const stage = stageRef.current;
+    const stage: any = stageRef.current;
     if (!stage) return;
+
+    const safeSetPosition = (x: number, y: number) => {
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+      stage.position({ x, y });
+      stage.batchDraw();
+      requestGridUpdate();
+    };
 
     const handleWheel = (e: any) => {
       e.evt.preventDefault();
@@ -47,12 +59,11 @@ export default function UseBoardZoom(
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
           };
-          stage.position(newPos);
+          safeSetPosition(newPos.x, newPos.y);
+
           stage.batchDraw();
 
-          if (updateGridRef.current) {
-            updateGridRef.current();
-          }
+          requestGridUpdate();
         }
         return;
       }
@@ -62,10 +73,10 @@ export default function UseBoardZoom(
         const newX = stage.x() - e.evt.deltaX;
         const newY = stage.y() - e.evt.deltaY;
 
-        stage.position({ x: newX, y: newY });
+        safeSetPosition(newX, newY);
 
         stage.batchDraw();
-        if (updateGridRef.current) updateGridRef.current();
+        requestGridUpdate();
       }
     };
 
