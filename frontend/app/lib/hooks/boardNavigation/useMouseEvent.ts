@@ -39,5 +39,5 @@ export default function UseMouseEvent(
 
       stage.container().removeEventListener('contextmenu', preventContextMenu);
     };
-  }, [stageRef, isStageValid]);
+  }, [stageRef, isStageValid, dragBy]);
 }

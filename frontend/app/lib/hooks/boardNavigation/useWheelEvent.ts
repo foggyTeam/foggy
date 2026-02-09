@@ -51,5 +51,5 @@ export default function UseWheelEvent(
     return () => {
       stage.off('wheel', handleWheel);
     };
-  }, [stageRef, isStageValid]);
+  }, [stageRef, isStageValid, dragBy, zoomTo]);
 }
