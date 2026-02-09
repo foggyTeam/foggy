@@ -15,7 +15,7 @@ import { createPortal } from 'react-dom';
 import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { useTheme } from 'next-themes';
-import GridBackground from '@/app/lib/components/backgroundGrid';
+import GridBackground from '@/app/lib/components/board/backgroundGrid';
 import useStageContainerSize from '@/app/lib/hooks/boardNavigation/useStageSize';
 import UseMouseEvent from '@/app/lib/hooks/boardNavigation/useMouseEvent';
 import UseWheelEvent from '@/app/lib/hooks/boardNavigation/useWheelEvent';
