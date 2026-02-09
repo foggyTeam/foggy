@@ -27,6 +27,7 @@ import { observer } from 'mobx-react-lite';
 interface BoardContextProps {
   stageRef: RefObject<null | Konva.Stage>;
   updateGridRef: MutableRefObject<(() => void) | null>;
+  updateCursorsRef: MutableRefObject<(() => void) | null>;
   // ZOOM
   scale: number;
   setScale: (scale: number) => void;
@@ -59,6 +60,7 @@ export const BoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
     const stageRef: RefObject<null | Konva.Stage> = useRef(null);
     const updateGridRef = useRef<(() => void) | null>(null);
+    const updateCursorsRef = useRef<null | (() => void)>(null);
 
     // ZOOM
     const [scale, setScale] = useState(1);
@@ -146,9 +148,8 @@ export const BoardProvider = observer(
           stage.scale({ x: 1, y: 1 });
           stage.batchDraw();
         }
-        if (updateGridRef.current) {
-          updateGridRef.current();
-        }
+        if (updateGridRef.current) updateGridRef.current();
+        if (updateCursorsRef.current) updateCursorsRef.current();
       }
     };
 
@@ -205,6 +206,7 @@ export const BoardProvider = observer(
         value={{
           stageRef,
           updateGridRef,
+          updateCursorsRef,
           // ZOOM
           scale,
           setScale,

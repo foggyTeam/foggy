@@ -1,6 +1,14 @@
 'use client';
+
 import io from 'socket.io-client';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
@@ -9,162 +17,195 @@ import throttle from 'lodash/throttle';
 import projectsStore from '@/app/stores/projectsStore';
 import { observer } from 'mobx-react-lite';
 
-const Cursors = observer(() => {
-  const [cursors, setCursors] = useState<{
-    [key: string]: {
-      x: number;
-      y: number;
-      nickname: string;
-      color:
-        | 'default'
-        | 'danger'
-        | 'primary'
-        | 'secondary'
-        | 'success'
-        | 'warning'
-        | undefined;
-    };
-  }>({});
-  const colors = ['primary', 'secondary', 'warning', 'success', 'danger'];
-  const userColor = colors[Math.floor(Math.random() * colors.length)];
-  const { stageRef, scale } = useBoardContext();
-  const [forceUpdate, setForceUpdate] = useState(false);
+type CursorColor =
+  | 'default'
+  | 'danger'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | undefined;
 
-  const getScreenPointerPosition = (
-    x: number,
-    y: number,
-  ): { x: number; y: number } => {
+type CursorData = {
+  x: number;
+  y: number;
+  nickname: string;
+  color: CursorColor;
+};
+
+const colors: CursorColor[] = [
+  'primary',
+  'secondary',
+  'warning',
+  'success',
+  'danger',
+];
+
+const Cursors = observer(() => {
+  const { stageRef, scale, updateCursorsRef } = useBoardContext();
+
+  const [cursorIds, setCursorIds] = useState<string[]>([]);
+  const cursorIdsRef = useRef<string[]>([]);
+  useEffect(() => {
+    cursorIdsRef.current = cursorIds;
+  }, [cursorIds]);
+
+  const cursorsRef = useRef<Map<string, CursorData>>(new Map());
+  const nodeRef = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const userColor = useMemo(
+    () => colors[Math.floor(Math.random() * colors.length)],
+    [],
+  );
+
+  const redraw = useCallback(() => {
     const stage = stageRef.current;
-    if (!stage) return { x: 0, y: 0 };
+    if (!stage) return;
+
     const container = stage.container();
     const rect = container.getBoundingClientRect();
-    const scale = stage.scaleX();
+    const s = stage.scaleX();
     const offsetX = stage.x();
     const offsetY = stage.y();
-    const screenX = rect.left + (x * scale + offsetX);
-    const screenY = rect.top + (y * scale + offsetY);
 
-    return {
-      x: screenX,
-      y: screenY,
-    };
-  };
+    for (const id of cursorIdsRef.current) {
+      const el = nodeRef.current[id];
+      const data = cursorsRef.current.get(id);
+      if (!el || !data) continue;
+
+      const screenX = rect.left + (data.x * s + offsetX);
+      const screenY = rect.top + (data.y * s + offsetY);
+
+      el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) scale(${scale})`;
+    }
+  }, [stageRef, scale]);
 
   useEffect(() => {
-    if (!projectsStore.activeBoard) return;
-    const stage = stageRef.current;
+    updateCursorsRef.current = redraw;
+    requestAnimationFrame(redraw);
+
+    return () => {
+      if (updateCursorsRef.current === redraw) updateCursorsRef.current = null;
+    };
+  }, [updateCursorsRef, redraw]);
+
+  useEffect(() => {
+    const boardId = projectsStore.activeBoard?.id;
     const userId = userStore.user?.id;
     const nickname = userStore.user?.name;
     const avatar = userStore.user?.image;
-    const boardId = projectsStore.activeBoard.id;
 
-    const socket = io(process.env.NEXT_PUBLIC_API_URI, {
-      auth: {
-        id: userId,
-        nickname: nickname,
-        avatar: avatar,
-        color: userColor,
-        boardId: boardId,
-      },
+    if (!boardId || !userId) return;
+
+    const socket = io(process.env.NEXT_PUBLIC_API_URI!, {
+      auth: { id: userId, nickname, avatar, color: userColor, boardId },
       reconnectionAttempts: 3,
       reconnectionDelay: 1000,
     });
 
-    const handleStageChange = () => setForceUpdate((prev) => !prev);
-    const handleMouseMove = (event: MouseEvent) => {
-      if (event.buttons > 0) handleStageChange();
-      const relativePosition = stageRef.current?.getRelativePointerPosition();
-      if (relativePosition) {
-        const { x, y } = relativePosition;
-        socket.emit('cursorMove', {
-          id: userId,
-          nickname: nickname,
-          color: userColor,
-          x,
-          y,
-        });
-      }
+    const handleMouseMove = (_: MouseEvent) => {
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      const relative = stage.getRelativePointerPosition();
+      if (!relative) return;
+
+      socket.emit('cursorMove', {
+        id: userId,
+        nickname,
+        color: userColor,
+        x: relative.x,
+        y: relative.y,
+      });
     };
 
     const throttledMouseMove = throttle(handleMouseMove, 50);
-    const throttledWheel = throttle(handleStageChange, 10);
     document.addEventListener('mousemove', throttledMouseMove);
-    stage?.on('wheel', throttledWheel);
 
     socket.on(
       'cursorMove',
       (data: {
-        boardId: string;
         id: string;
         nickname: string;
         x: number;
         y: number;
-        color:
-          | 'default'
-          | 'danger'
-          | 'primary'
-          | 'secondary'
-          | 'success'
-          | 'warning'
-          | undefined;
+        color: CursorColor;
       }) => {
-        setCursors((prev) => ({
-          ...prev,
-          [data.id]: {
-            x: data.x,
-            y: data.y,
-            nickname: data.nickname,
-            color: data.color,
-          },
-        }));
+        cursorsRef.current.set(data.id, {
+          x: data.x,
+          y: data.y,
+          nickname: data.nickname,
+          color: data.color,
+        });
+
+        setCursorIds((prev) => {
+          if (prev.includes(data.id)) {
+            redraw();
+            return prev;
+          }
+
+          const next = [...prev, data.id];
+          requestAnimationFrame(redraw);
+          return next;
+        });
+
+        redraw();
       },
     );
+
     socket.on('userDisconnected', (data: { id: string }) => {
-      setCursors((prev) => {
-        const { [data.id]: _, ...rest } = prev;
-        return rest;
-      });
+      cursorsRef.current.delete(data.id);
+      nodeRef.current[data.id] = null;
+
+      setCursorIds((prev) => prev.filter((id) => id !== data.id));
+
+      requestAnimationFrame(redraw);
     });
 
     return () => {
       document.removeEventListener('mousemove', throttledMouseMove);
-      stage?.off('wheel', throttledWheel);
+      throttledMouseMove.cancel();
+
       socket.off('cursorMove');
       socket.off('userDisconnected');
       socket.disconnect();
     };
-  }, [stageRef, projectsStore.activeBoard]);
+  }, [projectsStore.activeBoard?.id, stageRef, userColor, redraw]);
 
   return (
     <>
-      {Object.entries(cursors).map(([id, { x, y, nickname, color }]) => {
-        const { x: screenX, y: screenY } = getScreenPointerPosition(x, y);
+      {cursorIds.map((id) => {
+        const data = cursorsRef.current.get(id);
+        if (!data) return null;
+
         return (
-          <Chip
+          <div
             key={id}
-            variant="light"
-            color={color}
-            className="pointer-events-none fixed flex h-fit items-center"
-            classNames={{
-              base: 'gap-0 p-0 m-0',
-              content: 'font-semibold p-0',
+            ref={(el) => {
+              nodeRef.current[id] = el;
+              if (el) requestAnimationFrame(redraw);
             }}
-            style={{
-              top: screenY,
-              left: screenX,
-              zIndex: 50,
-              transform: `scale(${scale})`,
-            }}
-            startContent={
-              (
-                <MousePointer2Icon
-                  className={`relative -top-1 -left-0.5 stroke-${color}-500`}
-                />
-              ) as ReactNode
-            }
+            className="pointer-events-none fixed top-0 left-0 z-50"
           >
-            {nickname}
-          </Chip>
+            <Chip
+              variant="light"
+              color={data.color}
+              className="pointer-events-none flex h-fit items-center"
+              classNames={{
+                base: 'gap-0 p-0 m-0',
+                content: 'font-semibold p-0',
+              }}
+              startContent={
+                (
+                  <MousePointer2Icon
+                    className={`relative -top-1 -left-0.5 stroke-${data.color}-500`}
+                  />
+                ) as ReactNode
+              }
+            >
+              {data.nickname}
+            </Chip>
+          </div>
         );
       })}
     </>

@@ -45,12 +45,14 @@ const BoardStage = observer(() => {
     handleSelect,
     resetStage,
     updateGridRef,
+    updateCursorsRef,
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  const { dragBy, zoomTo } = UseRAFNavigation(stageRef, setScale, () =>
-    updateGridRef.current?.(),
-  );
+  const { dragBy, zoomTo } = UseRAFNavigation(stageRef, setScale, () => {
+    updateGridRef.current?.();
+    updateCursorsRef.current?.();
+  });
 
   UseTouchEvent(stageRef, isStageValid, dragBy, zoomTo);
   UseMouseEvent(stageRef, isStageValid, dragBy);
@@ -124,7 +126,10 @@ const BoardStage = observer(() => {
               height={isEditingText.textHeight}
               setHeight={(newHeight: number) => {
                 if (isEditingText)
-                  setIsEditingText({ ...isEditingText, textHeight: newHeight });
+                  setIsEditingText({
+                    ...isEditingText,
+                    textHeight: newHeight,
+                  });
               }}
               width={isEditingText.textWidth}
             />

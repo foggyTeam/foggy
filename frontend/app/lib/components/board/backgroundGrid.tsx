@@ -15,12 +15,6 @@ const createGridPattern = (gridSize: number) => {
 export default function GridBackground({ gridSize }: { gridSize: number }) {
   const { stageRef, updateGridRef } = useBoardContext();
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const lastRef = useRef<{
-    step: number;
-    offsetX: number;
-    offsetY: number;
-  } | null>(null);
-
   const patternUrl = useMemo(() => {
     const svgPattern = createGridPattern(gridSize);
     return `data:image/svg+xml;base64,${btoa(svgPattern)}`;
@@ -38,17 +32,6 @@ export default function GridBackground({ gridSize }: { gridSize: number }) {
 
     const offsetX = pos.x % step;
     const offsetY = pos.y % step;
-
-    const last = lastRef.current;
-    if (
-      last &&
-      Math.abs(last.step - step) < 0.01 &&
-      Math.abs(last.offsetX - offsetX) < 0.5 &&
-      Math.abs(last.offsetY - offsetY) < 0.5
-    ) {
-      return;
-    }
-    lastRef.current = { step, offsetX, offsetY };
 
     grid.style.backgroundImage = `url(${patternUrl})`;
     grid.style.backgroundRepeat = 'repeat';
