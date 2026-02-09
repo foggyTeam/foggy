@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useRef } from 'react';
+import React, { ReactNode, useMemo, useRef } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
@@ -20,6 +20,7 @@ import TextEditor from '@/app/lib/components/board/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { useTheme } from 'next-themes';
 import GridBackground from '@/app/lib/components/backgroundGrid';
+import useStageContainerSize from '@/app/lib/hooks/useStageSize';
 
 const GRID_SIZE = 24;
 export const STAGE_SIZE = 3000;
@@ -27,6 +28,11 @@ export const STAGE_SIZE = 3000;
 const BoardStage = observer(() => {
   const { resolvedTheme } = useTheme();
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const { width: viewportWidth, height: viewportHeight } =
+    useStageContainerSize(containerRef);
+  const isStageValid = viewportWidth > 0 && viewportHeight > 0;
 
   const {
     stageRef,
@@ -43,72 +49,87 @@ const BoardStage = observer(() => {
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  UseBoardNavigation(stageRef, scale);
+  UseBoardNavigation(
+    stageRef,
+    { width: viewportWidth, height: viewportHeight },
+    scale,
+  );
   UseBoardZoom(stageRef, scale, setScale);
+
+  const stageSize = useMemo(
+    () => ({
+      width: viewportWidth,
+      height: viewportHeight,
+    }),
+    [viewportWidth, viewportHeight],
+  );
 
   return (
     <div
+      ref={containerRef}
       data-testid="simple-board-stage"
       className="relative h-full w-full overflow-hidden"
     >
       <GridBackground gridSize={GRID_SIZE} />
-      <Stage
-        style={{ touchAction: 'none' }}
-        width={STAGE_SIZE}
-        height={STAGE_SIZE}
-        ref={stageRef}
-        onClick={handleSelect}
-      >
-        {projectsStore.activeBoard?.layers?.map((layer, index) => (
-          <BoardLayer
-            key={index}
-            layer={layer}
-            fitCoordinates={(pos, element) =>
-              fitElementCoordinates(
-                pos.x,
-                pos.y,
-                element.width,
-                element.height,
-                stageRef.current?.getPosition() || { x: 0, y: 0 },
-                scale,
-                (element.type === 'line' && {
-                  x: Math.min(
-                    ...element.points.filter((point, index) => !(index % 2)),
-                  ),
-                  y: Math.min(
-                    ...element.points.filter((point, index) => index % 2),
-                  ),
-                }) ||
-                  undefined,
-              )
-            }
-          />
-        ))}
+      {isStageValid && (
+        <Stage
+          style={{ touchAction: 'none' }}
+          width={stageSize.width}
+          height={stageSize.height}
+          ref={stageRef}
+          onClick={handleSelect}
+        >
+          {projectsStore.activeBoard?.layers?.map((layer, index) => (
+            <BoardLayer
+              key={index}
+              layer={layer}
+              fitCoordinates={(pos, element) =>
+                fitElementCoordinates(
+                  pos.x,
+                  pos.y,
+                  element.width,
+                  element.height,
+                  stageRef.current?.getPosition() || { x: 0, y: 0 },
+                  scale,
+                  (element.type === 'line' && {
+                    x: Math.min(
+                      ...element.points.filter((point, index) => !(index % 2)),
+                    ),
+                    y: Math.min(
+                      ...element.points.filter((point, index) => index % 2),
+                    ),
+                  }) ||
+                    undefined,
+                )
+              }
+            />
+          ))}
 
-        {selectedElements.length > 0 && !activeTool && (
-          <Layer>
-            <Group draggable>
-              {selectedElements.map((element, index) => (
-                <Rect key={index} />
-              ))}
-              <Transformer
-                ref={selectionRef}
-                nodes={selectedElements}
-                rotationSnapTolerance={16}
-                boundBoxFunc={(oldBox, newBox) =>
-                  Math.abs(newBox.width) < 4 || Math.abs(newBox.height) < 4
-                    ? oldBox
-                    : newBox
-                }
-                borderStroke={primary[theme]['400']}
-                anchorStroke={primary[theme]['400']}
-                anchorCornerRadius={16}
-                rotateAnchorCursor="grab"
-              />
-            </Group>
-          </Layer>
-        )}
-      </Stage>
+          {selectedElements.length > 0 && !activeTool && (
+            <Layer>
+              <Group draggable>
+                {selectedElements.map((element, index) => (
+                  <Rect key={index} />
+                ))}
+                <Transformer
+                  ref={selectionRef}
+                  nodes={selectedElements}
+                  rotationSnapTolerance={16}
+                  boundBoxFunc={(oldBox, newBox) =>
+                    Math.abs(newBox.width) < 4 || Math.abs(newBox.height) < 4
+                      ? oldBox
+                      : newBox
+                  }
+                  borderStroke={primary[theme]['400']}
+                  anchorStroke={primary[theme]['400']}
+                  anchorCornerRadius={16}
+                  rotateAnchorCursor="grab"
+                />
+              </Group>
+            </Layer>
+          )}
+        </Stage>
+      )}
 
       <div className="flex justify-center">
         <ToolBar />
