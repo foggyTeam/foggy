@@ -20,6 +20,7 @@ import useStageContainerSize from '@/app/lib/hooks/boardNavigation/useStageSize'
 import UseMouseEvent from '@/app/lib/hooks/boardNavigation/useMouseEvent';
 import UseWheelEvent from '@/app/lib/hooks/boardNavigation/useWheelEvent';
 import UseTouchEvent from '@/app/lib/hooks/boardNavigation/useTouchEvent';
+import UseRAFNavigation from '@/app/lib/hooks/boardNavigation/useRAFNavigation';
 
 const GRID_SIZE = 24;
 
@@ -34,7 +35,6 @@ const BoardStage = observer(() => {
 
   const {
     stageRef,
-    scale,
     setScale,
     selectedElements,
     activeTool,
@@ -44,21 +44,17 @@ const BoardStage = observer(() => {
     setTextContent,
     handleSelect,
     resetStage,
+    updateGridRef,
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  UseMouseEvent(stageRef, scale, {
-    width: viewportWidth,
-    height: viewportHeight,
-  });
-  UseWheelEvent(stageRef, setScale, {
-    width: viewportWidth,
-    height: viewportHeight,
-  });
-  UseTouchEvent(stageRef, scale, {
-    width: viewportWidth,
-    height: viewportHeight,
-  });
+  const { dragBy, zoomTo } = UseRAFNavigation(stageRef, () =>
+    updateGridRef.current?.(),
+  );
+
+  UseTouchEvent(stageRef, isStageValid, dragBy, zoomTo);
+  UseMouseEvent(stageRef, isStageValid, dragBy);
+  UseWheelEvent(stageRef, setScale, isStageValid, dragBy, zoomTo);
 
   const stageSize = useMemo(
     () => ({

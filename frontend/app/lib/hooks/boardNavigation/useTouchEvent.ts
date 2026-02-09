@@ -1,6 +1,5 @@
 'use client';
 
-import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { useEffect, useRef } from 'react';
 
 function getTouchesCenter(t1: Touch, t2: Touch) {
@@ -12,25 +11,16 @@ function getTouchesCenter(t1: Touch, t2: Touch) {
 
 export default function UseTouchEvent(
   stageRef: any,
-  scale: number,
-  viewPort: { width: number; height: number },
+  isStageValid: boolean,
+  dragBy: (dx: number, dy: number) => void,
+  zoomTo: (scale: number, anchor: { x: number; y: number }) => void,
 ) {
-  const { updateGridRef } = useBoardContext();
   const isDragging = useRef(false);
   const prevTouchCenter = useRef<{ x: number; y: number } | null>(null);
-
-  const requestGridUpdate = () => updateGridRef.current?.();
 
   useEffect(() => {
     const stage: any = stageRef.current;
     if (!stage) return;
-
-    const safeSetPosition = (x: number, y: number) => {
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      stage.position({ x, y });
-      stage.batchDraw();
-      requestGridUpdate();
-    };
 
     // TOUCH NAVIGATION
     const handleTouchStart = (e: any) => {
@@ -57,7 +47,7 @@ export default function UseTouchEvent(
 
       prevTouchCenter.current = center;
 
-      safeSetPosition(stage.x() + dx, stage.y() + dy);
+      dragBy(dx, dy);
     };
     const stopTouchDragging = () => {
       isDragging.current = false;
@@ -75,5 +65,5 @@ export default function UseTouchEvent(
       stage.off('touchend', stopTouchDragging);
       stage.off('touchcancel', stopTouchDragging);
     };
-  }, [stageRef, scale, viewPort.width, viewPort.height, updateGridRef]);
+  }, [stageRef, isStageValid]);
 }

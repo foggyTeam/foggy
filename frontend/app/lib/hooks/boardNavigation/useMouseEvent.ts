@@ -1,28 +1,17 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 export default function UseMouseEvent(
   stageRef: any,
-  scale: number,
-  viewPort: { width: number; height: number },
+  isStageValid: boolean,
+  dragBy: (dx: number, dy: number) => void,
 ) {
-  const { updateGridRef } = useBoardContext();
   const isDragging = useRef(false);
-
-  const requestGridUpdate = () => updateGridRef.current?.();
 
   useEffect(() => {
     const stage: any = stageRef.current;
     if (!stage) return;
-
-    const safeSetPosition = (x: number, y: number) => {
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      stage.position({ x, y });
-      stage.batchDraw();
-      requestGridUpdate();
-    };
 
     // MOUSE NAVIGATION
     const handleMouseDown = (e: any) => {
@@ -30,7 +19,7 @@ export default function UseMouseEvent(
     };
     const handleMouseMove = (e: any) => {
       if (!isDragging.current) return;
-      safeSetPosition(stage.x() + e.evt.movementX, stage.y() + e.evt.movementY);
+      dragBy(e.evt.movementX, e.evt.movementY);
     };
     const handleMouseUp = () => {
       isDragging.current = false;
@@ -50,5 +39,5 @@ export default function UseMouseEvent(
 
       stage.container().removeEventListener('contextmenu', preventContextMenu);
     };
-  }, [stageRef, scale, viewPort.width, viewPort.height, updateGridRef]);
+  }, [stageRef, isStageValid]);
 }

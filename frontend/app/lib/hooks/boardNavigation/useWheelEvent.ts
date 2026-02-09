@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useBoardContext } from '@/app/lib/components/board/boardContext';
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 4;
@@ -10,22 +9,13 @@ const WHEEL_DELTA = 50;
 export default function UseWheelEvent(
   stageRef: any,
   setScale: any,
-  viewPort: { width: number; height: number },
+  isStageValid: boolean,
+  dragBy: (dx: number, dy: number) => void,
+  zoomTo: (scale: number, anchor: { x: number; y: number }) => void,
 ) {
-  const { updateGridRef } = useBoardContext();
-
-  const requestGridUpdate = () => updateGridRef.current?.();
-
   useEffect(() => {
     const stage: any = stageRef.current;
     if (!stage) return;
-
-    const safeSetPosition = (x: number, y: number) => {
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      stage.position({ x, y });
-      stage.batchDraw();
-      requestGridUpdate();
-    };
 
     const handleWheel = (e: any) => {
       e.evt.preventDefault();
@@ -44,39 +34,19 @@ export default function UseWheelEvent(
 
         if (!pointer) return;
 
-        const mousePointTo = {
-          x: (pointer.x - stage.x()) / oldScale,
-          y: (pointer.y - stage.y()) / oldScale,
-        };
-
         const newScale =
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
         if (!(MIN_SCALE >= newScale || MAX_SCALE <= newScale)) {
           setScale(newScale);
 
-          stage.scale({ x: newScale, y: newScale });
-          const newPos = {
-            x: pointer.x - mousePointTo.x * newScale,
-            y: pointer.y - mousePointTo.y * newScale,
-          };
-          safeSetPosition(newPos.x, newPos.y);
-
-          stage.batchDraw();
-
-          requestGridUpdate();
+          zoomTo(newScale, { x: pointer.x, y: pointer.y });
         }
         return;
       }
 
       // TOUCHPAD
       if (Math.abs(e.evt.deltaY as number) < 100) {
-        const newX = stage.x() - e.evt.deltaX;
-        const newY = stage.y() - e.evt.deltaY;
-
-        safeSetPosition(newX, newY);
-
-        stage.batchDraw();
-        requestGridUpdate();
+        dragBy(-e.evt.deltaX, -e.evt.deltaY);
       }
     };
 
@@ -85,5 +55,5 @@ export default function UseWheelEvent(
     return () => {
       stage.off('wheel', handleWheel);
     };
-  }, [stageRef, viewPort.width, viewPort.height]);
+  }, [stageRef, isStageValid]);
 }
