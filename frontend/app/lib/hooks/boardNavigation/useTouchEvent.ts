@@ -9,14 +9,21 @@ function getTouchesCenter(t1: Touch, t2: Touch) {
   };
 }
 
+function getTouchesDistance(t1: Touch, t2: Touch) {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
 export default function UseTouchEvent(
   stageRef: any,
   isStageValid: boolean,
   dragBy: (dx: number, dy: number) => void,
   zoomTo: (scale: number, anchor: { x: number; y: number }) => void,
 ) {
-  const isDragging = useRef(false);
-  const prevTouchCenter = useRef<{ x: number; y: number } | null>(null);
+  const isPinching = useRef(false);
+  const prevCenter = useRef<{ x: number; y: number } | null>(null);
+  const prevDistance = useRef<number | null>(null);
 
   useEffect(() => {
     const stage: any = stageRef.current;
@@ -25,45 +32,65 @@ export default function UseTouchEvent(
     // TOUCH NAVIGATION
     const handleTouchStart = (e: any) => {
       if (e.evt.touches.length === 2) {
-        isDragging.current = true;
         const [t1, t2] = e.evt.touches;
-        prevTouchCenter.current = getTouchesCenter(t1, t2);
+
+        isPinching.current = true;
+        prevCenter.current = getTouchesCenter(t1, t2);
+        prevDistance.current = getTouchesDistance(t1, t2);
       }
     };
+
     const handleTouchMove = (e: any) => {
-      if (!(isDragging.current && e.evt.touches.length === 2)) return;
+      if (!isPinching.current || e.evt.touches.length !== 2) return;
 
       const [t1, t2] = e.evt.touches;
-      const center = getTouchesCenter(t1, t2);
 
-      const prev = prevTouchCenter.current;
-      if (!prev) {
-        prevTouchCenter.current = center;
+      const center = getTouchesCenter(t1, t2);
+      const distance = getTouchesDistance(t1, t2);
+
+      const prevC = prevCenter.current;
+      const prevD = prevDistance.current;
+
+      if (!prevC || !prevD) {
+        prevCenter.current = center;
+        prevDistance.current = distance;
         return;
       }
 
-      const dx = center.x - prev.x;
-      const dy = center.y - prev.y;
+      // PAN
+      dragBy(center.x - prevC.x, center.y - prevC.y);
 
-      prevTouchCenter.current = center;
+      // ZOOM
+      const scaleBy = distance / prevD;
+      if (
+        Number.isFinite(scaleBy) &&
+        scaleBy !== 1 &&
+        Math.abs(scaleBy - 1) > 0.01
+      ) {
+        const nextScale = stage.scaleX() * scaleBy;
+        zoomTo(nextScale, center);
+      }
 
-      dragBy(dx, dy);
+      prevCenter.current = center;
+      prevDistance.current = distance;
     };
-    const stopTouchDragging = () => {
-      isDragging.current = false;
-      prevTouchCenter.current = null;
+
+    const stopPinch = () => {
+      isPinching.current = false;
+      prevCenter.current = null;
+      prevDistance.current = null;
     };
 
     stage.on('touchstart', handleTouchStart);
     stage.on('touchmove', handleTouchMove);
-    stage.on('touchend', stopTouchDragging);
-    stage.on('touchcancel', stopTouchDragging);
+    stage.on('touchend', stopPinch);
+    stage.on('touchcancel', stopPinch);
 
     return () => {
       stage.off('touchstart', handleTouchStart);
       stage.off('touchmove', handleTouchMove);
-      stage.off('touchend', stopTouchDragging);
-      stage.off('touchcancel', stopTouchDragging);
+      stage.off('touchend', stopPinch);
+      stage.off('touchcancel', stopPinch);
     };
-  }, [stageRef, isStageValid]);
+  }, [stageRef, isStageValid, dragBy, zoomTo]);
 }

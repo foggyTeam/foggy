@@ -2,13 +2,20 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
+const MIN_SCALE = 0.5;
+const MAX_SCALE = 4;
+
 type Point = {
   x: number;
   y: number;
 };
 
 // Redraws are driven by request animation frame
-export default function UseRAFNavigation(stageRef: any, callback?: () => void) {
+export default function UseRAFNavigation(
+  stageRef: any,
+  setScale: any,
+  callback?: () => void,
+) {
   const rafId = useRef<number | null>(null);
 
   const pendingOffset = useRef<Point | null>(null);
@@ -96,9 +103,12 @@ export default function UseRAFNavigation(stageRef: any, callback?: () => void) {
       if (
         !Number.isFinite(scale) ||
         !Number.isFinite(anchor.x) ||
-        !Number.isFinite(anchor.y)
+        !Number.isFinite(anchor.y) ||
+        MIN_SCALE >= scale ||
+        MAX_SCALE <= scale
       )
         return;
+      setScale(scale);
       pendingZoom.current = { scale, anchor };
       schedule();
     },

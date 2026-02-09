@@ -2,13 +2,11 @@
 
 import { useEffect } from 'react';
 
-const MIN_SCALE = 0.5;
-const MAX_SCALE = 4;
 const WHEEL_DELTA = 50;
 
 export default function UseWheelEvent(
   stageRef: any,
-  setScale: any,
+
   isStageValid: boolean,
   dragBy: (dx: number, dy: number) => void,
   zoomTo: (scale: number, anchor: { x: number; y: number }) => void,
@@ -36,11 +34,9 @@ export default function UseWheelEvent(
 
         const newScale =
           e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
-        if (!(MIN_SCALE >= newScale || MAX_SCALE <= newScale)) {
-          setScale(newScale);
 
-          zoomTo(newScale, { x: pointer.x, y: pointer.y });
-        }
+        zoomTo(newScale, { x: pointer.x, y: pointer.y });
+
         return;
       }
 

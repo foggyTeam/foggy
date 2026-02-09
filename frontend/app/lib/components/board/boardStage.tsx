@@ -48,13 +48,13 @@ const BoardStage = observer(() => {
   } = useBoardContext();
   const selectionRef: any = useRef(null);
 
-  const { dragBy, zoomTo } = UseRAFNavigation(stageRef, () =>
+  const { dragBy, zoomTo } = UseRAFNavigation(stageRef, setScale, () =>
     updateGridRef.current?.(),
   );
 
   UseTouchEvent(stageRef, isStageValid, dragBy, zoomTo);
   UseMouseEvent(stageRef, isStageValid, dragBy);
-  UseWheelEvent(stageRef, setScale, isStageValid, dragBy, zoomTo);
+  UseWheelEvent(stageRef, isStageValid, dragBy, zoomTo);
 
   const stageSize = useMemo(
     () => ({
