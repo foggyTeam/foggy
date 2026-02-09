@@ -6,9 +6,7 @@ import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import UseBoardZoom from '@/app/lib/hooks/useBoardZoom';
-import UseBoardNavigation, {
-  fitElementCoordinates,
-} from '@/app/lib/hooks/useBoardNavigation';
+import UseBoardNavigation from '@/app/lib/hooks/useBoardNavigation';
 import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
@@ -82,29 +80,7 @@ const BoardStage = observer(() => {
           onClick={handleSelect}
         >
           {projectsStore.activeBoard?.layers?.map((layer, index) => (
-            <BoardLayer
-              key={index}
-              layer={layer}
-              fitCoordinates={(pos, element) =>
-                fitElementCoordinates(
-                  pos.x,
-                  pos.y,
-                  element.width,
-                  element.height,
-                  stageRef.current?.getPosition() || { x: 0, y: 0 },
-                  scale,
-                  (element.type === 'line' && {
-                    x: Math.min(
-                      ...element.points.filter((point, index) => !(index % 2)),
-                    ),
-                    y: Math.min(
-                      ...element.points.filter((point, index) => index % 2),
-                    ),
-                  }) ||
-                    undefined,
-                )
-              }
-            />
+            <BoardLayer key={index} layer={layer} />
           ))}
 
           {selectedElements.length > 0 && !activeTool && (

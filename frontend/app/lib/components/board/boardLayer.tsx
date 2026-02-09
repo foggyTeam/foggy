@@ -8,16 +8,7 @@ import { useBoardContext } from '@/app/lib/components/board/boardContext';
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
-export default function BoardLayer({
-  layer,
-  fitCoordinates,
-}: {
-  layer: BoardElement[];
-  fitCoordinates: (
-    pos: { x: number; y: number },
-    element: BoardElement,
-  ) => { x: number; y: number };
-}) {
+export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
   const {
     updateElement,
     handleSelect,
@@ -83,7 +74,6 @@ export default function BoardLayer({
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -100,7 +90,6 @@ export default function BoardLayer({
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -119,7 +108,6 @@ export default function BoardLayer({
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) => {
                   updateElement(element.id, {
                     x: e.target.attrs.x,
@@ -151,7 +139,6 @@ export default function BoardLayer({
                 {...element}
                 onClick={handleSelect}
                 onDblClick={handleTextEdit}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -172,7 +159,6 @@ export default function BoardLayer({
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
