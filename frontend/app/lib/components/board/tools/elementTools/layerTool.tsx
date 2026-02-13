@@ -6,7 +6,6 @@ import {
   LayersIcon,
 } from 'lucide-react';
 import { Button } from '@heroui/button';
-import projectsStore from '@/app/stores/projectsStore';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
@@ -15,6 +14,7 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import boardStore from '@/app/stores/boardStore';
 
 export default function LayerTool() {
   const { commonSize } = useAdaptiveParams();
@@ -23,11 +23,11 @@ export default function LayerTool() {
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {
-    setCurrentLayer(projectsStore.getElementLayer(selectedElement.attrs.id));
+    setCurrentLayer(boardStore.getElementPosition(selectedElement.attrs.id));
   }, [selectedElement]);
 
   const changeLayer = (action: 'back' | 'forward' | 'bottom' | 'top') => {
-    const newLayer = projectsStore.changeElementLayer(
+    const newLayer = boardStore.changeElementLayer(
       selectedElement.attrs.id,
       action,
     );
@@ -38,16 +38,14 @@ export default function LayerTool() {
     if (top)
       return (
         currentLayer.layer ===
-          projectsStore.getMaxMinElementPositions().max.layer &&
-        currentLayer.index ===
-          projectsStore.getMaxMinElementPositions().max.index
+          boardStore.getMaxMinElementPositions().max.layer &&
+        currentLayer.index === boardStore.getMaxMinElementPositions().max.index
       );
     else
       return (
         currentLayer.layer ===
-          projectsStore.getMaxMinElementPositions().min.layer &&
-        currentLayer.index ===
-          projectsStore.getMaxMinElementPositions().min.index
+          boardStore.getMaxMinElementPositions().min.layer &&
+        currentLayer.index === boardStore.getMaxMinElementPositions().min.index
       );
   };
 

@@ -20,16 +20,81 @@ class BoardStore {
 
   activeBoard: Board | undefined = undefined;
 
+  positionsMap = observable.map<string, { layer: number; index: number }>();
+
   constructor() {
     makeAutoObservable(this, {
       activeBoard: observable,
 
+      setActiveBoard: action,
       addElement: action,
       updateElement: action,
       changeElementLayer: action,
       removeElement: action,
-      setActiveBoard: action,
     });
+  }
+
+  setActiveBoard = (board: any | undefined) => {
+    if (!board) {
+      this.activeBoard = board;
+      this.disconnectSocket();
+    } else {
+      this.activeBoard = {
+        ...board,
+        layers: board.layers.map((layer) =>
+          observable.array(layer.map((element) => observable(element))),
+        ),
+        lastChange: board.updatedAt,
+        type: board.type.toUpperCase() as BoardTypes,
+      } as Board;
+
+      this.buildElementsMap();
+
+      projectsStore.addRecentBoard(
+        projectsStore.activeProject?.id || '',
+        board.sectionId,
+        board.id,
+        board.name,
+        board.type.toUpperCase() as BoardTypes,
+      );
+      this.connectSocket(this.activeBoard.id || '');
+    }
+  };
+  buildElementsMap() {
+    if (!this.activeBoard) return;
+
+    this.positionsMap.clear();
+    for (
+      let layerIndex = 0;
+      layerIndex < this.activeBoard.layers.length;
+      layerIndex++
+    ) {
+      const layer = this.activeBoard.layers[layerIndex];
+      for (let elementIndex = 0; elementIndex < layer.length; elementIndex++) {
+        const element = layer[elementIndex];
+        this.positionsMap.set(element.id, {
+          layer: layerIndex,
+          index: elementIndex,
+        });
+      }
+    }
+  }
+  private reindexLayer(layer: number, startIndex = 0) {
+    const elements = this.activeBoard?.layers?.[layer];
+    if (!elements) return;
+    for (let i = startIndex; i < elements.length; i++) {
+      this.positionsMap.set(elements[i].id, { layer, index: i });
+    }
+  }
+  getElementPosition(id: string) {
+    if (this.positionsMap.has(id)) return this.positionsMap.get(id);
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.board.boardElementNotFound.title,
+    });
+
+    return null;
   }
 
   connectSocket(boardId: string) {
@@ -60,9 +125,14 @@ class BoardStore {
   // BOARD
   addElement = (newElement: BoardElement, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
-      this.activeBoard.layers[this.activeBoard?.layers.length - 1].push(
-        newElement,
-      );
+      const lastLayer = this.activeBoard?.layers.length - 1;
+      const lastIndex = this.activeBoard.layers[lastLayer].length;
+      this.activeBoard.layers[lastLayer].push(observable(newElement) as any);
+
+      this.positionsMap.set(newElement.id, {
+        layer: lastLayer,
+        index: lastIndex,
+      });
       if (!external) this.boardWebsocket.emit('addElement', newElement);
     }
   };
@@ -72,16 +142,17 @@ class BoardStore {
     external?: boolean,
   ) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
-      this.activeBoard.layers = this.activeBoard.layers.map(
-        (layer: BoardElement[]) =>
-          layer.map((element) => {
-            if (!(element.id === id)) return element;
-            if (!(element.type === 'text'))
-              return { ...element, ...newAttrs } as BoardElement;
+      const { layer, index } = this.getElementPosition(id);
+      const element = this.activeBoard.layers[layer][index];
+      if (element.type === 'text') {
+        Object.assign(
+          this.activeBoard.layers[layer][index],
+          UpdateTextElement(element, newAttrs as Partial<TextElement>),
+        );
+      } else {
+        Object.assign(this.activeBoard.layers[layer][index], newAttrs);
+      }
 
-            return UpdateTextElement(element, newAttrs as Partial<TextElement>);
-          }),
-      );
       if (!external)
         this.boardWebsocket.emit('updateElement', { id, newAttrs });
     }
@@ -93,43 +164,37 @@ class BoardStore {
     if (!this.activeBoard?.layers || !this.boardWebsocket)
       return { layer: -1, index: -1 };
 
-    const layers = this.activeBoard.layers;
-    const position = this.getElementLayer(id);
-    if (position.index < 0 || position.layer < 0) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.boardElementNotFound,
-      });
-      return { layer: -1, index: -1 };
-    }
+    const { layer, index } = this.getElementPosition(id);
+    const element = this.activeBoard.layers[layer][index];
 
-    const element: BoardElement = layers[position.layer][position.index];
-    layers[position.layer].splice(position.index, 1);
-
-    layers[position.layer] = [...layers[position.layer]];
+    this.activeBoard.layers[layer].splice(index, 1);
+    this.reindexLayer(layer, index);
 
     const maxMin = this.getMaxMinElementPositions();
     const firstNonEmptyLayer = maxMin.min.layer;
     const lastNonEmptyLayer = maxMin.max.layer;
 
-    let targetLayer = position.layer;
-    let targetIndex = position.index;
+    let targetLayer = layer;
+    let targetIndex = index;
 
     switch (action) {
       case 'back': {
-        if (position.layer === firstNonEmptyLayer && position.index === 0) {
-          targetLayer = position.layer;
+        if (layer === firstNonEmptyLayer && index === 0) {
+          targetLayer = layer;
           targetIndex = 0;
           break;
         }
-        if (position.index > 0) {
-          targetIndex = position.index - 1;
+        if (index > 0) {
+          targetIndex = index - 1;
         } else {
-          let prevLayer = position.layer - 1;
-          while (prevLayer >= 0 && layers[prevLayer].length === 0) prevLayer--;
+          let prevLayer = layer - 1;
+          while (
+            prevLayer >= 0 &&
+            this.activeBoard.layers[prevLayer].length === 0
+          )
+            prevLayer--;
           targetLayer = prevLayer;
-          const len = layers[targetLayer].length;
+          const len = this.activeBoard.layers[targetLayer].length;
           targetIndex = len > 0 ? len - 1 : 0;
         }
         break;
@@ -137,27 +202,25 @@ class BoardStore {
 
       case 'forward': {
         if (
-          position.layer === lastNonEmptyLayer &&
-          position.index === layers[position.layer].length
+          layer === lastNonEmptyLayer &&
+          index === this.activeBoard.layers[layer].length
         ) {
-          targetLayer = position.layer;
-          targetIndex = layers[position.layer].length;
+          targetLayer = layer;
+          targetIndex = this.activeBoard.layers[layer].length;
           break;
         }
-        if (position.index < layers[position.layer].length) {
-          targetIndex = position.index + 1;
+        if (index < this.activeBoard.layers[layer].length) {
+          targetIndex = index + 1;
         } else {
           let nextLayer =
-            position.layer < layers.length - 1
-              ? position.layer + 1
-              : position.layer;
+            layer < this.activeBoard.layers.length - 1 ? layer + 1 : layer;
           while (
-            nextLayer < layers.length - 1 &&
-            layers[nextLayer].length === 0
+            nextLayer < this.activeBoard.layers.length - 1 &&
+            this.activeBoard.layers[nextLayer].length === 0
           )
             nextLayer++;
           targetLayer = nextLayer;
-          targetIndex = layers[targetLayer].length > 0 ? 1 : 0;
+          targetIndex = this.activeBoard.layers[targetLayer].length > 0 ? 1 : 0;
         }
         break;
       }
@@ -170,18 +233,17 @@ class BoardStore {
 
       case 'top': {
         targetLayer = lastNonEmptyLayer;
-        targetIndex = layers[lastNonEmptyLayer].length;
+        targetIndex = this.activeBoard.layers[lastNonEmptyLayer].length;
         break;
       }
     }
 
-    layers[targetLayer].splice(targetIndex, 0, element);
-    if (targetLayer !== position.layer)
-      layers[targetLayer] = [...layers[targetLayer]];
+    this.activeBoard.layers[targetLayer].splice(targetIndex, 0, element);
+    this.reindexLayer(targetLayer, targetIndex);
 
     this.boardWebsocket.emit('changeElementLayer', {
       id: id,
-      prevPosition: position,
+      prevPosition: { layer, index },
       newPosition: { layer: targetLayer, index: targetIndex },
     });
 
@@ -210,17 +272,15 @@ class BoardStore {
         this.activeBoard.layers[prevPosition.layer][prevPosition.index];
 
       this.activeBoard.layers[prevPosition.layer].splice(prevPosition.index, 1);
+      this.reindexLayer(prevPosition.layer, prevPosition.index);
+
       this.activeBoard.layers[newPosition.layer].splice(
         newPosition.index,
         0,
         element,
       );
-      this.activeBoard.layers[prevPosition.layer] = [
-        ...this.activeBoard.layers[prevPosition.layer],
-      ];
-      this.activeBoard.layers[newPosition.layer] = [
-        ...this.activeBoard.layers[newPosition.layer],
-      ];
+
+      this.reindexLayer(newPosition.layer, newPosition.index);
     } catch (error) {
       addToast({
         color: 'danger',
@@ -232,26 +292,15 @@ class BoardStore {
   };
   removeElement = (id: string, external?: boolean) => {
     if (this.activeBoard?.layers && this.boardWebsocket) {
-      this.activeBoard.layers = this.activeBoard.layers.map((layer) =>
-        layer.filter((element) => element.id !== id),
-      );
+      const { layer, index } = this.getElementPosition(id);
+      this.activeBoard.layers[layer].splice(index, 1);
+      this.positionsMap.delete(id);
+      this.reindexLayer(layer, index);
+
       if (!external) this.boardWebsocket.emit('removeElement', id);
     }
   };
-  getElementLayer = (id: string): { layer: number; index: number } => {
-    const currentIndex = { layer: -1, index: -1 };
 
-    if (this.activeBoard?.layers)
-      this.activeBoard?.layers.map((layer, layerIndex) => {
-        const index = layer.findIndex((element) => element.id === id);
-        if (index !== -1) {
-          currentIndex.layer = layerIndex;
-          currentIndex.index = index;
-        }
-      });
-
-    return currentIndex;
-  };
   getMaxMinElementPositions = (): {
     max: { layer: number; index: number };
     min: { layer: number; index: number };
@@ -274,31 +323,6 @@ class BoardStore {
       },
       min: { layer: firstNonEmptyLayer, index: 0 },
     };
-  };
-
-  setActiveBoard = (board: any | undefined) => {
-    if (!board) {
-      this.activeBoard = board;
-      this.disconnectSocket();
-    } else {
-      this.activeBoard = {
-        ...board,
-        layers: board.layers.map((layer: BoardElement[]) =>
-          observable.array(layer),
-        ),
-        lastChange: board.updatedAt,
-        type: board.type.toUpperCase() as BoardTypes,
-      } as Board;
-
-      projectsStore.addRecentBoard(
-        projectsStore.activeProject?.id || '',
-        board.sectionId,
-        board.id,
-        board.name,
-        board.type.toUpperCase() as BoardTypes,
-      );
-      this.connectSocket(this.activeBoard.id || '');
-    }
   };
 }
 

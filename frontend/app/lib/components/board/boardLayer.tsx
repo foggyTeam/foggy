@@ -4,11 +4,12 @@ import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { observer } from 'mobx-react-lite';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
-export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
+const BoardLayer = observer(({ layer }: { layer: BoardElement[] }) => {
   const {
     updateElement,
     handleSelect,
@@ -80,6 +81,7 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
                     y: e.target.y(),
                   })
                 }
+                onTap={handleSelect}
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 draggable={transformAvailable && !allToolsDisabled}
               />
@@ -89,6 +91,7 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
               <Ellipse
                 key={element.id}
                 {...element}
+                onTap={handleSelect}
                 onClick={handleSelect}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
@@ -107,6 +110,7 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
               <Line
                 key={element.id}
                 {...element}
+                onTap={handleSelect}
                 onClick={handleSelect}
                 onDragEnd={(e: any) => {
                   updateElement(element.id, {
@@ -134,11 +138,13 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
 
             return (
               <Image
+                onTap={handleSelect}
                 key={element.id}
                 image={imageElement}
                 {...element}
                 onClick={handleSelect}
                 onDblClick={handleTextEdit}
+                onDblTap={handleTextEdit}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -156,6 +162,7 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
           case 'marker':
             return (
               <Line
+                onTap={handleSelect}
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
@@ -171,4 +178,6 @@ export default function BoardLayer({ layer }: { layer: BoardElement[] }) {
       })}
     </Layer>
   );
-}
+});
+
+export default BoardLayer;

@@ -96,7 +96,6 @@ export const BoardProvider = observer(
 
       e.cancelBubble = true;
       const target = e.target;
-
       if (target.parent)
         changeSelection((prevState) => {
           if (e.evt.ctrlKey || e.evt.metaKey || prevState.length === 0)
