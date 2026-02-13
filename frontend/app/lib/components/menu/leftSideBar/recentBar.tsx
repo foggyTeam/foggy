@@ -10,6 +10,7 @@ import React from 'react';
 import Link from 'next/link';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
+import boardStore from '@/app/stores/boardStore';
 
 const RecentBar = observer(
   ({
@@ -38,7 +39,7 @@ const RecentBar = observer(
                 onClick={() => settingsStore.startLoading()}
                 isIconOnly
                 variant={
-                  board.url.endsWith(projectsStore.activeBoard?.id || '')
+                  board.url.endsWith(boardStore.activeBoard?.id || '')
                     ? 'flat'
                     : 'light'
                 }

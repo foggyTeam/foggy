@@ -7,7 +7,6 @@ import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/boardLayer';
 import ToolBar from '@/app/lib/components/board/menu/toolBar';
 import { observer } from 'mobx-react-lite';
-import projectsStore from '@/app/stores/projectsStore';
 import { primary } from '@/tailwind.config';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
@@ -21,6 +20,7 @@ import UseMouseEvent from '@/app/lib/hooks/boardNavigation/useMouseEvent';
 import UseWheelEvent from '@/app/lib/hooks/boardNavigation/useWheelEvent';
 import UseTouchEvent from '@/app/lib/hooks/boardNavigation/useTouchEvent';
 import UseRAFNavigation from '@/app/lib/hooks/boardNavigation/useRAFNavigation';
+import boardStore from '@/app/stores/boardStore';
 
 const GRID_SIZE = 24;
 
@@ -86,7 +86,7 @@ const BoardStage = observer(() => {
           ref={stageRef}
           onClick={handleSelect}
         >
-          {projectsStore.activeBoard?.layers?.map((layer, index) => (
+          {boardStore.activeBoard?.layers?.map((layer, index) => (
             <BoardLayer key={index} layer={layer} />
           ))}
 

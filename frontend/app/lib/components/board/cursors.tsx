@@ -14,8 +14,8 @@ import { MousePointer2Icon } from 'lucide-react';
 import userStore from '@/app/stores/userStore';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import throttle from 'lodash/throttle';
-import projectsStore from '@/app/stores/projectsStore';
 import { observer } from 'mobx-react-lite';
+import boardStore from '@/app/stores/boardStore';
 
 type CursorColor =
   | 'default'
@@ -91,7 +91,7 @@ const Cursors = observer(() => {
   }, [updateCursorsRef, redraw]);
 
   useEffect(() => {
-    const boardId = projectsStore.activeBoard?.id;
+    const boardId = boardStore.activeBoard?.id;
     const userId = userStore.user?.id;
     const nickname = userStore.user?.name;
     const avatar = userStore.user?.image;
@@ -171,7 +171,7 @@ const Cursors = observer(() => {
       socket.off('userDisconnected');
       socket.disconnect();
     };
-  }, [projectsStore.activeBoard?.id, stageRef, userColor, redraw]);
+  }, [boardStore.activeBoard?.id, stageRef, userColor, redraw]);
 
   return (
     <>
