@@ -234,7 +234,7 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
 export default function BackgroundGradient() {
   const { isMobile } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
 
   const [isBoardPage, setIsBoardPage] = useState(false);
   const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
