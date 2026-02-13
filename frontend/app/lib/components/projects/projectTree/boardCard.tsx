@@ -13,6 +13,7 @@ import { UpdateBoard } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import { useTopLoader } from 'nextjs-toploader';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function BoardCard({
   parentList,
@@ -21,6 +22,7 @@ export default function BoardCard({
   parentList: string[];
   board: Pick<Board, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
 }) {
+  const { isMobile, smallerSize } = useAdaptiveParams();
   const { activeNodes, setActiveNodes, removeNode } = useActiveSectionContext();
   const router = useRouter();
   const { start } = useTopLoader();
@@ -49,34 +51,43 @@ export default function BoardCard({
       );
   };
 
+  function handleClick(event: any) {
+    if (isMobile) {
+      handleDoubleClick();
+      return;
+    }
+    setActiveNodes(
+      event.ctrlKey
+        ? [...activeNodes, { id: board.id, parentList }]
+        : [{ id: board.id, parentList }],
+    );
+  }
+
+  function handleDoubleClick() {
+    start();
+    settingsStore.startLoading();
+    router.push(
+      `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
+    );
+  }
+
   return (
     <div
-      onDoubleClick={() => {
-        start();
-        settingsStore.startLoading();
-        router.push(
-          `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
-        );
-      }}
-      className="flex max-h-16 w-full items-center justify-between gap-2 p-1 pr-0 pl-10"
+      data-testid="board-card"
+      onDoubleClick={handleDoubleClick}
+      className="flex max-h-16 w-full items-center justify-between gap-2 py-0.5 pr-0 pl-5 sm:p-1 sm:pl-10"
     >
       <div
-        onClick={(event) =>
-          setActiveNodes(
-            event.ctrlKey
-              ? [...activeNodes, { id: board.id, parentList }]
-              : [{ id: board.id, parentList }],
-          )
-        }
+        onClick={(event) => handleClick(event)}
         className={clsx(
-          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-1 pr-0 transition-colors',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-start gap-0 rounded-xl p-0.5 pr-0 transition-colors sm:p-1',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == board.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
         )}
       >
         <div className="flex h-full w-full items-center">
-          <div className="flex h-8 w-8 items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center sm:h-8 sm:w-8">
             <ElementIcon elementType={board.type} />
           </div>
           <NameInput
@@ -90,14 +101,15 @@ export default function BoardCard({
             onValueChange={setBoardName}
           />
         </div>
-        <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
+        <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
           {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
             <Button
+              data-testid="delete-btn"
               isIconOnly
               onPress={() => removeNode(board.id, parentList)}
               variant="light"
               color="danger"
-              size="sm"
+              size={smallerSize}
             >
               <TrashIcon className="stroke-danger-500" />
             </Button>

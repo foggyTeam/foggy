@@ -81,6 +81,16 @@
     "myTeams": "МОИ КОМАНДЫ",
     "teamProjects": "ПРОЕКТЫ _",
     "participants": "УЧАСТНИКИ",
+
+    "mobileTitles": {
+      "myProjects": "МОИ ПРОЕКТЫ",
+      "myTeams": "МОИ КОМАНДЫ",
+      "teamProjects": "ПРОЕКТЫ КОМАНДЫ",
+      "project": "ПРОЕКТ",
+      "team": "КОМАНДА",
+      "participants": "УЧАСТНИКИ"
+    },
+
     "andNMore": "И еще _...",
     "you": "(вы)",
     "searchPlaceholder": "Найти...",

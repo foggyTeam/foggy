@@ -5,7 +5,7 @@ import NotFound from '@/app/lib/components/notFound';
 
 export default function NotFoundPage() {
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center gap-8 px-24 py-8">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-8 px-24 py-8">
       <div
         className={clsx(
           'flex h-full w-full max-w-2xl flex-col items-center justify-center',

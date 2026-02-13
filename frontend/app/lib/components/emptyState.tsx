@@ -13,6 +13,7 @@ import ChartIllustration from '@/app/lib/components/svg/illustrations/statistics
 import MessagingIllustration from '@/app/lib/components/svg/illustrations/study';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const illustrationsMap = {
   404: NotFoundIllustration,
@@ -47,6 +48,8 @@ export default function EmptyState({
   size = 'default',
   className,
 }: EmptyStateProps) {
+  const { commonSize } = useAdaptiveParams();
+
   const Illustration = illustrationsMap[illustrationType];
   const maxHeight = (size: 'default' | 'sm' | 'lg' | 'full') => {
     switch (size) {
@@ -79,13 +82,13 @@ export default function EmptyState({
             'line-clamp-1 w-full text-center',
             size === 'full'
               ? 'text-primary text-6xl font-extrabold'
-              : 'text-primary-900 text-small font-medium',
+              : 'text-primary-900 sm:text-small text-medium font-medium',
           )}
         >
           {title.toUpperCase()}
         </p>
         {text && (
-          <p className="text-default-500 text-small w-full text-center">
+          <p className="text-default-500 sm:text-small text-medium w-full text-center">
             {text}
           </p>
         )}
@@ -94,16 +97,20 @@ export default function EmptyState({
         <div className="flex w-full items-center justify-center gap-16">
           {!!leftButton && (
             <FButton
-              size="md"
+              size={commonSize}
               variant="light"
               color="primary"
-              onClick={leftButton.callback}
+              onPress={leftButton.callback}
             >
               {leftButton.title}
             </FButton>
           )}
           {!!rightButton && (
-            <FButton size="md" color="primary" onClick={rightButton.callback}>
+            <FButton
+              size={commonSize}
+              color="primary"
+              onPress={rightButton.callback}
+            >
               {rightButton.title}
             </FButton>
           )}

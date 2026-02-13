@@ -37,12 +37,12 @@ async function getUserData() {
 export default async function ProfilePage() {
   const userData = await getUserData();
   return (
-    <div className="flex h-screen w-screen items-center justify-center">
+    <div className="flex h-full max-h-screen w-full items-center justify-center p-4 sm:px-24 sm:py-8">
       <div
         className={clsx(
-          'flex h-fit w-auto flex-col items-center justify-center',
+          'flex h-full w-full items-start justify-center sm:h-fit sm:w-auto sm:items-center',
           bg_container,
-          'rounded-bl-[64px] px-12',
+          'overflow-y-auto sm:rounded-bl-[64px] sm:px-12',
         )}
       >
         {userData ? <ProfileForm {...userData} /> : <ProfileFormSkeleton />}

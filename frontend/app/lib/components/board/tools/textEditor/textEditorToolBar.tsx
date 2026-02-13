@@ -136,7 +136,7 @@ export default function TextEditorToolBar({
     <div
       className={clsx(
         bg_container_no_padding,
-        'flex h-14 w-fit justify-start gap-1 p-2 sm:p-3',
+        'flex flex-wrap justify-start gap-1 p-2 sm:h-14 sm:w-fit sm:flex-nowrap sm:p-3',
       )}
     >
       {tools.base.map((tool, index) => {

@@ -11,8 +11,10 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
 import debounce from 'lodash/debounce';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EraserTool() {
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     toolsDisabled,
@@ -55,6 +57,7 @@ export default function EraserTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.eraserTool}>
       <Button
+        data-testid="eraser-tool-btn"
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'eraser') setActiveTool('');
@@ -63,13 +66,13 @@ export default function EraserTool() {
         variant={activeTool === 'eraser' ? 'flat' : 'light'}
         color={activeTool === 'eraser' ? 'primary' : 'default'}
         isIconOnly
-        size="md"
+        size={commonSize}
       >
         <EraserIcon
           className={
             activeTool === 'eraser'
               ? 'stroke-primary-500'
-              : 'stroke-default-500'
+              : 'stroke-default-600'
           }
         />
       </Button>

@@ -67,7 +67,7 @@ const ClosedRightSideBar = observer(
             variant="light"
             size="md"
           >
-            <BellIcon className="stroke-default-500" />
+            <BellIcon className="stroke-default-600" />
           </Button>
         </Badge>
       </div>

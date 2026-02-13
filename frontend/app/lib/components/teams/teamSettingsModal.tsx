@@ -24,6 +24,7 @@ import {
   DeleteTeam,
   UpdateTeam,
 } from '@/app/lib/server/actions/teamServerActions';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const TeamSettingsModal = observer(
   ({
@@ -35,6 +36,7 @@ const TeamSettingsModal = observer(
     onOpenChange: any;
     isNewTeam?: boolean;
   }) => {
+    const { commonSize, smallerSize } = useAdaptiveParams();
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const {
@@ -205,7 +207,12 @@ const TeamSettingsModal = observer(
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-md gap-2 overflow-visible p-6">
           {() =>
             (
@@ -235,7 +242,7 @@ const TeamSettingsModal = observer(
                       label={settingsStore.t.team.teamSettings.name}
                       labelPlacement="inside"
                       name="name"
-                      size="md"
+                      size={commonSize}
                       value={name}
                       onValueChange={setName}
                     />
@@ -247,7 +254,7 @@ const TeamSettingsModal = observer(
                           allowRequests: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.allowRequests}
                     </Checkbox>
@@ -261,7 +268,7 @@ const TeamSettingsModal = observer(
                           memberListIsPublic: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.memberListIsPublic}
                     </Checkbox>
@@ -275,7 +282,7 @@ const TeamSettingsModal = observer(
                           projectListIsPublic: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.projectListIsPublic}
                     </Checkbox>
@@ -294,7 +301,7 @@ const TeamSettingsModal = observer(
                         isDisabled={isSaving}
                         variant="bordered"
                         color="danger"
-                        size="md"
+                        size={commonSize}
                       >
                         {settingsStore.t.team.teamSettings.deleteButton}
                       </FButton>
@@ -306,7 +313,7 @@ const TeamSettingsModal = observer(
                       onPress={onSubmit}
                       variant="solid"
                       color="primary"
-                      size="md"
+                      size={commonSize}
                     >
                       {isNewTeam
                         ? settingsStore.t.team.teamSettings.createButton

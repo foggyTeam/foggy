@@ -13,6 +13,7 @@ import FunnelIcon from '@/app/lib/components/svg/funnelIcon';
 import AllFilters from '@/app/lib/components/filters/allFilters';
 import { FilterSet } from '@/app/lib/types/definitions';
 import CheckAccess from '@/app/lib/utils/checkAccess';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export interface ActionBarProps {
   setSearchValue: any;
@@ -45,6 +46,7 @@ export default function ContentActionBar({
   openSettings,
   type,
 }: ActionBarProps) {
+  const { smallerSize } = useAdaptiveParams();
   const hasFilters = () => {
     return [
       filters?.role?.size,
@@ -54,36 +56,40 @@ export default function ContentActionBar({
     ].some((size) => !!size);
   };
   return (
-    <div className="flex h-fit w-full flex-col gap-2">
-      <div className="flex h-fit w-full items-center justify-between gap-1">
-        <div className="flex gap-1">
+    <div
+      data-testid="content-section-head"
+      className="flex h-fit w-full flex-col gap-2"
+    >
+      <div className="flex h-fit w-full items-start justify-between gap-1 sm:items-center">
+        <div className="flex flex-wrap items-center gap-1 sm:flex-nowrap">
           <Input
             onValueChange={setSearchValue}
             placeholder={settingsStore.t.main.searchPlaceholder}
             radius="full"
-            size="sm"
+            size={smallerSize}
             variant="flat"
             type="text"
-            className="m-0 max-w-64 p-0"
+            className="m-0 w-full p-0 sm:max-w-64"
             classNames={{
               inputWrapper:
-                'shadow-none text-sm bg-[hsl(var(--heroui-background))]',
-              input: 'text-sm',
+                'shadow-none sm:text-sm text-medium bg-[hsl(var(--heroui-background))]',
+              input: 'sm:text-sm text-medium',
             }}
-            endContent={<SearchIcon className="stroke-default-500" />}
+            endContent={<SearchIcon className="stroke-default-600" />}
           />
           {dispatchFilters !== undefined && (
             <Button
               isDisabled={filtersDisabled}
               onPress={openFilters}
               isIconOnly
+              data-testid="filters-btn"
               variant={hasFilters() ? 'flat' : 'light'}
               color={hasFilters() ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <FunnelIcon
                 className={
-                  hasFilters() ? 'stroke-primary-500' : 'stroke-default-300'
+                  hasFilters() ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
@@ -92,13 +98,14 @@ export default function ContentActionBar({
             <Button
               onPress={() => setFavorite(!favorite)}
               isIconOnly
+              data-testid="favorite-btn"
               variant={favorite ? 'flat' : 'light'}
               color={favorite ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <StarIcon
                 className={
-                  favorite ? 'stroke-primary-500' : 'stroke-default-300'
+                  favorite ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
@@ -107,40 +114,54 @@ export default function ContentActionBar({
             <Button
               onPress={() => setWithNotification(!withNotification)}
               isIconOnly
+              data-testid="with-notification-btn"
               variant={withNotification ? 'flat' : 'light'}
               color={withNotification ? 'primary' : 'default'}
-              size="sm"
+              size={smallerSize}
             >
               <BellIcon
                 className={
-                  withNotification ? 'stroke-primary-500' : 'stroke-default-300'
+                  withNotification ? 'stroke-primary-500' : 'stroke-default-600'
                 }
               />
             </Button>
           )}
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex h-fit gap-1">
           {addNew !== undefined &&
             (type ? CheckAccess(['admin', 'owner'], type) : true) && (
-              <Button onPress={addNew} isIconOnly variant="light" size="sm">
+              <Button
+                data-testid="add-new-btn"
+                onPress={addNew}
+                isIconOnly
+                variant="light"
+                size={smallerSize}
+              >
                 <PlusIcon className="stroke-default-500" />
               </Button>
             )}
           {addMember !== undefined && CheckAccess(['admin', 'owner'], type) && (
-            <Button onPress={addMember} isIconOnly variant="light" size="sm">
+            <Button
+              data-testid="add-member-btn"
+              onPress={addMember}
+              isIconOnly
+              variant="light"
+              size={smallerSize}
+            >
               <UserRoundPlusIcon className="stroke-default-500" />
             </Button>
           )}
           {openSettings !== undefined &&
             CheckAccess(['admin', 'owner'], type) && (
               <Button
+                data-testid="settings-btn"
                 onPress={openSettings}
                 isIconOnly
                 variant="light"
-                size="sm"
+                size={smallerSize}
               >
-                <SettingsIcon className="stroke-default-500" />
+                <SettingsIcon className="stroke-default-600" />
               </Button>
             )}
         </div>

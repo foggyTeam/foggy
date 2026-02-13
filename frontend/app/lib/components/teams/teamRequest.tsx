@@ -13,7 +13,7 @@ import { ScrollShadow } from '@heroui/scroll-shadow';
 
 const TeamRequest = observer(({ team }: { team: Team | undefined }) => {
   return (
-    <div className="flex h-fit w-full flex-col gap-4 overflow-clip text-sm">
+    <div className="text-medium flex h-fit w-full flex-col gap-4 overflow-clip sm:text-sm">
       <div className="flex h-fit flex-col gap-4">
         <div className="flex h-fit items-center justify-start gap-4">
           <Avatar

@@ -7,6 +7,7 @@ import {
 } from '@heroui/modal';
 import { ReactNode } from 'react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function AreYouSureModal({
   isOpen,
@@ -25,8 +26,14 @@ export default function AreYouSureModal({
   sure: string;
   dismiss: string;
 }) {
+  const { commonSize } = useAdaptiveParams();
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent>
         {(onClose) =>
           (
@@ -36,22 +43,24 @@ export default function AreYouSureModal({
               </ModalHeader>
               {description && (
                 <ModalBody>
-                  <p className="text-sm">{description}</p>
+                  <p className="text-medium sm:text-sm">{description}</p>
                 </ModalBody>
               )}
               <ModalFooter className="flex w-full justify-between">
                 <FButton
+                  data-testid="sure-btn"
                   color="danger"
                   variant="light"
-                  size="md"
+                  size={commonSize}
                   onPress={action}
                 >
                   {sure}
                 </FButton>
                 <FButton
+                  data-testid="dismiss-btn"
                   color="primary"
                   variant="bordered"
-                  size="md"
+                  size={commonSize}
                   onPress={onClose}
                 >
                   {dismiss}
