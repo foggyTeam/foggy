@@ -24,6 +24,7 @@
 }
 
 :root {
+  --app-height: 100vh;
   --background: #e4e4e7;
   --foreground: #18181b;
 }
@@ -42,7 +43,27 @@ body {
   font-family: Montserrat, sans-serif;
 }
 
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
 .bg-gradient {
   pointer-events: none;
   will-change: transform, opacity;
+}
+
+.app-shell {
+  height: var(--app-height);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
 }
