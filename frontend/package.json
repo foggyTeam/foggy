@@ -44,7 +44,7 @@
     "@heroui/toast": "^2.0.20",
     "@heroui/tooltip": "^2.2.27",
     "@heroui/use-infinite-scroll": "^2.2.12",
-    "@internationalized/date": "3.10.0",
+    "@internationalized/date": "3.11.0",
     "@next/env": "^15.5.12",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.18",
@@ -96,9 +96,6 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "vite": "^5.4.21",
     "vitest": "^2.1.9"
-  },
-  "overrides": {
-    "@internationalized/date": "3.10.0"
   },
   "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }
