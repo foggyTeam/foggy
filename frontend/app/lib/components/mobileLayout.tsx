@@ -57,7 +57,11 @@ const MobileLayout = observer(
           return (
             <Tab
               key={tab.key}
-              title={settingsStore.t.main.mobileTitles[tab.titleKey]}
+              title={
+                settingsStore.t.main.mobileTitles[
+                  tab.titleKey as keyof typeof settingsStore.t.main.mobileTitles
+                ]
+              }
             >
               {childMap.get(tab.key)}
             </Tab>

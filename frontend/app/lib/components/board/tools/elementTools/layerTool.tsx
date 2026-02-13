@@ -23,7 +23,9 @@ export default function LayerTool() {
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {
-    setCurrentLayer(boardStore.getElementPosition(selectedElement.attrs.id));
+    const position = boardStore.getElementPosition(selectedElement.attrs.id);
+    if (!position) return;
+    setCurrentLayer(position);
   }, [selectedElement]);
 
   const changeLayer = (action: 'back' | 'forward' | 'bottom' | 'top') => {

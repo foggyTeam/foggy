@@ -234,14 +234,14 @@ const circles: { light: circleParams[]; dark: circleParams[] } = {
 export default function BackgroundGradient() {
   const { isMobile } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState<keyof typeof circles>('dark');
 
   const [isBoardPage, setIsBoardPage] = useState(false);
   const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
   const path = usePathname();
 
-  const currentCircles = circles[theme].filter((_, i) =>
-    isMobile ? i % 2 === 0 : true,
+  const currentCircles = circles[theme as keyof typeof circles].filter(
+    (_: circleParams, i: number) => (isMobile ? i % 2 === 0 : true),
   );
 
   useEffect(() => {
@@ -259,7 +259,7 @@ export default function BackgroundGradient() {
         theme === 'dark' ? 'bg-default-100 opacity-50' : 'bg-default-200',
       )}
     >
-      {currentCircles.map((circle, index) => (
+      {currentCircles.map((circle: circleParams, index: number) => (
         <BackgroundCircle
           isBoardPage={isBoardPage}
           key={index}

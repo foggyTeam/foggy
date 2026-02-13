@@ -41,7 +41,7 @@ class BoardStore {
     } else {
       this.activeBoard = {
         ...board,
-        layers: board.layers.map((layer) =>
+        layers: board.layers.map((layer: BoardElement[]) =>
           observable.array(layer.map((element) => observable(element))),
         ),
         lastChange: board.updatedAt,
@@ -87,14 +87,15 @@ class BoardStore {
     }
   }
   getElementPosition(id: string) {
-    if (this.positionsMap.has(id)) return this.positionsMap.get(id);
+    const position = this.positionsMap.get(id);
+    if (position) return position;
     addToast({
       color: 'danger',
       severity: 'danger',
-      title: settingsStore.t.toasts.board.boardElementNotFound.title,
+      title: settingsStore.t.toasts.board.boardElementNotFound,
     });
 
-    return null;
+    return { layer: -1, index: -1 };
   }
 
   connectSocket(boardId: string) {
