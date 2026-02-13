@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useMemo, useRef } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
 import { Button } from '@heroui/button';
 import { MaximizeIcon } from 'lucide-react';
@@ -65,6 +65,11 @@ const BoardStage = observer(() => {
     }),
     [viewportWidth, viewportHeight],
   );
+
+  useEffect(() => {
+    if (!isStageValid) return;
+    requestAnimationFrame(() => updateGridRef.current?.());
+  }, [isStageValid, viewportWidth, viewportHeight]);
 
   return (
     <div

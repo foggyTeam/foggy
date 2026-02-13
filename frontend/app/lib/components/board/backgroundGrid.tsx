@@ -30,8 +30,10 @@ export default function GridBackground({ gridSize }: { gridSize: number }) {
 
     const step = gridSize * scale;
 
-    const offsetX = pos.x % step;
-    const offsetY = pos.y % step;
+    const mod = (n: number, m: number) => ((n % m) + m) % m;
+
+    const offsetX = mod(pos.x, step);
+    const offsetY = mod(pos.y, step);
 
     grid.style.backgroundImage = `url(${patternUrl})`;
     grid.style.backgroundRepeat = 'repeat';

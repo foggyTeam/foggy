@@ -42,10 +42,11 @@ const colors: CursorColor[] = [
 ];
 
 const Cursors = observer(() => {
-  const { stageRef, scale, updateCursorsRef } = useBoardContext();
+  const { stageRef, updateCursorsRef } = useBoardContext();
 
   const [cursorIds, setCursorIds] = useState<string[]>([]);
   const cursorIdsRef = useRef<string[]>([]);
+
   useEffect(() => {
     cursorIdsRef.current = cursorIds;
   }, [cursorIds]);
@@ -76,9 +77,9 @@ const Cursors = observer(() => {
       const screenX = rect.left + (data.x * s + offsetX);
       const screenY = rect.top + (data.y * s + offsetY);
 
-      el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) scale(${scale})`;
+      el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) scale(${s})`;
     }
-  }, [stageRef, scale]);
+  }, [stageRef]);
 
   useEffect(() => {
     updateCursorsRef.current = redraw;
