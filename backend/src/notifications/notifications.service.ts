@@ -285,9 +285,25 @@ export class NotificationService {
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
     isAccept: boolean,
+    customRole?: Role,
   ): Promise<void> {
     const notification = await this.findNotificationById(notificationId);
     this.validateRecipient(notification, userId);
+
+    if (isAccept && customRole) {
+      const isJoinRequest = [
+        NotificationType.PROJECT_JOIN_REQUEST,
+        NotificationType.TEAM_JOIN_REQUEST,
+      ].includes(notification.type);
+
+      if (isJoinRequest && customRole === Role.OWNER) {
+        throw new CustomException(
+          getErrorMessages({ general: 'errorNotRecognized' }),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     switch (notification.type) {
       case NotificationType.PROJECT_INVITE:
         await this.handleProjectInvite(notification, userId, isAccept);
@@ -296,10 +312,20 @@ export class NotificationService {
         await this.handleTeamInvite(notification, userId, isAccept);
         break;
       case NotificationType.PROJECT_JOIN_REQUEST:
-        await this.handleProjectJoinRequest(notification, userId, isAccept);
+        await this.handleProjectJoinRequest(
+          notification,
+          userId,
+          isAccept,
+          customRole,
+        );
         break;
       case NotificationType.TEAM_JOIN_REQUEST:
-        await this.handleTeamJoinRequest(notification, userId, isAccept);
+        await this.handleTeamJoinRequest(
+          notification,
+          userId,
+          isAccept,
+          customRole,
+        );
         break;
       case NotificationType.PROJECT_TEAM_INVITE:
         await this.handleProjectTeamInvite(notification, userId, isAccept);
@@ -517,24 +543,27 @@ export class NotificationService {
     notification: NotificationDocument,
     inviterId: Types.ObjectId,
     isAccept: boolean,
+    customRole?: Role,
   ) {
     const metadata = notification.metadata as JoinRequestMetadata;
     const userId = notification.initiator;
     const projectId = notification.target.id;
+
+    const roleToAssign = isAccept && customRole ? customRole : metadata.role;
 
     if (isAccept) {
       await this.projectService.manageProjectUser(
         projectId,
         inviterId,
         userId,
-        metadata.role,
+        roleToAssign,
         true,
       );
       await this.notifyProjectOnJoin(
         projectId,
         userId,
         inviterId,
-        metadata.role,
+        roleToAssign,
       );
     }
 
@@ -546,7 +575,7 @@ export class NotificationService {
       initiator: inviterId,
       target: { type: EntityType.PROJECT, id: projectId },
       metadata: {
-        role: metadata.role,
+        role: roleToAssign,
         inviterId: inviterId,
         expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
@@ -589,19 +618,17 @@ export class NotificationService {
     notification: NotificationDocument,
     inviterId: Types.ObjectId,
     isAccept: boolean,
+    customRole?: Role,
   ) {
     const metadata = notification.metadata as JoinRequestMetadata;
     const userId = notification.initiator;
     const teamId = notification.target.id;
 
+    const roleToAssign = isAccept && customRole ? customRole : metadata.role;
+
     if (isAccept) {
-      await this.teamService.addMember(
-        teamId,
-        userId,
-        metadata.role,
-        inviterId,
-      );
-      await this.notifyTeamOnJoin(teamId, userId, inviterId, metadata.role);
+      await this.teamService.addMember(teamId, userId, roleToAssign, inviterId);
+      await this.notifyTeamOnJoin(teamId, userId, inviterId, roleToAssign);
     }
 
     await this.notificationModel.create({
@@ -612,7 +639,7 @@ export class NotificationService {
       initiator: inviterId,
       target: { type: EntityType.TEAM, id: teamId },
       metadata: {
-        role: metadata.role,
+        role: roleToAssign,
         inviterId: inviterId,
         expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
