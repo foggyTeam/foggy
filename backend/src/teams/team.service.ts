@@ -465,7 +465,7 @@ export class TeamService {
       members = await this.getMembers(team);
     }
 
-    let projects: any[] = [];
+    const projects: any[] = [];
     if (
       team.settings.projectListIsPublic &&
       team.projects &&
@@ -597,33 +597,59 @@ export class TeamService {
     await this.projectService.removeTeamFromProjectByTeam(projectId, teamId);
   }
 
-  async searchTeams(query: string, limit = 20, cursor?: string) {
+  async searchTeams(
+    query: string,
+    projectId: Types.ObjectId,
+    limit = 20,
+    cursor?: string,
+  ) {
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
 
     const filter: any = {};
+
     if (query) {
       filter.name = { $regex: query, $options: 'i' };
     }
+
+    const project = await this.projectService.findProjectById(projectId);
+
+    const existingTeamIds =
+      project.accessControlTeams
+        ?.map((teamAccess) => teamAccess.teamId)
+        .filter((id) => id != null) || [];
+
+    if (existingTeamIds.length > 0) {
+      filter._id = { $nin: existingTeamIds };
+    }
+
     if (cursor) {
-      filter._id = { $gt: new Types.ObjectId(cursor) };
+      if (filter._id) {
+        filter._id.$gt = new Types.ObjectId(cursor);
+      } else {
+        filter._id = { $gt: new Types.ObjectId(cursor) };
+      }
     }
 
     const teams = await this.teamModel
       .find(filter)
       .sort({ _id: 1 })
       .limit(validatedLimit)
-      .select('name avatar _id')
+      .select('name avatar _id members')
+      .lean()
       .exec();
+
+    const teamsWithMemberCount = teams.map((team) => ({
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      memberCount: team.members?.length || 0,
+    }));
 
     const nextCursor =
       teams.length === validatedLimit ? teams[teams.length - 1]._id : null;
 
     return {
-      teams: teams.map((team) => ({
-        id: team._id,
-        name: team.name,
-        avatar: team.avatar,
-      })),
+      teams: teamsWithMemberCount,
       nextCursor,
       hasNextPage: Boolean(nextCursor),
     };

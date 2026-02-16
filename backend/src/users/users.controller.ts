@@ -160,7 +160,7 @@ export class UsersController {
 
   @Post('search')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Search users for adding to project' })
+  @ApiOperation({ summary: 'Search users for adding to project or team' })
   @ApiResponse({
     status: 200,
     description: 'List of users matching the search criteria',
@@ -180,6 +180,11 @@ export class UsersController {
           description: 'Project ID to exclude its members',
           example: '65a8e5c9d8df1f04e8e3b4a2',
         },
+        teamId: {
+          type: 'string',
+          description: 'Team ID to exclude its members',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
         limit: {
           type: 'number',
           description: 'Maximum number of results (1-100)',
@@ -196,13 +201,33 @@ export class UsersController {
   async searchUsers(
     @Body('query') query: string = '',
     @Body('projectId') projectId?: string,
+    @Body('teamId') teamId?: string,
     @Body('limit') limit: number = 20,
     @Body('cursor') cursor?: string,
   ) {
-    const parsedProjectId = projectId
-      ? new Types.ObjectId(projectId)
-      : undefined;
+    if (projectId) {
+      return this.usersService.searchUsers(
+        query,
+        { type: 'project', id: new Types.ObjectId(projectId) },
+        Number(limit),
+        cursor,
+      );
+    }
 
-    return this.usersService.searchUsers(query, parsedProjectId, limit, cursor);
+    if (teamId) {
+      return this.usersService.searchUsers(
+        query,
+        { type: 'team', id: new Types.ObjectId(teamId) },
+        Number(limit),
+        cursor,
+      );
+    }
+
+    return this.usersService.searchUsers(
+      query,
+      undefined,
+      Number(limit),
+      cursor,
+    );
   }
 }

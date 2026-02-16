@@ -63,11 +63,35 @@ export class TeamController {
 
   @Post('search')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Search teams by name' })
+  @ApiOperation({
+    summary: 'Search teams for adding to project',
+  })
+  @ApiSecurity('x-user-id')
   @ApiResponse({
     status: 200,
-    description: 'List of teams matching the search criteria',
+    description:
+      'List of teams matching the search criteria, excluding teams already in the project',
+    schema: {
+      type: 'object',
+      properties: {
+        teams: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              avatar: { type: 'string' },
+              memberCount: { type: 'number' },
+            },
+          },
+        },
+        nextCursor: { type: 'string', nullable: true },
+        hasNextPage: { type: 'boolean' },
+      },
+    },
   })
+  @ApiResponse({ status: 404, description: 'Project not found' })
   @ApiBody({
     description: 'Search parameters',
     schema: {
@@ -77,6 +101,11 @@ export class TeamController {
           type: 'string',
           description: 'Search query for team name',
           example: 'team name',
+        },
+        projectId: {
+          type: 'string',
+          description: 'Project ID to exclude its teams',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
         },
         limit: {
           type: 'number',
@@ -93,10 +122,16 @@ export class TeamController {
   })
   async searchTeams(
     @Body('query') query: string = '',
+    @Body('projectId') projectId?: string,
     @Body('limit') limit: number = 20,
     @Body('cursor') cursor?: string,
   ) {
-    return this.teamService.searchTeams(query, limit, cursor);
+    return this.teamService.searchTeams(
+      query,
+      new Types.ObjectId(projectId),
+      Number(limit),
+      cursor,
+    );
   }
 
   @Get()
