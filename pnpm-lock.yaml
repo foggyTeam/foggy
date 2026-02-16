@@ -267,6 +267,9 @@ importers:
       '@types/lodash':
         specifier: ^4.17.23
         version: 4.17.23
+      '@types/node':
+        specifier: ^20.19.33
+        version: 20.19.33
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -376,9 +379,6 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@types/node':
-        specifier: ^20.19.33
-        version: 20.19.33
       '@vitest/ui':
         specifier: ^2.1.9
         version: 2.1.9(vitest@2.1.9)
