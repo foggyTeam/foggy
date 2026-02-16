@@ -8,7 +8,6 @@ import {
 import getUserId from '@/app/lib/getUserId';
 import { Role } from 'aws-sdk/clients/s3';
 
-// TODO: allow search with teamId
 export async function SearchUsers(data: {
   query: string;
   projectId?: string;
