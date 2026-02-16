@@ -85,10 +85,10 @@
     "zod": "^3.25.76",
     "eslint": "^9.39.2",
     "@eslint/eslintrc": "^3.3.3",
-    "eslint-config-next": "15.1.2"
+    "eslint-config-next": "15.1.2",
+    "@types/node": "^20.19.33"
   },
   "devDependencies": {
-    "@types/node": "^20.19.33",
     "@vitest/ui": "^2.1.9",
     "install": "^0.13.0",
     "openapi-typescript": "^7.13.0",
