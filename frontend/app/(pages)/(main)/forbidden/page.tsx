@@ -1,5 +1,5 @@
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React from 'react';
+import React, { Suspense } from 'react';
 import ForbiddenState from '@/app/lib/components/forbiddenState';
 import clsx from 'clsx';
 
@@ -13,7 +13,9 @@ export default function ForbiddenPage() {
           'p-8',
         )}
       >
-        <ForbiddenState />
+        <Suspense fallback={null}>
+          <ForbiddenState />
+        </Suspense>
       </div>
     </div>
   );
