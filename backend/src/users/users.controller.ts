@@ -253,8 +253,6 @@ export class UsersController {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              type: { type: 'string', enum: ['user'] },
-              name: { type: 'string' },
               nickname: { type: 'string' },
               avatar: { type: 'string' },
             },
@@ -266,7 +264,6 @@ export class UsersController {
             type: 'object',
             properties: {
               id: { type: 'string' },
-              type: { type: 'string', enum: ['team'] },
               name: { type: 'string' },
               avatar: { type: 'string' },
               memberCount: { type: 'number' },
@@ -345,14 +342,11 @@ export class UsersController {
     return {
       users: usersResult.users.map((user) => ({
         id: user.id.toString(),
-        type: 'user',
-        name: user.nickname,
         nickname: user.nickname,
         avatar: user.avatar,
       })),
       teams: teamsResult.teams.map((team) => ({
         id: team.id.toString(),
-        type: 'team',
         name: team.name,
         avatar: team.avatar,
         memberCount: team.memberCount || 0,
