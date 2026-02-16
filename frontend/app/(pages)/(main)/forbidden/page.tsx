@@ -13,7 +13,7 @@ export default function ForbiddenPage() {
           'p-8',
         )}
       >
-        <Suspense>
+        <Suspense fallback={null}>
           <ForbiddenState />
         </Suspense>
       </div>
