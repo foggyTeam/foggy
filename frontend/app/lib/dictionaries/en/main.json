@@ -82,6 +82,16 @@
     "myTeams": "MY TEAMS",
     "teamProjects": "_ PROJECTS",
     "participants": "PARTICIPANTS",
+
+    "mobileTitles": {
+      "myProjects": "MY PROJECTS",
+      "myTeams": "MY TEAMS",
+      "project": "PROJECT",
+      "team": "TEAM",
+      "teamProjects": "TEAM PROJECTS",
+      "participants": "PARTICIPANTS"
+    },
+
     "andNMore": "And _ more...",
     "you": "(you)",
     "searchPlaceholder": "Find...",

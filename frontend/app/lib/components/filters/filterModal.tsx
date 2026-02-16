@@ -164,8 +164,13 @@ export default function FilterModal({
   ]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
-      <ModalContent className="flex w-fit max-w-2xl gap-2 p-6">
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
+      <ModalContent className="flex w-full max-w-2xl gap-2 p-6 sm:w-fit">
         {() =>
           (
             <>
@@ -173,11 +178,11 @@ export default function FilterModal({
                 {settingsStore.t.filters.menuHeader}
               </ModalHeader>
 
-              <ModalBody className="flex h-fit max-h-40 w-fit max-w-2xl flex-col flex-wrap gap-2 p-0">
+              <ModalBody className="flex h-fit w-full flex-col flex-wrap gap-2 p-0 sm:max-h-40 sm:w-fit sm:max-w-2xl">
                 {membersList && membersList.length > 0 && (
                   <Select
                     radius="md"
-                    className="w-72"
+                    className="w-full sm:w-72"
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
@@ -208,7 +213,7 @@ export default function FilterModal({
                 {teamsList && teamsList.length > 0 && (
                   <Select
                     radius="md"
-                    className="w-72"
+                    className="w-full sm:w-72"
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
@@ -240,7 +245,7 @@ export default function FilterModal({
                 {rolesList && rolesList.length > 0 && (
                   <Select
                     radius="md"
-                    className="w-72"
+                    className="w-full sm:w-72"
                     classNames={{
                       popoverContent: clsx(
                         bg_container_no_padding,
@@ -297,7 +302,7 @@ export default function FilterModal({
                         </Button>
                       )
                     }
-                    className="w-72"
+                    className="w-full sm:w-72"
                     classNames={{
                       label: 'text-xs',
                     }}

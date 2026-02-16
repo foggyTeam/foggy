@@ -6,8 +6,10 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { getLocale } from '@/app/lib/locale';
 import { addToast } from '@heroui/toast';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const LocaleSwitcher = observer(() => {
+  const { commonSize } = useAdaptiveParams();
   useEffect(() => {
     try {
       getLocale().then((l) => {
@@ -31,7 +33,7 @@ const LocaleSwitcher = observer(() => {
       isIconOnly
       color="secondary"
       variant="light"
-      size="md"
+      size={commonSize}
       className="font-semibold"
     >
       {settingsStore.locale.toUpperCase()}

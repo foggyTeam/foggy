@@ -20,6 +20,7 @@ import {
 } from '@/app/lib/server/actions/userServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { useTheme } from 'next-themes';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 enum ButtonAction {
   UNDEFINED,
@@ -28,6 +29,7 @@ enum ButtonAction {
 }
 
 const LoginForm = observer(() => {
+  const { commonSize } = useAdaptiveParams();
   const { resolvedTheme } = useTheme();
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -96,7 +98,7 @@ const LoginForm = observer(() => {
 
   return (
     <Form
-      className={'flex min-w-24 flex-col gap-2 sm:w-80'}
+      className="flex w-full min-w-24 flex-col gap-2 sm:w-80"
       onSubmit={onSubmit}
       validationErrors={errors}
     >
@@ -110,7 +112,7 @@ const LoginForm = observer(() => {
         name="email"
         type="email"
         autoComplete="email"
-        size="md"
+        size={commonSize}
         value={email}
         onValueChange={setEmail}
         endContent={
@@ -121,7 +123,7 @@ const LoginForm = observer(() => {
               type="button"
               onClick={() => setEmail('')}
             >
-              <X className="stroke-default-400" />
+              <X className="stroke-default-600" />
             </button>
           )
         }
@@ -148,9 +150,9 @@ const LoginForm = observer(() => {
               onClick={() => setPasswordVisible(!passwordVisible)}
             >
               {passwordVisible ? (
-                <Eye className="stroke-default-500" />
+                <Eye className="stroke-default-600" />
               ) : (
-                <EyeClosed className="stroke-default-500" />
+                <EyeClosed className="stroke-default-600" />
               )}
             </button>
             {password && (
@@ -165,21 +167,22 @@ const LoginForm = observer(() => {
             )}
           </div>
         }
-        size="md"
+        size={commonSize}
         autoComplete="current-password"
         classNames={{ inputWrapper: 'bg-[hsl(var(--heroui-background))]' }}
       />
 
-      <div className="mt-1 flex w-full items-center justify-between gap-2">
+      <div className="mt-1 flex w-full flex-wrap items-center justify-between gap-2 sm:max-w-80 sm:flex-nowrap">
         <FButton
           onPress={() => setAction(ButtonAction.SIGNIN)}
           isDisabled={!!Object.keys(errors).length || loginButtonLoading}
           type={action === ButtonAction.SIGNIN ? 'submit' : 'button'}
           isLoading={signInButtonLoading}
-          variant="bordered"
+          variant="ghost"
           color="primary"
-          size="md"
+          size={commonSize}
           className="w-full"
+          data-testid="signin-btn"
         >
           {settingsStore.t.login.signUpButton}
         </FButton>
@@ -191,7 +194,9 @@ const LoginForm = observer(() => {
           type="submit"
           variant="solid"
           color="primary"
-          size="md"
+          size={commonSize}
+          data-testid="login-btn"
+          className="w-full sm:w-fit"
         >
           {settingsStore.t.login.signInButton}
         </FButton>
@@ -203,7 +208,8 @@ const LoginForm = observer(() => {
           isIconOnly
           variant="light"
           color="secondary"
-          size="md"
+          data-testid="google-btn"
+          size={commonSize}
         >
           <GoogleIcon
             alt="Google"
@@ -212,13 +218,13 @@ const LoginForm = observer(() => {
             stroke={primary[theme].DEFAULT}
           />
         </Button>
-
         <Button
+          data-testid="yandex-btn"
           onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
           isIconOnly
           variant="light"
           color="secondary"
-          size="md"
+          size={commonSize}
         >
           <YandexIcon
             alt="Yandex"

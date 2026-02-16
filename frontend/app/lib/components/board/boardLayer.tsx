@@ -4,20 +4,12 @@ import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { observer } from 'mobx-react-lite';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
-export default function BoardLayer({
-  layer,
-  fitCoordinates,
-}: {
-  layer: BoardElement[];
-  fitCoordinates: (
-    pos: { x: number; y: number },
-    element: BoardElement,
-  ) => { x: number; y: number };
-}) {
+const BoardLayer = observer(({ layer }: { layer: BoardElement[] }) => {
   const {
     updateElement,
     handleSelect,
@@ -83,13 +75,13 @@ export default function BoardLayer({
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
                     y: e.target.y(),
                   })
                 }
+                onTap={handleSelect}
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 draggable={transformAvailable && !allToolsDisabled}
               />
@@ -99,8 +91,8 @@ export default function BoardLayer({
               <Ellipse
                 key={element.id}
                 {...element}
+                onTap={handleSelect}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -118,8 +110,8 @@ export default function BoardLayer({
               <Line
                 key={element.id}
                 {...element}
+                onTap={handleSelect}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) => {
                   updateElement(element.id, {
                     x: e.target.attrs.x,
@@ -146,12 +138,13 @@ export default function BoardLayer({
 
             return (
               <Image
+                onTap={handleSelect}
                 key={element.id}
                 image={imageElement}
                 {...element}
                 onClick={handleSelect}
                 onDblClick={handleTextEdit}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
+                onDblTap={handleTextEdit}
                 onDragEnd={(e) =>
                   updateElement(element.id, {
                     x: e.target.x(),
@@ -169,10 +162,10 @@ export default function BoardLayer({
           case 'marker':
             return (
               <Line
+                onTap={handleSelect}
                 key={element.id}
                 {...element}
                 onClick={handleSelect}
-                dragBoundFunc={(pos) => fitCoordinates(pos, element)}
                 onDragEnd={(e: any) =>
                   updateElement(element.id, { points: e.target.points() })
                 }
@@ -185,4 +178,6 @@ export default function BoardLayer({
       })}
     </Layer>
   );
-}
+});
+
+export default BoardLayer;

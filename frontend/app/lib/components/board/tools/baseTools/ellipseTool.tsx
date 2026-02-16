@@ -10,8 +10,10 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import useTool from '@/app/lib/hooks/useTool';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EllipseTool() {
+  const { commonSize } = useAdaptiveParams();
   const {
     stageRef,
     toolsDisabled,
@@ -57,6 +59,7 @@ export default function EllipseTool() {
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.ellipseTool}>
       <Button
+        data-testid="ellipse-tool-btn"
         isDisabled={toolsDisabled || allToolsDisabled}
         onPress={() => {
           if (activeTool === 'ellipse') setActiveTool('');
@@ -65,13 +68,13 @@ export default function EllipseTool() {
         variant={activeTool === 'ellipse' ? 'flat' : 'light'}
         color={activeTool === 'ellipse' ? 'primary' : 'default'}
         isIconOnly
-        size="md"
+        size={commonSize}
       >
         <CircleIcon
           className={
             activeTool === 'ellipse'
               ? 'stroke-primary-500'
-              : 'stroke-default-500'
+              : 'stroke-default-600'
           }
         />
       </Button>

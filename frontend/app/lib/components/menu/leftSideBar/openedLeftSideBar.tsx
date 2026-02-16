@@ -29,6 +29,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
 import { addToast } from '@heroui/toast';
+import boardStore from '@/app/stores/boardStore';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -163,7 +164,7 @@ const OpenedLeftSideBar = observer(
     const handleRemoveNode = async () => {
       if (!projectsStore.activeProject) return;
       if (nodeToRemove) {
-        if (nodeToRemove.id === projectsStore.activeBoard?.id)
+        if (nodeToRemove.id === boardStore.activeBoard?.id)
           router.push(`/project/${projectsStore.activeProject?.id}`);
 
         try {
@@ -267,7 +268,7 @@ const OpenedLeftSideBar = observer(
                   variant="light"
                   size="md"
                 >
-                  <SettingsIcon className="stroke-default-500" />
+                  <SettingsIcon className="stroke-default-600" />
                 </Button>
               </div>
               <div
@@ -311,9 +312,7 @@ const OpenedLeftSideBar = observer(
                         return (
                           <LeftSideBarElementCard
                             element={child as Board}
-                            isActive={
-                              child.id === projectsStore.activeBoard?.id
-                            }
+                            isActive={child.id === boardStore.activeBoard?.id}
                             key={child.id}
                             handleClick={() => handleChildClick(child as Board)}
                             addNode={() => onAddOpen(child.id)}
