@@ -156,6 +156,9 @@ importers:
 
   frontend:
     dependencies:
+      '@eslint/eslintrc':
+        specifier: ^3.3.3
+        version: 3.3.3
       '@heroui/alert':
         specifier: ^2.2.30
         version: 2.2.30(@heroui/system@2.4.27(@heroui/theme@2.4.26(tailwindcss@4.1.18))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@heroui/theme@2.4.26(tailwindcss@4.1.18))(framer-motion@11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -285,6 +288,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      eslint:
+        specifier: ^9.39.2
+        version: 9.39.2(jiti@2.6.1)
+      eslint-config-next:
+        specifier: 15.1.2
+        version: 15.1.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       framer-motion:
         specifier: ^11.18.2
         version: 11.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -367,21 +376,12 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@eslint/eslintrc':
-        specifier: ^3.3.3
-        version: 3.3.3
       '@types/node':
         specifier: ^20.19.33
         version: 20.19.33
       '@vitest/ui':
         specifier: ^2.1.9
         version: 2.1.9(vitest@2.1.9)
-      eslint:
-        specifier: ^9.39.2
-        version: 9.39.2(jiti@2.6.1)
-      eslint-config-next:
-        specifier: 15.1.2
-        version: 15.1.2(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
       install:
         specifier: ^0.13.0
         version: 0.13.0
