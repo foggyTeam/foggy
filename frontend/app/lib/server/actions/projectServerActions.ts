@@ -17,7 +17,9 @@ export async function GetAllProjects() {
   });
 }
 
-export async function AddNewProject(data: Partial<Project>) {
+export async function AddNewProject(
+  data: Partial<Project & { teamId: string }>,
+) {
   return await postRequest(
     'projects',
     {
@@ -25,9 +27,17 @@ export async function AddNewProject(data: Partial<Project>) {
       avatar: data.avatar,
       description: data.description,
       settings: data.settings,
+      teamId: data.teamId,
     },
     { headers: { 'x-user-id': await getUserId() } },
   );
+}
+export async function GetShortProjectInfo(id: string) {
+  return await getRequest(`projects/${id}/brief`, {
+    headers: {
+      'x-user-id': await getUserId(),
+    },
+  });
 }
 export async function GetProject(id: string) {
   return await getRequest(`projects/${id}`, {

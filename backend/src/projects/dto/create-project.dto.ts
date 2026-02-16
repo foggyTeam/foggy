@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -7,6 +8,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { getErrorMessages } from '../../errorMessages/errorMessages';
+import { ApiProperty } from '@nestjs/swagger';
+import { Types } from 'mongoose';
 
 export class ProjectSettingsDto {
   @IsOptional()
@@ -40,6 +43,15 @@ export class CreateProjectDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiProperty({
+    required: false,
+    description: 'ID команды, для которой создается проект',
+    type: String,
+  })
+  @IsOptional()
+  @IsMongoId()
+  teamId?: Types.ObjectId | null;
 
   @IsNotEmpty()
   @ValidateNested()

@@ -8,6 +8,7 @@ import {
 import { Button } from '@heroui/button';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EditorToolDropdown({
   id,
@@ -24,6 +25,7 @@ export default function EditorToolDropdown({
   handleClick: any;
   isAccent: boolean;
 }) {
+  const { commonSize } = useAdaptiveParams();
   const [selectedOption, setSelectedOption] = useState(activeOption);
 
   useEffect(() => {
@@ -50,11 +52,10 @@ export default function EditorToolDropdown({
       onClose={() => requestAnimationFrame(reset)}
     >
       <DropdownTrigger>
-        <Button id={id} variant="light" isIconOnly size="sm">
+        <Button id={id} variant="light" isIconOnly size={commonSize}>
           <Icon
             className={clsx(
-              'h-5 w-5',
-              isAccent ? 'stroke-f_accent' : 'stroke-default-500',
+              isAccent ? 'stroke-f_accent' : 'stroke-default-600',
             )}
           />
         </Button>
@@ -77,10 +78,9 @@ export default function EditorToolDropdown({
               startContent={
                 <ToolIcon
                   className={clsx(
-                    'h-5 w-5',
                     activeOption == value
                       ? 'stroke-f_accent'
-                      : 'stroke-default-500',
+                      : 'stroke-default-600',
                   )}
                 />
               }

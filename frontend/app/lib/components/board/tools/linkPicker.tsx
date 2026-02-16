@@ -1,5 +1,6 @@
 import { Input } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function LinkPicker({
   value,
@@ -8,6 +9,7 @@ export default function LinkPicker({
   value: string;
   changeValue: any;
 }) {
+  const { smallerSize } = useAdaptiveParams();
   return (
     <Input
       placeholder={settingsStore.t.toolBar.linkPlaceholder}
@@ -17,7 +19,7 @@ export default function LinkPicker({
       onValueChange={changeValue}
       color={'primary'}
       variant="underlined"
-      size="sm"
+      size={smallerSize}
       className="w-52"
       classNames={{
         input: 'text-default-500 font-medium',

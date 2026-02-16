@@ -13,6 +13,7 @@ import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import SelectRole from '@/app/lib/components/members/selectRole';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function ChangeRoleModal({
   member,
@@ -29,6 +30,7 @@ export default function ChangeRoleModal({
   onOpenChange: () => void;
   action: () => void;
 }) {
+  const { smallerSize, commonSize } = useAdaptiveParams();
   const changeTypes = {
     override: settingsStore.t.members.changeRole.upgradeMember.replace(
       '_',
@@ -47,7 +49,12 @@ export default function ChangeRoleModal({
   }, [newRole, changeType, submitRoleType, submitRole]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      placement="center"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-2xl gap-4 p-6">
         {(onClose) =>
           (
@@ -72,14 +79,14 @@ export default function ChangeRoleModal({
                   <Select
                     color="primary"
                     radius="full"
-                    size="sm"
+                    size={smallerSize}
                     className="m-0 w-full p-0"
                     classNames={{
-                      innerWrapper: 'text-sm',
-                      value: 'text-sm',
+                      innerWrapper: 'sm:text-sm text-medium',
+                      value: 'sm:text-sm text-medium',
                       popoverContent: clsx(
                         bg_container_no_padding,
-                        'p-2 sm:p-3 bg-opacity-100',
+                        'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100',
                       ),
                     }}
                     selectedKeys={[changeType]}
@@ -112,7 +119,7 @@ export default function ChangeRoleModal({
                 <FButton
                   color="primary"
                   variant="light"
-                  size="md"
+                  size={commonSize}
                   className="w-fit"
                   onPress={onClose}
                 >
@@ -120,9 +127,10 @@ export default function ChangeRoleModal({
                 </FButton>
 
                 <FButton
+                  isDisabled={newRole === member.role}
                   onPress={action}
                   color="primary"
-                  size="md"
+                  size={commonSize}
                   className="w-full"
                 >
                   {settingsStore.t.members.changeRole.modalSave}

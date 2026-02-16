@@ -44,14 +44,37 @@ export async function JoinProjectRequest(
   );
 }
 
+export async function JoinTeamRequest(
+  teamId: string,
+  role: Role,
+  message: string,
+) {
+  return postRequest(
+    `notifications/team-join-request`,
+    {
+      entityId: teamId,
+      customMessage: message,
+      role,
+    },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
 export async function AnswerNotification(
   notificationId: string,
   accept: boolean,
+  role?: Role,
 ) {
   if (accept) {
-    return postRequest(`notifications/${notificationId}/accept`, null, {
-      headers: { 'x-user-id': await getUserId() },
-    });
+    return postRequest(
+      `notifications/${notificationId}/accept`,
+      role ? { role } : null,
+      {
+        headers: { 'x-user-id': await getUserId() },
+      },
+    );
   } else {
     return postRequest(`notifications/${notificationId}/reject`, null, {
       headers: { 'x-user-id': await getUserId() },

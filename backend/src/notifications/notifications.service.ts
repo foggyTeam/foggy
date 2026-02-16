@@ -14,6 +14,7 @@ import {
   NotificationResponse,
 } from '../shared/interfaces/notification.type';
 import { ProjectService } from '../projects/project.service';
+import { TeamService } from '../teams/team.service';
 import { CustomException } from '../exceptions/custom-exception';
 import { getErrorMessages } from '../errorMessages/errorMessages';
 import { JoinRequestDto } from './dto/join-request.dto';
@@ -28,6 +29,8 @@ export class NotificationService {
     private readonly usersService: UsersService,
     @Inject(forwardRef(() => ProjectService))
     private readonly projectService: ProjectService,
+    @Inject(forwardRef(() => TeamService))
+    private readonly teamService: TeamService,
   ) {}
 
   async getUserNotifications(
@@ -61,6 +64,7 @@ export class NotificationService {
     const entityIds: { [key: string]: Set<string> } = {
       [EntityType.USER]: new Set(),
       [EntityType.PROJECT]: new Set(),
+      [EntityType.TEAM]: new Set(),
     };
 
     for (const notif of notifications) {
@@ -73,6 +77,10 @@ export class NotificationService {
       if (notif.target?.type === EntityType.PROJECT) {
         entityIds[EntityType.PROJECT].add(notif.target.id.toString());
       }
+
+      if (notif.target?.type === EntityType.TEAM) {
+        entityIds[EntityType.TEAM].add(notif.target.id.toString());
+      }
     }
 
     const users = await this.usersService.getUserDetails(
@@ -82,6 +90,12 @@ export class NotificationService {
     );
     const projects = await this.projectService.getProjectDetails(
       Array.from(entityIds[EntityType.PROJECT]).map(
+        (id) => new Types.ObjectId(id),
+      ),
+    );
+
+    const teams = await this.teamService.getTeamsDetails(
+      Array.from(entityIds[EntityType.TEAM]).map(
         (id) => new Types.ObjectId(id),
       ),
     );
@@ -101,6 +115,16 @@ export class NotificationService {
         {
           name: p.name,
           avatar: p.avatar,
+        },
+      ]),
+    );
+
+    const teamMap = new Map(
+      teams.map((t) => [
+        t._id.toString(),
+        {
+          name: t.name,
+          avatar: t.avatar,
         },
       ]),
     );
@@ -126,6 +150,15 @@ export class NotificationService {
             id: ref.id,
             name: projectInfo?.name,
             avatar: projectInfo?.avatar,
+          };
+        }
+        if (ref.type === EntityType.TEAM) {
+          const teamInfo = teamMap.get(ref.id.toString());
+          return {
+            type: EntityType.TEAM,
+            id: ref.id,
+            name: teamInfo?.name,
+            avatar: teamInfo?.avatar,
           };
         }
         return {
@@ -183,7 +216,7 @@ export class NotificationService {
     role: Role,
     expiresAt?: Date,
   ): Promise<void> {
-    //TODO: await this.teamService.findTeamById(entityId);
+    await this.teamService.findTeamById(entityId);
     await this.createInvite(
       recipientId,
       entityId,
@@ -192,6 +225,38 @@ export class NotificationService {
       NotificationType.TEAM_INVITE,
       expiresAt,
     );
+  }
+
+  public async createProjectTeamInvite(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+    role: Role,
+    expiresAt?: Date,
+  ): Promise<void> {
+    await this.projectService.findProjectById(projectId);
+    await this.teamService.findTeamById(teamId);
+
+    const teamAdminIds = await this.teamService.getTeamAdminIds(teamId);
+    if (!teamAdminIds || teamAdminIds.length === 0) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.checkProjectTeamInviteDuplicate(projectId, teamId);
+    await new this.notificationModel({
+      type: NotificationType.PROJECT_TEAM_INVITE,
+      recipients: teamAdminIds.map((id) => ({ userId: id })),
+      initiator: inviterId,
+      target: { type: EntityType.PROJECT, id: projectId },
+      metadata: {
+        teamId,
+        role,
+        expiresAt: expiresAt || this.getDefaultExpiryDate(),
+      } as any,
+    }).save();
   }
 
   async createProjectJoinRequest(
@@ -220,9 +285,25 @@ export class NotificationService {
     notificationId: Types.ObjectId,
     userId: Types.ObjectId,
     isAccept: boolean,
+    customRole?: Role,
   ): Promise<void> {
     const notification = await this.findNotificationById(notificationId);
     this.validateRecipient(notification, userId);
+
+    if (isAccept && customRole) {
+      const isJoinRequest = [
+        NotificationType.PROJECT_JOIN_REQUEST,
+        NotificationType.TEAM_JOIN_REQUEST,
+      ].includes(notification.type);
+
+      if (isJoinRequest && customRole === Role.OWNER) {
+        throw new CustomException(
+          getErrorMessages({ general: 'errorNotRecognized' }),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     switch (notification.type) {
       case NotificationType.PROJECT_INVITE:
         await this.handleProjectInvite(notification, userId, isAccept);
@@ -231,10 +312,23 @@ export class NotificationService {
         await this.handleTeamInvite(notification, userId, isAccept);
         break;
       case NotificationType.PROJECT_JOIN_REQUEST:
-        await this.handleProjectJoinRequest(notification, userId, isAccept);
+        await this.handleProjectJoinRequest(
+          notification,
+          userId,
+          isAccept,
+          customRole,
+        );
         break;
       case NotificationType.TEAM_JOIN_REQUEST:
-        await this.handleTeamJoinRequest(notification, userId, isAccept);
+        await this.handleTeamJoinRequest(
+          notification,
+          userId,
+          isAccept,
+          customRole,
+        );
+        break;
+      case NotificationType.PROJECT_TEAM_INVITE:
+        await this.handleProjectTeamInvite(notification, userId, isAccept);
         break;
       default:
         throw new CustomException(
@@ -242,7 +336,10 @@ export class NotificationService {
           HttpStatus.BAD_REQUEST,
         );
     }
-
+    if (notification.type === NotificationType.PROJECT_TEAM_INVITE) {
+      await this.notificationModel.findByIdAndDelete(notificationId);
+      return;
+    }
     await this.deleteNotification(notificationId, userId);
   }
 
@@ -260,6 +357,71 @@ export class NotificationService {
         { _id: notificationId },
         { $pull: { recipients: { userId } } },
       );
+    }
+  }
+
+  public async removeTeamNotifications(teamId: Types.ObjectId): Promise<void> {
+    try {
+      await this.notificationModel
+        .deleteMany({
+          $or: [
+            { 'target.type': EntityType.TEAM, 'target.id': teamId },
+            { 'metadata.teamId': teamId },
+            {
+              type: {
+                $in: [
+                  NotificationType.TEAM_INVITE,
+                  NotificationType.TEAM_JOIN_REQUEST,
+                  NotificationType.TEAM_JOIN_ACCEPTED,
+                  NotificationType.TEAM_JOIN_REJECTED,
+                  NotificationType.TEAM_MEMBER_ADDED,
+                  NotificationType.PROJECT_TEAM_INVITE,
+                  NotificationType.PROJECT_TEAM_INVITE_REJECTED,
+                ],
+              },
+              $or: [{ 'target.id': teamId }, { 'metadata.teamId': teamId }],
+            },
+          ],
+        })
+        .exec();
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for team ${teamId}: ${(err as Error).message}`,
+      );
+      throw err;
+    }
+  }
+
+  public async removeProjectNotifications(
+    projectId: Types.ObjectId,
+  ): Promise<void> {
+    try {
+      await this.notificationModel
+        .deleteMany({
+          $or: [
+            { 'target.type': EntityType.PROJECT, 'target.id': projectId },
+            {
+              type: {
+                $in: [
+                  NotificationType.PROJECT_INVITE,
+                  NotificationType.PROJECT_JOIN_REQUEST,
+                  NotificationType.PROJECT_JOIN_ACCEPTED,
+                  NotificationType.PROJECT_JOIN_REJECTED,
+                  NotificationType.PROJECT_MEMBER_ADDED,
+                  NotificationType.PROJECT_TEAM_INVITE,
+                  NotificationType.PROJECT_TEAM_INVITE_REJECTED,
+                ],
+              },
+              'target.id': projectId,
+            },
+          ],
+        })
+        .exec();
+    } catch (err) {
+      console.warn(
+        `Failed to delete notifications for project ${projectId}: ${(err as Error).message}`,
+      );
+      throw err;
     }
   }
 
@@ -324,7 +486,7 @@ export class NotificationService {
     const adminIds =
       entityType === EntityType.PROJECT
         ? await this.projectService.getProjectAdminIds(entityId)
-        : []; //TODO: team admins
+        : await this.teamService.getTeamAdminIds(entityId);
 
     await new this.notificationModel({
       type: joinType,
@@ -381,24 +543,27 @@ export class NotificationService {
     notification: NotificationDocument,
     inviterId: Types.ObjectId,
     isAccept: boolean,
+    customRole?: Role,
   ) {
     const metadata = notification.metadata as JoinRequestMetadata;
     const userId = notification.initiator;
     const projectId = notification.target.id;
+
+    const roleToAssign = isAccept && customRole ? customRole : metadata.role;
 
     if (isAccept) {
       await this.projectService.manageProjectUser(
         projectId,
         inviterId,
         userId,
-        metadata.role,
+        roleToAssign,
         true,
       );
       await this.notifyProjectOnJoin(
         projectId,
         userId,
         inviterId,
-        metadata.role,
+        roleToAssign,
       );
     }
 
@@ -410,7 +575,7 @@ export class NotificationService {
       initiator: inviterId,
       target: { type: EntityType.PROJECT, id: projectId },
       metadata: {
-        role: metadata.role,
+        role: roleToAssign,
         inviterId: inviterId,
         expiresAt: this.getDefaultExpiryDate(),
       } as JoinResponseMetadata,
@@ -418,27 +583,181 @@ export class NotificationService {
   }
 
   private async handleTeamInvite(
-    notification: NotificationDocument, // eslint-disable-line @typescript-eslint/no-unused-vars
-    userId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
-    isAccept: boolean, // eslint-disable-line @typescript-eslint/no-unused-vars
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+    isAccept: boolean,
   ) {
-    //TODO: team notification
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
-    );
+    const metadata = notification.metadata as InviteMetadata;
+    const inviterId = notification.initiator;
+    const teamId = notification.target.id;
+
+    if (isAccept) {
+      await this.teamService.addMember(
+        teamId,
+        userId,
+        metadata.role,
+        inviterId,
+      );
+      await this.notifyTeamOnJoin(teamId, userId, inviterId, metadata.role);
+    } else {
+      await this.notificationModel.create({
+        type: NotificationType.TEAM_JOIN_REJECTED,
+        recipients: [{ userId: inviterId }],
+        initiator: userId,
+        target: { type: EntityType.TEAM, id: teamId },
+        metadata: {
+          role: metadata.role,
+          inviterId: inviterId,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as JoinResponseMetadata,
+      });
+    }
   }
 
   private async handleTeamJoinRequest(
-    notification: NotificationDocument, // eslint-disable-line @typescript-eslint/no-unused-vars
-    inviterId: Types.ObjectId, // eslint-disable-line @typescript-eslint/no-unused-vars
-    isAccept: boolean, // eslint-disable-line @typescript-eslint/no-unused-vars
+    notification: NotificationDocument,
+    inviterId: Types.ObjectId,
+    isAccept: boolean,
+    customRole?: Role,
   ) {
-    //TODO: team notification
-    throw new CustomException(
-      getErrorMessages({ feature: 'notImplemented' }),
-      HttpStatus.NOT_IMPLEMENTED,
+    const metadata = notification.metadata as JoinRequestMetadata;
+    const userId = notification.initiator;
+    const teamId = notification.target.id;
+
+    const roleToAssign = isAccept && customRole ? customRole : metadata.role;
+
+    if (isAccept) {
+      await this.teamService.addMember(teamId, userId, roleToAssign, inviterId);
+      await this.notifyTeamOnJoin(teamId, userId, inviterId, roleToAssign);
+    }
+
+    await this.notificationModel.create({
+      type: isAccept
+        ? NotificationType.TEAM_JOIN_ACCEPTED
+        : NotificationType.TEAM_JOIN_REJECTED,
+      recipients: [{ userId }],
+      initiator: inviterId,
+      target: { type: EntityType.TEAM, id: teamId },
+      metadata: {
+        role: roleToAssign,
+        inviterId: inviterId,
+        expiresAt: this.getDefaultExpiryDate(),
+      } as JoinResponseMetadata,
+    });
+  }
+
+  private async handleProjectTeamInvite(
+    notification: NotificationDocument,
+    userId: Types.ObjectId,
+    isAccept: boolean,
+  ) {
+    const metadata = notification.metadata as any;
+    const inviterId = notification.initiator;
+    const projectId = notification.target.id as Types.ObjectId;
+    const teamId = metadata.teamId as Types.ObjectId;
+    const role: Role = metadata.role as Role;
+
+    if (isAccept) {
+      await this.projectService.addTeamToProject(
+        projectId,
+        teamId,
+        role,
+        inviterId,
+        false,
+      );
+
+      await this.notificationModel.create({
+        type: NotificationType.TEAM_MEMBER_ADDED,
+        recipients: (await this.teamService.getTeamMemberIds(teamId)).map(
+          (id) => ({ userId: id }),
+        ),
+        initiator: inviterId,
+        target: { type: EntityType.PROJECT, id: projectId },
+        metadata: {
+          teamId,
+          role,
+          inviterId,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as JoinResponseMetadata,
+      });
+
+      const projectMemberIds =
+        await this.projectService.getProjectMemberIds(projectId);
+      const teamMemberIds = await this.teamService.getTeamMemberIds(teamId);
+      const teamMemberIdStrs = new Set(
+        teamMemberIds.map((id) => id.toString()),
+      );
+
+      const recipients = projectMemberIds
+        .filter((id) => !teamMemberIdStrs.has(id.toString()))
+        .map((id) => ({ userId: id }));
+
+      if (recipients.length > 0) {
+        await this.notificationModel.create({
+          type: NotificationType.PROJECT_MEMBER_ADDED,
+          recipients,
+          initiator: inviterId,
+          target: { type: EntityType.PROJECT, id: projectId },
+          metadata: {
+            teamId,
+            role,
+            inviterId,
+            expiresAt: this.getDefaultExpiryDate(),
+          } as JoinResponseMetadata,
+        });
+      }
+    } else {
+      const projectAdminIds =
+        await this.projectService.getProjectAdminIds(projectId);
+      const uniqueRecipients = new Set<string>([
+        inviterId.toString(),
+        ...projectAdminIds.map((id) => id.toString()),
+      ]);
+
+      await this.notificationModel.create({
+        type: NotificationType.PROJECT_TEAM_INVITE_REJECTED,
+        recipients: Array.from(uniqueRecipients).map((s) => ({
+          userId: new Types.ObjectId(s),
+        })),
+        initiator: userId,
+        target: { type: EntityType.PROJECT, id: projectId },
+        metadata: {
+          teamId,
+          role,
+          inviterId,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as any,
+      });
+    }
+  }
+
+  private async notifyTeamOnJoin(
+    teamId: Types.ObjectId,
+    newMemberId: Types.ObjectId,
+    inviterId: Types.ObjectId,
+    role: Role,
+  ) {
+    const teamMembers = await this.teamService.getTeamMemberIds(teamId);
+    const membersWithSettings = await this.usersService.getUsersWithSettings(
+      teamMembers.filter((id) => !id.equals(newMemberId)),
     );
+    const recipients = membersWithSettings
+      .filter((user) => user.settings?.teamNotifications !== false)
+      .map((user) => ({ userId: user._id }));
+
+    if (recipients.length > 0) {
+      await this.notificationModel.create({
+        type: NotificationType.TEAM_MEMBER_ADDED,
+        recipients,
+        initiator: newMemberId,
+        target: { type: EntityType.TEAM, id: teamId },
+        metadata: {
+          inviterId,
+          role,
+          expiresAt: this.getDefaultExpiryDate(),
+        } as JoinResponseMetadata,
+      });
+    }
   }
 
   private validateRecipient(
@@ -551,6 +870,27 @@ export class NotificationService {
           existingNotification._id,
         );
       }
+    }
+  }
+
+  private async checkProjectTeamInviteDuplicate(
+    projectId: Types.ObjectId,
+    teamId: Types.ObjectId,
+  ): Promise<void> {
+    const existingNotification = await this.notificationModel
+      .findOne({
+        type: NotificationType.PROJECT_TEAM_INVITE,
+        'target.type': EntityType.PROJECT,
+        'target.id': projectId,
+        'metadata.teamId': teamId,
+      })
+      .exec();
+
+    if (existingNotification) {
+      throw new CustomException(
+        getErrorMessages({ notification: 'inviteDuplicateExists' }),
+        HttpStatus.CONFLICT,
+      );
     }
   }
 

@@ -5,19 +5,33 @@
   "scripts": {
     "frontend:dev": "cd frontend && pnpm dev",
     "backend:dev": "cd backend && pnpm start:dev",
+    "frontend:network": "cd frontend && pnpm dev -- --hostname 0.0.0.0",
     "dev": "concurrently \"pnpm run frontend:dev\" \"pnpm run backend:dev\"",
     "frontend": "cd frontend && pnpm start",
     "backend": "cd backend && pnpm start",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\"",
-    "docker": "docker-compose up --build"
+    "docker": "docker-compose up --build",
+    "e2e": "pnpm exec playwright test",
+    "e2e-ui": "pnpm exec playwright test --ui",
+    "performance": "npx playwright test -g \"Performance benchmark\" --project=chromium --headed",
+    "performance-headless": "npx playwright test -g \"Performance benchmark\" --project=chromium"
   },
   "workspaces": [
     "frontend",
     "backend"
   ],
   "devDependencies": {
-    "concurrently": "^9.1.2",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.9",
+    "axios": "^1.13.2",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.2.3",
     "husky": "^9.1.7"
+  },
+  "pnpm": {
+    "overrides": {
+      "@internationalized/date": "3.11.0"
+    }
   },
   "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }

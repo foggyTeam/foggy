@@ -12,8 +12,15 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
 import { addToast } from '@heroui/toast';
+import { useTheme } from 'next-themes';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function FillTool() {
+  const { resolvedTheme } = useTheme();
+  const { commonSize } = useAdaptiveParams();
+
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
   const { selectedElement, updateElement, allToolsDisabled } =
     useBoardContext();
   const [fillColor, changeColor] = useState(selectedElement.attrs.fill || '');
@@ -48,7 +55,7 @@ export default function FillTool() {
         fill: isElementVisible(
           selectedElement.attrs.type,
           fillColor,
-          primary.DEFAULT,
+          primary[theme].DEFAULT,
           1,
         )
           ? fillColor
@@ -60,11 +67,12 @@ export default function FillTool() {
     <Popover>
       <PopoverTrigger>
         <Button
+          data-testid="fill-tool-btn"
           isDisabled={allToolsDisabled}
           variant="light"
           color="default"
           isIconOnly
-          size="md"
+          size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.fillTool}>
             <CircleIcon

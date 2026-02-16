@@ -17,7 +17,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import GetDateTime from '@/app/lib/utils/getDateTime';
 import CompareByRole from '@/app/lib/utils/compareByRole';
 
-export default function ProjectCard(project: Project) {
+const MAX_MEMBERS = 7;
+
+export default function ProjectCard(
+  project: Project & { isDisabled?: boolean; hideFavorite?: boolean },
+) {
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -35,13 +39,15 @@ export default function ProjectCard(project: Project) {
 
   return (
     <div
+      data-testid="project-card"
       ref={cardRef}
-      onClick={() => setIsExpanded(true)}
+      onClick={() => (project.isDisabled ? undefined : setIsExpanded(true))}
       className={clsx(
-        'box-border flex flex-col items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+        'hover:bg-default-50 shadow-container box-border flex w-full flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
         el_animation,
-        isExpanded ? 'h-fit w-[576px]' : 'h-24 w-[284px] cursor-pointer',
+        isExpanded ? 'h-fit sm:w-[576px]' : 'h-[108px] sm:h-24 sm:w-[284px]',
         isExpanded ? project_tile_exp : project_tile,
+        !isExpanded && !project.isDisabled ? 'cursor-pointer' : 'cursor-auto',
       )}
     >
       <div className="flex h-fit w-full items-center justify-between gap-2">
@@ -49,38 +55,40 @@ export default function ProjectCard(project: Project) {
           <Avatar
             size="md"
             color="primary"
-            name={project.name.toUpperCase()}
+            name={project.name?.toUpperCase()}
             src={project.avatar}
           />
           <h1
             className={clsx(
-              'truncate text-nowrap font-medium accent-link',
+              'accent-link hover:accent-link-hover truncate font-medium text-nowrap',
               !isExpanded && 'max-w-40',
             )}
           >
             <a
               onClick={(event) => event.stopPropagation()}
-              href={`project/${project.id}`}
+              href={`/project/${project.id}`}
             >
               {project.name}
             </a>
           </h1>
         </div>
-        <Button
-          onPress={() =>
-            projectsStore.updateProject(project.id, {
-              favorite: !project.favorite,
-            })
-          }
-          isIconOnly
-          variant="light"
-          size="sm"
-          radius="lg"
-        >
-          <StarIcon
-            className={`stroke-default-300 ${project.favorite ? 'fill-default-300' : ''}`}
-          />
-        </Button>
+        {!project.hideFavorite && (
+          <Button
+            onPress={() =>
+              projectsStore.updateProject(project.id, {
+                favorite: !project.favorite,
+              })
+            }
+            isIconOnly
+            variant="light"
+            size="sm"
+            radius="lg"
+          >
+            <StarIcon
+              className={`stroke-default-300 ${project.favorite ? 'fill-default-300' : ''}`}
+            />
+          </Button>
+        )}
       </div>
 
       <div
@@ -103,21 +111,21 @@ export default function ProjectCard(project: Project) {
           </p>
         </div>
         {isExpanded ? (
-          <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
+          <div className="mt-0.5 grid max-h-full w-full grid-cols-1 gap-1 sm:grid-cols-2">
             {project.members
               .sort(CompareByRole)
-              .slice(0, 7)
+              .slice(0, MAX_MEMBERS)
               .map((member, index) => (
                 <MediumMemberCard key={index} {...member} />
               ))}
-            {project.members.length > 7 && (
+            {project.members.length > MAX_MEMBERS && (
               <a
                 href={`project/${project.id}`}
-                className="h-8 content-center justify-start px-4 italic accent-link"
+                className="accent-link hover:accent-link-hover h-8 content-center justify-start px-4 italic"
               >
                 {settingsStore.t.main.andNMore.replace(
                   '_',
-                  (project.members.length - 7).toString(),
+                  (project.members.length - MAX_MEMBERS).toString(),
                 )}
               </a>
             )}
@@ -127,7 +135,7 @@ export default function ProjectCard(project: Project) {
             {project.members.slice(0, 3).map((member, index) => (
               <Avatar
                 classNames={{
-                  base: 'h-7 w-7 border-white border-1.5',
+                  base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-1.5',
                 }}
                 key={index}
                 name={member.nickname}
@@ -137,7 +145,7 @@ export default function ProjectCard(project: Project) {
             {project.members.length - 3 > 0 && (
               <Avatar
                 classNames={{
-                  base: 'h-7 w-7 border-white border-2',
+                  base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-2',
                 }}
                 name={`+${project.members.length - 3}`}
               />
@@ -146,7 +154,7 @@ export default function ProjectCard(project: Project) {
         )}
       </div>
       {isExpanded && (
-        <p className="w-full text-end text-xs text-default-700">
+        <p className="text-default-700 w-full text-end text-xs">
           {GetDateTime(project.lastChange)}
         </p>
       )}

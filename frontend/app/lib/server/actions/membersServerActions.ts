@@ -10,13 +10,30 @@ import { Role } from 'aws-sdk/clients/s3';
 
 export async function SearchUsers(data: {
   query: string;
-  projectId: string;
+  projectId?: string;
+  teamId?: string;
   limit: number;
   cursor: string;
 }) {
   return await postRequest(`users/search`, data, {
     headers: { 'x-user-id': await getUserId() },
   });
+}
+
+export async function SearchAll(data: {
+  query: string;
+  projectId?: string;
+  limit: number;
+  usersCursor: string;
+  teamsCursor: string;
+}) {
+  return await postRequest(
+    `users/search-all`,
+    { ...data, teamsLimit: data.limit, usersLimit: data.limit },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
 }
 
 const expirationTimesMap: Record<string, number> = {
@@ -32,21 +49,41 @@ function getExpiresAt(term: keyof typeof expirationTimesMap) {
   const ms = expirationTimesMap[term];
   return new Date(Date.now() + ms).toISOString();
 }
+
+// PROJECT
 export async function AddProjectMember(
   projectId: string,
+  type: 'user' | 'team',
   data: {
-    userId: string;
+    id: string;
     role: Omit<Role, 'owner'>;
     expirationTime: keyof typeof expirationTimesMap;
   },
 ) {
-  return await postRequest(
-    `projects/${projectId}/users`,
-    { ...data, expiresAt: getExpiresAt(data.expirationTime) },
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
+  console.log(type, data);
+  return await (type === 'user'
+    ? postRequest(
+        `projects/${projectId}/users`,
+        {
+          userId: data.id,
+          role: data.role,
+          expiresAt: getExpiresAt(data.expirationTime),
+        },
+        {
+          headers: { 'x-user-id': await getUserId() },
+        },
+      )
+    : postRequest(
+        `projects/${projectId}/teams`,
+        {
+          teamId: data.id,
+          role: data.role,
+          expiresAt: getExpiresAt(data.expirationTime),
+        },
+        {
+          headers: { 'x-user-id': await getUserId() },
+        },
+      ));
 }
 
 export async function UpdateProjectMemberRole(
@@ -75,5 +112,81 @@ export async function DeleteProjectMember(
     {
       headers: { 'x-user-id': await getUserId() },
     },
+  );
+}
+
+// TEAM
+export async function AddTeamMember(
+  teamId: string,
+  data: {
+    userId: string;
+    role: Omit<Role, 'owner'>;
+    expirationTime: keyof typeof expirationTimesMap;
+  },
+) {
+  return await postRequest(
+    `teams/${teamId}/members`,
+    { ...data, expiresAt: getExpiresAt(data.expirationTime) },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+export async function UpdateTeamMemberRole(
+  teamId: string,
+  data: { userId: string; role: Role },
+) {
+  return await patchRequest(
+    `teams/${teamId}/members/${data.userId}/role`,
+    data,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+export async function DeleteTeamMember(
+  teamId: string,
+  userId: string,
+  newOwnerId?: string | null,
+) {
+  return await deleteRequest(
+    newOwnerId
+      ? `teams/${teamId}/members/${userId}?newOwner=${newOwnerId}`
+      : `teams/${teamId}/members/${userId}`,
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
+export async function GetInvitationLink(
+  type: 'project' | 'team',
+  data: {
+    id: string;
+    role: Omit<Role, 'owner'>;
+    expirationTime: keyof typeof expirationTimesMap;
+  },
+): Promise<string> {
+  // TODO: real request
+  const token = await new Promise((resolve) =>
+    setTimeout(() => resolve(`somestringhere${data}${type}`), 500),
+  );
+  return `${process.env.FRONTEND_URI}/invitation/${token}`;
+}
+
+export async function ProcessInvitationToken(token: string): Promise<any> {
+  // TODO: decrypt real request
+  return new Promise((resolve) =>
+    setTimeout(
+      () =>
+        resolve({
+          accepted: true,
+          type: 'project',
+          id: '693d249238ecad24dc5f4b71',
+        }),
+      3000,
+    ),
   );
 }

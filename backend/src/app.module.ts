@@ -10,6 +10,7 @@ import { BoardGateway } from './websocket/board.gateway';
 import { ProjectModule } from './projects/projects.module';
 import { BoardModule } from './board/board.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { TeamModule } from './teams/teams.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     }),
     UsersModule,
     ProjectModule,
+    TeamModule,
     BoardModule,
     NotificationsModule,
   ],

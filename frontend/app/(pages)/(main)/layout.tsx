@@ -4,12 +4,14 @@ import UserLoader from '@/app/lib/components/dataLoaders/userLoader';
 import ProjectsLoader from '@/app/lib/components/dataLoaders/projectsLoader';
 import TeamsLoader from '@/app/lib/components/dataLoaders/teamsLoader';
 import { Project, Team } from '@/app/lib/types/definitions';
-import allTeams from '@/app/mockData/teams.json';
 import LeftSideBar from '@/app/lib/components/menu/leftSideBar/leftSideBar';
 import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import { GetUserById } from '@/app/lib/server/actions/userServerActions';
 import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
 import { User } from 'next-auth';
+import BoardLoadingCard from '@/app/lib/components/board/boardLoadingCard';
+import { GetAllTeams } from '@/app/lib/server/actions/teamServerActions';
+import NavBar from '@/app/lib/components/menu/mobileNavBar/navBar';
 
 async function getUser() {
   try {
@@ -37,9 +39,7 @@ async function getUserProjects(): Promise<Project[] | undefined> {
 }
 async function getUserTeams(): Promise<Team[] | undefined> {
   try {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(allTeams as Team[]), 300);
-    });
+    return await GetAllTeams();
   } catch (e) {
     console.error('User with this id does not exist.');
     return undefined;
@@ -61,9 +61,20 @@ export default async function MainLayout({
       <ProjectsLoader projectsData={userProjects} />
       <TeamsLoader teamsData={userTeams} />
       <NotificationsLoader />
-      <LeftSideBar />
-      <RightSideBar />
-      {children}
+      <BoardLoadingCard />
+
+      <div className="flex h-full w-full flex-col">
+        <section className="hidden sm:block">
+          <LeftSideBar />
+          <RightSideBar />
+        </section>
+
+        <section className="block sm:hidden">
+          <NavBar />
+        </section>
+
+        <div className="w-full flex-1 overflow-hidden">{children}</div>
+      </div>
     </>
   );
 }

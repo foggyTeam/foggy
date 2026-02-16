@@ -1,4 +1,7 @@
+'use client';
+
 import { Tooltip } from '@heroui/tooltip';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function FTooltip({
   content,
@@ -9,6 +12,10 @@ export default function FTooltip({
   children: any;
   placement?: any;
 }) {
+  const { isMobile } = useAdaptiveParams();
+
+  if (isMobile) return children;
+
   return (
     <Tooltip
       showArrow

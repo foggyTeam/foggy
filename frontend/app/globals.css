@@ -1,18 +1,69 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@config '../tailwind.config.ts';
+
+@plugin './hero.ts';
+@source '../node_modules/@heroui/react/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 :root {
-  --background: #fafafa;
+  --app-height: 100vh;
+  --background: #e4e4e7;
   --foreground: #18181b;
 }
 
 html.dark {
-  --background: #18181b;
+  --background: #27272a;
   --foreground: #fafafa;
+}
+
+html {
+  background-color: var(--background);
 }
 
 body {
   color: var(--foreground);
   font-family: Montserrat, sans-serif;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+.bg-gradient {
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.app-shell {
+  height: var(--app-height);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
 }

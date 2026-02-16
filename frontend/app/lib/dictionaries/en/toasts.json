@@ -13,7 +13,27 @@
     "members": {
       "addMemberError": "Failed to add member",
       "deleteMemberError": "Failed to remove member",
-      "updateMemberRoleError": "Failed to update member role"
+      "updateMemberRoleError": "Failed to update member role",
+      "invitationLink": {
+        "accepted": {
+          "team": "You've successfully joined the team!",
+          "project": "You've successfully joined the project!"
+        },
+        "error": {
+          "title": "Failed to join...",
+          "description": "Your invitation link might be invalid or expired"
+        }
+      }
+    },
+    "team": {
+      "addTeamError": "Failed to create the team",
+      "addTeamSuccess": "Team created",
+      "deleteTeamError": "Failed to delete the team",
+      "deleteTeamSuccess": "Team deleted",
+      "noActive": "No active team",
+      "teamNotExist": "A team with this ID does not exist",
+      "updateTeamError": "Failed to update team data",
+      "updateTeamSuccess": "Team data updated"
     },
     "project": {
       "addProjectError": "Failed to create the project",
@@ -74,6 +94,17 @@
       "updateNotificationsError": "Failed to update notifications list",
       "updateNotificationError": "Failed to update notification",
       "updateNotificationsNumberError": "Failed to update unread number"
+    },
+    "joinRequest": {
+      "sendRequestError": "Failed to send your request",
+      "requestError": {
+        "title": "Incorrect request",
+        "description": "Make sure form fields are filled in correctly"
+      },
+      "requestSent": {
+        "title": "Request was sent!",
+        "description": "You will receive a notification when it is approved or declined."
+      }
     },
     "copyError": "Failed to copy to clipboard",
     "copySuccess": "Copied to clipboard",

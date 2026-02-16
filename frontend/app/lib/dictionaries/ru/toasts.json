@@ -13,7 +13,27 @@
     "members": {
       "addMemberError": "Не удалось добавить участника",
       "deleteMemberError": "Не удалось удалить участника",
-      "updateMemberRoleError": "Не удалось обновить роль участника"
+      "updateMemberRoleError": "Не удалось обновить роль участника",
+      "invitationLink": {
+        "accepted": {
+          "team": "Вы успешно присоединились к команде!",
+          "project": "Вы успешно присоединились к проекту!"
+        },
+        "error": {
+          "title": "Не удалось присоединиться...",
+          "description": "Ваша ссылка-приглашение некорректна или истекла"
+        }
+      }
+    },
+    "team": {
+      "addTeamError": "Не удалось создать команду",
+      "addTeamSuccess": "Команда создана",
+      "deleteTeamError": "Не удалось удалить команду",
+      "deleteTeamSuccess": "Команда удалена",
+      "noActive": "Нет активной команды",
+      "teamNotExist": "Команда с этим ID не найдена",
+      "updateTeamError": "Не удалось обновить данные команды",
+      "updateTeamSuccess": "Данные команды обновлены"
     },
     "project": {
       "addProjectError": "Не удалось создать проект",
@@ -74,6 +94,17 @@
       "updateNotificationsError": "Не удалось обновить список уведомлений",
       "updateNotificationError": "Не удалось обновить уведомление",
       "updateNotificationsNumberError": "Не удалось получить количество непрочитанных уведомлений"
+    },
+    "joinRequest": {
+      "sendRequestError": "Не удалось отправить заявку",
+      "requestError": {
+        "title": "Некорректные данные",
+        "description": "Убедитесь, что поля формы заполнены верно"
+      },
+      "requestSent": {
+        "title": "Заявка отправлена!",
+        "description": "Вы получите уведомление, когда она будет одобрена или отклонена."
+      }
     },
     "copyError": "Не удалось скопировать в буфер обмена",
     "copySuccess": "Скопировано в буфер обмена",
