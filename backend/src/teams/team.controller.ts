@@ -323,6 +323,7 @@ export class TeamController {
         value: {
           userId: '507f1f77bcf86cd799439011',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
     },
@@ -332,12 +333,14 @@ export class TeamController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') role: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Body('expiresAt') expiresAt?: Date,
   ): Promise<void> {
     return this.teamService.inviteMember(
       teamId,
       targetUserId,
       role,
       requestingUserId,
+      expiresAt,
     );
   }
 
