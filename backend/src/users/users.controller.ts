@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { TeamService } from '../teams/team.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { GoogleUserDto } from './dto/login-google.dto';
@@ -20,7 +21,10 @@ import { Types } from 'mongoose';
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly teamService: TeamService,
+  ) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -229,5 +233,135 @@ export class UsersController {
       Number(limit),
       cursor,
     );
+  }
+
+  @Post('search-all')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Search users and teams combined for adding to project',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Combined list of users and teams matching the search criteria',
+    schema: {
+      type: 'object',
+      properties: {
+        users: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              type: { type: 'string', enum: ['user'] },
+              name: { type: 'string' },
+              nickname: { type: 'string' },
+              avatar: { type: 'string' },
+              memberCount: { type: 'number' },
+            },
+          },
+        },
+        teams: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              type: { type: 'string', enum: ['team'] },
+              name: { type: 'string' },
+              avatar: { type: 'string' },
+              memberCount: { type: 'number' },
+            },
+          },
+        },
+        usersNextCursor: { type: 'string', nullable: true },
+        teamsNextCursor: { type: 'string', nullable: true },
+        hasMoreUsers: { type: 'boolean' },
+        hasMoreTeams: { type: 'boolean' },
+      },
+    },
+  })
+  @ApiBody({
+    description: 'Search parameters for combined search',
+    schema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Search query for nickname or team name',
+          example: 'hoggy',
+        },
+        projectId: {
+          type: 'string',
+          description: 'Project ID to exclude its members and teams',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+        usersLimit: {
+          type: 'number',
+          description: 'Maximum number of users results (1-100)',
+          example: 10,
+        },
+        teamsLimit: {
+          type: 'number',
+          description: 'Maximum number of teams results (1-100)',
+          example: 10,
+        },
+        usersCursor: {
+          type: 'string',
+          description: 'Cursor for users pagination',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+        teamsCursor: {
+          type: 'string',
+          description: 'Cursor for teams pagination',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
+        },
+      },
+    },
+  })
+  async searchAll(
+    @Body('query') query: string = '',
+    @Body('projectId') projectId?: string,
+    @Body('usersLimit') usersLimit: number = 10,
+    @Body('teamsLimit') teamsLimit: number = 10,
+    @Body('usersCursor') usersCursor?: string,
+    @Body('teamsCursor') teamsCursor?: string,
+  ) {
+    const usersResult = await this.usersService.searchUsers(
+      query,
+      projectId
+        ? { type: 'project', id: new Types.ObjectId(projectId) }
+        : undefined,
+      Number(usersLimit),
+      usersCursor,
+    );
+
+    const teamsResult = await this.teamService.searchTeams(
+      query,
+      projectId ? new Types.ObjectId(projectId) : undefined,
+      Number(teamsLimit),
+      teamsCursor,
+    );
+
+    return {
+      users: usersResult.users.map((user) => ({
+        id: user.id.toString(),
+        type: 'user',
+        name: user.nickname,
+        nickname: user.nickname,
+        avatar: user.avatar,
+      })),
+      teams: teamsResult.teams.map((team) => ({
+        id: team.id.toString(),
+        type: 'team',
+        name: team.name,
+        avatar: team.avatar,
+        memberCount: team.memberCount || 0,
+      })),
+      usersNextCursor: usersResult.nextCursor,
+      teamsNextCursor: teamsResult.nextCursor,
+      hasMoreUsers: usersResult.hasNextPage,
+      hasMoreTeams: teamsResult.hasNextPage,
+    };
   }
 }
