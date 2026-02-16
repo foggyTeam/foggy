@@ -8,3 +8,13 @@
 
 # содержит секретные данные, не может быть опубликован
 .env
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/e2e/.auth_state.json
+/e2e/.user_context.json
+/e2e/performance/

@@ -18,8 +18,15 @@ import NotificationMainText from '@/app/lib/components/notifications/notificatio
 import { useDisclosure } from '@heroui/modal';
 import NotificationCardModal from '@/app/lib/components/notifications/notificationCardModal';
 import SelectRole from '@/app/lib/components/members/selectRole';
+import { Badge } from '@heroui/badge';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
-export default function NotificationCard(notification: Notification) {
+// TODO: process team invitation to project
+
+export default function NotificationCard(
+  notification: Notification & { isNew?: boolean },
+) {
+  const { smallerSize } = useAdaptiveParams();
   const { onAnswer, onDelete } = useContext(NotificationsContext);
   const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -53,29 +60,44 @@ export default function NotificationCard(notification: Notification) {
       }
     }
 
-    return chooseTitle().replace('_', notification.target.name.toUpperCase());
+    return chooseTitle().replace('_', notification.target.name?.toUpperCase());
   };
 
   return (
     <>
       <div
+        className={clsx(
+          'py-auto shadow-container relative box-border flex w-[98%] max-w-full flex-col items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-2 sm:max-w-72',
+          el_animation,
+          isExpanded ? 'h-fit py-2' : 'h-10 cursor-pointer sm:h-8',
+          isExpanded ? notification_tile_exp : notification_tile,
+        )}
         ref={cardRef}
         onClick={(event) => {
           event.stopPropagation();
           setIsExpanded(true);
         }}
-        className={clsx(
-          'py-auto shadow-container box-border flex w-[98%] max-w-72 flex-col items-center justify-between gap-1 rounded-2xl bg-white px-2',
-          el_animation,
-          isExpanded ? 'h-fit py-2' : 'h-8 cursor-pointer',
-          isExpanded ? notification_tile_exp : notification_tile,
-        )}
       >
+        <div className="absolute -top-2 right-1">
+          <Badge
+            showOutline={false}
+            isInvisible={!notification.isNew}
+            size={smallerSize}
+            content=""
+            color="success"
+            variant="shadow"
+            shape="circle"
+            placement="top-right"
+          >
+            <div />
+          </Badge>
+        </div>
+
         <div className="flex h-fit w-full items-center justify-between gap-2">
           <div className="flex h-full w-full items-center justify-start gap-1">
             <Avatar
               classNames={{
-                base: 'h-7 w-7 border-white border-2',
+                base: 'h-7 w-7 border-[hsl(var(--heroui-background))] border-2',
               }}
               src={notification.target.avatar}
               name={notification.target.name}
@@ -84,22 +106,25 @@ export default function NotificationCard(notification: Notification) {
               {getTitle()}
             </h1>
           </div>
+
           <div className="flex h-full w-fit items-center justify-start gap-1">
             <p className="text-default-700 w-fit text-end text-xs text-nowrap">
               {GetDateTime(notification.createdAt)}
             </p>
+
             <Button
               isIconOnly
               onPress={() => onDelete(notification.id)}
               variant="light"
               color="danger"
               radius="full"
-              size="sm"
+              size={smallerSize}
             >
               <TrashIcon className="stroke-default-300 hover:stroke-danger transition-colors" />
             </Button>
           </div>
         </div>
+
         {isExpanded && (
           <div className="flex h-fit w-full flex-col gap-2">
             <NotificationMainText {...notification} />
@@ -146,7 +171,7 @@ export default function NotificationCard(notification: Notification) {
                       }
                       variant="bordered"
                       color="danger"
-                      size="sm"
+                      size={smallerSize}
                       className="text-small"
                       radius="full"
                     >
@@ -175,7 +200,7 @@ export default function NotificationCard(notification: Notification) {
                       }
                       variant="flat"
                       color="success"
-                      size="sm"
+                      size={smallerSize}
                       className="text-small"
                       radius="full"
                     >
@@ -195,6 +220,7 @@ export default function NotificationCard(notification: Notification) {
           </div>
         )}
       </div>
+
       <NotificationCardModal
         notification={notification}
         role={role}

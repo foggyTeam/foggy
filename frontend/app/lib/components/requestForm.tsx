@@ -9,12 +9,17 @@ import { Textarea } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { addToast } from '@heroui/toast';
-import { JoinProjectRequest } from '@/app/lib/server/actions/notificationsServerActions';
+import {
+  JoinProjectRequest,
+  JoinTeamRequest,
+} from '@/app/lib/server/actions/notificationsServerActions';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { requestMessageFormSchema } from '@/app/lib/types/schemas';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const RequestForm = observer(
   ({ id, type }: { id: string | undefined; type: 'project' | 'team' }) => {
+    const { commonSize } = useAdaptiveParams();
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState({} as any);
 
@@ -33,8 +38,10 @@ const RequestForm = observer(
         setIsLoading(true);
 
         try {
-          // TODO: when API ready, remade for teams
-          const result = await JoinProjectRequest(id, role, message);
+          const result =
+            type === 'project'
+              ? await JoinProjectRequest(id, role, message)
+              : await JoinTeamRequest(id, role, message);
           if (
             Object.keys(result).findIndex((element) => element === 'errors') !==
             -1
@@ -87,11 +94,11 @@ const RequestForm = observer(
           placeholder={settingsStore.t.notifications.sendRequest.placeholder}
           type="message"
           autoComplete="message"
-          size="md"
+          size={commonSize}
           value={message}
           onValueChange={setMessage}
           classNames={{
-            inputWrapper: 'bg-white',
+            inputWrapper: 'bg-[hsl(var(--heroui-background))]',
           }}
         />
         <SelectRole
@@ -108,7 +115,7 @@ const RequestForm = observer(
             variant="solid"
             color="primary"
             isDisabled={isSendDisabled}
-            size="md"
+            size={commonSize}
           >
             {isSendDisabled
               ? settingsStore.t.notifications.sendRequest.alreadySentButton

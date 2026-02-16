@@ -10,6 +10,7 @@ import React from 'react';
 import Link from 'next/link';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
+import boardStore from '@/app/stores/boardStore';
 
 const RecentBar = observer(
   ({
@@ -27,7 +28,7 @@ const RecentBar = observer(
             'absolute top-1/3 left-0 z-50 flex w-fit flex-col items-center' +
               ' justify-center gap-1 rounded-l-none rounded-r-[64px] px-3 py-6',
             bg_container,
-            'transform transition-all hover:bg-white/65 hover:pl-4',
+            'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-4',
           )}
         >
           {projectsStore.recentBoards.map((board) => (
@@ -38,7 +39,7 @@ const RecentBar = observer(
                 onClick={() => settingsStore.startLoading()}
                 isIconOnly
                 variant={
-                  board.url.endsWith(projectsStore.activeBoard?.id || '')
+                  board.url.endsWith(boardStore.activeBoard?.id || '')
                     ? 'flat'
                     : 'light'
                 }
@@ -51,7 +52,7 @@ const RecentBar = observer(
           ))}
 
           <Button onPress={onAddOpen} isIconOnly variant="light" size="md">
-            <PlusIcon className="stroke-default-500" />
+            <PlusIcon className="stroke-default-600" />
           </Button>
         </div>
       </>

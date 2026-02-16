@@ -15,6 +15,7 @@ import { PencilParams } from '@/app/lib/components/board/tools/drawingHandlers';
 import { foggy_accent } from '@/tailwind.config';
 import EraserTool from '@/app/lib/components/board/tools/baseTools/eraserTool';
 import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { useTheme } from 'next-themes';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -27,15 +28,19 @@ export type ToolProps = {
   pencilParams?: PencilParams;
 };
 
-const DEFAULT_PENCIL: PencilParams = {
-  color: foggy_accent.DEFAULT,
-  width: 4,
-  tension: 0.4,
-  lineJoin: 'round',
-  lineCap: 'round',
-};
-
 export default function ToolBar() {
+  const { resolvedTheme } = useTheme();
+
+  const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
+
+  const DEFAULT_PENCIL: PencilParams = {
+    color: foggy_accent[theme].DEFAULT,
+    width: 4,
+    tension: 0.4,
+    lineJoin: 'round',
+    lineCap: 'round',
+  };
+
   const { selectedElement, activeTool } = useBoardContext();
   const tools = [TextTool, PencilTool, EraserTool, RectTool, EllipseTool];
 
@@ -44,11 +49,12 @@ export default function ToolBar() {
 
   return (
     <div
+      data-testid="board-toolbar"
       className={clsx(
-        'absolute right-0 bottom-0 left-0 z-50 w-full justify-self-center px-2 py-3',
+        'absolute right-0 bottom-0 left-0 z-30 w-full justify-self-center px-4 py-3 sm:z-50',
         'sm:right-auto sm:bottom-4 sm:left-auto sm:w-fit sm:rounded-2xl sm:rounded-tr-[64px] sm:px-6',
         bg_container_no_padding,
-        'flex flex-col justify-center gap-1 rounded-none',
+        'flex flex-col justify-center gap-1 rounded-t-none rounded-l-none rounded-r-none',
         'overflow-visible',
       )}
     >

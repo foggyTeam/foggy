@@ -47,16 +47,45 @@ export class ProjectService {
   ): Promise<Types.ObjectId> {
     try {
       await this.validateUser(userId);
+
+      const { teamId, ...projectData } = createProjectDto as any;
+
+      let ownerId: Types.ObjectId = userId;
+      const accessControlTeams: ProjectDocument['accessControlTeams'] = [];
+
+      if (teamId) {
+        const teamObjectId =
+          teamId instanceof Types.ObjectId
+            ? teamId
+            : new Types.ObjectId(teamId);
+
+        ownerId = await this.teamService.getTeamOwnerId(teamObjectId);
+
+        accessControlTeams.push({
+          teamId: teamObjectId,
+          role: Role.ADMIN,
+          addedAt: new Date(),
+          individualOverrides: [],
+        } as any);
+      }
+
       const newProject = new this.projectModel({
-        ...createProjectDto,
+        ...projectData,
         accessControlUsers: [
           {
-            userId,
+            userId: ownerId,
             role: Role.OWNER,
           },
         ],
+        ...(accessControlTeams.length > 0 && { accessControlTeams }),
       });
+
       await this.saveProject(newProject);
+
+      if (accessControlTeams.length > 0) {
+        await this.safeAddProjectToTeam(teamId, newProject._id);
+      }
+
       return newProject._id;
     } catch (error) {
       if (error instanceof CustomException) {
@@ -474,7 +503,9 @@ export class ProjectService {
             user.userId.equals(targetUserId) && user.role === Role.OWNER,
         );
         if (ownerIndex !== -1) {
-          project.accessControlUsers[ownerIndex].userId = newOwner;
+          project.accessControlUsers[ownerIndex].userId = new Types.ObjectId(
+            newOwner,
+          );
         }
       } else if (isOwner) {
         throw new CustomException(
@@ -533,6 +564,7 @@ export class ProjectService {
     requestingUserId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     newRole: Role,
+    newOwner?: Types.ObjectId,
   ): Promise<ProjectDocument> {
     const project = (await this.validateUser(
       requestingUserId,
@@ -557,10 +589,51 @@ export class ProjectService {
       );
 
       if (isOwner) {
-        throw new CustomException(
-          getErrorMessages({ project: 'cannotChangeOwnerRole' }),
-          HttpStatus.FORBIDDEN,
+        const isSelfChange = new Types.ObjectId(requestingUserId).equals(
+          targetUserId,
         );
+        if (!isSelfChange) {
+          throw new CustomException(
+            getErrorMessages({ project: 'cannotChangeOwnerRole' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+
+        if (!newOwner) {
+          throw new CustomException(
+            getErrorMessages({ project: 'mustSetNewOwner' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        if (newOwner.equals(targetUserId)) {
+          throw new CustomException(
+            getErrorMessages({ project: 'mustSetNewOwner' }),
+            HttpStatus.FORBIDDEN,
+          );
+        }
+        await this.validateUser(newOwner);
+
+        project.accessControlUsers = project.accessControlUsers.filter(
+          (u) => !u.userId.equals(newOwner),
+        );
+
+        const ownerIndex = project.accessControlUsers.findIndex(
+          (u) => u.userId.equals(targetUserId) && u.role === Role.OWNER,
+        );
+        if (ownerIndex === -1) {
+          throw new CustomException(
+            getErrorMessages({ project: 'notFound' }),
+            HttpStatus.NOT_FOUND,
+          );
+        }
+        project.accessControlUsers[ownerIndex].userId = newOwner;
+
+        project.accessControlUsers.push({
+          userId: targetUserId,
+          role: newRole,
+        } as any);
+
+        return await this.saveProject(project);
       }
 
       project.accessControlUsers[explicitIndex].role = newRole;
@@ -971,10 +1044,7 @@ export class ProjectService {
       description: project.description,
       members: project.settings.memberListIsPublic ? members : [],
       updatedAt: project.updatedAt,
-      settings: {
-        allowRequests: project.settings.allowRequests,
-        memberListIsPublic: project.settings.memberListIsPublic,
-      },
+      settings: project.settings,
     };
   }
 

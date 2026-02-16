@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { Board } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
+import boardStore from '@/app/stores/boardStore';
 
 const BoardLoader = ({
   boardData,
@@ -15,9 +16,9 @@ const BoardLoader = ({
     if (sectionData && boardData) {
       const sectionId = boardData.sectionIds.pop();
       projectsStore.insertProjectChild(boardData.sectionIds, sectionData, true);
-      projectsStore.setActiveBoard({ ...boardData, sectionId });
+      boardStore.setActiveBoard({ ...boardData, sectionId });
     }
-    return () => projectsStore.setActiveBoard(undefined);
+    return () => boardStore.setActiveBoard(undefined);
   }, [sectionData, boardData]);
 
   return null;

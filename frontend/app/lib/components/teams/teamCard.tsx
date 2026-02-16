@@ -12,11 +12,12 @@ export default function TeamCard(team: Team) {
 
   return (
     <div
+      data-testid="team-card"
       onClick={() => router.push(`/team/${team.id}`)}
       className={clsx(
-        'hover:bg-default-50 accent-link hover:accent-link-hover shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
+        'hover:bg-default-50 accent-link hover:accent-link-hover shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
         el_animation,
-        'h-16 w-[379px] cursor-pointer',
+        'h-16 w-full cursor-pointer sm:w-[379px]',
         team_tile,
       )}
     >
@@ -46,7 +47,7 @@ export default function TeamCard(team: Team) {
             <Avatar
               size="md"
               classNames={{
-                base: 'border-white border-1.5',
+                base: 'border-[hsl(var(--heroui-background))] border-1.5',
               }}
               key={member.id}
               name={member.nickname}
@@ -57,7 +58,7 @@ export default function TeamCard(team: Team) {
             <Avatar
               size="md"
               classNames={{
-                base: 'border-white border-2',
+                base: 'border-[hsl(var(--heroui-background))] border-2',
               }}
               name={`+${team.members.length - 5}`}
             />

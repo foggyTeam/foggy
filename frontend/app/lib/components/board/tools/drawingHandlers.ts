@@ -50,8 +50,8 @@ export interface TextEdit {
   textHeight: number;
 }
 
-const DEFAULT_FILL = primary['200'];
-const DEFAULT_STROKE = primary['300'];
+const DEFAULT_FILL = primary.light['200'];
+const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
 
 const getRelativePointerPosition = (stage: any) => {

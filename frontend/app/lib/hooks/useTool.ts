@@ -22,23 +22,36 @@ export default function useTool({
     if ((activeTool === toolName || isTextEditing) && stageRef.current) {
       const stage = stageRef.current?.getStage();
 
-      if (handlers.mouseDownHandler)
+      if (handlers.mouseDownHandler) {
         stage.on('mousedown', handlers.mouseDownHandler);
-      if (handlers.mouseMoveHandler)
+        stage.on('touchstart', handlers.mouseDownHandler);
+      }
+      if (handlers.mouseMoveHandler) {
         stage.on('mousemove', handlers.mouseMoveHandler);
-      if (handlers.mouseUpHandler) stage.on('mouseup', handlers.mouseUpHandler);
+        stage.on('touchmove', handlers.mouseMoveHandler);
+      }
+      if (handlers.mouseUpHandler) {
+        stage.on('mouseup', handlers.mouseUpHandler);
+        stage.on('touchend', handlers.mouseUpHandler);
+      }
     }
 
     return () => {
       if (stageRef.current) {
         const stage = stageRef.current.getStage();
 
-        if (handlers.mouseDownHandler)
+        if (handlers.mouseDownHandler) {
           stage.off('mousedown', handlers.mouseDownHandler);
-        if (handlers.mouseMoveHandler)
+          stage.off('touchstart', handlers.mouseDownHandler);
+        }
+        if (handlers.mouseMoveHandler) {
           stage.off('mousemove', handlers.mouseMoveHandler);
-        if (handlers.mouseUpHandler)
+          stage.off('touchmove', handlers.mouseMoveHandler);
+        }
+        if (handlers.mouseUpHandler) {
           stage.off('mouseup', handlers.mouseUpHandler);
+          stage.off('touchend', handlers.mouseUpHandler);
+        }
       }
     };
   }, [activeTool, stageRef, toolName, handlers, isTextEditing]);

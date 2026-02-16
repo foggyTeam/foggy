@@ -9,7 +9,6 @@ import {
   Param,
   Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -72,6 +71,19 @@ export class ProjectController {
           name: 'My Project',
           description: 'Project description',
           avatar: 'url',
+          settings: {
+            allowRequests: true,
+            isPublic: true,
+            memberListIsPublic: true,
+          },
+        },
+      },
+      example2: {
+        summary: 'Create project from inside a team',
+        value: {
+          name: 'Team Project',
+          description: 'Created from team',
+          teamId: '507f1f77bcf86cd799439013',
           settings: {
             allowRequests: true,
             isPublic: true,
@@ -489,6 +501,12 @@ export class ProjectController {
     status: 403,
     description: 'Forbidden - cannot change owner role',
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is changing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiBody({
     description: 'New role for user',
     examples: {
@@ -513,12 +531,14 @@ export class ProjectController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') newRole: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<Project> {
     return this.projectService.updateUserRole(
       projectId,
       requestingUserId,
       targetUserId,
       newRole,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
@@ -799,7 +819,7 @@ export class ProjectController {
     );
   }
 
-  @Put(':id/teams/:teamId/role')
+  @Patch(':id/teams/:teamId/role')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update team role in project' })
   @ApiSecurity('x-user-id')

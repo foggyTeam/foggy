@@ -26,7 +26,7 @@ const ClosedRightSideBar = observer(
           bg_container,
           right_sidebar_layout,
           'flex flex-col items-center justify-center gap-4',
-          'transform transition-all hover:bg-white/65 hover:pr-2',
+          'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pr-2',
         )}
       >
         <Button
@@ -67,7 +67,7 @@ const ClosedRightSideBar = observer(
             variant="light"
             size="md"
           >
-            <BellIcon className="stroke-default-500" />
+            <BellIcon className="stroke-default-600" />
           </Button>
         </Badge>
       </div>

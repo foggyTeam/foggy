@@ -20,10 +20,11 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import boardStore from '@/app/stores/boardStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
-    `^/project/[^/]+/[^/]+/${projectsStore.activeBoard?.id}$`,
+    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}$`,
   );
   const [isOpened, setIsOpened] = useState(false);
   const path = usePathname();
@@ -48,7 +49,7 @@ const LeftSideBar = observer(() => {
     if (!isOpened) setParentList(projectsStore.activeBoardParentList);
   }, [isOpened]);
   const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
-    if (!projectsStore.activeProject || !projectsStore.activeBoard) return;
+    if (!projectsStore.activeProject || !boardStore.activeBoard) return;
     const fullParentList = isOpened
       ? parentSectionId
         ? [...parentList, parentSectionId]
@@ -61,7 +62,7 @@ const LeftSideBar = observer(() => {
           name: nodeName,
           parentSectionId: isOpened
             ? parentSectionId
-            : projectsStore.activeBoard.sectionId,
+            : boardStore.activeBoard.sectionId,
         })
           .catch(() =>
             addToast({
@@ -86,7 +87,7 @@ const LeftSideBar = observer(() => {
           type: nodeType.toLowerCase(),
           sectionId: isOpened
             ? parentSectionId
-            : projectsStore.activeBoard.sectionId,
+            : boardStore.activeBoard.sectionId,
         })
           .catch(() =>
             addToast({
@@ -101,7 +102,7 @@ const LeftSideBar = observer(() => {
               name: nodeName,
               type: nodeType,
               layers: [[], [], []],
-              sectionId: projectsStore.activeBoard?.sectionId || '',
+              sectionId: boardStore.activeBoard?.sectionId || '',
               lastChange: new Date().toISOString(),
             };
             projectsStore.addProjectChild(fullParentList, newBoard, false);

@@ -3,6 +3,7 @@ import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { SessionPayload } from '@/app/lib/types/definitions';
 
+const environment = process.env.NODE_ENV;
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
 
@@ -13,7 +14,7 @@ export async function createSession(userId: string) {
 
   cookieStore.set('session' as any, session, {
     httpOnly: true,
-    secure: true,
+    secure: environment !== 'development',
     expires: expiresAt as any,
     sameSite: 'lax',
     path: '/',
@@ -49,7 +50,7 @@ export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.set('session' as any, '', {
     httpOnly: true,
-    secure: true,
+    secure: environment !== 'development',
     expires: new Date(0) as any,
     sameSite: 'lax',
     path: '/',

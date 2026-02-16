@@ -13,7 +13,17 @@
     "members": {
       "addMemberError": "Failed to add member",
       "deleteMemberError": "Failed to remove member",
-      "updateMemberRoleError": "Failed to update member role"
+      "updateMemberRoleError": "Failed to update member role",
+      "invitationLink": {
+        "accepted": {
+          "team": "You've successfully joined the team!",
+          "project": "You've successfully joined the project!"
+        },
+        "error": {
+          "title": "Failed to join...",
+          "description": "Your invitation link might be invalid or expired"
+        }
+      }
     },
     "team": {
       "addTeamError": "Failed to create the team",

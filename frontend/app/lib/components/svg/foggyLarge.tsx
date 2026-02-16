@@ -13,11 +13,11 @@ function FoggyLarge(props: any) {
     >
       <defs>
         <linearGradient id="logo-gradient" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%" stopColor={primary.DEFAULT} />
-          <stop offset="30%" stopColor={secondary[400]} />
-          <stop offset="35%" stopColor={danger[400]} />
-          <stop offset="40%" stopColor={secondary[400]} />
-          <stop offset="70%" stopColor={primary.DEFAULT} />
+          <stop offset="0%" stopColor={primary.light.DEFAULT} />
+          <stop offset="30%" stopColor={secondary.light[400]} />
+          <stop offset="35%" stopColor={danger.light[400]} />
+          <stop offset="40%" stopColor={secondary.light[400]} />
+          <stop offset="70%" stopColor={primary.light.DEFAULT} />
           <animateTransform
             attributeName="gradientTransform"
             type="translate"

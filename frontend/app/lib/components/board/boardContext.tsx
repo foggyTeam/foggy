@@ -2,6 +2,7 @@
 
 import React, {
   createContext,
+  MutableRefObject,
   ReactNode,
   RefObject,
   useContext,
@@ -22,9 +23,12 @@ import cursorPencil from '@/app/lib/components/svg/cursorPencil';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import cursorText from '@/app/lib/components/svg/cursorText';
 import { observer } from 'mobx-react-lite';
+import boardStore from '@/app/stores/boardStore';
 
 interface BoardContextProps {
   stageRef: RefObject<null | Konva.Stage>;
+  updateGridRef: MutableRefObject<(() => void) | null>;
+  updateCursorsRef: MutableRefObject<(() => void) | null>;
   // ZOOM
   scale: number;
   setScale: (scale: number) => void;
@@ -56,6 +60,9 @@ const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 export const BoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
     const stageRef: RefObject<null | Konva.Stage> = useRef(null);
+    const updateGridRef = useRef<(() => void) | null>(null);
+    const updateCursorsRef = useRef<null | (() => void)>(null);
+
     // ZOOM
     const [scale, setScale] = useState(1);
     // TRANSFORMER
@@ -70,17 +77,17 @@ export const BoardProvider = observer(
 
     // STORE OPERATIONS
     const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
-      projectsStore.updateElement(id, newAttrs);
+      boardStore.updateElement(id, newAttrs);
     };
     const addElement = (newElement: BoardElement) => {
-      projectsStore.addElement(newElement);
+      boardStore.addElement(newElement);
     };
     const removeElement = (id: string) => {
       if (selectedElements)
         changeSelection(
           selectedElements.filter((element) => element.attrs.id !== id),
         );
-      projectsStore.removeElement(id);
+      boardStore.removeElement(id);
     };
 
     // OPERATIONS
@@ -89,7 +96,6 @@ export const BoardProvider = observer(
 
       e.cancelBubble = true;
       const target = e.target;
-
       if (target.parent)
         changeSelection((prevState) => {
           if (e.evt.ctrlKey || e.evt.metaKey || prevState.length === 0)
@@ -142,6 +148,8 @@ export const BoardProvider = observer(
           stage.scale({ x: 1, y: 1 });
           stage.batchDraw();
         }
+        if (updateGridRef.current) updateGridRef.current();
+        if (updateCursorsRef.current) updateCursorsRef.current();
       }
     };
 
@@ -197,6 +205,8 @@ export const BoardProvider = observer(
       <BoardContext.Provider
         value={{
           stageRef,
+          updateGridRef,
+          updateCursorsRef,
           // ZOOM
           scale,
           setScale,

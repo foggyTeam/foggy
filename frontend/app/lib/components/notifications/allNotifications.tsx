@@ -55,7 +55,7 @@ const AllNotifications = observer(() => {
     accept: boolean,
     role?: Role,
   ) => {
-    await AnswerNotification(notificationId, accept)
+    await AnswerNotification(notificationId, accept, role)
       .then(() => {
         // TODO: process {errors: }
         switch (notificationType) {
@@ -107,10 +107,16 @@ const AllNotifications = observer(() => {
   };
 
   return (
-    <div className="w-72">
+    <div className="h-full w-full sm:w-72">
       <NotificationsContext.Provider value={{ onAnswer, onDelete }}>
         <ContentSection
-          data={notificationsStore.notifications.slice()}
+          data-testid="all-notifications"
+          data={notificationsStore.notifications.map((notification, index) => {
+            return {
+              ...notification,
+              isNew: index < notificationsStore.unreadNumber,
+            };
+          })}
           DataCard={NotificationCard}
           emptyState={{
             title: settingsStore.t.notifications.empty.title,

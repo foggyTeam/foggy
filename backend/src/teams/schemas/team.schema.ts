@@ -7,7 +7,6 @@ export interface TeamMemberInfo {
   nickname: string;
   avatar: string;
   role: Role;
-  joinedAt: Date;
   teamName?: string;
 }
 
@@ -15,21 +14,19 @@ export interface TeamListItem {
   id: Types.ObjectId;
   name: string;
   avatar: string;
-  description?: string;
   members: TeamMemberInfo[];
   memberCount: number;
-  updatedAt: Date;
 }
 
 interface TeamSettings {
   allowRequests: boolean;
-  isPublic: boolean;
+  projectListIsPublic: boolean;
   memberListIsPublic: boolean;
 }
 
 const defaultTeamSettings: TeamSettings = {
   allowRequests: true,
-  isPublic: false,
+  projectListIsPublic: false,
   memberListIsPublic: false,
 };
 
@@ -46,9 +43,6 @@ export class Team {
 
   @Prop({ default: '' })
   avatar: string;
-
-  @Prop({ default: '' })
-  description?: string;
 
   @Prop({ type: Object, default: defaultTeamSettings })
   settings: TeamSettings;

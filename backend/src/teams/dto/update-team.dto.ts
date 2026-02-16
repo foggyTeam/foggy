@@ -24,15 +24,6 @@ export class UpdateTeamDto {
   avatar?: string;
 
   @ApiProperty({
-    description: 'Description of the team',
-    example: 'Updated team description',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @ApiProperty({
     description: 'Team settings',
     type: TeamSettingsDto,
     required: false,

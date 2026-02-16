@@ -139,8 +139,11 @@ export interface Team {
   projects: Project[];
 }
 
-// TODO: actualize when API available
-export type RawTeam = Team;
+export interface RawTeam extends Omit<Team, 'id' | 'members' | 'projects'> {
+  id: string;
+  members: TeamMember[];
+  projects: any[];
+}
 
 export type Role = 'owner' | 'admin' | 'editor' | 'reader';
 

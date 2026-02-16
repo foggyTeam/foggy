@@ -19,6 +19,12 @@ import userStore from '@/app/stores/userStore';
 import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
 import teamsStore from '@/app/stores/teamsStore';
+import {
+  AddNewTeam,
+  DeleteTeam,
+  UpdateTeam,
+} from '@/app/lib/server/actions/teamServerActions';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const TeamSettingsModal = observer(
   ({
@@ -30,6 +36,7 @@ const TeamSettingsModal = observer(
     onOpenChange: any;
     isNewTeam?: boolean;
   }) => {
+    const { commonSize, smallerSize } = useAdaptiveParams();
     const router = useRouter();
     const [isSaving, setIsSaving] = useState(false);
     const {
@@ -92,26 +99,23 @@ const TeamSettingsModal = observer(
 
     const deleteTeam = async () => {
       if (teamsStore.activeTeam) {
-        // TODO: delete when API ready
-        /*
-        await DeleteProject(projectsStore.activeProject.id)
-          .catch((error) =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.project.deleteProjectError,
-              description: error,
-            }),
-          )
-          .then(() => {
-            projectsStore.setActiveProject(null);
-            addToast({
-              color: 'success',
-              severity: 'success',
-              title: settingsStore.t.toasts.project.deleteProjectSuccess,
-            });
-            router.push('/');
-          });*/
+        try {
+          await DeleteTeam(teamsStore.activeTeam.id);
+          teamsStore.setActiveTeam(null);
+          addToast({
+            color: 'success',
+            severity: 'success',
+            title: settingsStore.t.toasts.team.deleteTeamSuccess,
+          });
+          router.push('/');
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.team.deleteTeamError,
+            description: e.toString(),
+          });
+        }
       } else {
         addToast({
           color: 'danger',
@@ -133,77 +137,82 @@ const TeamSettingsModal = observer(
         }
 
         if (isNewTeam) {
-          // TODO: add new team
-          /*
-          await AddNewProject(updatedData)
-            .then((result) => {
-              if (
-                Object.keys(result).findIndex(
-                  (element) => element === 'errors',
-                ) !== -1
-              ) {
-                setErrors(result.errors);
-              } else {
-                if (!userStore.user) return;
-                const newProject = {
-                  id: result.data.id,
-                  members: [
-                    {
-                      id: userStore.user.id,
-                      nickname: userStore.user.name,
-                      avatar: userStore.user.image,
-                      role: 'owner',
-                    },
-                  ],
-                  ...updatedData,
-                } as Project;
+          try {
+            const result = await AddNewTeam(updatedData);
+            if (
+              Object.keys(result).findIndex(
+                (element) => element === 'errors',
+              ) !== -1
+            ) {
+              setErrors(result.errors);
+              throw new Error();
+            } else {
+              if (!userStore.user) return;
+              const newTeam = {
+                id: result.data.id,
+                members: [
+                  {
+                    id: userStore.user.id,
+                    nickname: userStore.user.name,
+                    avatar: userStore.user.image,
+                    role: 'owner',
+                  },
+                ],
+                ...updatedData,
+              } as Team;
+              teamsStore.addTeam(newTeam);
 
-                projectsStore.addProject(newProject);
-
-                router.push(`/project/${newProject.id}`);
-              }
-            })
-            .catch((error) =>
-              addToast({
-                color: 'danger',
-                severity: 'danger',
-                title: settingsStore.t.toasts.project.addProjectError,
-                description: error,
-              }),
-            )
-            .finally(() => setIsSaving(false));*/
+              router.push(`/team/${newTeam.id}`);
+            }
+          } catch (e: any) {
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.team.addTeamError,
+              description: e.toString(),
+            });
+          }
         } else if (teamsStore.activeTeam) {
-          // TODO: when API is ready
-          /*
-          await UpdateProject(projectsStore.activeProject.id, updatedData)
-            .then((result) => {
-              if (
-                Object.keys(result).findIndex(
-                  (element) => element === 'errors',
-                ) !== -1
-              ) {
-                setErrors(result.errors);
-                addToast({
-                  color: 'danger',
-                  severity: 'danger',
-                  title: settingsStore.t.toasts.project.updateProjectError,
-                });
-              } else {
-                addToast({
-                  color: 'success',
-                  severity: 'success',
-                  title: settingsStore.t.toasts.project.updateProjectSuccess,
-                });
-              }
-            })
-            .finally(() => setIsSaving(false));
-        */
+          try {
+            const result = await UpdateTeam(
+              teamsStore.activeTeam.id,
+              updatedData,
+            );
+            if (
+              Object.keys(result).findIndex(
+                (element) => element === 'errors',
+              ) !== -1
+            ) {
+              setErrors(result.errors);
+              throw new Error(result.errors);
+            } else {
+              teamsStore.updateTeam(teamsStore.activeTeam.id, updatedData);
+              addToast({
+                color: 'success',
+                severity: 'success',
+                title: settingsStore.t.toasts.team.updateTeamSuccess,
+              });
+            }
+          } catch (e: any) {
+            addToast({
+              color: 'danger',
+              severity: 'danger',
+              title: settingsStore.t.toasts.team.updateTeamError,
+              description: e.toString(),
+            });
+          }
         }
+        setIsSaving(false);
       }
     };
 
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-md gap-2 overflow-visible p-6">
           {() =>
             (
@@ -216,7 +225,8 @@ const TeamSettingsModal = observer(
                       src={avatar}
                       classNames={{
                         icon: 'w-32 h-32',
-                        avatar: 'w-32 h-32 border border-4 border-white',
+                        avatar:
+                          'w-32 h-32 border border-4 border-[hsl(var(--heroui-background))]',
                       }}
                       tooltipContent={
                         settingsStore.t.team.teamSettings.uploadAvatarHint
@@ -232,7 +242,7 @@ const TeamSettingsModal = observer(
                       label={settingsStore.t.team.teamSettings.name}
                       labelPlacement="inside"
                       name="name"
-                      size="md"
+                      size={commonSize}
                       value={name}
                       onValueChange={setName}
                     />
@@ -244,7 +254,7 @@ const TeamSettingsModal = observer(
                           allowRequests: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.allowRequests}
                     </Checkbox>
@@ -258,7 +268,7 @@ const TeamSettingsModal = observer(
                           memberListIsPublic: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.memberListIsPublic}
                     </Checkbox>
@@ -272,7 +282,7 @@ const TeamSettingsModal = observer(
                           projectListIsPublic: value,
                         })
                       }
-                      size="sm"
+                      size={smallerSize}
                     >
                       {settingsStore.t.team.teamSettings.projectListIsPublic}
                     </Checkbox>
@@ -291,7 +301,7 @@ const TeamSettingsModal = observer(
                         isDisabled={isSaving}
                         variant="bordered"
                         color="danger"
-                        size="md"
+                        size={commonSize}
                       >
                         {settingsStore.t.team.teamSettings.deleteButton}
                       </FButton>
@@ -303,7 +313,7 @@ const TeamSettingsModal = observer(
                       onPress={onSubmit}
                       variant="solid"
                       color="primary"
-                      size="md"
+                      size={commonSize}
                     >
                       {isNewTeam
                         ? settingsStore.t.team.teamSettings.createButton

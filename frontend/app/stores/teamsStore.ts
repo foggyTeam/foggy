@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { RawTeam, Role, Team } from '@/app/lib/types/definitions';
+import { RawTeam, Role, Team, TeamMember } from '@/app/lib/types/definitions';
 import userStore from '@/app/stores/userStore';
 
 class TeamsStore {
@@ -26,7 +26,16 @@ class TeamsStore {
       this.myRole = undefined;
       return;
     }
-    this.activeTeam = { ...team };
+    this.activeTeam = {
+      id: team.id,
+      name: team.name,
+      avatar: team.avatar,
+      settings: team.settings,
+      members: team.members.map((member) => {
+        return { ...member } as TeamMember;
+      }),
+      projects: [...team.projects],
+    };
     this.myRole = this.activeTeam.members.find(
       (member) => member.id === userStore.user?.id,
     )?.role;
@@ -50,6 +59,27 @@ class TeamsStore {
       ...this.allTeams[teamIndex],
       ...newAttrs,
     };
+  };
+
+  // MEMBERS
+  updateTeamMember = (memberId: string, newAttrs: Partial<TeamMember>) => {
+    if (this.activeTeam) {
+      const memberIndex = this.activeTeam.members.findIndex(
+        (member) => member.id === memberId,
+      );
+      if (memberIndex >= 0)
+        this.activeTeam.members[memberIndex] = {
+          ...this.activeTeam.members[memberIndex],
+          ...newAttrs,
+        };
+    }
+  };
+  removeTeamMember = (memberId: string) => {
+    if (this.activeTeam) {
+      this.activeTeam.members = this.activeTeam.members.filter(
+        (member) => member.id !== memberId,
+      );
+    }
   };
 }
 

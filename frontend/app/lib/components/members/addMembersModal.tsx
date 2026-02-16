@@ -15,11 +15,17 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { HistoryIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
 import MemberAutocomplete from '@/app/lib/components/members/memberAutocomplete';
-import { AddProjectMember } from '@/app/lib/server/actions/membersServerActions';
+import {
+  AddProjectMember,
+  AddTeamMember,
+  GetInvitationLink,
+} from '@/app/lib/server/actions/membersServerActions';
 import projectsStore from '@/app/stores/projectsStore';
 import { addToast } from '@heroui/toast';
 import SelectRole from '@/app/lib/components/members/selectRole';
 import teamsStore from '@/app/stores/teamsStore';
+import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AddMembersModal = observer(
   ({
@@ -29,8 +35,9 @@ const AddMembersModal = observer(
   }: {
     isOpen: boolean;
     onOpenChange: () => void;
-    type: 'project' | 'team';
+    type: 'project' | 'team' | 'all';
   }) => {
+    const { commonSize, smallerSize } = useAdaptiveParams();
     const expirationTimes = {
       '24h': `24 ${settingsStore.t.time.hours.toLowerCase()}`,
       '7d': `7 ${settingsStore.t.time.days.toLowerCase()}`,
@@ -41,20 +48,40 @@ const AddMembersModal = observer(
       never: settingsStore.t.time.never.toLowerCase(),
     } as const;
     const [isLoading, setIsLoading] = useState(false);
+    const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+    const [selectedMembers, setSelectedMembers] = useState<
+      { id: string; type: 'user' | 'team' }[]
+    >([]);
     const [role, setRole] = useState<Role | undefined>(undefined);
     const [expirationTime, setExpirationTime] =
       useState<keyof typeof expirationTimes>('24h');
 
     const handleAddMembers = () => {
       setIsLoading(true);
-      selectedMembers.forEach(async (id) => {
+      selectedMembers.forEach(async ({ id, type: memberType }) => {
         switch (type) {
-          case 'project':
+          case 'team':
+            if (!teamsStore.activeTeam || !role) return;
+            try {
+              await AddTeamMember(teamsStore.activeTeam.id, {
+                userId: id,
+                role: role,
+                expirationTime: expirationTime,
+              });
+            } catch (e: any) {
+              addToast({
+                color: 'danger',
+                severity: 'danger',
+                title: settingsStore.t.toasts.members.addMemberError,
+                description: e.message,
+              });
+            }
+            break;
+          default:
             if (!projectsStore.activeProject || !role) return;
-            await AddProjectMember(projectsStore.activeProject.id, {
-              userId: id,
+            await AddProjectMember(projectsStore.activeProject.id, memberType, {
+              id,
               role: role,
               expirationTime: expirationTime,
             }).catch((error: any) =>
@@ -65,19 +92,38 @@ const AddMembersModal = observer(
                 description: error,
               }),
             );
-            break;
-          case 'team':
-            if (!teamsStore.activeTeam || !role) return;
-            // TODO: add team member
-            console.log('add team member', id);
         }
       });
       setIsLoading(false);
       onOpenChange();
     };
 
+    const handleCopyInvitationLink = async () => {
+      const entityId =
+        type === 'project'
+          ? projectsStore.activeProject?.id
+          : teamsStore.activeTeam?.id;
+      if (!entityId || !role) return;
+
+      setIsGeneratingLink(true);
+      try {
+        const link = await GetInvitationLink(type == 'all' ? 'project' : type, {
+          id: entityId,
+          role,
+          expirationTime,
+        });
+        await CopyToClipboard(link);
+      } catch (e: any) {}
+      setIsGeneratingLink(false);
+    };
+
     return (
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+      <Modal
+        placement="center"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        hideCloseButton
+      >
         <ModalContent className="flex w-full max-w-lg gap-2 p-6">
           {() => (
             <>
@@ -88,19 +134,19 @@ const AddMembersModal = observer(
               <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
                 <MemberAutocomplete
                   memberType={type}
-                  setSelectedId={setSelectedMembers}
+                  setSelected={setSelectedMembers}
                 />
-                <div className="flex w-full flex-nowrap justify-between gap-2">
+                <div className="flex w-full flex-col flex-nowrap justify-between gap-2 sm:flex-row">
                   <SelectRole
                     role={role}
                     setRole={setRole}
-                    style={'bordered'}
-                    className={'w-48'}
+                    style="bordered"
+                    className="w-full sm:w-48"
                   />
-                  <div className="flex w-fit items-center gap-1">
+                  <div className="flex w-full items-center gap-1 sm:w-fit">
                     <div className="flex items-center gap-1">
-                      <HistoryIcon className="stroke-default-500" />
-                      <p className="text-sm">
+                      <HistoryIcon className="stroke-default-600" />
+                      <p className="text-medium sm:text-sm">
                         {settingsStore.t.members.addMember.expiresIn}
                       </p>
                     </div>
@@ -108,11 +154,11 @@ const AddMembersModal = observer(
                       radius="full"
                       className="w-fit"
                       variant="flat"
-                      size="sm"
+                      size={smallerSize}
                       classNames={{
                         popoverContent: clsx(
                           bg_container_no_padding,
-                          'p-2 sm:p-3 bg-white/100 w-36',
+                          'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/100 w-36',
                         ),
                         innerWrapper: 'w-full',
                         selectorIcon: 'invisible',
@@ -143,16 +189,24 @@ const AddMembersModal = observer(
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className="flex w-full justify-between gap-4 p-0 pt-2">
+              <ModalFooter className="flex w-full flex-wrap justify-between gap-4 p-0 pt-2">
                 {/*TODO: add link*/}
-                <Button isDisabled={!role} size="md" variant="light">
+                <Button
+                  isLoading={isGeneratingLink}
+                  onPress={handleCopyInvitationLink}
+                  isDisabled={!role}
+                  size={commonSize}
+                  className="w-full sm:w-fit"
+                  variant="light"
+                >
                   {settingsStore.t.members.addMember.modalCopyLink}
                 </Button>
                 <Button
                   isDisabled={!selectedMembers.length || !role}
                   isLoading={isLoading}
                   onPress={handleAddMembers}
-                  size="md"
+                  size={commonSize}
+                  className="w-full sm:w-fit"
                   color="primary"
                 >
                   {settingsStore.t.members.addMember.modalSure}

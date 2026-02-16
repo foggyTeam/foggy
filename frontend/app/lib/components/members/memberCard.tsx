@@ -87,9 +87,9 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
     <>
       <div
         className={clsx(
-          'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2',
+          'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
           el_animation,
-          'h-16 w-[98%] max-w-[379px]',
+          'h-16 w-[98%] sm:max-w-[379px]',
           team_tile,
         )}
       >
@@ -98,7 +98,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
             size="md"
             color="primary"
             className="min-h-10 min-w-10"
-            name={member.nickname.toUpperCase()}
+            name={member.nickname?.toUpperCase()}
             src={member.avatar}
           />
           <div className="flex h-full w-full flex-col items-start justify-between">
@@ -137,7 +137,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 variant="light"
                 size="sm"
               >
-                <IdCardIcon className="stroke-default-300" />
+                <IdCardIcon className="stroke-default-500" />
               </Button>
             )}
             {userStore.user?.id === member.id ? (

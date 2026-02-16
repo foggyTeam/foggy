@@ -9,11 +9,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiSecurity,
   ApiTags,
@@ -61,11 +63,35 @@ export class TeamController {
 
   @Post('search')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Search teams by name' })
+  @ApiOperation({
+    summary: 'Search teams for adding to project',
+  })
+  @ApiSecurity('x-user-id')
   @ApiResponse({
     status: 200,
-    description: 'List of teams matching the search criteria',
+    description:
+      'List of teams matching the search criteria, excluding teams already in the project',
+    schema: {
+      type: 'object',
+      properties: {
+        teams: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              name: { type: 'string' },
+              avatar: { type: 'string' },
+              memberCount: { type: 'number' },
+            },
+          },
+        },
+        nextCursor: { type: 'string', nullable: true },
+        hasNextPage: { type: 'boolean' },
+      },
+    },
   })
+  @ApiResponse({ status: 404, description: 'Project not found' })
   @ApiBody({
     description: 'Search parameters',
     schema: {
@@ -75,6 +101,11 @@ export class TeamController {
           type: 'string',
           description: 'Search query for team name',
           example: 'team name',
+        },
+        projectId: {
+          type: 'string',
+          description: 'Project ID to exclude its teams',
+          example: '65a8e5c9d8df1f04e8e3b4a2',
         },
         limit: {
           type: 'number',
@@ -91,10 +122,16 @@ export class TeamController {
   })
   async searchTeams(
     @Body('query') query: string = '',
+    @Body('projectId') projectId?: string,
     @Body('limit') limit: number = 20,
     @Body('cursor') cursor?: string,
   ) {
-    return this.teamService.searchTeams(query, limit, cursor);
+    return this.teamService.searchTeams(
+      query,
+      new Types.ObjectId(projectId),
+      Number(limit),
+      cursor,
+    );
   }
 
   @Get()
@@ -152,7 +189,6 @@ export class TeamController {
         id: { type: 'string' },
         name: { type: 'string' },
         avatar: { type: 'string' },
-        description: { type: 'string', nullable: true },
         memberCount: { type: 'number' },
         members: {
           type: 'array',
@@ -166,11 +202,9 @@ export class TeamController {
                 type: 'string',
                 enum: ['owner', 'admin', 'editor', 'reader'],
               },
-              joinedAt: { type: 'string', format: 'date-time' },
             },
           },
         },
-        updatedAt: { type: 'string', format: 'date-time' },
         settings: {
           type: 'object',
           properties: {
@@ -231,7 +265,6 @@ export class TeamController {
               },
             },
           },
-          updatedAt: { type: 'string', format: 'date-time' },
         },
       },
     },
@@ -290,6 +323,7 @@ export class TeamController {
         value: {
           userId: '507f1f77bcf86cd799439011',
           role: 'editor',
+          expiresAt: '2025-12-31T23:59:59Z',
         },
       },
     },
@@ -299,12 +333,14 @@ export class TeamController {
     @Body('userId') targetUserId: Types.ObjectId,
     @Body('role') role: Role,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Body('expiresAt') expiresAt?: Date,
   ): Promise<void> {
     return this.teamService.inviteMember(
       teamId,
       targetUserId,
       role,
       requestingUserId,
+      expiresAt,
     );
   }
 
@@ -322,20 +358,37 @@ export class TeamController {
     description: 'ID of the user to remove',
     type: String,
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is removing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'Member has been successfully removed from team',
   })
   @ApiResponse({ status: 404, description: 'Team or user not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid newOwner ID or newOwner is not a team member',
+  })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden - owner must specify newOwner when removing themselves',
+  })
   async removeMember(
     @Param('id') teamId: Types.ObjectId,
     @Param('userId') targetUserId: Types.ObjectId,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<void> {
     return this.teamService.removeMember(
       teamId,
       targetUserId,
       requestingUserId,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 
@@ -353,17 +406,25 @@ export class TeamController {
     description: 'Member role has been successfully updated',
     type: Team,
   })
+  @ApiQuery({
+    name: 'newOwner',
+    description: 'ID of new owner (required if owner is changing themselves)',
+    required: false,
+    type: String,
+  })
   @ApiResponse({ status: 404, description: 'Team or user not found' })
   @ApiBody({ type: ChangeTeamMemberRoleDto })
   async changeMemberRole(
     @Param('id') teamId: Types.ObjectId,
     @Body() changeRoleDto: ChangeTeamMemberRoleDto,
     @Headers('x-user-id') requestingUserId: Types.ObjectId,
+    @Query('newOwner') newOwner?: string,
   ): Promise<TeamDocument> {
     return this.teamService.changeMemberRole(
       teamId,
       changeRoleDto,
       requestingUserId,
+      newOwner ? new Types.ObjectId(newOwner) : undefined,
     );
   }
 

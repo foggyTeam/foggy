@@ -59,7 +59,7 @@ export class BoardService {
     }
   }
 
-  async findAll(): Promise<Partial<BoardDocument>[]> {
+  async findAll(): Promise<Partial<Board>[]> {
     if (process.env.NODE_ENV !== 'development') {
       throw new CustomException(
         getErrorMessages({ general: 'devOnly' }),

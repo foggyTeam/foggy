@@ -12,6 +12,7 @@ import { getErrorMessages } from '../errorMessages/errorMessages';
 import { CustomException } from '../exceptions/custom-exception';
 import { isURL } from 'class-validator';
 import { ProjectService } from '../projects/project.service';
+import { TeamService } from '../teams/team.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel('Counter') private counterModel: Model<Counter>,
     private readonly projectService: ProjectService,
+    private readonly teamService: TeamService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
@@ -134,26 +136,47 @@ export class UsersService {
 
   async searchUsers(
     query: string,
-    projectId?: Types.ObjectId,
+    excludeContext?: {
+      type: 'project' | 'team';
+      id: Types.ObjectId;
+    },
     limit = 20,
     cursor?: string,
   ) {
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
 
-    const excludeIds = projectId
-      ? await this.projectService.getProjectMemberIds(projectId)
-      : [];
+    let excludeIds: Types.ObjectId[] = [];
+
+    if (excludeContext) {
+      if (excludeContext.type === 'project') {
+        excludeIds = await this.projectService.getProjectMemberIds(
+          excludeContext.id,
+        );
+      } else if (excludeContext.type === 'team') {
+        excludeIds = await this.teamService.getTeamMemberIds(excludeContext.id);
+      }
+    }
 
     const filter: any = {};
     if (query) {
       filter.nickname = { $regex: query, $options: 'i' };
     }
-    filter._id = {
-      ...(cursor && { $gt: new Types.ObjectId(cursor) }),
-      ...(excludeIds.length && {
-        $nin: excludeIds.map((id) => new Types.ObjectId(id)),
-      }),
-    };
+
+    filter._id = {};
+
+    if (cursor) {
+      filter._id.$gt = new Types.ObjectId(cursor);
+    }
+
+    if (excludeIds.length > 0) {
+      filter._id.$nin = excludeIds.map((id) =>
+        id instanceof Types.ObjectId ? id : new Types.ObjectId(id),
+      );
+    }
+
+    if (Object.keys(filter._id).length === 0) {
+      delete filter._id;
+    }
 
     const users = await this.userModel
       .find(filter)

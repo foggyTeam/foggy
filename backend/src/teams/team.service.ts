@@ -63,14 +63,27 @@ export class TeamService {
   async getTeamById(
     teamId: Types.ObjectId,
     userId: Types.ObjectId,
-  ): Promise<TeamDocument> {
+  ): Promise<any> {
     await this.validateUser(userId);
     await this.validateTeamAccess(teamId, userId, Role.READER);
 
-    return this.teamModel
+    const team = await this.teamModel
       .findById(teamId)
       .orFail(() => this.notFoundError())
+      .lean()
       .exec();
+
+    const members = await this.getMembers(team as TeamDocument);
+    const projects = await this.getTeamProjects(teamId, userId);
+
+    return {
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      settings: team.settings,
+      members,
+      projects,
+    };
   }
 
   async getUserTeams(userId: Types.ObjectId): Promise<TeamListItem[]> {
@@ -85,14 +98,12 @@ export class TeamService {
 
     for (const team of teams) {
       const members = await this.getMembers(team);
-      result.push({
+      result.push(<TeamListItem>{
         id: team._id,
         name: team.name,
         avatar: team.avatar,
-        description: team.description,
         members,
         memberCount: members.length,
-        updatedAt: team.updatedAt,
       });
     }
 
@@ -108,10 +119,6 @@ export class TeamService {
 
     if (updateData.name) {
       team.name = updateData.name;
-    }
-
-    if (updateData.description !== undefined) {
-      team.description = updateData.description;
     }
 
     if (updateData.avatar !== undefined) {
@@ -199,6 +206,7 @@ export class TeamService {
     teamId: Types.ObjectId,
     targetUserId: Types.ObjectId,
     requestingUserId: Types.ObjectId,
+    newOwner?: Types.ObjectId,
   ): Promise<void> {
     const targetUserIdObj = new Types.ObjectId(targetUserId);
     const requestingUserIdObj = new Types.ObjectId(requestingUserId);
@@ -225,21 +233,32 @@ export class TeamService {
 
     const isOwner = targetMember.role === Role.OWNER;
     if (isOwner && isSelfRemove) {
-      const adminMembers = team.members.filter(
-        (member) =>
-          member.role === Role.ADMIN && !member.userId.equals(targetUserIdObj),
-      );
-      if (adminMembers.length === 0) {
+      if (!newOwner) {
         throw new CustomException(
           getErrorMessages({ project: 'mustSetNewOwner' }),
           HttpStatus.FORBIDDEN,
         );
       }
-
-      adminMembers[0].role = Role.OWNER;
+      if (newOwner.equals(targetUserIdObj)) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+      await this.validateUser(newOwner);
+      const newOwnerMember = team.members.find((m) =>
+        m.userId.equals(newOwner),
+      );
+      if (!newOwnerMember) {
+        throw new CustomException(
+          getErrorMessages({ project: 'userNotFound' }),
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      newOwnerMember.role = Role.OWNER;
     } else if (isOwner) {
       throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
+        getErrorMessages({ project: 'cannotRemoveOwner' }),
         HttpStatus.FORBIDDEN,
       );
     }
@@ -254,6 +273,7 @@ export class TeamService {
     teamId: Types.ObjectId,
     changeRoleDto: ChangeTeamMemberRoleDto,
     requestingUserId: Types.ObjectId,
+    newOwner?: Types.ObjectId,
   ): Promise<TeamDocument> {
     const team = await this.validateTeamAccess(
       teamId,
@@ -268,16 +288,54 @@ export class TeamService {
 
     if (!targetMember) {
       throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
+        getErrorMessages({ project: 'userNotFound' }),
         HttpStatus.NOT_FOUND,
       );
     }
 
-    if (targetMember.role === Role.OWNER) {
-      throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
-        HttpStatus.FORBIDDEN,
+    const isOwner = targetMember.role === Role.OWNER;
+
+    if (isOwner) {
+      const isSelfChange = new Types.ObjectId(requestingUserId).equals(
+        changeRoleDto.userId,
       );
+
+      if (!isSelfChange) {
+        throw new CustomException(
+          getErrorMessages({ project: 'cannotChangeOwnerRole' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (!newOwner) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      if (newOwner.equals(changeRoleDto.userId)) {
+        throw new CustomException(
+          getErrorMessages({ project: 'mustSetNewOwner' }),
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      await this.validateUser(newOwner);
+      const newOwnerMember = team.members.find((m) =>
+        m.userId.equals(newOwner),
+      );
+      if (!newOwnerMember) {
+        throw new CustomException(
+          getErrorMessages({ project: 'userNotFound' }),
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      newOwnerMember.role = Role.OWNER;
+      targetMember.role = changeRoleDto.role;
+
+      return await this.saveTeam(team);
     }
 
     targetMember.role = changeRoleDto.role;
@@ -376,7 +434,6 @@ export class TeamService {
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: member.role,
-        joinedAt: member.joinedAt,
         teamName,
       };
     });
@@ -393,13 +450,6 @@ export class TeamService {
       .orFail(() => this.notFoundError())
       .exec();
 
-    if (!team.settings.isPublic) {
-      throw new CustomException(
-        getErrorMessages({ general: 'errorNotRecognized' }),
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     if (userId) {
       const userRole = await this.getUserRoleInTeam(teamId, userId);
       if (userRole) {
@@ -415,18 +465,33 @@ export class TeamService {
       members = await this.getMembers(team);
     }
 
+    const projects: any[] = [];
+    if (
+      team.settings.projectListIsPublic &&
+      team.projects &&
+      team.projects.length > 0
+    ) {
+      for (const projectId of team.projects) {
+        try {
+          projects.push(
+            await this.projectService.getProjectBriefInfo(projectId),
+          );
+        } catch (err) {
+          console.warn(
+            `Skipping project ${projectId} in team brief info ${teamId}: ${(err as Error).message}`,
+          );
+        }
+      }
+    }
+
     return {
       id: team._id,
       name: team.name,
       avatar: team.avatar,
-      description: team.description,
       memberCount: team.members.length,
       members: team.settings.memberListIsPublic ? members : [],
-      updatedAt: team.updatedAt,
-      settings: {
-        allowRequests: team.settings.allowRequests,
-        memberListIsPublic: team.settings.memberListIsPublic,
-      },
+      settings: team.settings,
+      projects: team.settings.projectListIsPublic ? projects : [],
     };
   }
 
@@ -438,6 +503,19 @@ export class TeamService {
     return team.members
       .filter((m) => m.role === Role.ADMIN || m.role === Role.OWNER)
       .map((m) => m.userId);
+  }
+
+  public async getTeamOwnerId(teamId: Types.ObjectId): Promise<Types.ObjectId> {
+    const team = await this.findTeamById(teamId);
+    const owner = team.members.find((m) => m.role === Role.OWNER);
+    if (!owner) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return owner.userId;
   }
 
   public async findTeamById(teamId: Types.ObjectId): Promise<TeamDocument> {
@@ -521,45 +599,57 @@ export class TeamService {
 
   async searchTeams(
     query: string,
+    projectId: Types.ObjectId,
     limit = 20,
     cursor?: string,
-  ): Promise<{
-    teams: {
-      id: Types.ObjectId;
-      name: string;
-      description?: string;
-      avatar?: string;
-    }[];
-    nextCursor: Types.ObjectId | null;
-    hasNextPage: boolean;
-  }> {
+  ) {
     const validatedLimit = Math.min(Math.max(limit, 1), 100);
 
     const filter: any = {};
+
     if (query) {
       filter.name = { $regex: query, $options: 'i' };
     }
+
+    const project = await this.projectService.findProjectById(projectId);
+
+    const existingTeamIds =
+      project.accessControlTeams
+        ?.map((teamAccess) => teamAccess.teamId)
+        .filter((id) => id != null) || [];
+
+    if (existingTeamIds.length > 0) {
+      filter._id = { $nin: existingTeamIds };
+    }
+
     if (cursor) {
-      filter._id = { $gt: new Types.ObjectId(cursor) };
+      if (filter._id) {
+        filter._id.$gt = new Types.ObjectId(cursor);
+      } else {
+        filter._id = { $gt: new Types.ObjectId(cursor) };
+      }
     }
 
     const teams = await this.teamModel
       .find(filter)
       .sort({ _id: 1 })
       .limit(validatedLimit)
-      .select('name description avatar _id')
+      .select('name avatar _id members')
+      .lean()
       .exec();
+
+    const teamsWithMemberCount = teams.map((team) => ({
+      id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+      memberCount: team.members?.length || 0,
+    }));
 
     const nextCursor =
       teams.length === validatedLimit ? teams[teams.length - 1]._id : null;
 
     return {
-      teams: teams.map((team) => ({
-        id: team._id,
-        name: team.name,
-        description: team.description,
-        avatar: team.avatar,
-      })),
+      teams: teamsWithMemberCount,
       nextCursor,
       hasNextPage: Boolean(nextCursor),
     };
@@ -627,7 +717,7 @@ export class TeamService {
       .findById(team._id)
       .populate<{
         'members.userId': {
-          _id: Types.ObjectId;
+          id: Types.ObjectId;
           nickname: string;
           avatar: string;
         };
@@ -644,8 +734,23 @@ export class TeamService {
         nickname: userObj.nickname,
         avatar: userObj.avatar,
         role: member.role,
-        joinedAt: member.joinedAt,
       };
     });
+  }
+
+  async getTeamsDetails(teamIds: Types.ObjectId[]): Promise<any[]> {
+    if (!teamIds.length) return [];
+
+    const teams = await this.teamModel
+      .find({ _id: { $in: teamIds } })
+      .select('_id name avatar')
+      .lean()
+      .exec();
+
+    return teams.map((team) => ({
+      _id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+    }));
   }
 }

@@ -22,6 +22,7 @@ import { NotificationService } from './notifications.service';
 import { Role } from '../shared/types/enums';
 import { NotificationResponse } from '../shared/interfaces/notification.type';
 import { JoinRequestDto } from './dto/join-request.dto';
+import { NotificationResponseDto } from './dto/notification-response.dto';
 
 @ApiTags('notifications')
 @Controller('notifications')
@@ -230,6 +231,11 @@ export class NotificationController {
     type: String,
     description: 'ID of the notification to accept',
   })
+  @ApiBody({
+    description: 'Optional role to assign',
+    type: NotificationResponseDto,
+    required: false,
+  })
   @ApiResponse({
     status: 204,
     description: 'Notification accepted',
@@ -237,11 +243,13 @@ export class NotificationController {
   async acceptNotification(
     @Headers('x-user-id') userId: Types.ObjectId,
     @Param('id') notificationId: Types.ObjectId,
+    @Body() responseDto?: NotificationResponseDto,
   ): Promise<void> {
     return this.notificationService.handleNotification(
       new Types.ObjectId(notificationId),
       new Types.ObjectId(userId),
       true,
+      responseDto?.role,
     );
   }
 
