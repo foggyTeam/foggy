@@ -18,7 +18,7 @@ export default function MemberAutocomplete({
   setSelectedId: (
     newId: ((prevState: string[]) => string[]) | string[],
   ) => void;
-  memberType: 'project' | 'team';
+  memberType: 'project' | 'team' | 'all';
 }) {
   const { smallerSize } = useAdaptiveParams();
   const [selectedMembers, setSelectedMembers] = useState<
@@ -30,15 +30,22 @@ export default function MemberAutocomplete({
   >([]);
   const [inputValue, setInputValue] = useState('');
 
-  const { membersList, isLoading, hasMore, onLoadMore } = useMembersList({
+  const {
+    membersList,
+    isLoading,
+    hasMoreUsers,
+    hasMoreTeams,
+    onLoadMoreUsers,
+    onLoadMoreAll,
+  } = useMembersList({
     inputValue,
     memberType,
   });
   const [, scrollerRef] = useInfiniteScroll({
-    hasMore,
+    hasMore: memberType === 'all' ? hasMoreTeams || hasMoreUsers : hasMoreUsers,
     isEnabled: true,
     shouldUseLoader: false,
-    onLoadMore,
+    onLoadMore: memberType === 'all' ? onLoadMoreAll : onLoadMoreUsers,
   });
 
   const handleSelectionChange = (key: any | null) => {

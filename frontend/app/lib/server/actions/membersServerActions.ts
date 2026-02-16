@@ -20,6 +20,22 @@ export async function SearchUsers(data: {
   });
 }
 
+export async function SearchAll(data: {
+  query: string;
+  projectId?: string;
+  limit: number;
+  usersCursor: string;
+  teamsCursor: string;
+}) {
+  return await postRequest(
+    `users/search-all`,
+    { ...data, teamsLimit: data.limit, usersLimit: data.limit },
+    {
+      headers: { 'x-user-id': await getUserId() },
+    },
+  );
+}
+
 const expirationTimesMap: Record<string, number> = {
   '24h': 24 * 60 * 60 * 1000,
   '7d': 7 * 24 * 60 * 60 * 1000,

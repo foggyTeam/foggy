@@ -35,7 +35,7 @@ const AddMembersModal = observer(
   }: {
     isOpen: boolean;
     onOpenChange: () => void;
-    type: 'project' | 'team';
+    type: 'project' | 'team' | 'all';
   }) => {
     const { commonSize, smallerSize } = useAdaptiveParams();
     const expirationTimes = {

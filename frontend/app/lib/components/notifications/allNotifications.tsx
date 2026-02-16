@@ -55,8 +55,7 @@ const AllNotifications = observer(() => {
     accept: boolean,
     role?: Role,
   ) => {
-    // TODO: user could change the role
-    await AnswerNotification(notificationId, accept)
+    await AnswerNotification(notificationId, accept, role)
       .then(() => {
         // TODO: process {errors: }
         switch (notificationType) {

@@ -65,11 +65,16 @@ export async function JoinTeamRequest(
 export async function AnswerNotification(
   notificationId: string,
   accept: boolean,
+  role?: Role,
 ) {
   if (accept) {
-    return postRequest(`notifications/${notificationId}/accept`, null, {
-      headers: { 'x-user-id': await getUserId() },
-    });
+    return postRequest(
+      `notifications/${notificationId}/accept`,
+      role ? { role } : null,
+      {
+        headers: { 'x-user-id': await getUserId() },
+      },
+    );
   } else {
     return postRequest(`notifications/${notificationId}/reject`, null, {
       headers: { 'x-user-id': await getUserId() },

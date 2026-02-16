@@ -241,7 +241,8 @@
     "addMember": {
       "modalHeader": "Invite members",
       "searchPlaceholder": {
-        "project": "Find by nickname or team name...",
+        "all": "Find by nickname or team name...",
+        "project": "Find by nickname...",
         "team": "Find by nickname..."
       },
       "rolePlaceholder": "Choose a role...",
