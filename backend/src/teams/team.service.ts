@@ -737,4 +737,20 @@ export class TeamService {
       };
     });
   }
+
+  async getTeamsDetails(teamIds: Types.ObjectId[]): Promise<any[]> {
+    if (!teamIds.length) return [];
+
+    const teams = await this.teamModel
+      .find({ _id: { $in: teamIds } })
+      .select('_id name avatar')
+      .lean()
+      .exec();
+
+    return teams.map((team) => ({
+      _id: team._id,
+      name: team.name,
+      avatar: team.avatar,
+    }));
+  }
 }

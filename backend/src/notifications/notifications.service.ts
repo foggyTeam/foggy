@@ -64,6 +64,7 @@ export class NotificationService {
     const entityIds: { [key: string]: Set<string> } = {
       [EntityType.USER]: new Set(),
       [EntityType.PROJECT]: new Set(),
+      [EntityType.TEAM]: new Set(),
     };
 
     for (const notif of notifications) {
@@ -76,6 +77,10 @@ export class NotificationService {
       if (notif.target?.type === EntityType.PROJECT) {
         entityIds[EntityType.PROJECT].add(notif.target.id.toString());
       }
+
+      if (notif.target?.type === EntityType.TEAM) {
+        entityIds[EntityType.TEAM].add(notif.target.id.toString());
+      }
     }
 
     const users = await this.usersService.getUserDetails(
@@ -85,6 +90,12 @@ export class NotificationService {
     );
     const projects = await this.projectService.getProjectDetails(
       Array.from(entityIds[EntityType.PROJECT]).map(
+        (id) => new Types.ObjectId(id),
+      ),
+    );
+
+    const teams = await this.teamService.getTeamsDetails(
+      Array.from(entityIds[EntityType.TEAM]).map(
         (id) => new Types.ObjectId(id),
       ),
     );
@@ -104,6 +115,16 @@ export class NotificationService {
         {
           name: p.name,
           avatar: p.avatar,
+        },
+      ]),
+    );
+
+    const teamMap = new Map(
+      teams.map((t) => [
+        t._id.toString(),
+        {
+          name: t.name,
+          avatar: t.avatar,
         },
       ]),
     );
@@ -129,6 +150,15 @@ export class NotificationService {
             id: ref.id,
             name: projectInfo?.name,
             avatar: projectInfo?.avatar,
+          };
+        }
+        if (ref.type === EntityType.TEAM) {
+          const teamInfo = teamMap.get(ref.id.toString());
+          return {
+            type: EntityType.TEAM,
+            id: ref.id,
+            name: teamInfo?.name,
+            avatar: teamInfo?.avatar,
           };
         }
         return {
