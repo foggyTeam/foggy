@@ -257,7 +257,6 @@ export class UsersController {
               name: { type: 'string' },
               nickname: { type: 'string' },
               avatar: { type: 'string' },
-              memberCount: { type: 'number' },
             },
           },
         },
