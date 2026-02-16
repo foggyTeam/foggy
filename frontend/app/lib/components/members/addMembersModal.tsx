@@ -61,8 +61,9 @@ const AddMembersModal = observer(
         switch (type) {
           case 'project':
             if (!projectsStore.activeProject || !role) return;
-            await AddProjectMember(projectsStore.activeProject.id, {
-              userId: id,
+            // TODO: distinguish team from user
+            await AddProjectMember(projectsStore.activeProject.id, 'user', {
+              id,
               role: role,
               expirationTime: expirationTime,
             }).catch((error: any) =>

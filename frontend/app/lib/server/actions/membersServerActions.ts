@@ -53,19 +53,36 @@ function getExpiresAt(term: keyof typeof expirationTimesMap) {
 // PROJECT
 export async function AddProjectMember(
   projectId: string,
+  type: 'user' | 'team',
   data: {
-    userId: string;
+    id: string;
     role: Omit<Role, 'owner'>;
     expirationTime: keyof typeof expirationTimesMap;
   },
 ) {
-  return await postRequest(
-    `projects/${projectId}/users`,
-    { ...data, expiresAt: getExpiresAt(data.expirationTime) },
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
+  return await (type === 'user'
+    ? postRequest(
+        `projects/${projectId}/users`,
+        {
+          userId: data.id,
+          role: data.role,
+          expiresAt: getExpiresAt(data.expirationTime),
+        },
+        {
+          headers: { 'x-user-id': await getUserId() },
+        },
+      )
+    : postRequest(
+        `projects/${projectId}/teams`,
+        {
+          teamId: data.id,
+          role: data.role,
+          expiresAt: getExpiresAt(data.expirationTime),
+        },
+        {
+          headers: { 'x-user-id': await getUserId() },
+        },
+      ));
 }
 
 export async function UpdateProjectMemberRole(
