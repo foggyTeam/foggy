@@ -11,12 +11,19 @@ import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
 import { useMembersList } from '@/app/lib/hooks/useMembersList';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
+interface SelectedMember {
+  id: string;
+  type: 'user' | 'team';
+}
+
 export default function MemberAutocomplete({
-  setSelectedId,
+  setSelected,
   memberType,
 }: {
-  setSelectedId: (
-    newId: ((prevState: string[]) => string[]) | string[],
+  setSelected: (
+    newMember:
+      | ((prevState: SelectedMember[]) => SelectedMember[])
+      | SelectedMember[],
   ) => void;
   memberType: 'project' | 'team' | 'all';
 }) {
@@ -62,7 +69,10 @@ export default function MemberAutocomplete({
   };
 
   useEffect(() => {
-    setSelectedId(selectedMembers.map((member) => member.id));
+    const selected: SelectedMember[] = selectedMembers.map((member) => {
+      return { id: member.id, type: 'name' in member ? 'team' : 'user' };
+    });
+    setSelected(selected);
     setInputValue('');
   }, [selectedMembers]);
 

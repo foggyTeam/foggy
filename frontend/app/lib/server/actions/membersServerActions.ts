@@ -60,6 +60,7 @@ export async function AddProjectMember(
     expirationTime: keyof typeof expirationTimesMap;
   },
 ) {
+  console.log(type, data);
   return await (type === 'user'
     ? postRequest(
         `projects/${projectId}/users`,

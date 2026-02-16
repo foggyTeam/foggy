@@ -21,6 +21,8 @@ import SelectRole from '@/app/lib/components/members/selectRole';
 import { Badge } from '@heroui/badge';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
+// TODO: process team invitation to project
+
 export default function NotificationCard(
   notification: Notification & { isNew?: boolean },
 ) {

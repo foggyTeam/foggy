@@ -50,31 +50,17 @@ const AddMembersModal = observer(
     const [isLoading, setIsLoading] = useState(false);
     const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
-    const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+    const [selectedMembers, setSelectedMembers] = useState<
+      { id: string; type: 'user' | 'team' }[]
+    >([]);
     const [role, setRole] = useState<Role | undefined>(undefined);
     const [expirationTime, setExpirationTime] =
       useState<keyof typeof expirationTimes>('24h');
 
     const handleAddMembers = () => {
       setIsLoading(true);
-      selectedMembers.forEach(async (id) => {
+      selectedMembers.forEach(async ({ id, type: memberType }) => {
         switch (type) {
-          case 'project':
-            if (!projectsStore.activeProject || !role) return;
-            // TODO: distinguish team from user
-            await AddProjectMember(projectsStore.activeProject.id, 'user', {
-              id,
-              role: role,
-              expirationTime: expirationTime,
-            }).catch((error: any) =>
-              addToast({
-                color: 'danger',
-                severity: 'danger',
-                title: settingsStore.t.toasts.members.addMemberError,
-                description: error,
-              }),
-            );
-            break;
           case 'team':
             if (!teamsStore.activeTeam || !role) return;
             try {
@@ -91,6 +77,21 @@ const AddMembersModal = observer(
                 description: e.message,
               });
             }
+            break;
+          default:
+            if (!projectsStore.activeProject || !role) return;
+            await AddProjectMember(projectsStore.activeProject.id, memberType, {
+              id,
+              role: role,
+              expirationTime: expirationTime,
+            }).catch((error: any) =>
+              addToast({
+                color: 'danger',
+                severity: 'danger',
+                title: settingsStore.t.toasts.members.addMemberError,
+                description: error,
+              }),
+            );
         }
       });
       setIsLoading(false);
@@ -106,7 +107,7 @@ const AddMembersModal = observer(
 
       setIsGeneratingLink(true);
       try {
-        const link = await GetInvitationLink(type, {
+        const link = await GetInvitationLink(type == 'all' ? 'project' : type, {
           id: entityId,
           role,
           expirationTime,
@@ -133,7 +134,7 @@ const AddMembersModal = observer(
               <ModalBody className="flex h-fit w-full max-w-lg flex-col flex-wrap gap-4 p-0">
                 <MemberAutocomplete
                   memberType={type}
-                  setSelectedId={setSelectedMembers}
+                  setSelected={setSelectedMembers}
                 />
                 <div className="flex w-full flex-col flex-nowrap justify-between gap-2 sm:flex-row">
                   <SelectRole
