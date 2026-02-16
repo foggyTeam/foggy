@@ -58,7 +58,7 @@ export default function NotificationCard(
       }
     }
 
-    return chooseTitle().replace('_', notification.target.name.toUpperCase());
+    return chooseTitle().replace('_', notification.target.name?.toUpperCase());
   };
 
   return (

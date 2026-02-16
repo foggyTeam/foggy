@@ -44,25 +44,32 @@ export function useMembersList({
       data.projectId = projectsStore.activeProject?.id;
     if (memberType === 'team') data.teamId = teamsStore.activeTeam?.id;
 
-    await SearchUsers(data)
-      .then(
-        (data: { hasNextPage: boolean; nextCursor: string; users: any[] }) => {
-          setMembersList((prev) =>
-            append ? [...prev, ...data.users] : (data.users ?? []),
-          );
-          setNextCursor(data.nextCursor || '');
-          setHasMore(data.hasNextPage);
-        },
-      )
-      .catch((error) =>
-        addToast({
-          color: 'danger',
-          severity: 'danger',
-          title: settingsStore.t.toasts.user.loadMoreError,
-          description: error,
-        }),
-      )
-      .finally(() => setIsLoading(false));
+    try {
+      const result: {
+        statusCode: number;
+        message?: string;
+        hasNextPage: boolean;
+        nextCursor: string;
+        users: any[];
+      } = await SearchUsers(data);
+
+      if (result.statusCode && result.statusCode !== 200)
+        throw new Error(result.message || '');
+
+      setMembersList((prev) =>
+        append ? [...prev, ...result.users] : (result.users ?? []),
+      );
+      setNextCursor(result.nextCursor || '');
+      setHasMore(result.hasNextPage);
+    } catch (error: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.user.loadMoreError,
+        description: error?.message,
+      });
+    }
+    setIsLoading(false);
   };
 
   useEffect(() => {
