@@ -7,7 +7,6 @@ import { observer } from 'mobx-react-lite';
 import { useDisclosure } from '@heroui/modal';
 import MemberCard from '@/app/lib/components/members/memberCard';
 import CompareByRole from '@/app/lib/utils/compareByRole';
-import { createContext, useContext } from 'react';
 import { Role } from '@/app/lib/types/definitions';
 import AddMembersModal from '@/app/lib/components/members/addMembersModal';
 import {
@@ -16,35 +15,13 @@ import {
 } from '@/app/lib/server/actions/membersServerActions';
 import { addToast } from '@heroui/toast';
 import { useRouter } from 'next/navigation';
-
-interface MembersContextType {
-  memberType: 'team' | 'project';
-  myRole: Role | null;
-  removeMember: (
-    id: string,
-    newOwnerId?: string | null,
-    removeType?: 'breakup' | 'entire' | null,
-  ) => void;
-  updateMemberRole: (
-    id: string,
-    newRole: Role,
-    changeType?: 'override' | 'updateMax' | null,
-  ) => void;
-}
-
-const MembersContext = createContext<MembersContextType | null>(null);
-export const useMembersContext = () => {
-  const context = useContext(MembersContext);
-  if (!context)
-    throw new Error('useContext must be used within a ContextProvider');
-  return context;
-};
+import MembersContext from '@/app/lib/hooks/useMembersContext';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const AllProjectMembers = observer(() => {
+  const { isMobile } = useAdaptiveParams();
   const router = useRouter();
-  const myRole: Role | null =
-    projectsStore.activeProject?.members.toSorted(CompareByRole)[0].role ||
-    null;
+  const myRole: Role | null = projectsStore.myRole ?? null;
   const {
     isOpen: isAddMemberOpen,
     onOpen: onAddMemberOpen,
@@ -112,6 +89,8 @@ const AllProjectMembers = observer(() => {
         }}
       >
         <ContentSection
+          hideTitle={isMobile}
+          data-testid="all-project-members"
           sectionTitle={settingsStore.t.projects.projectMembers}
           data={
             projectsStore.activeProject?.members.toSorted(CompareByRole) || []
@@ -119,10 +98,12 @@ const AllProjectMembers = observer(() => {
           DataCard={MemberCard}
           filter
           addMember={onAddMemberOpen}
+          type="project"
         />
       </MembersContext.Provider>
       {isAddMemberOpen && (
         <AddMembersModal
+          type="all"
           isOpen={isAddMemberOpen}
           onOpenChange={onAddMemberOpenChange}
         />

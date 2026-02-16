@@ -5,12 +5,14 @@ import { UsersController } from './users.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { Counter, CounterSchema } from './schemas/user-counter.schema';
 import { ProjectModule } from '../projects/projects.module';
+import { TeamModule } from '../teams/teams.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Counter.name, schema: CounterSchema }]),
     forwardRef(() => ProjectModule),
+    forwardRef(() => TeamModule),
   ],
   controllers: [UsersController],
   providers: [UsersService],

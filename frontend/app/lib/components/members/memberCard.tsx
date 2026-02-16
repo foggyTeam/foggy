@@ -10,7 +10,7 @@ import userStore from '@/app/stores/userStore';
 import settingsStore from '@/app/stores/settingsStore';
 import Link from 'next/link';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
-import { useMembersContext } from '@/app/lib/components/projects/allProjectMembers';
+import { useMembersContext } from '@/app/lib/hooks/useMembersContext';
 import RemoveTeamMemberModal from '@/app/lib/components/members/removeTeamMemberModal';
 import SelectOwnerModal from '@/app/lib/components/members/selectOwnerModal';
 import { useMemberModals } from '@/app/lib/hooks/useMemberModals';
@@ -19,7 +19,8 @@ import ChangeRoleModal from '@/app/lib/components/members/changeRoleModal';
 
 export default function MemberCard(member: ProjectMember | TeamMember) {
   const { currentStep, nextStep, resetSequence } = useMemberModals();
-  const { myRole, updateMemberRole, removeMember } = useMembersContext();
+  const { myRole, updateMemberRole, removeMember, memberType } =
+    useMembersContext();
 
   const areYouSureModalText = {
     newOwner: {
@@ -86,9 +87,9 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
     <>
       <div
         className={clsx(
-          'box-border flex items-center justify-between gap-1 rounded-2xl bg-white px-3 py-2 shadow-container hover:bg-default-50',
+          'hover:bg-default-50 shadow-container box-border flex items-center justify-between gap-1 rounded-2xl bg-[hsl(var(--heroui-background))] px-3 py-2',
           el_animation,
-          'h-16 w-[98%] max-w-[379px]',
+          'h-16 w-[98%] sm:max-w-[379px]',
           team_tile,
         )}
       >
@@ -97,19 +98,19 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
             size="md"
             color="primary"
             className="min-h-10 min-w-10"
-            name={member.nickname.toUpperCase()}
+            name={member.nickname?.toUpperCase()}
             src={member.avatar}
           />
           <div className="flex h-full w-full flex-col items-start justify-between">
             <div className="flex items-center gap-1">
-              <h1 className="max-w-32 truncate text-nowrap font-medium">
+              <h1 className="max-w-32 truncate font-medium text-nowrap">
                 {/* TODO: navigate to member page */}
                 <Link href="/" className="accent-link">
                   {member.nickname}
                 </Link>
               </h1>
               {userStore.user?.id === member.id && (
-                <p className="text-xs text-default-700">
+                <p className="text-default-700 text-xs">
                   {settingsStore.t.main.you}
                 </p>
               )}
@@ -125,7 +126,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
 
         <div className="flex h-full w-fit items-center justify-start gap-2">
           <>
-            {CheckAccess(['admin', 'owner']) && (
+            {CheckAccess(['admin', 'owner'], memberType) && (
               <Button
                 isDisabled={
                   (member.role === 'owner' && myRole !== 'owner') ||
@@ -136,7 +137,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 variant="light"
                 size="sm"
               >
-                <IdCardIcon className="stroke-default-300" />
+                <IdCardIcon className="stroke-default-500" />
               </Button>
             )}
             {userStore.user?.id === member.id ? (
@@ -157,7 +158,7 @@ export default function MemberCard(member: ProjectMember | TeamMember) {
                 <LogOutIcon className="stroke-danger" />
               </Button>
             ) : (
-              CheckAccess(['admin', 'owner']) && (
+              CheckAccess(['admin', 'owner'], memberType) && (
                 <Button
                   isDisabled={
                     member.role === 'owner' ||

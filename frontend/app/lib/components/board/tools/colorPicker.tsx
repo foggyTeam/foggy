@@ -2,8 +2,8 @@ import { HexAlphaColorPicker } from 'react-colorful';
 import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import { CopyIcon } from 'lucide-react';
-import { addToast } from '@heroui/toast';
-import settingsStore from '@/app/stores/settingsStore';
+import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function ColorPicker({
   value,
@@ -12,6 +12,8 @@ export default function ColorPicker({
   value: string;
   changeValue: any;
 }) {
+  const { commonSize } = useAdaptiveParams();
+
   return (
     <>
       <HexAlphaColorPicker
@@ -24,7 +26,7 @@ export default function ColorPicker({
         onValueChange={changeValue}
         color={'primary'}
         variant="underlined"
-        size="sm"
+        size={commonSize}
         className="w-[89.2%]"
         classNames={{
           input: 'text-default-500 font-medium',
@@ -32,28 +34,13 @@ export default function ColorPicker({
         endContent={
           <Button
             onPress={() => {
-              navigator.clipboard
-                .writeText(value)
-                .catch(() =>
-                  addToast({
-                    color: 'danger',
-                    severity: 'danger',
-                    title: settingsStore.t.toasts.copyError,
-                  }),
-                )
-                .then(() =>
-                  addToast({
-                    color: 'default',
-                    severity: 'default',
-                    title: settingsStore.t.toasts.copySuccess,
-                  }),
-                );
+              CopyToClipboard(value);
             }}
             isIconOnly
-            size="sm"
+            size={commonSize}
             variant="light"
           >
-            <CopyIcon className="h-5 w-5 stroke-default-500" />
+            <CopyIcon className="stroke-default-600 h-5 w-5" />
           </Button>
         }
       />

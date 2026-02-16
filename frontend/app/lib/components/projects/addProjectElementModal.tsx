@@ -8,6 +8,7 @@ import { Input } from '@heroui/input';
 import { Button } from '@heroui/button';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { projectElementNameSchema } from '@/app/lib/types/schemas';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function AddProjectElementModal({
   isOpen,
@@ -22,6 +23,7 @@ export default function AddProjectElementModal({
   boardOnly?: boolean;
   sectionOnly?: boolean;
 }) {
+  const { smallerSize } = useAdaptiveParams();
   const [name, setName] = useState<string>('');
   const [error, setError] = useState({} as any);
   const [filetype, setFiletype] = useState<ProjectElementTypes>(
@@ -44,7 +46,12 @@ export default function AddProjectElementModal({
   }, [name, setError]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      data-testid="add-project-element-modal"
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+    >
       <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
         {(onClose) =>
           (
@@ -58,10 +65,11 @@ export default function AddProjectElementModal({
                   variant="light"
                   disabledKeys={disabledKeys}
                   aria-label="Filtypes"
-                  size="lg"
+                  size={smallerSize}
                 >
                   {filetypeTabs.map((filetype) => (
                     <Tab
+                      data-testid={`${filetype.toLowerCase()}-btn`}
                       key={filetype}
                       title={<ElementIcon elementType={filetype} />}
                     />
@@ -86,12 +94,12 @@ export default function AddProjectElementModal({
                   isInvalid={error.name}
                   errorMessage={error.name}
                   radius="full"
-                  size="sm"
+                  size={smallerSize}
                   type="text"
                   className="m-0 w-56 p-0"
                   classNames={{
-                    inputWrapper: 'text-sm',
-                    input: 'text-sm',
+                    inputWrapper: 'sm:text-sm text-medium',
+                    input: 'sm:text-sm text-medium',
                   }}
                   placeholder={
                     settingsStore.t.projects.addElement[
@@ -105,6 +113,7 @@ export default function AddProjectElementModal({
                 />
                 {/* Maybe some presets here*/}
                 <Button
+                  data-testid="create-btn"
                   onPress={() => action(name, filetype)}
                   isDisabled={error.name}
                   color="primary"

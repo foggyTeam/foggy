@@ -5,34 +5,54 @@ import settingsStore from '@/app/stores/settingsStore';
 import { CheckIcon, SearchIcon } from 'lucide-react';
 import SmallMemberCard from '@/app/lib/components/members/smallMemberCard';
 import React, { useEffect, useState } from 'react';
-import { ProjectMember, Team } from '@/app/lib/types/definitions';
+import { ProjectMember, Team, TeamMember } from '@/app/lib/types/definitions';
 import FilterCard from '@/app/lib/components/filters/filterCard';
 import { useInfiniteScroll } from '@heroui/use-infinite-scroll';
 import { useMembersList } from '@/app/lib/hooks/useMembersList';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+
+interface SelectedMember {
+  id: string;
+  type: 'user' | 'team';
+}
 
 export default function MemberAutocomplete({
-  setSelectedId,
+  setSelected,
+  memberType,
 }: {
-  setSelectedId: (
-    newId: ((prevState: string[]) => string[]) | string[],
+  setSelected: (
+    newMember:
+      | ((prevState: SelectedMember[]) => SelectedMember[])
+      | SelectedMember[],
   ) => void;
+  memberType: 'project' | 'team' | 'all';
 }) {
+  const { smallerSize } = useAdaptiveParams();
   const [selectedMembers, setSelectedMembers] = useState<
     Array<
       | Pick<ProjectMember, 'id' | 'nickname' | 'avatar'>
       | Pick<Team, 'id' | 'name' | 'avatar'>
+      | Pick<TeamMember, 'id' | 'nickname' | 'avatar'>
     >
   >([]);
   const [inputValue, setInputValue] = useState('');
 
-  const { membersList, isLoading, hasMore, onLoadMore } = useMembersList({
+  const {
+    membersList,
+    isLoading,
+    hasMoreUsers,
+    hasMoreTeams,
+    onLoadMoreUsers,
+    onLoadMoreAll,
+  } = useMembersList({
     inputValue,
+    memberType,
   });
   const [, scrollerRef] = useInfiniteScroll({
-    hasMore,
+    hasMore: memberType === 'all' ? hasMoreTeams || hasMoreUsers : hasMoreUsers,
     isEnabled: true,
     shouldUseLoader: false,
-    onLoadMore,
+    onLoadMore: memberType === 'all' ? onLoadMoreAll : onLoadMoreUsers,
   });
 
   const handleSelectionChange = (key: any | null) => {
@@ -49,7 +69,10 @@ export default function MemberAutocomplete({
   };
 
   useEffect(() => {
-    setSelectedId(selectedMembers.map((member) => member.id));
+    const selected: SelectedMember[] = selectedMembers.map((member) => {
+      return { id: member.id, type: 'name' in member ? 'team' : 'user' };
+    });
+    setSelected(selected);
     setInputValue('');
   }, [selectedMembers]);
 
@@ -61,22 +84,25 @@ export default function MemberAutocomplete({
         items={membersList}
         onSelectionChange={handleSelectionChange}
         radius="full"
-        size="sm"
+        size={smallerSize}
         variant="flat"
         type="text"
         className="w-full"
         classNames={{
           popoverContent: clsx(
             bg_container_no_padding,
-            'p-2 sm:p-3 bg-opacity-90 border-default-500',
+            'p-2 sm:p-3 bg-[hsl(var(--heroui-background))]/90 border-default',
           ),
+          base: 'sm:text-small text-medium',
         }}
         listboxProps={{
           selectionMode: 'multiple',
           hideSelectedIcon: true,
         }}
-        placeholder={settingsStore.t.members.addMember.searchPlaceholder}
-        selectorIcon={<SearchIcon className="stroke-default-500" />}
+        placeholder={
+          settingsStore.t.members.addMember.searchPlaceholder[memberType]
+        }
+        selectorIcon={<SearchIcon className="stroke-default-600" />}
         allowsCustomValue
         menuTrigger="input"
         scrollRef={scrollerRef}
@@ -100,7 +126,7 @@ export default function MemberAutocomplete({
                   />
                   {selectedMembers.find(
                     (selectedMember) => selectedMember.id === member.id,
-                  ) && <CheckIcon className="stroke-default-500" />}
+                  ) && <CheckIcon className="stroke-default-600" />}
                 </div>
               </AutocompleteItem>
             ) as any,

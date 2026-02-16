@@ -95,8 +95,10 @@ export interface Project {
   lastChange: string;
 }
 
-export interface RawProject
-  extends Omit<Project, 'sections' | 'members' | 'lastChange'> {
+export interface RawProject extends Omit<
+  Project,
+  'sections' | 'members' | 'lastChange'
+> {
   members: any[];
   updatedAt: string;
   sections: any[];
@@ -132,11 +134,24 @@ export interface Team {
   id: string;
   name: string;
   avatar?: string;
+  settings: TeamSettings;
   members: TeamMember[];
   projects: Project[];
 }
 
+export interface RawTeam extends Omit<Team, 'id' | 'members' | 'projects'> {
+  id: string;
+  members: TeamMember[];
+  projects: any[];
+}
+
 export type Role = 'owner' | 'admin' | 'editor' | 'reader';
+
+export class TeamSettings {
+  allowRequests: boolean = true;
+  memberListIsPublic: boolean = true;
+  projectListIsPublic: boolean = true;
+}
 
 export interface TeamMember {
   id: string;

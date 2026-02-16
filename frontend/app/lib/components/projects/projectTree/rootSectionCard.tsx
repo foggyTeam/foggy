@@ -14,8 +14,10 @@ import { UpdateSection } from '@/app/lib/server/actions/projectServerActions';
 import { observer } from 'mobx-react-lite';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const RootSectionCard = observer(({ id }: { id: string }) => {
+  const { smallerSize } = useAdaptiveParams();
   const section = projectsStore.getProjectChild(id, []) as ProjectSection;
   const { activeNodes, setActiveNodes, removeNode, addNode } =
     useActiveSectionContext();
@@ -46,11 +48,13 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
 
   return (
     <div
+      aria-expanded={isExpanded}
+      data-testid="section-card"
       tabIndex={0}
       onBlur={() => setActiveNodes([])}
       className={clsx(
         'flex flex-col items-start justify-start rounded-2xl',
-        'w-full bg-white px-3 py-2 shadow-container hover:bg-default-50',
+        'hover:bg-default-50 shadow-container w-full bg-[hsl(var(--heroui-background))] px-3 py-2',
         'max-h-16 transition-all duration-500',
         !isExpanded && el_animation,
         isExpanded && 'max-h-[1000px]',
@@ -65,7 +69,7 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
           )
         }
         className={clsx(
-          'group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-1 hover:bg-default-100',
+          'hover:bg-default-100 group flex w-full cursor-pointer items-center justify-between gap-0 rounded-xl p-0.5 sm:p-1',
           activeNodes.length &&
             activeNodes.findIndex((node) => node.id == section.id) > -1 &&
             'bg-primary-100 hover:bg-primary-100',
@@ -73,21 +77,23 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
       >
         <div className="flex h-full w-full items-center">
           <Button
+            data-testid="expand-btn"
             isIconOnly
             onPress={() => setIsExpanded(!isExpanded)}
             variant="light"
-            size="sm"
+            size={smallerSize}
           >
             <ChevronRightIcon
               className={clsx(
-                'stroke-default-500 transition-transform',
+                'stroke-default-600 transition-transform',
                 isExpanded && 'rotate-90',
               )}
             />
           </Button>
           <NameInput
             isReadonly={
-              isReadonly || !CheckAccess(['admin', 'owner', 'editor'])
+              isReadonly ||
+              !CheckAccess(['admin', 'owner', 'editor'], 'project')
             }
             setIsReadonly={setIsReadonly}
             onBlur={updateSectionName}
@@ -98,23 +104,25 @@ const RootSectionCard = observer(({ id }: { id: string }) => {
             maxW="lg"
           />
         </div>
-        {CheckAccess(['admin', 'owner', 'editor']) && (
-          <div className="invisible flex h-full w-fit items-center justify-end gap-2 pr-2 group-hover:visible">
+        {CheckAccess(['admin', 'owner', 'editor'], 'project') && (
+          <div className="flex h-full w-fit items-center justify-end gap-0.5 pr-1 group-hover:visible sm:invisible sm:gap-2 sm:pr-2">
             <>
               <Button
+                data-testid="add-child-btn"
                 isIconOnly
                 onPress={() => addNode([section.id])}
                 variant="light"
-                size="sm"
+                size={smallerSize}
               >
-                <PlusIcon className="stroke-default-500" />
+                <PlusIcon className="stroke-default-600" />
               </Button>
               <Button
+                data-testid="delete-btn"
                 isIconOnly
                 onPress={() => removeNode(section.id, [], true)}
                 variant="light"
                 color="danger"
-                size="sm"
+                size={smallerSize}
               >
                 <TrashIcon className="stroke-danger-500" />
               </Button>

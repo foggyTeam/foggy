@@ -9,6 +9,8 @@ import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import React from 'react';
 import Link from 'next/link';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import settingsStore from '@/app/stores/settingsStore';
+import boardStore from '@/app/stores/boardStore';
 
 const RecentBar = observer(
   ({
@@ -23,10 +25,10 @@ const RecentBar = observer(
         <div
           onClick={openSideBar}
           className={clsx(
-            'absolute left-0 top-1/3 z-50 flex w-fit flex-col items-center' +
+            'absolute top-1/3 left-0 z-50 flex w-fit flex-col items-center' +
               ' justify-center gap-1 rounded-l-none rounded-r-[64px] px-3 py-6',
             bg_container,
-            'transform transition-all hover:bg-opacity-65 hover:pl-4',
+            'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-4',
           )}
         >
           {projectsStore.recentBoards.map((board) => (
@@ -34,9 +36,10 @@ const RecentBar = observer(
               <Button
                 as={Link}
                 href={board.url}
+                onClick={() => settingsStore.startLoading()}
                 isIconOnly
                 variant={
-                  board.url.endsWith(projectsStore.activeBoard?.id || '')
+                  board.url.endsWith(boardStore.activeBoard?.id || '')
                     ? 'flat'
                     : 'light'
                 }
@@ -49,7 +52,7 @@ const RecentBar = observer(
           ))}
 
           <Button onPress={onAddOpen} isIconOnly variant="light" size="md">
-            <PlusIcon className="stroke-default-500" />
+            <PlusIcon className="stroke-default-600" />
           </Button>
         </div>
       </>

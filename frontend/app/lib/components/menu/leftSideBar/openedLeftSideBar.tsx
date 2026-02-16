@@ -29,6 +29,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
 import { addToast } from '@heroui/toast';
+import boardStore from '@/app/stores/boardStore';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -149,10 +150,12 @@ const OpenedLeftSideBar = observer(
 
     const handleChildClick = (child: ProjectSection | Board) => {
       if ('children' in child) setParentList((prev) => [...prev, child.id]);
-      else
+      else {
+        settingsStore.startLoading();
         router.push(
           `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
         );
+      }
     };
     const removeNode = (id: string, isSection: boolean) => {
       setNodeToRemove({ id: id, parentList: parentList, isSection });
@@ -161,7 +164,7 @@ const OpenedLeftSideBar = observer(
     const handleRemoveNode = async () => {
       if (!projectsStore.activeProject) return;
       if (nodeToRemove) {
-        if (nodeToRemove.id === projectsStore.activeBoard?.id)
+        if (nodeToRemove.id === boardStore.activeBoard?.id)
           router.push(`/project/${projectsStore.activeProject?.id}`);
 
         try {
@@ -210,7 +213,7 @@ const OpenedLeftSideBar = observer(
             bg_container,
             left_sidebar_layout,
             'h-fit w-fit overflow-clip',
-            'transform transition-all hover:bg-opacity-65 hover:pl-0.5',
+            'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-0.5',
           )}
         >
           <DrawerContent className="gap-4">
@@ -239,7 +242,7 @@ const OpenedLeftSideBar = observer(
                   itemsAfterCollapse={1}
                 >
                   <BreadcrumbItem onPress={handleOpenRoot}>
-                    <p className="w-full overflow-hidden text-ellipsis text-nowrap">
+                    <p className="w-full overflow-hidden text-nowrap text-ellipsis">
                       {(projectsStore.activeProject?.name || '').toUpperCase()}
                     </p>
                   </BreadcrumbItem>
@@ -248,7 +251,7 @@ const OpenedLeftSideBar = observer(
                     : parentList
                   ).map((sectionId) => (
                     <BreadcrumbItem key={sectionId} onPress={handleOpenParent}>
-                      <p className="w-full overflow-hidden text-ellipsis text-nowrap">
+                      <p className="w-full overflow-hidden text-nowrap text-ellipsis">
                         {activeSection &&
                         'id' in activeSection &&
                         sectionId === activeSection.id
@@ -265,13 +268,13 @@ const OpenedLeftSideBar = observer(
                   variant="light"
                   size="md"
                 >
-                  <SettingsIcon className="stroke-default-500" />
+                  <SettingsIcon className="stroke-default-600" />
                 </Button>
               </div>
               <div
                 className={clsx(
                   'relative h-full w-full flex-1 overflow-y-auto',
-                  'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+                  'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
                   'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
                 )}
               >
@@ -309,9 +312,7 @@ const OpenedLeftSideBar = observer(
                         return (
                           <LeftSideBarElementCard
                             element={child as Board}
-                            isActive={
-                              child.id === projectsStore.activeBoard?.id
-                            }
+                            isActive={child.id === boardStore.activeBoard?.id}
                             key={child.id}
                             handleClick={() => handleChildClick(child as Board)}
                             addNode={() => onAddOpen(child.id)}

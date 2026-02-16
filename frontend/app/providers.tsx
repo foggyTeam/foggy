@@ -3,6 +3,7 @@ import { HeroUIProvider } from '@heroui/react';
 import React from 'react';
 import { SessionProvider } from 'next-auth/react';
 import { Session } from 'next-auth';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { ToastProvider } from '@heroui/toast';
 
 export function Providers({
@@ -15,7 +16,11 @@ export function Providers({
   return (
     <SessionProvider session={session}>
       <ToastProvider toastOffset={4} />
-      <HeroUIProvider>{children}</HeroUIProvider>
+      <HeroUIProvider>
+        <NextThemesProvider attribute="class" defaultTheme="system">
+          {children}
+        </NextThemesProvider>
+      </HeroUIProvider>
     </SessionProvider>
   );
 }

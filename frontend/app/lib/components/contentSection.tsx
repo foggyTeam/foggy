@@ -2,13 +2,19 @@
 
 import {
   FilterSet,
+  Notification,
   Project,
   ProjectMember,
   Team,
   TeamMember,
-  Notification,
 } from '@/app/lib/types/definitions';
-import { ComponentType, useMemo, useReducer, useState } from 'react';
+import {
+  ComponentType,
+  HTMLAttributes,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 
 import { Avatar } from '@heroui/avatar';
 import ContentActionBar, {
@@ -21,18 +27,28 @@ import FilterModal from '@/app/lib/components/filters/filterModal';
 import useFilteredData from '@/app/lib/hooks/useFilteredData';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
+import EmptyState, { EmptyStateProps } from '@/app/lib/components/emptyState';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 interface ContentSectionProps {
   sectionTitle?: string;
+  hideTitle?: boolean;
   sectionAvatar?: string;
-  data: Project[] | Team[] | TeamMember[] | ProjectMember[] | Notification[];
+  data:
+    | Project[]
+    | Team[]
+    | TeamMember[]
+    | ProjectMember[]
+    | (Notification & { isNew?: boolean })[];
   DataCard: ComponentType<any>;
+  emptyState?: EmptyStateProps;
   filter?: boolean;
   onlyFavorite?: boolean;
   onlyWithNotification?: boolean;
   addNew?: any;
   addMember?: any;
   openSettings?: any;
+  type?: 'project' | 'team';
 }
 
 export type FilterReducerActionPayload = {
@@ -82,16 +98,21 @@ function filtersReducer(state: FilterSet, action: FilterReducerAction) {
 // TODO: add loading state
 export default function ContentSection({
   sectionTitle,
+  hideTitle,
   sectionAvatar,
   data,
   DataCard,
+  emptyState,
   filter,
   onlyFavorite,
   onlyWithNotification,
   addNew,
   addMember,
   openSettings,
-}: ContentSectionProps) {
+  type,
+  ...rest
+}: ContentSectionProps & HTMLAttributes<HTMLDivElement>) {
+  const { isMobile } = useAdaptiveParams();
   const [searchValue, setSearchValue] = useState('');
   const [filters, dispatchFilters] = useReducer(
     filtersReducer,
@@ -116,10 +137,12 @@ export default function ContentSection({
 
   const actionBarProps = useMemo(() => {
     const props: ActionBarProps = {
+      type,
       setSearchValue,
       addNew,
       addMember,
       openSettings,
+      filtersDisabled: !data.length,
     };
 
     if (filter) {
@@ -147,12 +170,15 @@ export default function ContentSection({
 
   return (
     <>
-      <div className="flex h-full w-full flex-col gap-2 overflow-clip text-sm">
+      <div
+        {...rest}
+        className="text-medium flex h-full w-full flex-col gap-2 overflow-x-visible overflow-y-clip sm:text-sm"
+      >
         <div className="flex flex-col gap-1">
-          {sectionTitle && (
+          {sectionTitle && !hideTitle && (
             <div className="flex h-10 items-center justify-start gap-2">
-              {sectionAvatar?.length && (
-                <Avatar size="md" src={sectionAvatar} />
+              {sectionAvatar !== undefined && (
+                <Avatar size="md" name={sectionTitle} src={sectionAvatar} />
               )}
               <h1 className="font-medium">{sectionTitle}</h1>
             </div>
@@ -168,24 +194,41 @@ export default function ContentSection({
 
         <div
           className={clsx(
-            'relative h-full w-full flex-1 overflow-y-auto pt-0.5',
-            'scrollbar-thin scrollbar-track-white/20 scrollbar-thumb-default-300',
+            'relative h-full w-full flex-1 overflow-x-visible overflow-y-auto pt-0.5',
+            'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
             'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
           )}
         >
-          <div
-            className="grid-rows-auto grid content-between gap-y-2 pb-16"
-            style={{
-              gridTemplateColumns: 'repeat(auto-fill, 97px)',
-            }}
-          >
-            {filteredData.map((element) => (
-              <DataCard key={element.id} {...element} />
-            ))}
-          </div>
+          {!!filteredData.length && (
+            <div
+              data-testid="content-section-content"
+              className="grid-rows-auto grid content-between gap-y-2 pb-16"
+              style={{
+                gridTemplateColumns: isMobile
+                  ? '1fr'
+                  : 'repeat(auto-fill, 97px)',
+              }}
+            >
+              {filteredData.map((element) => (
+                <DataCard key={element.id} {...element} />
+              ))}
+            </div>
+          )}
+
+          {!!data.length && !filteredData.length && (
+            <EmptyState
+              className="pb-16"
+              title={settingsStore.t.filters.emptyResult.title}
+              text={settingsStore.t.filters.emptyResult.text}
+              illustrationType="question"
+            />
+          )}
+          {!data.length && emptyState && (
+            <EmptyState className="pb-16" {...emptyState} />
+          )}
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-50 h-16 bg-gradient-to-t from-default-50/50" />
+        <div className="from-default-50/50 absolute inset-x-0 bottom-0 z-50 h-16 bg-linear-to-t" />
       </div>
 
       {isFiltersOpen && (

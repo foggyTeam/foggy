@@ -5,11 +5,13 @@ import { Button } from '@heroui/button';
 import Link from 'next/link';
 import clsx from 'clsx';
 import { ChevronLeftIcon } from 'lucide-react';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function RightSideBarElementCard({
   link = { href: '/', Icon: ChevronLeftIcon, text: '' },
   element,
   isActive,
+  type,
 }: {
   link?: {
     href: string;
@@ -18,23 +20,19 @@ export default function RightSideBarElementCard({
   };
   element?: Project | Team;
   isActive?: boolean;
+  type?: 'team' | 'project';
 }) {
+  const { smallerSize } = useAdaptiveParams();
   return (
     <Button
       as={Link}
-      href={
-        (element &&
-          ('projects' in element
-            ? `/team/${element.id}`
-            : `/project/${element.id}`)) ||
-        link.href
-      }
-      className="flex h-fit w-full items-center justify-between gap-1 rounded-full bg-white/25 pl-0 pr-1 transition-colors duration-300 shadow-container hover:bg-primary-100"
+      href={(element && type && `/${type}/${element.id}`) || link.href}
+      className="shadow-container sm:text-small hover:bg-primary-100 text-medium flex h-10 w-full items-center justify-between gap-1 rounded-full bg-[hsl(var(--heroui-background))]/25 pr-1 pl-0 transition-colors duration-300 sm:h-fit"
     >
       <div className="flex items-center justify-start gap-1">
         {element ? (
           <Avatar
-            size="sm"
+            size={smallerSize}
             color="primary"
             classNames={{
               base: 'border-default-50 border-1.5',
@@ -44,7 +42,7 @@ export default function RightSideBarElementCard({
             src={element.avatar}
           />
         ) : (
-          <link.Icon className="h-8 w-8 stroke-default-500 p-1" />
+          <link.Icon className="stroke-default-600 h-10 w-10 p-1 sm:h-8 sm:w-8" />
         )}
         <p className={clsx('font-medium', isActive && 'text-f_accent')}>
           {element ? element.name : link.text}

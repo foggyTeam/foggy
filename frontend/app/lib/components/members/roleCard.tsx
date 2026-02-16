@@ -3,11 +3,11 @@ import { Role } from '@/app/lib/types/definitions';
 
 export const rolesList: Role[] = ['admin', 'editor', 'reader', 'owner'];
 export const colorMap: any = {
-  owner: info.DEFAULT,
-  admin: danger.DEFAULT,
-  editor: success.DEFAULT,
-  reader: warning.DEFAULT,
-  default: primary.DEFAULT,
+  owner: info.light.DEFAULT,
+  admin: danger.light.DEFAULT,
+  editor: success.light.DEFAULT,
+  reader: warning.light.DEFAULT,
+  default: primary.light.DEFAULT,
 };
 
 export default function RoleCard({ role }: { role: Role | string }) {
@@ -16,9 +16,9 @@ export default function RoleCard({ role }: { role: Role | string }) {
   return (
     <div
       style={{ borderColor: cardColor }}
-      className="flex w-fit min-w-[72px] max-w-32 items-center justify-center gap-1 rounded-full border-1.5 px-3 py-0.5"
+      className="border-1.5 flex w-fit max-w-32 min-w-[72px] items-center justify-center gap-1 rounded-full px-3 py-0.5"
     >
-      <p style={{ color: cardColor }} className="truncate text-nowrap text-xs">
+      <p style={{ color: cardColor }} className="truncate text-xs text-nowrap">
         {role}
       </p>
     </div>
