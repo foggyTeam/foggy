@@ -29,7 +29,6 @@ function getBoundingBox(stage: Stage, layers: BoardElement[][]) {
       if (!node) continue;
 
       const r = node.getClientRect({ skipTransform: false });
-
       if (r.width <= 0 || r.height <= 0) continue;
 
       box = box ? unionRect(box, r) : r;
@@ -47,9 +46,20 @@ function getBoundingBox(stage: Stage, layers: BoardElement[][]) {
   };
 }
 
+function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  type: string,
+  quality: number = 0.92,
+): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    canvas.toBlob((b) => resolve(b), type, quality);
+  });
+}
+
 export default async function GetBoardImage(
   stageRef: RefObject<Stage | null>,
   boardLayers: BoardElement[][],
+  backgroundColor: string,
 ): Promise<Blob | null> {
   const stage = stageRef.current;
   if (!stage) return null;
@@ -57,34 +67,36 @@ export default async function GetBoardImage(
   const boundingBox = getBoundingBox(stage, boardLayers);
   if (!boundingBox) return null;
 
-  const pixelRatio =
-    boundingBox.width > 2000 || boundingBox.height > 2000
-      ? 1
-      : boundingBox.width > 1000 || boundingBox.height > 1000
-        ? 1.5
-        : 2;
+  const sourceCanvas = stage.toCanvas({
+    ...boundingBox,
+    pixelRatio: 1,
+  });
 
-  const maxSide = Math.max(boundingBox.width, boundingBox.height);
-  const exportScale = maxSide > MAX_SIZE ? MAX_SIZE / maxSide : 0.95;
+  const srcW = sourceCanvas.width;
+  const srcH = sourceCanvas.height;
 
-  try {
-    const blob: Blob | any = await stage.toBlob({
-      ...boundingBox,
-      pixelRatio,
-      mimeType: 'image/jpeg',
-      quality: exportScale,
-    });
-    const url = stage.toDataURL({
-      ...boundingBox,
-      pixelRatio,
-      mimeType: 'image/jpeg',
-      quality: exportScale,
-    });
+  const maxSide = Math.max(srcW, srcH);
+  const downScale = maxSide > MAX_SIZE ? MAX_SIZE / maxSide : 1;
 
-    console.log(url);
+  const outW = Math.max(1, Math.round(srcW * downScale));
+  const outH = Math.max(1, Math.round(srcH * downScale));
 
-    return blob ?? null;
-  } catch {
-    return null;
-  }
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = outW;
+  outCanvas.height = outH;
+
+  const ctx = outCanvas.getContext('2d');
+  if (!ctx) return null;
+
+  ctx.fillStyle = backgroundColor;
+  ctx.fillRect(0, 0, outW, outH);
+
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+
+  ctx.drawImage(sourceCanvas, 0, 0, outW, outH);
+
+  const jpegQuality = 0.92;
+
+  return await canvasToBlob(outCanvas, 'image/jpeg', jpegQuality);
 }
