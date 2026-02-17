@@ -2,7 +2,10 @@ import crypto from 'crypto';
 
 export default function getHash(s: string): string {
   const secret = process.env.STORAGE_SECRET;
-  const hash = crypto.createHmac('sha256', secret).update(s).digest('hex');
+  const hash = crypto
+    .createHmac('sha256', secret || '')
+    .update(s)
+    .digest('hex');
 
   const num = BigInt(`0x${hash}`);
 

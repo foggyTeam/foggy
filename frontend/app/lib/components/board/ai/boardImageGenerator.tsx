@@ -13,8 +13,10 @@ import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import { uploadImage } from '@/app/lib/server/actions/handleImage';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { observer } from 'mobx-react-lite';
 
-export default function BoardImageGenerator() {
+const BoardImageGenerator = observer(() => {
   const { resolvedTheme } = useTheme();
   const { commonSize } = useAdaptiveParams();
   const { stageRef } = useBoardContext();
@@ -70,16 +72,20 @@ export default function BoardImageGenerator() {
   };
 
   return (
-    <Button
-      data-testid="save-board-image-btn"
-      onPress={handleUpload}
-      isIconOnly
-      isLoading={isLoading}
-      color={foggy_accent.light.DEFAULT}
-      size={commonSize}
-      className="accent-sh absolute bottom-3 left-3 z-50 font-semibold sm:bottom-6 sm:left-6"
-    >
-      <CloudUploadIcon />
-    </Button>
+    <FTooltip placement="right" content={settingsStore.t.toolTips.uploadButton}>
+      <Button
+        data-testid="save-board-image-btn"
+        onPress={handleUpload}
+        isIconOnly
+        isLoading={isLoading}
+        color={foggy_accent.light.DEFAULT as any}
+        size={commonSize}
+        className="accent-sh absolute bottom-3 left-3 z-50 font-semibold sm:bottom-6 sm:left-6"
+      >
+        <CloudUploadIcon />
+      </Button>
+    </FTooltip>
   );
-}
+});
+
+export default BoardImageGenerator;
