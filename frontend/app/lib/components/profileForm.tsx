@@ -16,7 +16,10 @@ import { useDisclosure } from '@heroui/modal';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
 import UploadAvatarButton from '@/app/lib/components/uploadAvatarButton';
-import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
+import {
+  deleteImage,
+  uploadPublicImage,
+} from '@/app/lib/server/actions/handleImage';
 import {
   DeleteUserById,
   SignUserOut,
@@ -62,7 +65,7 @@ const ProfileForm = observer((userData: ProfileData) => {
 
     const imageBlob = await HandleImageUpload(event);
     if (imageBlob && userStore.user) {
-      const response = await uploadImage('avatar', imageBlob);
+      const response = await uploadPublicImage('avatar', imageBlob);
 
       if ('url' in response) {
         await UpdateUserData({

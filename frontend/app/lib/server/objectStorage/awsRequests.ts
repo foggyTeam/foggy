@@ -38,6 +38,38 @@ export const getPublicFileURL = async (
   }
 };
 
+export const getPrivateFileURL = async (
+  fileName: string,
+  directoryName: string,
+  file: Blob,
+) => {
+  const fileType = file.type;
+  const key = `${directoryName}/${fileName}.${fileType.split('/')[1]}`;
+
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+    ContentType: fileType,
+    Expires: 300,
+  };
+
+  try {
+    const uploadURL = await s3.getSignedUrlPromise('putObject', params);
+
+    const response = await axios.put(uploadURL, file, {
+      headers: {
+        'Content-Type': fileType,
+      },
+    });
+
+    if (response.status === 200)
+      return { url: `${s3.endpoint.href}${bucketName}/${key}` };
+    else return { error: response.statusText };
+  } catch (error: any) {
+    return { error: error.response?.data || error.message };
+  }
+};
+
 export const deleteFileByURL = async (url: string) => {
   try {
     const parsedUrl = new URL(url);
