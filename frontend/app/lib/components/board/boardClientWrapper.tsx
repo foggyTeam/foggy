@@ -8,6 +8,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 import Konva from 'konva';
+import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
 
 export default function BoardClientWrapper() {
   const { isMobile } = useAdaptiveParams();
@@ -33,6 +34,7 @@ export default function BoardClientWrapper() {
     <BoardProvider>
       <BoardStage />
       <Cursors />
+      <BoardImageGenerator />
     </BoardProvider>
   );
 }

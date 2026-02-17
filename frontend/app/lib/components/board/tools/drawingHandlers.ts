@@ -6,6 +6,7 @@ import {
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
+import Konva from 'konva';
 
 interface DrawingHandlersProps {
   stageRef: any;
@@ -66,10 +67,17 @@ const getRelativePointerPosition = (stage: any) => {
   };
 };
 
-const getRelativeElementPosition = (stage: any, element: any) => {
-  const stagePosition = stage.getPosition();
-  const x = element.x + stagePosition.x;
-  const y = element.y + stagePosition.y;
+const getRelativeElementPosition = (
+  stage: Konva.Stage,
+  element: BoardElement,
+) => {
+  const stageX = stage.x();
+  const stageY = stage.y();
+  const scale = stage.scaleX();
+
+  const x = (element.x - stageX) / scale;
+  const y = (element.y - stageY) / scale;
+
   return { x, y };
 };
 
