@@ -1,74 +1,47 @@
 import { RefObject } from 'react';
-
-import { BoardElement } from '@/app/lib/types/definitions';
 import Konva from 'konva';
-import Stage = Konva.Stage;
+import { BoardElement } from '@/app/lib/types/definitions';
 
-function getSaveConfig(stage: Stage, layers: BoardElement[][]) {
-  let minX = Infinity,
-    minY = Infinity,
-    maxX = -Infinity,
-    maxY = -Infinity;
+type Stage = Konva.Stage;
 
-  const min = (a: number, b: number) => (a > b ? b : a);
-  const max = (a: number, b: number) => (a > b ? a : b);
+function unionRect(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number },
+) {
+  const x1 = Math.min(a.x, b.x);
+  const y1 = Math.min(a.y, b.y);
+  const x2 = Math.max(a.x + a.width, b.x + b.width);
+  const y2 = Math.max(a.y + a.height, b.y + b.height);
+  return { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
+}
+
+function getBoundingBox(stage: Stage, layers: BoardElement[][]) {
+  let box: { x: number; y: number; width: number; height: number } | null =
+    null;
 
   for (const layer of layers) {
     for (const element of layer) {
-      if (
-        (element.width === 0 || element.height === 0) &&
-        element.type !== 'line'
-      )
-        continue;
+      if (!element?.id) continue;
 
-      const x = element.x;
-      const y = element.y;
+      const node = stage.findOne(`#${element.id}`);
+      if (!node) continue;
 
-      if (element.type === 'line') {
-        for (let i = 0; i < element.points.length; i++) {
-          if (i % 2) {
-            minY = min(minY, y + element.points[i]);
-            maxY = max(maxY, y + element.points[i]);
-          } else {
-            minX = min(minX, x + element.points[i]);
-            maxX = max(maxX, x + element.points[i]);
-          }
-        }
-        continue;
-      }
+      const r = node.getClientRect({ skipTransform: false });
 
-      minX = min(minX, x);
-      minY = min(minY, y);
+      if (r.width <= 0 || r.height <= 0) continue;
 
-      maxX = max(maxX, x + element.width);
-      maxY = max(maxY, y + element.height);
+      box = box ? unionRect(box, r) : r;
     }
   }
 
-  const width = maxX - minX + 1;
-  const height = maxY - minY + 1;
-  const pixelRatio = () => {
-    if (width > 2000 || height > 2000) return 1;
-    if (width > 1000 || height > 1000) return 1.5;
-    return 2;
-  };
+  if (!box) return null;
 
-  const stageX = stage.x();
-  const stageY = stage.y();
-  const scale = stage.scaleX();
-
-  const relativeMinX = (minX - stageX) / scale;
-  const relativeMaxX = (maxX - stageX) / scale;
-  const relativeMinY = (stageY - minY) / scale;
-  const relativeMaxY = (stageY - maxY) / scale;
-
+  const padding = 20;
   return {
-    x: relativeMinX,
-    y: relativeMinY,
-    width: Math.abs(relativeMaxX - relativeMinX),
-    height: Math.abs(relativeMaxY - relativeMinY),
-    pixelRatio: pixelRatio(),
-    mimeType: 'image/jpeg',
+    x: Math.floor(box.x - padding),
+    y: Math.floor(box.y - padding),
+    width: Math.ceil(box.width + padding * 2),
+    height: Math.ceil(box.height + padding * 2),
   };
 }
 
@@ -79,16 +52,31 @@ export default async function GetBoardImage(
   const stage = stageRef.current;
   if (!stage) return null;
 
-  const config = getSaveConfig(stage, boardLayers);
+  const boundingBox = getBoundingBox(stage, boardLayers);
+  if (!boundingBox) return null;
+
+  const pixelRatio =
+    boundingBox.width > 2000 || boundingBox.height > 2000
+      ? 1
+      : boundingBox.width > 1000 || boundingBox.height > 1000
+        ? 1.5
+        : 2;
 
   try {
-    const dataUrl = stageRef.current?.toDataURL(config);
-    const blob: Blob | any = await stageRef.current?.toBlob(config);
-    if (!blob) throw new Error();
-
+    const blob: Blob | any = await stage.toBlob({
+      ...boundingBox,
+      pixelRatio,
+      mimeType: 'image/jpeg',
+    });
+    const dataUrl = stage.toDataURL({
+      ...boundingBox,
+      pixelRatio,
+      mimeType: 'image/jpeg',
+    });
+    console.log(dataUrl);
+    if (!blob) return null;
     return blob;
-  } catch (e: any) {
-    console.error('Failed to create board blob');
+  } catch {
+    return null;
   }
-  return null;
 }
