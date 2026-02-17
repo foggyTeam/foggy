@@ -4,6 +4,8 @@ import { BoardElement } from '@/app/lib/types/definitions';
 
 type Stage = Konva.Stage;
 
+const MAX_SIZE = 2048;
+
 function unionRect(
   a: { x: number; y: number; width: number; height: number },
   b: { x: number; y: number; width: number; height: number },
@@ -62,20 +64,26 @@ export default async function GetBoardImage(
         ? 1.5
         : 2;
 
+  const maxSide = Math.max(boundingBox.width, boundingBox.height);
+  const exportScale = maxSide > MAX_SIZE ? MAX_SIZE / maxSide : 0.95;
+
   try {
     const blob: Blob | any = await stage.toBlob({
       ...boundingBox,
       pixelRatio,
       mimeType: 'image/jpeg',
+      quality: exportScale,
     });
-    const dataUrl = stage.toDataURL({
+    const url = stage.toDataURL({
       ...boundingBox,
       pixelRatio,
       mimeType: 'image/jpeg',
+      quality: exportScale,
     });
-    console.log(dataUrl);
-    if (!blob) return null;
-    return blob;
+
+    console.log(url);
+
+    return blob ?? null;
   } catch {
     return null;
   }
