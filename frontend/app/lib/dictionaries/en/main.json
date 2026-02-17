@@ -406,7 +406,8 @@
       "layerTop": "Bring to front",
       "deleteTool": "Delete"
     },
-    "resetStage": "Reset position"
+    "resetStage": "Reset position",
+    "uploadButton": "Get board image temporary link"
   },
 
   "errors": {
