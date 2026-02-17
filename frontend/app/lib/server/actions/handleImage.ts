@@ -2,33 +2,30 @@
 
 import {
   deleteFileByURL,
-  getPrivateFileURL,
   getPublicFileURL,
 } from '@/app/lib/server/objectStorage/awsRequests';
-import getHash from '@/app/lib/utils/getStringHash';
+import getHash, { getRandomString } from '@/app/lib/utils/getStringHash';
 import getUserId from '@/app/lib/getUserId';
 
-export async function uploadPublicImage(
-  directoryName: string,
-  image: Blob | string,
-) {
-  return await getPublicFileURL(
-    getHash((await getUserId()) + Date().toString()),
-    directoryName,
-    image as Blob,
-  );
-}
+type NameConfig = {
+  type: 'hash' | 'random';
+  base?: string;
+};
 
-export async function uploadPrivateImage(
-  hashBase: string,
+export async function uploadImage(
   directoryName: string,
   image: Blob | string,
+  prefix: string = '',
+  nameConfig: NameConfig = {
+    type: 'hash',
+  },
 ) {
-  return await getPrivateFileURL(
-    getHash(hashBase),
-    directoryName,
-    image as Blob,
-  );
+  let name =
+    prefix +
+    (nameConfig.type === 'hash'
+      ? getHash(nameConfig.base || (await getUserId()) + Date().toString())
+      : getRandomString());
+  return await getPublicFileURL(name, directoryName, image as Blob);
 }
 
 export async function deleteImage(fileURL: string) {

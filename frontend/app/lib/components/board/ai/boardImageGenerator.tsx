@@ -11,7 +11,7 @@ import boardStore from '@/app/stores/boardStore';
 import { useTheme } from 'next-themes';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import { uploadPrivateImage } from '@/app/lib/server/actions/handleImage';
+import { uploadImage } from '@/app/lib/server/actions/handleImage';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 
 export default function BoardImageGenerator() {
@@ -44,10 +44,11 @@ export default function BoardImageGenerator() {
     }
 
     try {
-      const result = await uploadPrivateImage(
-        boardStore.activeBoard.id,
+      const result = await uploadImage(
         'board_images',
         blob,
+        'board_temp_image_',
+        { type: 'hash', base: boardStore.activeBoard.id },
       );
       if ('error' in result) throw new Error(result.error);
 

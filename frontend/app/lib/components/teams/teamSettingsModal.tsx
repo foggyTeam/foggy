@@ -16,10 +16,7 @@ import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import userStore from '@/app/stores/userStore';
-import {
-  deleteImage,
-  uploadPublicImage,
-} from '@/app/lib/server/actions/handleImage';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
 import teamsStore from '@/app/stores/teamsStore';
 import {
@@ -77,7 +74,7 @@ const TeamSettingsModal = observer(
       if (!userStore.user) return;
       const imageBlob = await HandleImageUpload(event);
       if (imageBlob) {
-        const response = await uploadPublicImage('teams_data', imageBlob);
+        const response = await uploadImage('teams_data', imageBlob);
 
         if ('url' in response && response.url) {
           if (avatar)

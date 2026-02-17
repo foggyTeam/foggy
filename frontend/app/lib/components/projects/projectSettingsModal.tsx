@@ -26,10 +26,7 @@ import {
   UpdateProject,
 } from '@/app/lib/server/actions/projectServerActions';
 import userStore from '@/app/stores/userStore';
-import {
-  deleteImage,
-  uploadPublicImage,
-} from '@/app/lib/server/actions/handleImage';
+import { deleteImage, uploadImage } from '@/app/lib/server/actions/handleImage';
 import { addToast } from '@heroui/toast';
 import teamsStore from '@/app/stores/teamsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -88,7 +85,7 @@ const ProjectSettingsModal = observer(
       if (!userStore.user) return;
       const imageBlob = await HandleImageUpload(event);
       if (imageBlob) {
-        const response = await uploadPublicImage('projects_data', imageBlob);
+        const response = await uploadImage('projects_data', imageBlob);
 
         if ('url' in response && response.url) {
           if (avatar)
