@@ -18,7 +18,7 @@ export enum AvailableProviders {
 export type AvailableLocales = 'en' | 'ru';
 
 // BOARD
-export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'TREE';
+export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
 
 export type BoardElement =
   | RectElement

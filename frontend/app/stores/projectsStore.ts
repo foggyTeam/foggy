@@ -58,11 +58,13 @@ class ProjectsStore {
     type: BoardTypes,
   ) => {
     if (!(projectId && sectionId && boardId)) return;
-    const newURL = `/project/${projectId}/${sectionId}/${boardId}`;
+    const newURL = `/project/${projectId}/${sectionId}/${boardId}/${type.toLowerCase()}`;
     const newBoard = { url: newURL, name: boardName, type };
 
     let boards = [...this.recentBoards];
-    const boardIndex = boards.findIndex((board) => board.url.endsWith(boardId));
+    const boardIndex = boards.findIndex((board) =>
+      board.url.endsWith(`${boardId}/${type.toLowerCase()}`),
+    );
 
     if (boardIndex !== -1) {
       boards[boardIndex] = newBoard;

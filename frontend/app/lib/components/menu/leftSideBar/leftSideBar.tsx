@@ -24,7 +24,7 @@ import boardStore from '@/app/stores/boardStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
-    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}$`,
+    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}+/(simple|graph|doc)$`,
   );
   const [isOpened, setIsOpened] = useState(false);
   const path = usePathname();

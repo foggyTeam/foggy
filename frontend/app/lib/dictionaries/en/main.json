@@ -187,9 +187,9 @@
         "new": "New graph",
         "placeholder": "Graph name"
       },
-      "tree": {
-        "new": "New tree",
-        "placeholder": "Tree name"
+      "doc": {
+        "new": "New document",
+        "placeholder": "Document name"
       },
       "create": "Create"
     },

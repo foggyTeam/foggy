@@ -4,10 +4,10 @@ import {
   GetBoard,
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
-import BoardClientWrapper from '@/app/lib/components/board/boardClientWrapper';
 import { notFound } from 'next/navigation';
+import BoardLoadingCard from '@/app/lib/components/board/boardLoadingCard';
 
-interface BoardPageProps {
+interface BoardLayoutProps {
   project_id: string;
   section_id: string;
   board_id: string;
@@ -28,10 +28,12 @@ async function getBoard(board_id: string): Promise<any | undefined> {
   return board;
 }
 
-export default async function BoardPage({
+export default async function BoardLayout({
   params,
+  children,
 }: {
-  params: Promise<BoardPageProps>;
+  params: Promise<BoardLayoutProps>;
+  children: React.ReactNode;
 }) {
   const { project_id, section_id, board_id } = await params;
   const sectionData = await getSection(project_id, section_id);
@@ -39,8 +41,9 @@ export default async function BoardPage({
 
   return (
     <>
-      <BoardClientWrapper />
+      <BoardLoadingCard />
       <BoardLoader boardData={boardData} sectionData={sectionData} />
+      {children}
     </>
   );
 }

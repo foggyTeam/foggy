@@ -153,7 +153,7 @@ const OpenedLeftSideBar = observer(
       else {
         settingsStore.startLoading();
         router.push(
-          `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
+          `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}/${child.type.toLowerCase()}`,
         );
       }
     };

@@ -47,6 +47,7 @@ class BoardStore {
         lastChange: board.updatedAt,
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
+      console.log(board.type);
 
       this.buildElementsMap();
 

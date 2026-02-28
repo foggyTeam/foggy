@@ -1,10 +1,11 @@
 import { ProjectElementTypes } from '@/app/lib/types/definitions';
 import {
-  CableIcon,
   FolderIcon,
   LayoutDashboardIcon,
   NetworkIcon,
+  ScanTextIcon,
 } from 'lucide-react';
+import { info } from '@/tailwind.config';
 
 export default function ElementIcon({
   elementType,
@@ -13,12 +14,17 @@ export default function ElementIcon({
 }) {
   switch (elementType) {
     case 'SIMPLE':
-      return <LayoutDashboardIcon className="stroke-primary-400 h-6 sm:h-5" />;
+      return <LayoutDashboardIcon className="stroke-primary h-6 sm:h-5" />;
     case 'GRAPH':
-      return <CableIcon className="stroke-secondary-400 h-6 sm:h-5" />;
-    case 'TREE':
-      return <NetworkIcon className="stroke-danger-400 h-6 sm:h-5" />;
+      return <NetworkIcon className="stroke-secondary h-6 sm:h-5" />;
+    case 'DOC':
+      return (
+        <ScanTextIcon
+          className="h-6 sm:h-5"
+          style={{ color: info.light.DEFAULT }}
+        />
+      );
     case 'SECTION':
-      return <FolderIcon className="stroke-success-400 h-6 sm:h-5" />;
+      return <FolderIcon className="stroke-success h-6 sm:h-5" />;
   }
 }
