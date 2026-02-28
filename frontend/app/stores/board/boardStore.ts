@@ -15,7 +15,6 @@ class BoardStore {
   constructor() {
     makeAutoObservable(this, {
       activeBoard: observable,
-      boardWebsocket: observable.ref,
 
       setActiveBoard: action,
     });
