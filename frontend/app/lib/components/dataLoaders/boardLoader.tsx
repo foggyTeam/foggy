@@ -15,9 +15,9 @@ const BoardLoader = ({
 }) => {
   useEffect(() => {
     if (sectionData && boardData) {
-      const sectionIds = boardData.sectionIds;
+      const sectionIds = [...boardData.sectionIds];
       const sectionId = sectionIds.pop();
-      projectsStore.insertProjectChild(boardData.sectionIds, sectionData, true);
+      projectsStore.insertProjectChild(sectionIds, sectionData, true);
       boardStore.setActiveBoard({ ...boardData, sectionId });
       switch (boardData.type.toUpperCase()) {
         case 'SIMPLE':
