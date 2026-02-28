@@ -6,7 +6,7 @@ import userStore from '@/app/stores/userStore';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import throttle from 'lodash/throttle';
 import { observer } from 'mobx-react-lite';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 import CursorChip, {
   CursorColor,
   cursorColors,

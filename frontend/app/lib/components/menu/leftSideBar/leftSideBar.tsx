@@ -20,7 +20,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(

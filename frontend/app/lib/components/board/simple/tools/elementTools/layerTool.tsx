@@ -14,7 +14,7 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
-import boardStore from '@/app/stores/boardStore';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 export default function LayerTool() {
   const { commonSize } = useAdaptiveParams();
@@ -23,13 +23,15 @@ export default function LayerTool() {
   const [currentLayer, setCurrentLayer] = useState({ layer: -1, index: -1 });
 
   useEffect(() => {
-    const position = boardStore.getElementPosition(selectedElement.attrs.id);
+    const position = simpleBoardStore.getElementPosition(
+      selectedElement.attrs.id,
+    );
     if (!position) return;
     setCurrentLayer(position);
   }, [selectedElement]);
 
   const changeLayer = (action: 'back' | 'forward' | 'bottom' | 'top') => {
-    const newLayer = boardStore.changeElementLayer(
+    const newLayer = simpleBoardStore.changeElementLayer(
       selectedElement.attrs.id,
       action,
     );
@@ -40,14 +42,16 @@ export default function LayerTool() {
     if (top)
       return (
         currentLayer.layer ===
-          boardStore.getMaxMinElementPositions().max.layer &&
-        currentLayer.index === boardStore.getMaxMinElementPositions().max.index
+          simpleBoardStore.getMaxMinElementPositions().max.layer &&
+        currentLayer.index ===
+          simpleBoardStore.getMaxMinElementPositions().max.index
       );
     else
       return (
         currentLayer.layer ===
-          boardStore.getMaxMinElementPositions().min.layer &&
-        currentLayer.index === boardStore.getMaxMinElementPositions().min.index
+          simpleBoardStore.getMaxMinElementPositions().min.layer &&
+        currentLayer.index ===
+          simpleBoardStore.getMaxMinElementPositions().min.index
       );
   };
 

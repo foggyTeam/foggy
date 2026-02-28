@@ -1,8 +1,19 @@
 import io, { Socket } from 'socket.io-client';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { BoardElement, BoardTypes } from '@/app/lib/types/definitions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
+
+const EventsMap: { [key: BoardTypes]: string[] } = {
+  SIMPLE: [
+    'elementAdded',
+    'elementUpdated',
+    'elementRemoved',
+    'changeElementLayer',
+  ],
+  GRAPH: [],
+  DOC: [],
+};
 
 export default function openBoardSocketConnection(
   boardId: string,
@@ -41,23 +52,30 @@ export default function openBoardSocketConnection(
   return socket;
 }
 
-export function socketAddEventListeners(socket: Socket) {
-  // addElement
+export function socketAddEventListeners(socket: Socket, boardType: BoardTypes) {
+  switch (boardType) {
+    case 'SIMPLE':
+      addSimpleBoardListeners(socket);
+      break;
+  }
+}
+
+function addSimpleBoardListeners(socket: Socket) {
   socket.on('elementAdded', (newElement: BoardElement) => {
-    boardStore.addElement(newElement, true);
+    simpleBoardStore.addElement(newElement, true);
   });
-  // updateElement
+
   socket.on(
     'elementUpdated',
     (data: { id: string; newAttrs: Partial<BoardElement> }) => {
-      boardStore.updateElement(data.id, data.newAttrs, true);
+      simpleBoardStore.updateElement(data.id, data.newAttrs, true);
     },
   );
-  // removeElement
+
   socket.on('elementRemoved', (id: string) =>
-    boardStore.removeElement(id, true),
+    simpleBoardStore.removeElement(id, true),
   );
-  // changeElementLayer
+
   socket.on(
     'changeElementLayer',
     (data: {
@@ -65,10 +83,17 @@ export function socketAddEventListeners(socket: Socket) {
       prevPosition: { layer: number; index: number };
       newPosition: { layer: number; index: number };
     }) =>
-      boardStore.changeElementLayerSocket(
+      simpleBoardStore.changeElementLayerSocket(
         data.id,
         data.prevPosition,
         data.newPosition,
       ),
   );
+}
+
+export function socketRemoveEventListeners(
+  socket: Socket,
+  boardType: BoardTypes,
+) {
+  for (const event of EventsMap[boardType]) socket.removeAllListeners(event);
 }

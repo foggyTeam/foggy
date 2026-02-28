@@ -14,7 +14,7 @@ import ConvertRawProject, {
 import userStore from '@/app/stores/userStore';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const RECENT_BOARDS_NUMBER = 4;
 

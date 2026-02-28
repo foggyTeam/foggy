@@ -7,7 +7,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import { foggy_accent } from '@/tailwind.config';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import GetBoardImage from '@/app/lib/utils/getBoardImage';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 import { useTheme } from 'next-themes';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
@@ -15,6 +15,7 @@ import { uploadImage } from '@/app/lib/server/actions/handleImage';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { observer } from 'mobx-react-lite';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 const BoardImageGenerator = observer(() => {
   const { resolvedTheme } = useTheme();
@@ -23,14 +24,14 @@ const BoardImageGenerator = observer(() => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleUpload = async () => {
-    if (!boardStore.activeBoard) return;
+    if (!boardStore.activeBoard || !simpleBoardStore.boardLayers) return;
 
     setIsLoading(true);
     let blob = null;
     try {
       blob = await GetBoardImage(
         stageRef,
-        boardStore.activeBoard.layers,
+        simpleBoardStore.boardLayers,
         resolvedTheme === 'light' ? '#e4e4e7' : '#27272a',
       );
       if (!blob) throw new Error();

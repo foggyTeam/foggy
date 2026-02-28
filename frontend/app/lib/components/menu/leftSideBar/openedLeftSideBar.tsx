@@ -29,7 +29,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
 import { addToast } from '@heroui/toast';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const OpenedLeftSideBar = observer(
   ({

@@ -23,7 +23,7 @@ import cursorPencil from '@/app/lib/components/svg/cursorPencil';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import cursorText from '@/app/lib/components/svg/cursorText';
 import { observer } from 'mobx-react-lite';
-import boardStore from '@/app/stores/boardStore';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 interface BoardContextProps {
   stageRef: RefObject<null | Konva.Stage>;
@@ -77,17 +77,17 @@ export const BoardProvider = observer(
 
     // STORE OPERATIONS
     const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
-      boardStore.updateElement(id, newAttrs);
+      simpleBoardStore.updateElement(id, newAttrs);
     };
     const addElement = (newElement: BoardElement) => {
-      boardStore.addElement(newElement);
+      simpleBoardStore.addElement(newElement);
     };
     const removeElement = (id: string) => {
       if (selectedElements)
         changeSelection(
           selectedElements.filter((element) => element.attrs.id !== id),
         );
-      boardStore.removeElement(id);
+      simpleBoardStore.removeElement(id);
     };
 
     // OPERATIONS

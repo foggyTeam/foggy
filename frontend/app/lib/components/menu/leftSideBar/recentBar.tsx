@@ -10,7 +10,7 @@ import React from 'react';
 import Link from 'next/link';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const RecentBar = observer(
   ({

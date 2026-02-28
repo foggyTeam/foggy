@@ -20,7 +20,7 @@ import UseMouseEvent from '@/app/lib/hooks/simpleBoardNavigation/useMouseEvent';
 import UseWheelEvent from '@/app/lib/hooks/simpleBoardNavigation/useWheelEvent';
 import UseTouchEvent from '@/app/lib/hooks/simpleBoardNavigation/useTouchEvent';
 import UseRAFNavigation from '@/app/lib/hooks/simpleBoardNavigation/useRAFNavigation';
-import boardStore from '@/app/stores/boardStore';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 const GRID_SIZE = 24;
 
@@ -86,7 +86,7 @@ const BoardStage = observer(() => {
           ref={stageRef}
           onClick={handleSelect}
         >
-          {boardStore.activeBoard?.layers?.map((layer, index) => (
+          {simpleBoardStore.boardLayers?.map((layer, index) => (
             <BoardLayer key={index} layer={layer} />
           ))}
 
