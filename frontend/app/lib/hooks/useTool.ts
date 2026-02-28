@@ -1,5 +1,7 @@
+'use client';
+
 import { useEffect } from 'react';
-import { useBoardContext } from '@/app/lib/components/board/boardContext';
+import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 
 interface ToolEffectParams {
   toolName: string;

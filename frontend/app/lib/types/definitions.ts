@@ -17,71 +17,6 @@ export enum AvailableProviders {
 
 export type AvailableLocales = 'en' | 'ru';
 
-// BOARD
-export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
-
-export type BoardElement =
-  | RectElement
-  | EllipseElement
-  | LineElement
-  | TextElement
-  | MarkerElement;
-
-interface BaseElement {
-  id: string;
-  type: string;
-  draggable: boolean;
-  dragDistance: 4;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-}
-
-export interface RectElement extends BaseElement {
-  type: 'rect';
-  cornerRadius: number;
-}
-
-export interface EllipseElement extends BaseElement {
-  type: 'ellipse';
-}
-
-export interface TextElement extends BaseElement {
-  // basically it is a Konva.image
-  type: 'text';
-  svg: string;
-  content: string;
-  cornerRadius: number;
-}
-
-export interface LineElement extends BaseElement {
-  type: 'line';
-  points: number[];
-  tension: number;
-  lineJoin: 'miter' | 'round' | 'bevel';
-  lineCap: 'butt' | 'round' | 'square';
-}
-
-export interface MarkerElement extends BaseElement {
-  type: 'marker';
-  points: number[];
-  opacity: number;
-}
-
-export interface Board {
-  id: string;
-  name: string;
-  type: BoardTypes;
-  layers: BoardElement[][];
-  sectionId: string;
-  lastChange: string;
-}
-
 // PROJECT
 export interface Project {
   id: string;
@@ -203,4 +138,70 @@ export interface Notification {
     inviterId?: string;
   };
   createdAt: string;
+}
+
+// BOARDS
+export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
+
+// SIMPLE BOARD
+export type BoardElement =
+  | RectElement
+  | EllipseElement
+  | LineElement
+  | TextElement
+  | MarkerElement;
+
+interface BaseElement {
+  id: string;
+  type: string;
+  draggable: boolean;
+  dragDistance: 4;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
+
+export interface RectElement extends BaseElement {
+  type: 'rect';
+  cornerRadius: number;
+}
+
+export interface EllipseElement extends BaseElement {
+  type: 'ellipse';
+}
+
+export interface TextElement extends BaseElement {
+  // basically it is a Konva.image
+  type: 'text';
+  svg: string;
+  content: string;
+  cornerRadius: number;
+}
+
+export interface LineElement extends BaseElement {
+  type: 'line';
+  points: number[];
+  tension: number;
+  lineJoin: 'miter' | 'round' | 'bevel';
+  lineCap: 'butt' | 'round' | 'square';
+}
+
+export interface MarkerElement extends BaseElement {
+  type: 'marker';
+  points: number[];
+  opacity: number;
+}
+
+export interface Board {
+  id: string;
+  name: string;
+  type: BoardTypes;
+  layers: BoardElement[][];
+  sectionId: string;
+  lastChange: string;
 }

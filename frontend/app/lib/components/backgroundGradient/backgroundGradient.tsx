@@ -237,7 +237,7 @@ export default function BackgroundGradient() {
   const [theme, setTheme] = useState<keyof typeof circles>('dark');
 
   const [isBoardPage, setIsBoardPage] = useState(false);
-  const boardPageRegex = /^\/project\/[^\/]+\/[^\/]+\/[^\/]+$/;
+  const boardPageRegex = /project\/[^\/]+\/[^\/]+\/[^\/]+\/(simple|graph)$/;
   const path = usePathname();
 
   const currentCircles = circles[theme as keyof typeof circles].filter(

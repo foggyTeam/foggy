@@ -1,0 +1,95 @@
+import { PencilIcon } from 'lucide-react';
+import { Button } from '@heroui/button';
+import { useState } from 'react';
+import {
+  handleDrawing,
+  handleEndDrawing,
+  handleStartDrawing,
+  PencilParams,
+} from '@/app/lib/components/board/simple/tools/drawingHandlers';
+import settingsStore from '@/app/stores/settingsStore';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
+import useTool from '@/app/lib/hooks/useTool';
+import debounce from 'lodash/debounce';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+
+export default function PencilTool({
+  pencilParams,
+}: {
+  pencilParams: PencilParams;
+}) {
+  const { commonSize } = useAdaptiveParams();
+  const {
+    stageRef,
+    activeTool,
+    setActiveTool,
+    addElement,
+    updateElement,
+    toolsDisabled,
+    allToolsDisabled,
+  } = useBoardContext();
+
+  const [drawing, setDrawing] = useState(false);
+  const [newElement, setNewElement] = useState(null);
+
+  const mouseDownHandler = handleStartDrawing({
+    stageRef,
+    activeTool,
+    addElement,
+    setDrawing,
+    setNewElement,
+    pencilParams,
+  } as any);
+  const mouseMoveHandler = debounce(
+    handleDrawing({
+      stageRef,
+      drawing,
+      setNewElement,
+      newElement,
+      updateElement,
+    } as any),
+    4,
+  );
+  const mouseUpHandler = handleEndDrawing({
+    drawing,
+    newElement,
+    setDrawing,
+    setNewElement,
+    updateElement,
+  } as any);
+
+  useTool({
+    toolName: 'pencil',
+    handlers: {
+      mouseDownHandler,
+      mouseMoveHandler,
+      mouseUpHandler,
+    },
+  });
+
+  return (
+    <FTooltip content={settingsStore.t.toolTips.tools.pencilTool}>
+      <Button
+        data-testid="pencil-tool-btn"
+        isDisabled={toolsDisabled || allToolsDisabled}
+        onPress={() => {
+          if (activeTool === 'pencil') setActiveTool('');
+          else setActiveTool('pencil');
+        }}
+        variant={activeTool === 'pencil' ? 'flat' : 'light'}
+        color={activeTool === 'pencil' ? 'primary' : 'default'}
+        isIconOnly
+        size={commonSize}
+      >
+        <PencilIcon
+          className={
+            activeTool === 'pencil'
+              ? 'stroke-primary-500'
+              : 'stroke-default-600'
+          }
+        />
+      </Button>
+    </FTooltip>
+  );
+}
