@@ -13,8 +13,8 @@
     "docker": "docker-compose up --build",
     "e2e": "pnpm exec playwright test --workers=1",
     "e2e-ui": "pnpm exec playwright test --ui",
-    "performance": "npx playwright test -g \"Performance benchmark\" --project=chromium --headed",
-    "performance-headless": "npx playwright test -g \"Performance benchmark\" --project=chromium"
+    "performance": "npx playwright test -g \"Performance benchmark\" --project=chromium --headed --repeat-each=10 --workers=1",
+    "performance-headless": "npx playwright test -g \"Performance benchmark\" --project=chromium --repeat-each=10 --workers=1"
   },
   "workspaces": [
     "frontend",
