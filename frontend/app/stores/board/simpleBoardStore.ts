@@ -12,12 +12,14 @@ import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 
-const Events = [
+const SimpleBoardEvents = [
   'elementAdded',
   'elementUpdated',
   'elementRemoved',
   'changeElementLayer',
 ];
+
+let socketRef: Socket | null = null;
 
 class SimpleBoardStore {
   boardLayers: IObservableArray<BoardElement>[] | undefined;
@@ -41,6 +43,7 @@ class SimpleBoardStore {
       (socket) => {
         this.cleanupListeners?.();
         this.cleanupListeners = null;
+        socketRef = socket;
 
         if (!socket) return;
         if (boardStore.activeBoard?.type === 'SIMPLE') {
@@ -52,7 +55,9 @@ class SimpleBoardStore {
   }
 
   // WEBSOCKET
-  socketAddEventListeners(socket: Socket) {
+  private socketAddEventListeners(socket: Socket) {
+    if (!socket) return;
+
     socket.on('elementAdded', (newElement: BoardElement) => {
       simpleBoardStore.addElement(newElement, true);
     });
@@ -82,8 +87,11 @@ class SimpleBoardStore {
         ),
     );
   }
-  socketRemoveEventListeners(socket: Socket) {
-    for (const event of Events) socket.removeAllListeners(event);
+  private socketRemoveEventListeners(socket: Socket) {
+    for (const event of SimpleBoardEvents) socket.removeAllListeners(event);
+  }
+  private emitSocketEvent(event: string, data: any) {
+    socketRef?.emit(event, data);
   }
 
   // GENERAL
@@ -139,7 +147,7 @@ class SimpleBoardStore {
 
   // CRUD
   addElement = (newElement: BoardElement, external?: boolean) => {
-    if (this.boardLayers && boardStore.boardWebsocket) {
+    if (this.boardLayers) {
       const lastLayer = this.boardLayers.length - 1;
       const lastIndex = this.boardLayers[lastLayer].length;
       this.boardLayers[lastLayer].push(observable(newElement) as any);
@@ -148,7 +156,7 @@ class SimpleBoardStore {
         layer: lastLayer,
         index: lastIndex,
       });
-      if (!external) boardStore.boardWebsocket.emit('addElement', newElement);
+      if (!external) this.emitSocketEvent('addElement', newElement);
     }
   };
   updateElement = (
@@ -156,7 +164,7 @@ class SimpleBoardStore {
     newAttrs: Partial<BoardElement>,
     external?: boolean,
   ) => {
-    if (this.boardLayers && boardStore.boardWebsocket) {
+    if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
       if (element.type === 'text') {
@@ -168,16 +176,14 @@ class SimpleBoardStore {
         Object.assign(this.boardLayers[layer][index], newAttrs);
       }
 
-      if (!external)
-        boardStore.boardWebsocket.emit('updateElement', { id, newAttrs });
+      if (!external) this.emitSocketEvent('updateElement', { id, newAttrs });
     }
   };
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
   ): { layer: number; index: number } => {
-    if (!this.boardLayers || !boardStore.boardWebsocket)
-      return { layer: -1, index: -1 };
+    if (!this.boardLayers) return { layer: -1, index: -1 };
 
     const { layer, index } = this.getElementPosition(id);
     const element = this.boardLayers[layer][index];
@@ -253,7 +259,7 @@ class SimpleBoardStore {
     this.boardLayers[targetLayer].splice(targetIndex, 0, element);
     this.reindexLayer(targetLayer, targetIndex);
 
-    boardStore.boardWebsocket.emit('changeElementLayer', {
+    this.emitSocketEvent('changeElementLayer', {
       id: id,
       prevPosition: { layer, index },
       newPosition: { layer: targetLayer, index: targetIndex },
@@ -298,13 +304,13 @@ class SimpleBoardStore {
     }
   };
   removeElement = (id: string, external?: boolean) => {
-    if (this.boardLayers && boardStore.boardWebsocket) {
+    if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       this.boardLayers[layer].splice(index, 1);
       this.positionsMap.delete(id);
       this.reindexLayer(layer, index);
 
-      if (!external) boardStore.boardWebsocket.emit('removeElement', id);
+      if (!external) this.emitSocketEvent('removeElement', id);
     }
   };
 
