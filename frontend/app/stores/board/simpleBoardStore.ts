@@ -7,13 +7,17 @@ import {
 } from 'mobx';
 import { BoardElement, TextElement } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
-import {
-  socketAddEventListeners,
-  socketRemoveEventListeners,
-} from '@/app/lib/utils/boardSocketConnection';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
+import { Socket } from 'socket.io-client';
+
+const Events = [
+  'elementAdded',
+  'elementUpdated',
+  'elementRemoved',
+  'changeElementLayer',
+];
 
 class SimpleBoardStore {
   boardLayers: IObservableArray<BoardElement>[] | undefined;
@@ -40,14 +44,49 @@ class SimpleBoardStore {
 
         if (!socket) return;
         if (boardStore.activeBoard?.type === 'SIMPLE') {
-          socketAddEventListeners(socket, 'SIMPLE');
-          this.cleanupListeners = () =>
-            socketRemoveEventListeners(socket, 'SIMPLE');
+          this.socketAddEventListeners(socket);
+          this.cleanupListeners = () => this.socketRemoveEventListeners(socket);
         }
       },
     );
   }
 
+  // WEBSOCKET
+  socketAddEventListeners(socket: Socket) {
+    socket.on('elementAdded', (newElement: BoardElement) => {
+      simpleBoardStore.addElement(newElement, true);
+    });
+
+    socket.on(
+      'elementUpdated',
+      (data: { id: string; newAttrs: Partial<BoardElement> }) => {
+        simpleBoardStore.updateElement(data.id, data.newAttrs, true);
+      },
+    );
+
+    socket.on('elementRemoved', (id: string) =>
+      simpleBoardStore.removeElement(id, true),
+    );
+
+    socket.on(
+      'changeElementLayer',
+      (data: {
+        id: string;
+        prevPosition: { layer: number; index: number };
+        newPosition: { layer: number; index: number };
+      }) =>
+        simpleBoardStore.changeElementLayerSocket(
+          data.id,
+          data.prevPosition,
+          data.newPosition,
+        ),
+    );
+  }
+  socketRemoveEventListeners(socket: Socket) {
+    for (const event of Events) socket.removeAllListeners(event);
+  }
+
+  // GENERAL
   setBoardLayers(layers: BoardElement[][] | undefined) {
     if (!layers) {
       this.boardLayers = undefined;
@@ -98,6 +137,7 @@ class SimpleBoardStore {
     return { layer: -1, index: -1 };
   }
 
+  // CRUD
   addElement = (newElement: BoardElement, external?: boolean) => {
     if (this.boardLayers && boardStore.boardWebsocket) {
       const lastLayer = this.boardLayers.length - 1;
