@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import {
   applyEdgeChanges,
@@ -24,23 +24,27 @@ export default function useInternalUpdates({
   getNodeById,
   getEdgeById,
 }: InternalUpdatesParams) {
-  // EMITTERS
-  const throttledEmitNodes = useMemo(
+  const pendingNodeChanges = useRef<NodeChange[]>([]);
+  const pendingEdgeChanges = useRef<EdgeChange[]>([]);
+
+  // FLUSHED EMITTERS
+  const flushNodeEmit = useMemo(
     () =>
-      throttle(
-        (changes: NodeChange[]) =>
-          graphBoardStore.emitUpdates('nodesUpdate', changes),
-        100,
-      ),
+      throttle(() => {
+        if (pendingNodeChanges.current.length === 0) return;
+        graphBoardStore.emitUpdates('nodesUpdate', pendingNodeChanges.current);
+        pendingNodeChanges.current = [];
+      }, 100),
     [],
   );
-  const throttledEmitEdges = useMemo(
+
+  const flushEdgeEmit = useMemo(
     () =>
-      throttle(
-        (changes: EdgeChange[]) =>
-          graphBoardStore.emitUpdates('edgesUpdate', changes),
-        100,
-      ),
+      throttle(() => {
+        if (pendingEdgeChanges.current.length === 0) return;
+        graphBoardStore.emitUpdates('edgesUpdate', pendingEdgeChanges.current);
+        pendingEdgeChanges.current = [];
+      }, 100),
     [],
   );
 
@@ -48,16 +52,22 @@ export default function useInternalUpdates({
   const onNodesChange = useCallback(
     (changes: NodeChange[], external?: boolean) => {
       setNodes((prev) => applyNodeChanges(changes, prev));
-      if (!external) throttledEmitNodes(changes);
+      if (!external) {
+        pendingNodeChanges.current.push(...changes);
+        flushNodeEmit();
+      }
     },
-    [throttledEmitNodes],
+    [flushNodeEmit],
   );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[], external?: boolean) => {
       setEdges((prev) => applyEdgeChanges(changes, prev));
-      if (!external) throttledEmitEdges(changes);
+      if (!external) {
+        pendingEdgeChanges.current.push(...changes);
+        flushEdgeEmit();
+      }
     },
-    [throttledEmitEdges],
+    [flushEdgeEmit],
   );
 
   const onNodesLockChange = (changes: { id: string; lock: boolean }[]) => {
@@ -102,10 +112,10 @@ export default function useInternalUpdates({
   // CLEANUP
   useEffect(() => {
     return () => {
-      throttledEmitNodes.cancel();
-      throttledEmitEdges.cancel();
+      flushEdgeEmit.cancel();
+      flushNodeEmit.cancel();
     };
-  }, [throttledEmitNodes, throttledEmitEdges]);
+  }, [flushEdgeEmit, flushNodeEmit]);
 
   return { onNodesChange, onNodesLockChange, onEdgesChange, onEdgesLockChange };
 }
