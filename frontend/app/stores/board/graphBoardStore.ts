@@ -17,16 +17,11 @@ class GraphBoardStore {
   boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
 
-  nodesMap = observable.map<string, number>();
-  edgesMap = observable.map<string, number>();
-
   private cleanupListeners: (() => void) | null = null;
   constructor() {
     makeAutoObservable(this, {
       boardNodes: observable,
       boardEdges: observable,
-      nodesMap: observable,
-      edgesMap: observable,
 
       setGraphData: action,
     });
@@ -69,32 +64,18 @@ class GraphBoardStore {
       this.boardNodes = undefined;
       return;
     }
-    this.boardNodes = observable.array(
-      (data.nodes || []).map((node) => observable(node)),
-    );
-    this.boardEdges = observable.array(
-      (data.edges || []).map((node) => observable(node)),
-    );
-
-    this.buildElementsMap();
-  }
-  buildElementsMap() {
-    this.nodesMap.clear();
-    if (!this.boardNodes) return;
-    for (let nodeIndex = 0; nodeIndex < this.boardNodes.length; nodeIndex++) {
-      const element = this.boardNodes[nodeIndex];
-      this.nodesMap.set(element.id, nodeIndex);
-    }
-
-    this.edgesMap.clear();
-    if (!this.boardEdges) return;
-    for (let edgeIndex = 0; edgeIndex < this.boardEdges?.length; edgeIndex++) {
-      const element = this.boardEdges[edgeIndex];
-      this.edgesMap.set(element.id, edgeIndex);
-    }
+    this.boardNodes = observable.array(data.nodes || []);
+    this.boardEdges = observable.array(data.edges || []);
   }
 
   // CRUD
+  updateNodes(nodes: GBaseNode[]) {
+    this.boardNodes?.replace(nodes);
+    console.log('update');
+  }
+  updateEdges(edges: GEdge[]) {
+    this.boardEdges?.replace(edges);
+  }
 }
 
 const graphBoardStore = new GraphBoardStore();

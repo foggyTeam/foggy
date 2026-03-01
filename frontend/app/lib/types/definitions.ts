@@ -213,7 +213,7 @@ export interface GBaseNode {
   data: GNodeData;
   hidden?: boolean;
   parentId?: string;
-  handles: GNodeHandle[];
+  handles?: GNodeHandle[];
 }
 
 interface GNodeData {

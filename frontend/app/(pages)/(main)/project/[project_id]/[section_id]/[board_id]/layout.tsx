@@ -20,13 +20,11 @@ const GraphMockData: Pick<GraphBoard, 'graphEdges' | 'graphNodes'> = {
       id: 'n1',
       position: { x: 0, y: 0 },
       data: { label: 'Node 1' },
-      handles: [],
     },
     {
       id: 'n2',
       position: { x: 0, y: 100 },
       data: { label: 'Node 2' },
-      handles: [],
     },
   ],
   graphEdges: [{ id: 'n1-n2', type: 'default', source: 'n1', target: 'n2' }],
