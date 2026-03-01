@@ -11,8 +11,10 @@ import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {
   Board,
+  GraphBoard,
   ProjectElementTypes,
   ProjectSection,
+  SimpleBoard,
 } from '@/app/lib/types/definitions';
 import {
   AddBoard,
@@ -97,15 +99,27 @@ const LeftSideBar = observer(() => {
             }),
           )
           .then((response: { data: { id: string } }) => {
-            const newBoard: Board = {
+            const data:
+              | Pick<SimpleBoard, 'layers'>
+              | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+              | object =
+              nodeType === 'SIMPLE'
+                ? { layers: [[], [], []] }
+                : nodeType === 'GRAPH'
+                  ? { graphEdges: [], graphNodes: [] }
+                  : {};
+            const newBoard = {
               id: response.data.id,
               name: nodeName,
               type: nodeType,
-              layers: [[], [], []],
               sectionId: boardStore.activeBoard?.sectionId || '',
               lastChange: new Date().toISOString(),
             };
-            projectsStore.addProjectChild(fullParentList, newBoard, false);
+            projectsStore.addProjectChild(
+              fullParentList,
+              Object.assign(newBoard, data) as Board,
+              false,
+            );
           });
     }
     onAddChildOpenChange();

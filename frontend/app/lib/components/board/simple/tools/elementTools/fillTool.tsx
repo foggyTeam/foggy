@@ -5,7 +5,7 @@ import { primary, to_rgb } from '@/tailwind.config';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { SBoardElement } from '@/app/lib/types/definitions';
 import ColorPicker from '@/app/lib/components/board/simple/tools/colorPicker';
 import { isElementVisible } from '@/app/lib/components/board/simple/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
@@ -43,7 +43,7 @@ export default function FillTool() {
       )
         updateElement(selectedElement.attrs.id, {
           fill: fillColor,
-        } as BoardElement);
+        } as SBoardElement);
       else
         addToast({
           color: 'warning',
@@ -60,7 +60,7 @@ export default function FillTool() {
         )
           ? fillColor
           : undefined,
-      } as BoardElement);
+      } as SBoardElement);
   }, [fillColor]);
 
   return (

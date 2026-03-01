@@ -5,7 +5,7 @@ import { primary, to_rgb } from '@/tailwind.config';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { SBoardElement } from '@/app/lib/types/definitions';
 import { Slider } from '@heroui/slider';
 import settingsStore from '@/app/stores/settingsStore';
 import ColorPicker from '@/app/lib/components/board/simple/tools/colorPicker';
@@ -54,7 +54,7 @@ export default function StrokeTool() {
             (strokeColor.length === 7 || strokeColor.length === 9)
               ? strokeColor
               : primary[theme].DEFAULT,
-        } as BoardElement);
+        } as SBoardElement);
       else
         addToast({
           color: 'warning',
@@ -77,12 +77,12 @@ export default function StrokeTool() {
             (strokeColor.length === 7 || strokeColor.length === 9)
               ? strokeColor
               : primary[theme].DEFAULT,
-        } as Partial<BoardElement>);
+        } as Partial<SBoardElement>);
       } else {
         updateElement(selectedElement.attrs.id, {
           strokeWidth: undefined,
           stroke: undefined,
-        } as Partial<BoardElement>);
+        } as Partial<SBoardElement>);
       }
     }
   }, [strokeColor, strokeWidth]);

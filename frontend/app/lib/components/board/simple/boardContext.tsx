@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { SBoardElement } from '@/app/lib/types/definitions';
 import {
   handleEditText,
   TextEdit,
@@ -36,7 +36,7 @@ interface BoardContextProps {
   transformAvailable: boolean;
   selectedElement: Konva.Shape;
   selectedElements: Konva.Shape[];
-  changeSelection: (elements: BoardElement[]) => void;
+  changeSelection: (elements: SBoardElement[]) => void;
   // TOOLS
   allToolsDisabled: boolean;
   toolsDisabled: boolean;
@@ -47,8 +47,8 @@ interface BoardContextProps {
   textContent: string;
   setTextContent: (content: string) => void;
   // OPERATIONS
-  addElement: (element: BoardElement) => void;
-  updateElement: (id: string, newAttrs: Partial<BoardElement>) => void;
+  addElement: (element: SBoardElement) => void;
+  updateElement: (id: string, newAttrs: Partial<SBoardElement>) => void;
   removeElement: (id: string) => void;
   handleSelect: (event: KonvaEventObject<any>) => void;
   handleTextEdit: (e: KonvaEventObject<any>) => void;
@@ -76,10 +76,10 @@ export const BoardProvider = observer(
     const [textContent, setTextContent] = useState('');
 
     // STORE OPERATIONS
-    const updateElement = (id: string, newAttrs: Partial<BoardElement>) => {
+    const updateElement = (id: string, newAttrs: Partial<SBoardElement>) => {
       simpleBoardStore.updateElement(id, newAttrs);
     };
-    const addElement = (newElement: BoardElement) => {
+    const addElement = (newElement: SBoardElement) => {
       simpleBoardStore.addElement(newElement);
     };
     const removeElement = (id: string) => {

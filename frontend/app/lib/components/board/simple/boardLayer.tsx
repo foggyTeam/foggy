@@ -1,7 +1,7 @@
 'use client';
 
 import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
-import { BoardElement, TextElement } from '@/app/lib/types/definitions';
+import { SBoardElement, TextElement } from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { observer } from 'mobx-react-lite';
@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 
-const BoardLayer = observer(({ layer }: { layer: BoardElement[] }) => {
+const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
   const {
     updateElement,
     handleSelect,
@@ -41,7 +41,7 @@ const BoardLayer = observer(({ layer }: { layer: BoardElement[] }) => {
     });
   };
 
-  const holdTransformEnd = (e: any, element: BoardElement) => {
+  const holdTransformEnd = (e: any, element: SBoardElement) => {
     const node = e.target;
 
     if (element.type === 'line') {
@@ -156,19 +156,6 @@ const BoardLayer = observer(({ layer }: { layer: BoardElement[] }) => {
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
-                draggable={transformAvailable && !allToolsDisabled}
-              />
-            );
-          case 'marker':
-            return (
-              <Line
-                onTap={handleSelect}
-                key={element.id}
-                {...element}
-                onClick={handleSelect}
-                onDragEnd={(e: any) =>
-                  updateElement(element.id, { points: e.target.points() })
-                }
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );

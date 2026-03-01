@@ -5,7 +5,7 @@ import {
   observable,
   reaction,
 } from 'mobx';
-import { BoardElement, TextElement } from '@/app/lib/types/definitions';
+import { SBoardElement, TextElement } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
@@ -22,7 +22,7 @@ const SimpleBoardEvents = [
 let socketRef: Socket | null = null;
 
 class SimpleBoardStore {
-  boardLayers: IObservableArray<BoardElement>[] | undefined;
+  boardLayers: IObservableArray<SBoardElement>[] | undefined;
   positionsMap = observable.map<string, { layer: number; index: number }>();
 
   private cleanupListeners: (() => void) | null = null;
@@ -58,13 +58,13 @@ class SimpleBoardStore {
   private socketAddEventListeners(socket: Socket) {
     if (!socket) return;
 
-    socket.on('elementAdded', (newElement: BoardElement) => {
+    socket.on('elementAdded', (newElement: SBoardElement) => {
       simpleBoardStore.addElement(newElement, true);
     });
 
     socket.on(
       'elementUpdated',
-      (data: { id: string; newAttrs: Partial<BoardElement> }) => {
+      (data: { id: string; newAttrs: Partial<SBoardElement> }) => {
         simpleBoardStore.updateElement(data.id, data.newAttrs, true);
       },
     );
@@ -95,13 +95,13 @@ class SimpleBoardStore {
   }
 
   // GENERAL
-  setBoardLayers(layers: BoardElement[][] | undefined) {
+  setBoardLayers(layers: SBoardElement[][] | undefined) {
     if (!layers) {
       this.boardLayers = undefined;
       this.positionsMap.clear();
       return;
     }
-    this.boardLayers = layers.map((layer: BoardElement[]) =>
+    this.boardLayers = layers.map((layer: SBoardElement[]) =>
       observable.array(layer.map((element) => observable(element))),
     );
     this.buildElementsMap();
@@ -146,7 +146,7 @@ class SimpleBoardStore {
   }
 
   // CRUD
-  addElement = (newElement: BoardElement, external?: boolean) => {
+  addElement = (newElement: SBoardElement, external?: boolean) => {
     if (this.boardLayers) {
       const lastLayer = this.boardLayers.length - 1;
       const lastIndex = this.boardLayers[lastLayer].length;
@@ -161,7 +161,7 @@ class SimpleBoardStore {
   };
   updateElement = (
     id: string,
-    newAttrs: Partial<BoardElement>,
+    newAttrs: Partial<SBoardElement>,
     external?: boolean,
   ) => {
     if (this.boardLayers) {

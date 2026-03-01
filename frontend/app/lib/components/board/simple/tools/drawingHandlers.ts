@@ -1,5 +1,5 @@
 import {
-  BoardElement,
+  SBoardElement,
   LineElement,
   TextElement,
 } from '@/app/lib/types/definitions';
@@ -12,12 +12,12 @@ interface DrawingHandlersProps {
   stageRef: any;
   activeTool: string;
   setActiveTool: (tool: string) => void;
-  addElement: (element: BoardElement) => void;
-  updateElement: (id: string, newAttrs: Partial<BoardElement>) => void;
+  addElement: (element: SBoardElement) => void;
+  updateElement: (id: string, newAttrs: Partial<SBoardElement>) => void;
   drawing?: boolean;
   setDrawing: (drawing: boolean) => void;
-  setNewElement: (element: BoardElement | null) => void;
-  newElement: BoardElement | null;
+  setNewElement: (element: SBoardElement | null) => void;
+  newElement: SBoardElement | null;
 }
 
 interface FreeDrawingHandlersProps {
@@ -69,7 +69,7 @@ const getRelativePointerPosition = (stage: any) => {
 
 const getRelativeElementPosition = (
   stage: Konva.Stage,
-  element: BoardElement,
+  element: SBoardElement,
 ) => {
   const stageX = stage.x();
   const stageY = stage.y();
@@ -108,7 +108,7 @@ export const handleMouseDown =
         cornerRadius: 4,
         width: 16,
         height: 16,
-      } as BoardElement;
+      } as SBoardElement;
 
       setNewElement(element);
       addElement(element);
@@ -130,7 +130,7 @@ export const handleMouseMove =
         y: height < 0 ? y : newElement.y,
         width: Math.abs(width),
         height: Math.abs(height),
-      } as BoardElement;
+      } as SBoardElement;
 
       updateElement(newElement.id, updatedElement);
     }
@@ -190,7 +190,7 @@ export const handlePlaceText =
         cornerRadius: 0,
         width: defaultTextWidth,
         height: textHeight,
-      } as BoardElement;
+      } as SBoardElement;
 
       addElement(element);
 

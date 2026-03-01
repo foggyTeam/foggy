@@ -1,5 +1,5 @@
 import { action, makeAutoObservable, observable } from 'mobx';
-import { Board, BoardTypes } from '@/app/lib/types/definitions';
+import { SimpleBoard, BoardTypes } from '@/app/lib/types/definitions';
 import userStore from '@/app/stores/userStore';
 import { Socket } from 'socket.io-client';
 import openBoardSocketConnection from '@/app/lib/utils/boardSocketConnection';
@@ -9,7 +9,7 @@ import settingsStore from '@/app/stores/settingsStore';
 class BoardStore {
   boardWebsocket: Socket | null = null;
 
-  activeBoard: Board | undefined = undefined;
+  activeBoard: SimpleBoard | undefined = undefined;
 
   constructor() {
     makeAutoObservable(this, {
@@ -29,7 +29,7 @@ class BoardStore {
         layers: [],
         lastChange: board.updatedAt,
         type: board.type.toUpperCase() as BoardTypes,
-      } as Board;
+      } as SimpleBoard;
 
       this.connectSocket(this.activeBoard.id || '');
     }

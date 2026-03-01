@@ -12,7 +12,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import { useEffect, useState } from 'react';
 import { NumberInput } from '@heroui/number-input';
 import settingsStore from '@/app/stores/settingsStore';
-import { BoardElement } from '@/app/lib/types/definitions';
+import { SBoardElement } from '@/app/lib/types/definitions';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -54,19 +54,19 @@ export default function SizeTool() {
       updateElement(selectedElement.attrs.id, {
         width: width ? width : 16,
         height: height ? height : 16,
-      } as BoardElement);
+      } as SBoardElement);
   }, [width, height]);
 
   useEffect(() => {
     updateElement(selectedElement.attrs.id, {
       cornerRadius: cornerRadius,
-    } as BoardElement);
+    } as SBoardElement);
   }, [cornerRadius]);
 
   useEffect(() => {
     updateElement(selectedElement.attrs.id, {
       rotation: rotation,
-    } as BoardElement);
+    } as SBoardElement);
   }, [rotation]);
 
   return (

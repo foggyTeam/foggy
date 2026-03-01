@@ -142,16 +142,34 @@ export interface Notification {
 
 // BOARDS
 export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
+export type Board = SimpleBoard | GraphBoard;
+
+interface BaseBoard {
+  id: string;
+  name: string;
+  type: BoardTypes;
+  sectionId: string;
+  lastChange: string;
+}
+export interface SimpleBoard extends BaseBoard {
+  type: 'SIMPLE';
+  layers: SBoardElement[][];
+}
+
+export interface GraphBoard extends BaseBoard {
+  type: 'GRAPH';
+  graphNodes: GBaseNode[];
+  graphEdges: GEdge[];
+}
 
 // SIMPLE BOARD
-export type BoardElement =
+export type SBoardElement =
   | RectElement
   | EllipseElement
   | LineElement
-  | TextElement
-  | MarkerElement;
+  | TextElement;
 
-interface BaseElement {
+interface SBaseElement {
   id: string;
   type: string;
   draggable: boolean;
@@ -165,25 +183,21 @@ interface BaseElement {
   stroke: string;
   strokeWidth: number;
 }
-
-export interface RectElement extends BaseElement {
+export interface RectElement extends SBaseElement {
   type: 'rect';
   cornerRadius: number;
 }
-
-export interface EllipseElement extends BaseElement {
+export interface EllipseElement extends SBaseElement {
   type: 'ellipse';
 }
-
-export interface TextElement extends BaseElement {
+export interface TextElement extends SBaseElement {
   // basically it is a Konva.image
   type: 'text';
   svg: string;
   content: string;
   cornerRadius: number;
 }
-
-export interface LineElement extends BaseElement {
+export interface LineElement extends SBaseElement {
   type: 'line';
   points: number[];
   tension: number;
@@ -191,17 +205,36 @@ export interface LineElement extends BaseElement {
   lineCap: 'butt' | 'round' | 'square';
 }
 
-export interface MarkerElement extends BaseElement {
-  type: 'marker';
-  points: number[];
-  opacity: number;
+// GRAPH BOARD
+export interface GBaseNode {
+  id: string;
+  type?: string;
+  position: { x: number; y: number };
+  data: GNodeData;
+  hidden?: boolean;
+  parentId?: string;
+  handles: GNodeHandle[];
 }
 
-export interface Board {
+interface GNodeData {
+  label?: string;
+}
+
+interface GNodeHandle {
+  id?: string | null;
+  nodeId: string;
+  x: number;
+  y: number;
+  type: 'source' | 'target';
+}
+
+export interface GEdge {
   id: string;
-  name: string;
-  type: BoardTypes;
-  layers: BoardElement[][];
-  sectionId: string;
-  lastChange: string;
+  type: 'default' | 'smoothstep' | 'straight' | 'step' | 'simplebezier';
+  source: string; // source node id
+  target: string; // target node id
+  sourceHandle?: string; // source node handle id
+  targetHandle?: string; // target node handle id
+  label?: string;
+  data?: any;
 }
