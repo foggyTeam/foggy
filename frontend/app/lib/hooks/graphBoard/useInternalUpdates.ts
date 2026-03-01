@@ -6,7 +6,6 @@ import {
   applyEdgeChanges,
   applyNodeChanges,
   EdgeChange,
-  type Node,
   NodeChange,
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -14,15 +13,11 @@ import graphBoardStore from '@/app/stores/board/graphBoardStore';
 interface InternalUpdatesParams {
   setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
   setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  getNodeById: (id: string) => Node;
-  getEdgeById: (id: string) => Node;
 }
 
 export default function useInternalUpdates({
   setNodes,
   setEdges,
-  getNodeById,
-  getEdgeById,
 }: InternalUpdatesParams) {
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
@@ -70,39 +65,6 @@ export default function useInternalUpdates({
     [flushEdgeEmit],
   );
 
-  const onNodesLockChange = (changes: { id: string; lock: boolean }[]) => {
-    onNodesChange(
-      changes.map((change) => {
-        return {
-          type: 'replace',
-          item: {
-            ...getNodeById(change.id),
-            connectable: !change.lock,
-            draggable: !change.lock,
-            selectable: !change.lock,
-          },
-        } as NodeChange;
-      }),
-      true,
-    );
-  };
-  const onEdgesLockChange = (changes: { id: string; lock: boolean }[]) => {
-    onEdgesChange(
-      changes.map((change) => {
-        return {
-          type: 'replace',
-          item: {
-            ...getEdgeById(change.id),
-            connectable: !change.lock,
-            draggable: !change.lock,
-            selectable: !change.lock,
-          },
-        } as EdgeChange;
-      }),
-      true,
-    );
-  };
-
   // INITIAL STATE WATCHER
   useEffect(() => {
     setNodes(graphBoardStore.boardNodes ?? []);
@@ -117,5 +79,5 @@ export default function useInternalUpdates({
     };
   }, [flushEdgeEmit, flushNodeEmit]);
 
-  return { onNodesChange, onNodesLockChange, onEdgesChange, onEdgesLockChange };
+  return { onNodesChange, onEdgesChange };
 }

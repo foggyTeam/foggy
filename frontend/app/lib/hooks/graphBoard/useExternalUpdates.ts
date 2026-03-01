@@ -9,15 +9,32 @@ import { applyEdgeChanges, applyNodeChanges } from '@xyflow/react';
 interface ExternalUpdatesParams {
   setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
   setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  onEdgesLockChange: (changes: { id: string; lock: boolean }[]) => void;
-  onNodesLockChange: (changes: { id: string; lock: boolean }[]) => void;
+}
+
+function applyLockUpdates<T extends { id: string }>(
+  items: T[],
+  lockUpdates: { id: string; lock: boolean }[],
+): T[] {
+  if (lockUpdates.length === 0) return items;
+  const lockMap = new Map(
+    lockUpdates.map((update) => [update.id, update.lock]),
+  );
+
+  return items.map((item) => {
+    const lock: boolean | undefined = lockMap.get(item.id);
+    if (lock === undefined) return item;
+    return {
+      ...item,
+      draggable: !lock,
+      selectable: !lock,
+      connectable: !lock,
+    };
+  });
 }
 
 export default function useExternalUpdates({
   setNodes,
   setEdges,
-  onEdgesLockChange,
-  onNodesLockChange,
 }: ExternalUpdatesParams) {
   // UPDATES HANDLERS
   const onExternalNodesChange = useMemo(
@@ -28,8 +45,10 @@ export default function useExternalUpdates({
 
         if (queue.length === 0) return;
         const { changes, lockUpdates } = batchGraphUpdates(queue);
-        setNodes((prev) => applyNodeChanges(changes, prev));
-        onNodesLockChange(lockUpdates);
+        setNodes((prev) => {
+          const nodes = applyNodeChanges(changes, prev);
+          return applyLockUpdates(nodes, lockUpdates);
+        });
       }, 640),
     [],
   );
@@ -42,8 +61,10 @@ export default function useExternalUpdates({
         if (queue.length === 0) return;
 
         const { changes, lockUpdates } = batchGraphUpdates(queue);
-        setEdges((prev) => applyEdgeChanges(changes, prev));
-        onEdgesLockChange(lockUpdates);
+        setEdges((prev) => {
+          const edges = applyEdgeChanges(changes, prev);
+          return applyLockUpdates(edges, lockUpdates);
+        });
       }, 640),
     [],
   );
