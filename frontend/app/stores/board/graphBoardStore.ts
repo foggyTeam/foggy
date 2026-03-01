@@ -15,8 +15,8 @@ const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
 let socketRef: Socket | null = null;
 
 class GraphBoardStore {
-  nodesExternalUpdatesQueue: NodeChange[] = [];
-  edgesExternalUpdatesQueue: EdgeChange[] = [];
+  nodesExternalUpdatesQueue: NodeChange[][] = [];
+  edgesExternalUpdatesQueue: EdgeChange[][] = [];
 
   boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;

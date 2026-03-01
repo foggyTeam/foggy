@@ -78,9 +78,9 @@ const GraphBoard = observer(() => {
           type: 'replace',
           item: {
             ...nodes[nodesMap.get(change.id)],
-            connectable: change.lock,
-            draggable: change.lock,
-            selectable: change.lock,
+            connectable: !change.lock,
+            draggable: !change.lock,
+            selectable: !change.lock,
           },
         } as NodeChange;
       }),
@@ -94,9 +94,9 @@ const GraphBoard = observer(() => {
           type: 'replace',
           item: {
             ...edges[edgesMap.get(change.id)],
-            connectable: change.lock,
-            draggable: change.lock,
-            selectable: change.lock,
+            connectable: !change.lock,
+            draggable: !change.lock,
+            selectable: !change.lock,
           },
         } as EdgeChange;
       }),
@@ -109,8 +109,9 @@ const GraphBoard = observer(() => {
     () =>
       throttle(() => {
         const queue = graphBoardStore.nodesExternalUpdatesQueue;
-        if (queue.length === 0) return;
         graphBoardStore.clearUpdatesQueue('nodes');
+
+        if (queue.length === 0) return;
         const { changes, lockUpdates } = batchGraphUpdates(queue);
         setNodes((prev) => applyNodeChanges(changes, prev));
         onNodesLockChange(lockUpdates);
@@ -122,8 +123,9 @@ const GraphBoard = observer(() => {
     () =>
       throttle(() => {
         const queue = graphBoardStore.edgesExternalUpdatesQueue;
-        if (queue.length === 0) return;
         graphBoardStore.clearUpdatesQueue('edges');
+        if (queue.length === 0) return;
+
         const { changes, lockUpdates } = batchGraphUpdates(queue);
         setEdges((prev) => applyEdgeChanges(changes, prev));
         onEdgesLockChange(lockUpdates);
