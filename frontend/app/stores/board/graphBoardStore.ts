@@ -9,19 +9,27 @@ import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { GBaseNode, GEdge } from '@/app/lib/types/definitions';
 
-const GraphBoardEvents = [];
+const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
 
 let socketRef: Socket | null = null;
 
 class GraphBoardStore {
+  nodesExternalUpdatesQueue = [];
+  edgesExternalUpdatesQueue = [];
+
   boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
+
+  nodesApplyUpdatesTrigger: boolean = false;
+  edgesApplyUpdatesTrigger: boolean = false;
 
   private cleanupListeners: (() => void) | null = null;
   constructor() {
     makeAutoObservable(this, {
       boardNodes: observable,
       boardEdges: observable,
+      nodesApplyUpdatesTrigger: observable,
+      edgesApplyUpdatesTrigger: observable,
 
       setGraphData: action,
     });
@@ -45,12 +53,31 @@ class GraphBoardStore {
   // WEBSOCKET
   private socketAddEventListeners(socket: Socket) {
     if (!socket) return;
+
+    socket.on('nodesUpdate', (changes: any) => {
+      this.nodesExternalUpdatesQueue.push(changes);
+      this.nodesApplyUpdatesTrigger = !this.nodesApplyUpdatesTrigger;
+    });
+
+    socket.on('edgesUpdate', (changes: any) => {
+      this.edgesExternalUpdatesQueue.push(changes);
+      this.edgesApplyUpdatesTrigger = !this.edgesApplyUpdatesTrigger;
+    });
   }
   private socketRemoveEventListeners(socket: Socket) {
     for (const event of GraphBoardEvents) socket.removeAllListeners(event);
   }
   private emitSocketEvent(event: string, data: any) {
     socketRef?.emit(event, data);
+  }
+
+  emitUpdates = (eventType: 'nodesUpdate' | 'edgesUpdate', changes: any) => {
+    this.emitSocketEvent(eventType, changes);
+  };
+
+  clearUpdatesQueue(queueType: 'nodes' | 'edges') {
+    if (queueType === 'nodes') this.nodesExternalUpdatesQueue = [];
+    else this.edgesExternalUpdatesQueue = [];
   }
 
   // GENERAL
@@ -71,7 +98,6 @@ class GraphBoardStore {
   // CRUD
   updateNodes(nodes: GBaseNode[]) {
     this.boardNodes?.replace(nodes);
-    console.log('update');
   }
   updateEdges(edges: GEdge[]) {
     this.boardEdges?.replace(edges);
