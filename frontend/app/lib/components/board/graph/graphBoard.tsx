@@ -2,6 +2,7 @@
 
 import '@xyflow/react/dist/style.css';
 import { observer } from 'mobx-react-lite';
+import type { EdgeChange, NodeChange } from '@xyflow/react';
 import {
   applyEdgeChanges,
   applyNodeChanges,
@@ -12,75 +13,147 @@ import {
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import throttle from 'lodash/throttle';
+import batchGraphUpdates from '@/app/lib/utils/batchGraphUpdates';
 
 const GraphBoard = observer(() => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
 
+  const nodesMap = useMemo(() => {
+    const map = new Map<string, number>();
+    nodes.forEach((node, index) => map.set(node.id, index));
+    return map;
+  }, [nodes]);
+  const edgesMap = useMemo(() => {
+    const map = new Map<string, number>();
+    edges.forEach((edge, index) => map.set(edge.id, index));
+    return map;
+  }, [edges]);
+
+  // INITIAL STATE
   useEffect(() => {
-    setNodes(graphBoardStore.boardNodes || []);
-    setEdges(graphBoardStore.boardEdges || []);
+    setNodes(graphBoardStore.boardNodes ?? []);
+    setEdges(graphBoardStore.boardEdges ?? []);
   }, [graphBoardStore.boardNodes, graphBoardStore.boardEdges]);
 
-  useEffect(
-    () => batchedExternalUpdate('nodes'),
-    [graphBoardStore.nodesApplyUpdatesTrigger],
+  // EMITTERS
+  const throttledEmitNodes = useMemo(
+    () =>
+      throttle(
+        (changes: NodeChange[]) =>
+          graphBoardStore.emitUpdates('nodesUpdate', changes),
+        100,
+      ),
+    [],
   );
-  useEffect(
-    () => batchedExternalUpdate('edges'),
-    [graphBoardStore.edgesApplyUpdatesTrigger],
-  );
-
-  const handleExternalUpdate = (updateType: 'nodes' | 'edges') => {
-    const queue =
-      updateType === 'nodes'
-        ? graphBoardStore.nodesExternalUpdatesQueue
-        : graphBoardStore.edgesExternalUpdatesQueue;
-    graphBoardStore.clearUpdatesQueue(updateType);
-    // TODO: batch updates
-    const batchedChanges = [];
-    if (updateType === 'nodes') onNodesChange(batchedChanges, true);
-    else onEdgesChange(batchedChanges, true);
-  };
-
-  const batchedExternalUpdate = useMemo(
-    () => throttle(handleExternalUpdate, 640),
+  const throttledEmitEdges = useMemo(
+    () =>
+      throttle(
+        (changes: EdgeChange[]) =>
+          graphBoardStore.emitUpdates('edgesUpdate', changes),
+        100,
+      ),
     [],
   );
 
-  const throttledNodesUpdate = useMemo(
-    () => throttle(graphBoardStore.updateNodes, 640),
-    [],
-  );
-  const throttledEdgesUpdate = useMemo(
-    () => throttle(graphBoardStore.updateEdges, 640),
-    [],
-  );
-  const throttledEmitChanges = useMemo(
-    () => throttle(graphBoardStore.emitUpdates, 100),
-    [],
-  );
-
+  // LOCAL HANDLERS
   const onNodesChange = useCallback(
-    (changes, external: boolean = false) =>
-      setNodes((nodesSnapshot) => {
-        const updated = applyNodeChanges(changes, nodesSnapshot);
-        throttledNodesUpdate(updated);
-        if (!external) throttledEmitChanges('nodesUpdate', changes);
-        return updated;
-      }),
-    [throttledNodesUpdate, throttledEmitChanges],
+    (changes: NodeChange[], external?: boolean) => {
+      setNodes((prev) => applyNodeChanges(changes, prev));
+      if (!external) throttledEmitNodes(changes);
+    },
+    [throttledEmitNodes],
   );
   const onEdgesChange = useCallback(
-    (changes, external: boolean = false) =>
-      setEdges((edgesSnapshot) => {
-        const updated = applyEdgeChanges(changes, edgesSnapshot);
-        throttledEdgesUpdate(updated);
-        if (!external) throttledEmitChanges('edgesUpdate', changes);
-        return updated;
-      }),
-    [throttledEdgesUpdate, throttledEmitChanges],
+    (changes: EdgeChange[], external?: boolean) => {
+      setEdges((prev) => applyEdgeChanges(changes, prev));
+      if (!external) throttledEmitEdges(changes);
+    },
+    [throttledEmitEdges],
   );
+  const onNodesLockChange = (changes: { id: string; lock: boolean }[]) => {
+    onNodesChange(
+      changes.map((change) => {
+        return {
+          type: 'replace',
+          item: {
+            ...nodes[nodesMap.get(change.id)],
+            connectable: change.lock,
+            draggable: change.lock,
+            selectable: change.lock,
+          },
+        } as NodeChange;
+      }),
+      true,
+    );
+  };
+  const onEdgesLockChange = (changes: { id: string; lock: boolean }[]) => {
+    onEdgesChange(
+      changes.map((change) => {
+        return {
+          type: 'replace',
+          item: {
+            ...edges[edgesMap.get(change.id)],
+            connectable: change.lock,
+            draggable: change.lock,
+            selectable: change.lock,
+          },
+        } as EdgeChange;
+      }),
+      true,
+    );
+  };
+
+  // EXTERNAL HANDLERS
+  const onExternalNodesChange = useMemo(
+    () =>
+      throttle(() => {
+        const queue = graphBoardStore.nodesExternalUpdatesQueue;
+        if (queue.length === 0) return;
+        graphBoardStore.clearUpdatesQueue('nodes');
+        const { changes, lockUpdates } = batchGraphUpdates(queue);
+        setNodes((prev) => applyNodeChanges(changes, prev));
+        onNodesLockChange(lockUpdates);
+      }, 640),
+    [],
+  );
+
+  const onExternalEdgesChange = useMemo(
+    () =>
+      throttle(() => {
+        const queue = graphBoardStore.edgesExternalUpdatesQueue;
+        if (queue.length === 0) return;
+        graphBoardStore.clearUpdatesQueue('edges');
+        const { changes, lockUpdates } = batchGraphUpdates(queue);
+        setEdges((prev) => applyEdgeChanges(changes, prev));
+        onEdgesLockChange(lockUpdates);
+      }, 640),
+    [],
+  );
+
+  // EXTERNAL UPDATES WATCHERS
+  useEffect(() => {
+    onExternalNodesChange();
+  }, [graphBoardStore.nodesApplyUpdatesTrigger, onExternalNodesChange]);
+
+  useEffect(() => {
+    onExternalEdgesChange();
+  }, [graphBoardStore.edgesApplyUpdatesTrigger, onExternalEdgesChange]);
+
+  // CLEANUP
+  useEffect(() => {
+    return () => {
+      throttledEmitNodes.cancel();
+      throttledEmitEdges.cancel();
+      onExternalNodesChange.cancel();
+      onExternalEdgesChange.cancel();
+    };
+  }, [
+    throttledEmitNodes,
+    throttledEmitEdges,
+    onExternalNodesChange,
+    onExternalEdgesChange,
+  ]);
 
   return (
     <div
@@ -88,10 +161,10 @@ const GraphBoard = observer(() => {
       className="relative h-full w-full overflow-hidden"
     >
       <ReactFlow
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
         nodes={nodes}
         edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         fitView
       >
         <Background />
