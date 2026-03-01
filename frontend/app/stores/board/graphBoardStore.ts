@@ -8,14 +8,15 @@ import {
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { GBaseNode, GEdge } from '@/app/lib/types/definitions';
+import { EdgeChange, NodeChange } from '@xyflow/react';
 
 const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
 
 let socketRef: Socket | null = null;
 
 class GraphBoardStore {
-  nodesExternalUpdatesQueue = [];
-  edgesExternalUpdatesQueue = [];
+  nodesExternalUpdatesQueue: NodeChange[] = [];
+  edgesExternalUpdatesQueue: EdgeChange[] = [];
 
   boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
@@ -44,7 +45,11 @@ class GraphBoardStore {
         if (!socket) return;
         if (boardStore.activeBoard?.type === 'GRAPH') {
           this.socketAddEventListeners(socket);
-          this.cleanupListeners = () => this.socketRemoveEventListeners(socket);
+          this.cleanupListeners = () => {
+            this.socketRemoveEventListeners(socket);
+            this.nodesExternalUpdatesQueue = [];
+            this.edgesExternalUpdatesQueue = [];
+          };
         }
       },
     );
