@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Board } from '@/app/lib/types/definitions';
+import { Board, BoardTypes } from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
@@ -19,6 +19,13 @@ const BoardLoader = ({
       const sectionId = sectionIds.pop();
       projectsStore.insertProjectChild(sectionIds, sectionData, true);
       boardStore.setActiveBoard({ ...boardData, sectionId });
+      projectsStore.addRecentBoard(
+        projectsStore.activeProject?.id || '',
+        sectionId,
+        boardData.id,
+        boardData.name,
+        boardData.type.toUpperCase() as BoardTypes,
+      );
       switch (boardData.type.toUpperCase()) {
         case 'SIMPLE':
           simpleBoardStore.setBoardLayers(boardData.layers);

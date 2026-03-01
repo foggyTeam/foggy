@@ -5,7 +5,6 @@ import { Socket } from 'socket.io-client';
 import openBoardSocketConnection from '@/app/lib/utils/boardSocketConnection';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import projectsStore from '@/app/stores/projectsStore';
 
 class BoardStore {
   boardWebsocket: Socket | null = null;
@@ -32,13 +31,6 @@ class BoardStore {
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
 
-      projectsStore.addRecentBoard(
-        projectsStore.activeProject?.id || '',
-        board.sectionId,
-        board.id,
-        board.name,
-        board.type.toUpperCase() as BoardTypes,
-      );
       this.connectSocket(this.activeBoard.id || '');
     }
   };
