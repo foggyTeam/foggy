@@ -2,14 +2,10 @@
 
 import React, { ReactNode, useEffect, useMemo, useRef } from 'react';
 import { Group, Layer, Rect, Stage, Transformer } from 'react-konva';
-import { Button } from '@heroui/button';
-import { MaximizeIcon } from 'lucide-react';
 import BoardLayer from '@/app/lib/components/board/simple/boardLayer';
 import ToolBar from '@/app/lib/components/board/simple/menu/toolBar';
 import { observer } from 'mobx-react-lite';
 import { primary } from '@/tailwind.config';
-import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
-import settingsStore from '@/app/stores/settingsStore';
 import { createPortal } from 'react-dom';
 import TextEditor from '@/app/lib/components/board/simple/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
@@ -21,6 +17,7 @@ import UseWheelEvent from '@/app/lib/hooks/simpleBoard/useWheelEvent';
 import UseTouchEvent from '@/app/lib/hooks/simpleBoard/useTouchEvent';
 import UseRAFNavigation from '@/app/lib/hooks/simpleBoard/useRAFNavigation';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
+import ResetStageButton from '@/app/lib/components/board/resetStageButton';
 
 const GRID_SIZE = 24;
 
@@ -142,19 +139,7 @@ const BoardStage = observer(() => {
           document.body,
         )}
 
-      <FTooltip content={settingsStore.t.toolTips.resetStage}>
-        <Button
-          data-testid="reset-stage-btn"
-          onPress={resetStage}
-          isIconOnly
-          color="secondary"
-          variant="light"
-          size="md"
-          className="invisible absolute right-24 bottom-4 z-50 font-semibold sm:visible"
-        >
-          <MaximizeIcon />
-        </Button>
-      </FTooltip>
+      <ResetStageButton callback={resetStage} />
     </div>
   );
 });
