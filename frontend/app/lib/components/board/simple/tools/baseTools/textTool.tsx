@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import 'react-quill-new/dist/quill.snow.css';
 import TextEditor from '@/app/lib/components/board/simple/tools/textEditor/textEditor';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
-import useTool from '@/app/lib/hooks/useTool';
+import useTool from '@/app/lib/hooks/simpleBoard/useTool';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function TextTool() {

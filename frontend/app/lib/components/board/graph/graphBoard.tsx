@@ -2,18 +2,10 @@
 
 import '@xyflow/react/dist/style.css';
 import { observer } from 'mobx-react-lite';
-import type { EdgeChange, NodeChange } from '@xyflow/react';
-import {
-  applyEdgeChanges,
-  applyNodeChanges,
-  Background,
-  Controls,
-  ReactFlow,
-} from '@xyflow/react';
-import graphBoardStore from '@/app/stores/board/graphBoardStore';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import throttle from 'lodash/throttle';
-import batchGraphUpdates from '@/app/lib/utils/batchGraphUpdates';
+import { Background, Controls, ReactFlow } from '@xyflow/react';
+import { useMemo, useState } from 'react';
+import useInternalUpdates from '@/app/lib/hooks/graphBoard/useInternalUpdates';
+import useExternalUpdates from '@/app/lib/hooks/graphBoard/useExternalUpdates';
 
 const GraphBoard = observer(() => {
   const [nodes, setNodes] = useState([]);
@@ -30,132 +22,22 @@ const GraphBoard = observer(() => {
     return map;
   }, [edges]);
 
-  // INITIAL STATE
-  useEffect(() => {
-    setNodes(graphBoardStore.boardNodes ?? []);
-    setEdges(graphBoardStore.boardEdges ?? []);
-  }, [graphBoardStore.boardNodes, graphBoardStore.boardEdges]);
+  const getNodeById = (id: string) => nodes[nodesMap.get(id)];
+  const getEdgeById = (id: string) => edges[edgesMap.get(id)];
 
-  // EMITTERS
-  const throttledEmitNodes = useMemo(
-    () =>
-      throttle(
-        (changes: NodeChange[]) =>
-          graphBoardStore.emitUpdates('nodesUpdate', changes),
-        100,
-      ),
-    [],
-  );
-  const throttledEmitEdges = useMemo(
-    () =>
-      throttle(
-        (changes: EdgeChange[]) =>
-          graphBoardStore.emitUpdates('edgesUpdate', changes),
-        100,
-      ),
-    [],
-  );
-
-  // LOCAL HANDLERS
-  const onNodesChange = useCallback(
-    (changes: NodeChange[], external?: boolean) => {
-      setNodes((prev) => applyNodeChanges(changes, prev));
-      if (!external) throttledEmitNodes(changes);
-    },
-    [throttledEmitNodes],
-  );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[], external?: boolean) => {
-      setEdges((prev) => applyEdgeChanges(changes, prev));
-      if (!external) throttledEmitEdges(changes);
-    },
-    [throttledEmitEdges],
-  );
-  const onNodesLockChange = (changes: { id: string; lock: boolean }[]) => {
-    onNodesChange(
-      changes.map((change) => {
-        return {
-          type: 'replace',
-          item: {
-            ...nodes[nodesMap.get(change.id)],
-            connectable: !change.lock,
-            draggable: !change.lock,
-            selectable: !change.lock,
-          },
-        } as NodeChange;
-      }),
-      true,
-    );
-  };
-  const onEdgesLockChange = (changes: { id: string; lock: boolean }[]) => {
-    onEdgesChange(
-      changes.map((change) => {
-        return {
-          type: 'replace',
-          item: {
-            ...edges[edgesMap.get(change.id)],
-            connectable: !change.lock,
-            draggable: !change.lock,
-            selectable: !change.lock,
-          },
-        } as EdgeChange;
-      }),
-      true,
-    );
-  };
-
-  // EXTERNAL HANDLERS
-  const onExternalNodesChange = useMemo(
-    () =>
-      throttle(() => {
-        const queue = graphBoardStore.nodesExternalUpdatesQueue;
-        graphBoardStore.clearUpdatesQueue('nodes');
-
-        if (queue.length === 0) return;
-        const { changes, lockUpdates } = batchGraphUpdates(queue);
-        setNodes((prev) => applyNodeChanges(changes, prev));
-        onNodesLockChange(lockUpdates);
-      }, 640),
-    [],
-  );
-
-  const onExternalEdgesChange = useMemo(
-    () =>
-      throttle(() => {
-        const queue = graphBoardStore.edgesExternalUpdatesQueue;
-        graphBoardStore.clearUpdatesQueue('edges');
-        if (queue.length === 0) return;
-
-        const { changes, lockUpdates } = batchGraphUpdates(queue);
-        setEdges((prev) => applyEdgeChanges(changes, prev));
-        onEdgesLockChange(lockUpdates);
-      }, 640),
-    [],
-  );
-
-  // EXTERNAL UPDATES WATCHERS
-  useEffect(() => {
-    onExternalNodesChange();
-  }, [graphBoardStore.nodesApplyUpdatesTrigger, onExternalNodesChange]);
-
-  useEffect(() => {
-    onExternalEdgesChange();
-  }, [graphBoardStore.edgesApplyUpdatesTrigger, onExternalEdgesChange]);
-
-  // CLEANUP
-  useEffect(() => {
-    return () => {
-      throttledEmitNodes.cancel();
-      throttledEmitEdges.cancel();
-      onExternalNodesChange.cancel();
-      onExternalEdgesChange.cancel();
-    };
-  }, [
-    throttledEmitNodes,
-    throttledEmitEdges,
-    onExternalNodesChange,
-    onExternalEdgesChange,
-  ]);
+  const { onNodesChange, onEdgesChange, onNodesLockChange, onEdgesLockChange } =
+    useInternalUpdates({
+      setNodes,
+      setEdges,
+      getNodeById,
+      getEdgeById,
+    });
+  useExternalUpdates({
+    setNodes,
+    setEdges,
+    onEdgesLockChange,
+    onNodesLockChange,
+  });
 
   return (
     <div

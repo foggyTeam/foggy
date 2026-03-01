@@ -15,11 +15,11 @@ import TextEditor from '@/app/lib/components/board/simple/tools/textEditor/textE
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { useTheme } from 'next-themes';
 import GridBackground from '@/app/lib/components/board/simple/backgroundGrid';
-import useStageContainerSize from '@/app/lib/hooks/simpleBoardNavigation/useStageSize';
-import UseMouseEvent from '@/app/lib/hooks/simpleBoardNavigation/useMouseEvent';
-import UseWheelEvent from '@/app/lib/hooks/simpleBoardNavigation/useWheelEvent';
-import UseTouchEvent from '@/app/lib/hooks/simpleBoardNavigation/useTouchEvent';
-import UseRAFNavigation from '@/app/lib/hooks/simpleBoardNavigation/useRAFNavigation';
+import useStageContainerSize from '@/app/lib/hooks/simpleBoard/useStageSize';
+import UseMouseEvent from '@/app/lib/hooks/simpleBoard/useMouseEvent';
+import UseWheelEvent from '@/app/lib/hooks/simpleBoard/useWheelEvent';
+import UseTouchEvent from '@/app/lib/hooks/simpleBoard/useTouchEvent';
+import UseRAFNavigation from '@/app/lib/hooks/simpleBoard/useRAFNavigation';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 const GRID_SIZE = 24;
