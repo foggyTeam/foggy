@@ -1,5 +1,5 @@
-import React from 'react';
+import GraphBoardClientWrapper from '@/app/lib/components/board/graph/graphBoardClientWrapper';
 
 export default async function GraphBoardPage() {
-  return <p>Graph page</p>;
+  return <GraphBoardClientWrapper />;
 }

@@ -39,7 +39,10 @@ const RecentBar = observer(
                 onClick={() => settingsStore.startLoading()}
                 isIconOnly
                 variant={
-                  board.url.endsWith(boardStore.activeBoard?.id || '')
+                  board.url.endsWith(
+                    `${boardStore.activeBoard?.id}/${boardStore.activeBoard?.type.toLowerCase()}` ||
+                      '',
+                  )
                     ? 'flat'
                     : 'light'
                 }

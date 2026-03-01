@@ -13,6 +13,7 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@eslint/eslintrc": "^3.3.3",
     "@heroui/alert": "^2.2.30",
     "@heroui/autocomplete": "^2.3.32",
     "@heroui/avatar": "^2.2.25",
@@ -49,13 +50,18 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/lodash": "^4.17.23",
+    "@types/node": "^20.19.33",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@xyflow/react": "^12.10.1",
     "add": "^2.0.6",
     "aws-sdk": "^2.1693.0",
     "axios": "^1.13.5",
     "canvas": "3.0.0-rc3",
     "clsx": "^2.1.1",
+    "d3-force": "^3.0.0",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "15.1.2",
     "framer-motion": "^11.18.2",
     "jose": "^5.10.0",
     "konva": "^9.3.22",
@@ -82,13 +88,10 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "zod": "^3.25.76",
-    "eslint": "^9.39.2",
-    "@eslint/eslintrc": "^3.3.3",
-    "eslint-config-next": "15.1.2",
-    "@types/node": "^20.19.33"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@types/d3-force": "^3.0.10",
     "@vitest/ui": "^2.1.9",
     "install": "^0.13.0",
     "openapi-typescript": "^7.13.0",
