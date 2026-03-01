@@ -99,14 +99,6 @@ class GraphBoardStore {
     this.boardNodes = observable.array(data.nodes || []);
     this.boardEdges = observable.array(data.edges || []);
   }
-
-  // CRUD
-  updateNodes(nodes: GBaseNode[]) {
-    this.boardNodes?.replace(nodes);
-  }
-  updateEdges(edges: GEdge[]) {
-    this.boardEdges?.replace(edges);
-  }
 }
 
 const graphBoardStore = new GraphBoardStore();

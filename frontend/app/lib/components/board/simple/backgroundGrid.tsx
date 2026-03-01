@@ -7,7 +7,7 @@ const createGridPattern = (gridSize: number) => {
   const size = gridSize;
   return `
     <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="${size / 2}" cy="${size / 2}" r="1" fill="#d4d4d8" />
+      <circle cx="${size / 2}" cy="${size / 2}" r="0.5" fill="#71717a" />
     </svg>
   `;
 };

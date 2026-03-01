@@ -7,6 +7,8 @@ import { useState } from 'react';
 import useInternalUpdates from '@/app/lib/hooks/graphBoard/useInternalUpdates';
 import useExternalUpdates from '@/app/lib/hooks/graphBoard/useExternalUpdates';
 
+const GRID_SIZE = 24;
+
 const GraphBoard = observer(() => {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -31,8 +33,9 @@ const GraphBoard = observer(() => {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         fitView
+        fitViewOptions={{ maxZoom: 1 }}
       >
-        <Background />
+        <Background size={1} gap={GRID_SIZE} color="#71717a" />
         <Controls />
       </ReactFlow>
     </div>
