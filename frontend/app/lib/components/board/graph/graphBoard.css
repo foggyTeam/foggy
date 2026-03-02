@@ -14,3 +14,17 @@
 .react-flow.dark {
   --xy-background-color-default: hsl(var(--heroui-primary-400) / 0);
 }
+
+.react-flow__handle {
+  background: hsl(var(--heroui-primary-500));
+  border: 1.5px solid hsl(var(--heroui-default-200));
+  transition: box-shadow 100ms ease-in-out;
+}
+
+.dark.react-flow__handle {
+  border-color: hsl(var(--heroui-default-100));
+}
+
+.react-flow__handle:hover {
+  box-shadow: 0 0 0 3px hsl(var(--heroui-primary-400) / 0.4);
+}

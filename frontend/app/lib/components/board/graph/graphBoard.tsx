@@ -7,6 +7,8 @@ import {
   Background,
   Connection,
   Edge,
+  NodeTypes,
+  Panel,
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react';
@@ -15,8 +17,12 @@ import useInternalUpdates from '@/app/lib/hooks/graphBoard/useInternalUpdates';
 import useExternalUpdates from '@/app/lib/hooks/graphBoard/useExternalUpdates';
 import ResetStageButton from '@/app/lib/components/board/resetStageButton';
 import { useTheme } from 'next-themes';
+import ExternalLinkNode from '@/app/lib/components/board/graph/nodes/externalLinkNode';
 
-const GRID_SIZE = 24;
+const GRID_SIZE = 16;
+const NODE_TYPES: NodeTypes = {
+  externalLink: ExternalLinkNode as any,
+};
 
 const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
@@ -111,10 +117,12 @@ const GraphBoard = observer(() => {
         colorMode={theme}
         reconnectRadius={16}
         selectionMode="partial"
+        nodeTypes={NODE_TYPES}
         proOptions={{ hideAttribution: true }}
-        fitViewOptions={{ maxZoom: 1.2 }}
+        fitViewOptions={{ maxZoom: 1.5 }}
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
+        <Panel position="bottom-center">Toolbar</Panel>
         <ResetStageButton
           callback={() => fitView({ duration: 300, maxZoom: 1 })}
         />
