@@ -30,7 +30,16 @@ interface ForcedLayoutOptions {
 }
 
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
-const COLLIDE_PADDING = 24;
+
+const DEFAULT_LINK_DISTANCE = 20;
+const DEFAULT_STRENGTH = 0.8;
+const DEFAULT_COLLIDE_PADDING = 16;
+
+const VELOCITY_DECAY = 0.75;
+const ALPHA_DECAY = 0.028;
+const FORCE_STRENGTH = -100;
+const MAX_DISTANCE = 600;
+const COLLIDE_STRENGTH = 0.2;
 
 export default function useForcedLayout(
   nodes: Node[],
@@ -39,9 +48,9 @@ export default function useForcedLayout(
   options: ForcedLayoutOptions = {},
 ) {
   const {
-    linkDistance = 180,
-    chargeStrength = 0.5,
-    collideRadius = COLLIDE_PADDING,
+    linkDistance = DEFAULT_LINK_DISTANCE,
+    chargeStrength = DEFAULT_STRENGTH,
+    collideRadius = DEFAULT_COLLIDE_PADDING,
   } = options;
   const rafId = useRef<number | null>(null);
 
@@ -49,7 +58,10 @@ export default function useForcedLayout(
   const dirtyNodesSet = useRef(new Set<Node['id']>());
 
   const simulation = useRef(
-    forceSimulation<D3Node>([]).alphaDecay(0.028).velocityDecay(0.55).stop(),
+    forceSimulation<D3Node>([])
+      .alphaDecay(ALPHA_DECAY)
+      .velocityDecay(VELOCITY_DECAY)
+      .stop(),
   );
 
   const scheduleRAFRerender = useCallback(() => {
@@ -87,15 +99,15 @@ export default function useForcedLayout(
 
     // FORCES
     const manyBodyForce = forceManyBody<D3Node>()
-      .strength(-300)
-      .distanceMax(600);
+      .strength(FORCE_STRENGTH)
+      .distanceMax(MAX_DISTANCE);
     const linkForce = forceLink<D3Node, SimulationLinkDatum<D3Node>>([])
       .id((d) => d.id)
       .distance(linkDistance)
       .strength(chargeStrength);
     const collideForce = forceCollide<D3Node>((d) => {
       return Math.sqrt(d.width ** 2 + d.height ** 2) / 2 + collideRadius;
-    }).strength(0.7);
+    }).strength(COLLIDE_STRENGTH);
 
     // Setting required forces simulation
     simulation.current
@@ -169,8 +181,13 @@ export default function useForcedLayout(
     const d3node = simulationNodesMap.current.get(node.id);
     if (!d3node) return;
 
-    d3node.fx = null;
-    d3node.fy = null;
+    d3node.fx = node.position.x;
+    d3node.fy = node.position.y;
+
+    setTimeout(() => {
+      d3node.fx = null;
+      d3node.fy = null;
+    }, 2000);
   }, []);
 
   return { onDrag, onDragStop, restart };
