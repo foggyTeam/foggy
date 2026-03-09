@@ -18,6 +18,7 @@ import useExternalUpdates from '@/app/lib/hooks/graphBoard/useExternalUpdates';
 import ResetStageButton from '@/app/lib/components/board/resetStageButton';
 import { useTheme } from 'next-themes';
 import ExternalLinkNode from '@/app/lib/components/board/graph/nodes/externalLinkNode';
+import useForcedLayout from '@/app/lib/hooks/graphBoard/useForcedLayout';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -31,6 +32,8 @@ const GraphBoard = observer(() => {
 
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+
+  const { onDrag, onDragStop } = useForcedLayout(nodes, edges, setNodes);
 
   const { onNodesChange, onEdgesChange } = useInternalUpdates({
     setNodes,
@@ -67,7 +70,7 @@ const GraphBoard = observer(() => {
         },
       ]);
     },
-    [onEdgesChange],
+    [edges, onEdgesChange],
   );
   const handleReconnect = useCallback(
     (oldEdge: Edge, newConnection: Connection) => {
@@ -96,7 +99,7 @@ const GraphBoard = observer(() => {
         },
       ]);
     },
-    [onEdgesChange],
+    [edges, onEdgesChange],
   );
 
   return (
@@ -105,6 +108,8 @@ const GraphBoard = observer(() => {
       className="relative h-full w-full overflow-hidden"
     >
       <ReactFlow
+        onNodeDragStop={onDragStop}
+        onNodeDrag={onDrag}
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
