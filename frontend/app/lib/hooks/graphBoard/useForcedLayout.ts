@@ -61,7 +61,7 @@ export default function useForcedLayout(
     rafId.current = requestAnimationFrame(() => {
       rafId.current = null;
       const dirty = dirtyNodesSet.current;
-      dirtyNodesSet.current.clear();
+      dirtyNodesSet.current = new Set();
 
       setNodes((prev) =>
         prev.map((node) => {
@@ -72,15 +72,6 @@ export default function useForcedLayout(
         }),
       );
     });
-
-    return () => {
-      // Cleanup при размонтировании
-      simulation.current.stop();
-      if (rafId.current !== null) {
-        cancelAnimationFrame(rafId.current);
-        rafId.current = null;
-      }
-    };
   }, [setNodes]);
 
   useEffect(() => {
@@ -113,8 +104,15 @@ export default function useForcedLayout(
       .force('collide', collideForce);
 
     simulation.current.on('tick', scheduleRAFRerender);
-
     simulation.current.nodes([...simulationNodesMap.current.values()]);
+
+    return () => {
+      simulation.current.stop();
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+        rafId.current = null;
+      }
+    };
   }, [setNodes]);
 
   useEffect(() => {
@@ -147,9 +145,9 @@ export default function useForcedLayout(
   }, [nodes, edges]);
 
   const restart = useCallback((alpha: number = 0.15) => {
-    if (simulation.current.alpha() < simulation.current.alphaMin()) {
-      simulation.current.alpha(alpha).restart();
-    }
+    simulation.current
+      .alpha(Math.max(simulation.current.alpha(), alpha))
+      .restart();
   }, []);
 
   const onDrag = useCallback(
@@ -171,8 +169,8 @@ export default function useForcedLayout(
     const d3node = simulationNodesMap.current.get(node.id);
     if (!d3node) return;
 
-    d3node.fx = 0;
-    d3node.fy = 0;
+    d3node.fx = null;
+    d3node.fy = null;
   }, []);
 
   return { onDrag, onDragStop, restart };
