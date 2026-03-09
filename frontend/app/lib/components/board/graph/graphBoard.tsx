@@ -28,12 +28,12 @@ const NODE_TYPES: NodeTypes = {
 const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const { fitView } = useReactFlow();
+  const { fitView, updateNode } = useReactFlow();
 
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
 
-  const { onDrag, onDragStop } = useForcedLayout(nodes, edges, setNodes);
+  const { onDrag, onDragStop } = useForcedLayout(nodes, edges, updateNode);
 
   const { onNodesChange, onEdgesChange } = useInternalUpdates({
     setNodes,
