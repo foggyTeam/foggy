@@ -7,8 +7,12 @@ import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeToo
 import InternalLinkTool from '@/app/lib/components/board/graph/tools/internalLinkTool';
 import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLinkTool';
 import NodeLinkTool from '@/app/lib/components/board/graph/tools/nodeLinkTool';
+import { Divider } from '@heroui/divider';
+import DeleteTool from '@/app/lib/components/board/graph/tools/deleteTool';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 export default function GraphToolbar() {
+  const { selectedElements } = useGraphBoardContext();
   const tools = [
     InternalLinkTool,
     ExternalLinkTool,
@@ -31,6 +35,12 @@ export default function GraphToolbar() {
         {tools.map((Tool, index) => (
           <Tool key={index} />
         ))}
+        {!!selectedElements.length && (
+          <>
+            <Divider orientation="vertical" />
+            <DeleteTool />
+          </>
+        )}
       </div>
     </div>
   );

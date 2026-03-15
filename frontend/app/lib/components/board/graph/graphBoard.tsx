@@ -46,8 +46,14 @@ const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const { fitView, updateNode } = useReactFlow();
-  const { activeTool, setActiveTool, toolCursor, createNewElement } =
-    useGraphBoardContext();
+  const {
+    activeTool,
+    setActiveTool,
+    toolCursor,
+    createNewElement,
+    deleteSelectedElements,
+    onSelectionChange,
+  } = useGraphBoardContext();
 
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
@@ -155,11 +161,13 @@ const GraphBoard = observer(() => {
         onNodeDragStop={onDragStop}
         onNodeDrag={onDrag}
         nodes={nodes}
+        onSelectionChange={onSelectionChange}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onReconnect={handleReconnect}
         fitView
+        onDelete={deleteSelectedElements}
         onConnect={handleConnect}
         panOnDrag={[2]}
         onPaneClick={handleClick}

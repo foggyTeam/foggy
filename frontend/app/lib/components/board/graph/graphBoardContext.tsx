@@ -12,7 +12,7 @@ import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import { useReactFlow } from '@xyflow/react';
-import { GNode } from '@/app/lib/types/definitions';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 
@@ -29,6 +29,10 @@ interface BoardContextProps {
   setActiveTool: (tool: GraphTool | undefined) => void;
   toolCursor: string;
 
+  // SELECTION
+  selectedElements: (GNode | GEdge)[];
+  onSelectionChange: (params: { nodes: any[]; edges: any[] }) => void;
+
   // OPERATIONS
   createNewElement: (
     e: MouseEvent,
@@ -38,13 +42,18 @@ interface BoardContextProps {
     elementId: GNode['id'],
     newAttrs: Partial<GNode['data']>,
   ) => void;
+  deleteSelectedElements: () => void;
 }
 
 const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 
 export const GraphBoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
-    const { screenToFlowPosition } = useReactFlow();
+    const { screenToFlowPosition, deleteElements } = useReactFlow();
+
+    const [selectedElements, setSelectedElements] = useState<(GNode | GEdge)[]>(
+      [],
+    );
 
     // TOOLS
     const allToolsDisabled = projectsStore.myRole === 'reader';
@@ -97,17 +106,34 @@ export const GraphBoardProvider = observer(
       ) as any,
       [],
     );
+    const deleteSelectedElements = async () => {
+      const edges = selectedElements.filter((e) => 'source' in e);
+      const nodes = selectedElements.slice(edges.length);
+      await deleteElements({ nodes, edges });
+    };
+    const onSelectionChange = useCallback(
+      debounce(({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
+        setSelectedElements([...edges, ...nodes]);
+      }, 256) as any,
+      [],
+    );
 
     return (
       <BoardContext.Provider
         value={{
+          // TOOLS
           allToolsDisabled,
           activeTool,
           setActiveTool,
           toolCursor,
           toolsDisabled: false,
+          // SELECTION
+          selectedElements,
+          onSelectionChange,
+          // OPERATIONS
           createNewElement,
           updateElement,
+          deleteSelectedElements,
         }}
       >
         {children}
