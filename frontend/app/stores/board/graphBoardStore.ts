@@ -135,11 +135,8 @@ class GraphBoardStore {
     external?: boolean,
   ) {
     if (!this.nodesDataMap || !this.boardNodes) return;
-    let needToClear = false;
-
     if (isNew) {
-      this.nodesDataMap.set(nodeId, newAttrs);
-      needToClear = !(this.nodesDataMap.size % 10);
+      this.nodesDataMap.set(nodeId, observable(newAttrs));
     } else {
       if (!this.nodesDataMap.has(nodeId)) {
         const nodeIndex = this.boardNodes?.findIndex(
@@ -147,18 +144,16 @@ class GraphBoardStore {
         );
         if (nodeIndex < 0) return;
         this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
-        needToClear = !(this.nodesDataMap.size % 10);
       }
       const node = this.nodesDataMap.get(nodeId);
       Object.assign(node, newAttrs);
     }
     if (!external)
       this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
-    if (needToClear) this.clearRemovedNodes();
   }
-  clearRemovedNodes() {
+  clearRemovedNodes(nodes: GNode[]) {
     for (const [id] of this.nodesDataMap?.entries()) {
-      const nodeIndex = this.boardNodes?.findIndex((node) => node.id === id);
+      const nodeIndex = nodes?.findIndex((node) => node.id === id);
       if (nodeIndex < 0) this.nodesDataMap?.delete(id);
     }
   }

@@ -30,6 +30,8 @@ import CustomNode from '@/app/lib/components/board/graph/nodes/customNode';
 import InternalLinkNode from '@/app/lib/components/board/graph/nodes/internalLinkNode';
 import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import debounce from 'lodash/debounce';
+import { GNode } from '@/app/lib/types/definitions';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -122,9 +124,18 @@ const GraphBoard = observer(() => {
     if (newElement) {
       onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
       graphBoardStore.updateNodeData(newElement.id, newElement.data, true);
+      debouncedClearNodesData(nodes);
       setActiveTool(undefined);
     }
   };
+
+  const debouncedClearNodesData = useCallback(
+    debounce((currentNodes: GNode[]) => {
+      if (graphBoardStore.nodesDataMap?.size % 10) return;
+      graphBoardStore.clearRemovedNodes(currentNodes);
+    }, 512) as any,
+    [],
+  );
 
   return (
     <div
