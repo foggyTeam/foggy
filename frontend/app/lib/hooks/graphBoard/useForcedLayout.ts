@@ -26,15 +26,15 @@ interface ForcedLayoutOptions {
 
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
 
-const DEFAULT_LINK_DISTANCE = 20;
-const DEFAULT_STRENGTH = 0.6; // сила натяжения ребра
+const DEFAULT_LINK_DISTANCE = 128;
+const DEFAULT_STRENGTH = 0.4; // сила натяжения ребра
 const DEFAULT_COLLIDE_PADDING = 16;
 
 const POSITION_THRESHOLD = 0.1; // нет ререндера, если позиция изменилась на меньшее значение
 const VELOCITY_DECAY = 0.6; // сила сопротивления среды
 const ALPHA_DECAY = 0.05; // скорость затухания анимации
 const FORCE_STRENGTH = -100; // сила отталкивания узлов
-const MAX_DISTANCE = 600; // максимальная дистанция между узлами
+const MAX_DISTANCE = 200; // максимальная дистанция между узлами
 const COLLIDE_STRENGTH = 0.3; // жесткость столкновений тел
 const UNPIN_DELAY = 1000; // время разблокировки узла после окончания drag
 const SYNC_DEBOUNCE = 256;
@@ -181,7 +181,7 @@ export default function useForcedLayout(
       .distance(linkDistance)
       .strength(chargeStrength);
     const collideForce = forceCollide<D3Node>((d) => {
-      return Math.sqrt(d.width ** 2 + d.height ** 2) / 2 + collideRadius;
+      return Math.max(d.width / 2, d.height / 2) + collideRadius;
     }).strength(COLLIDE_STRENGTH);
 
     simulation.current
