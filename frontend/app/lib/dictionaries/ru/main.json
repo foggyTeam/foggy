@@ -403,7 +403,9 @@
       "layerBack": "Назад",
       "layerForward": "Вперед",
       "layerTop": "На передний слой",
-      "deleteTool": "Удалить"
+      "deleteTool": "Удалить",
+
+      "customNodeTool": "Кастомный узел"
     },
     "resetStage": "Сбросить смещение",
     "uploadButton": "Получить временную ссылку на изображение доски"

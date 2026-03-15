@@ -404,7 +404,9 @@
       "layerBack": "Move back",
       "layerForward": "Move forward",
       "layerTop": "Bring to front",
-      "deleteTool": "Delete"
+      "deleteTool": "Delete",
+
+      "customNodeTool": "Custom node"
     },
     "resetStage": "Reset position",
     "uploadButton": "Get board image temporary link"
