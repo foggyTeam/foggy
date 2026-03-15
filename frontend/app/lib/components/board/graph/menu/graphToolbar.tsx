@@ -3,19 +3,7 @@
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import React from 'react';
-import { PencilParams } from '@/app/lib/components/board/simple/tools/drawingHandlers';
 import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeTool';
-
-export type ToolProps = {
-  isDisabled: boolean;
-  activeTool: string;
-  setActiveTool: any;
-  addElement: any;
-  updateElement: any;
-  stageRef: any;
-  resetStage: any;
-  pencilParams?: PencilParams;
-};
 
 export default function GraphToolbar() {
   const tools = [CustomNodeTool];

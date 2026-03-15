@@ -8,6 +8,7 @@ import {
   Background,
   Connection,
   Edge,
+  NodeAddChange,
   NodeTypes,
   Panel,
   ReactFlow,
@@ -28,6 +29,7 @@ import cursorPointer from '@/app/lib/components/svg/cursorPointer';
 import CustomNode from '@/app/lib/components/board/graph/nodes/customNode';
 import InternalLinkNode from '@/app/lib/components/board/graph/nodes/internalLinkNode';
 import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
+import graphBoardStore from '@/app/stores/board/graphBoardStore';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -118,7 +120,8 @@ const GraphBoard = observer(() => {
   const handleClick = (e: MouseEvent) => {
     const newElement = createNewElement(e, activeTool);
     if (newElement) {
-      setNodes([...nodes, newElement]);
+      onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
+      graphBoardStore.updateNodeData(newElement.id, newElement.data, true);
       setActiveTool(undefined);
     }
   };

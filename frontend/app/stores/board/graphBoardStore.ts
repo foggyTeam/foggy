@@ -11,7 +11,7 @@ import { Socket } from 'socket.io-client';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { EdgeChange, NodeChange } from '@xyflow/react';
 
-const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
+const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate', 'nodeDataUpdate'];
 
 let socketRef: Socket | null = null;
 
@@ -80,11 +80,13 @@ class GraphBoardStore {
       ({
         nodeId,
         newAttrs,
+        isNew,
       }: {
         nodeId: GNode['id'];
         newAttrs: Partial<GNode['data']>;
+        isNew?: boolean;
       }) => {
-        this.updateNodeData(nodeId, newAttrs, true);
+        this.updateNodeData(nodeId, newAttrs, isNew, true);
       },
     );
   }
@@ -113,6 +115,7 @@ class GraphBoardStore {
     if (!data) {
       this.boardEdges = undefined;
       this.boardNodes = undefined;
+      this.nodesDataMap = undefined;
       return;
     }
 
@@ -128,20 +131,36 @@ class GraphBoardStore {
   updateNodeData(
     nodeId: GNode['id'],
     newAttrs: Partial<GNode['data']>,
+    isNew?: boolean,
     external?: boolean,
   ) {
     if (!this.nodesDataMap || !this.boardNodes) return;
+    let needToClear = false;
 
-    if (!this.nodesDataMap.has(nodeId)) {
-      const nodeIndex = this.boardNodes?.findIndex(
-        (node) => node.id === nodeId,
-      );
-      if (nodeIndex < 0) return;
-      this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
+    if (isNew) {
+      this.nodesDataMap.set(nodeId, newAttrs);
+      needToClear = !(this.nodesDataMap.size % 10);
+    } else {
+      if (!this.nodesDataMap.has(nodeId)) {
+        const nodeIndex = this.boardNodes?.findIndex(
+          (node) => node.id === nodeId,
+        );
+        if (nodeIndex < 0) return;
+        this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
+        needToClear = !(this.nodesDataMap.size % 10);
+      }
+      const node = this.nodesDataMap.get(nodeId);
+      Object.assign(node, newAttrs);
     }
-    const node = this.nodesDataMap.get(nodeId);
-    Object.assign(node, newAttrs);
-    if (!external) this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs });
+    if (!external)
+      this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
+    if (needToClear) this.clearRemovedNodes();
+  }
+  clearRemovedNodes() {
+    for (const [id] of this.nodesDataMap?.entries()) {
+      const nodeIndex = this.boardNodes?.findIndex((node) => node.id === id);
+      if (nodeIndex < 0) this.nodesDataMap?.delete(id);
+    }
   }
 }
 
