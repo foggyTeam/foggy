@@ -406,7 +406,10 @@
       "layerTop": "Bring to front",
       "deleteTool": "Delete",
 
-      "customNodeTool": "Custom node"
+      "customNodeTool": "Custom node",
+      "internalLinkTool": "Link to another project element",
+      "externalLinkTool": "Link to anywhere in the Web",
+      "nodeLinkTool": "Link to other node"
     },
     "resetStage": "Reset position",
     "uploadButton": "Get board image temporary link"

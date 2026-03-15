@@ -8,6 +8,7 @@ import {
   Background,
   Connection,
   Edge,
+  Node,
   NodeAddChange,
   NodeTypes,
   Panel,
@@ -35,10 +36,10 @@ import { GNode } from '@/app/lib/types/definitions';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
-  externalLink: ExternalLinkNode as any,
+  externalLinkNode: ExternalLinkNode as any,
   customNode: CustomNode as any,
-  internalLink: InternalLinkNode as any,
-  nodeLink: NodeLinkNode as any,
+  internalLinkNode: InternalLinkNode as any,
+  nodeLinkNode: NodeLinkNode as any,
 };
 
 const GraphBoard = observer(() => {
@@ -48,8 +49,8 @@ const GraphBoard = observer(() => {
   const { activeTool, setActiveTool, toolCursor, createNewElement } =
     useGraphBoardContext();
 
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
 
   const { onDrag, onDragStop } = useForcedLayout(nodes, edges, updateNode);
 

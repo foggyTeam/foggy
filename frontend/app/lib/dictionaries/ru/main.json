@@ -405,7 +405,10 @@
       "layerTop": "На передний слой",
       "deleteTool": "Удалить",
 
-      "customNodeTool": "Кастомный узел"
+      "customNodeTool": "Кастомный узел",
+      "internalLinkTool": "Ссылка на другой элемент проекта",
+      "externalLinkTool": "Любая ссылка в Интернете",
+      "nodeLinkTool": "Ссылка на другой узел"
     },
     "resetStage": "Сбросить смещение",
     "uploadButton": "Получить временную ссылку на изображение доски"

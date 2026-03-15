@@ -3,6 +3,7 @@
 import React, {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -88,10 +89,13 @@ export const GraphBoardProvider = observer(
       }
       return newNode as GNode;
     };
-    const updateElement = debounce(
-      (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
-        graphBoardStore.updateNodeData(elementId, newAttrs),
-      256,
+    const updateElement = useCallback(
+      debounce(
+        (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
+          graphBoardStore.updateNodeData(elementId, newAttrs),
+        256,
+      ) as any,
+      [],
     );
 
     return (

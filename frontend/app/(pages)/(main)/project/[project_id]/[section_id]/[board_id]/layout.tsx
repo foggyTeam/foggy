@@ -19,14 +19,14 @@ const GraphMockData: Pick<GraphBoard, 'graphEdges' | 'graphNodes'> = {
     {
       id: 'n1',
       position: { x: 0, y: 0 },
-      data: { label: 'Node 1' },
-      type: 'externalLink',
+      data: { title: 'Node 1' },
+      type: 'externalLinkNode',
     },
     {
       id: 'n2',
       position: { x: 0, y: 100 },
-      data: { label: 'Node 2' },
-      type: 'externalLink',
+      data: { title: 'Node 2' },
+      type: 'customNode',
     },
   ],
   graphEdges: [

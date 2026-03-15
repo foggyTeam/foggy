@@ -4,9 +4,17 @@ import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import React from 'react';
 import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeTool';
+import InternalLinkTool from '@/app/lib/components/board/graph/tools/internalLinkTool';
+import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLinkTool';
+import NodeLinkTool from '@/app/lib/components/board/graph/tools/nodeLinkTool';
 
 export default function GraphToolbar() {
-  const tools = [CustomNodeTool];
+  const tools = [
+    InternalLinkTool,
+    ExternalLinkTool,
+    CustomNodeTool,
+    NodeLinkTool,
+  ];
 
   return (
     <div
