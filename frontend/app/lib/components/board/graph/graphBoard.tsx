@@ -58,7 +58,11 @@ const GraphBoard = observer(() => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
-  const { onDrag, onDragStop } = useForcedLayout(nodes, edges, updateNode);
+  const { onNodeDrag, onSelectionDrag, onDragStop } = useForcedLayout(
+    nodes,
+    edges,
+    updateNode,
+  );
 
   const { onNodesChange, onEdgesChange } = useInternalUpdates({
     setNodes,
@@ -158,8 +162,10 @@ const GraphBoard = observer(() => {
       className="relative h-full w-full overflow-hidden"
     >
       <ReactFlow
+        onNodeDrag={onNodeDrag}
+        onSelectionDrag={onSelectionDrag}
         onNodeDragStop={onDragStop}
-        onNodeDrag={onDrag}
+        onSelectionDragStop={onDragStop}
         nodes={nodes}
         onSelectionChange={onSelectionChange}
         edges={edges}

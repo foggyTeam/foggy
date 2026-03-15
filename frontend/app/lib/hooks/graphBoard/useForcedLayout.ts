@@ -53,6 +53,7 @@ export default function useForcedLayout(
 
   const rafId = useRef<number | null>(null);
   const unpinTimeouts = useRef(new Map<string, number>());
+  const draggedNodes = useRef<Set<string>>(new Set());
 
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
   const dirtyNodesSet = useRef(new Set<Node['id']>());
@@ -76,6 +77,8 @@ export default function useForcedLayout(
 
   const scheduleRAFRerender = useCallback(() => {
     for (const d3node of simulationNodesMap.current.values()) {
+      if (draggedNodes.current.has(d3node.id)) continue;
+
       const prev = positionsMap.current.get(d3node.id);
       const x = d3node.x ?? 0;
       const y = d3node.y ?? 0;
@@ -175,7 +178,8 @@ export default function useForcedLayout(
   useEffect(() => {
     const manyBodyForce = forceManyBody<D3Node>()
       .strength(FORCE_STRENGTH)
-      .distanceMax(MAX_DISTANCE);
+      .distanceMax(MAX_DISTANCE)
+      .theta(0.9);
     const linkForce = forceLink<D3Node, SimulationLinkDatum<D3Node>>([])
       .id((d) => d.id)
       .distance(linkDistance)
@@ -189,7 +193,11 @@ export default function useForcedLayout(
       .force('link', linkForce)
       .force('collide', collideForce);
 
-    simulation.current.on('tick', scheduleRAFRerender);
+    simulation.current.on('tick', () => {
+      scheduleRAFRerender();
+      if (simulation.current.alpha() < 0.02) simulation.current.stop();
+    });
+
     simulation.current.nodes([...simulationNodesMap.current.values()]);
 
     return () => {
@@ -218,40 +226,73 @@ export default function useForcedLayout(
     );
   }, [nodes, edges]);
 
-  const onDrag = useCallback(
-    (_event: MouseEvent, node: Node) => {
-      const d3node = simulationNodesMap.current.get(node.id);
-      if (!d3node) return;
+  const onNodeDrag = useCallback((_event: MouseEvent, node: Node) => {
+    draggedNodes.current.add(node.id);
 
-      d3node.fx = node.position.x;
-      d3node.fy = node.position.y;
-      d3node.x = node.position.x;
-      d3node.y = node.position.y;
-
-      simulation.current.alpha(0.3).restart();
-    },
-    [restart],
-  );
-
-  const onDragStop = useCallback((_event: MouseEvent, node: Node) => {
     const d3node = simulationNodesMap.current.get(node.id);
     if (!d3node) return;
 
     d3node.fx = node.position.x;
     d3node.fy = node.position.y;
+    d3node.x = node.position.x;
+    d3node.y = node.position.y;
 
-    if (unpinTimeouts.current.has(node.id)) {
-      clearTimeout(unpinTimeouts.current.get(node.id)!);
-    }
-
-    const timeoutId = setTimeout(() => {
-      d3node.fx = null;
-      d3node.fy = null;
-      unpinTimeouts.current.delete(node.id);
-    }, UNPIN_DELAY);
-
-    unpinTimeouts.current.set(node.id, timeoutId);
+    simulation.current.alpha(0.05).restart();
   }, []);
 
-  return { onDrag, onDragStop, restart };
+  const onSelectionDrag = useCallback((_event: MouseEvent, nodes: Node[]) => {
+    nodes.forEach((node) => {
+      draggedNodes.current.add(node.id);
+
+      const d3node = simulationNodesMap.current.get(node.id);
+      if (d3node) {
+        d3node.fx = node.position.x;
+        d3node.fy = node.position.y;
+      }
+    });
+  }, []);
+
+  const onDragStop = useCallback(
+    (_event: MouseEvent, nodeOrNodes: Node | Node[]) => {
+      const nodesArray = Array.isArray(nodeOrNodes)
+        ? nodeOrNodes
+        : [nodeOrNodes];
+
+      nodesArray.forEach((node) => {
+        draggedNodes.current.delete(node.id);
+
+        const d3node = simulationNodesMap.current.get(node.id);
+        if (!d3node) return;
+
+        d3node.x = node.position.x;
+        d3node.y = node.position.y;
+        d3node.fx = node.position.x;
+        d3node.fy = node.position.y;
+
+        if (unpinTimeouts.current.has(node.id)) {
+          clearTimeout(unpinTimeouts.current.get(node.id)!);
+        }
+
+        const timeoutId = setTimeout(() => {
+          d3node.fx = null;
+          d3node.fy = null;
+          unpinTimeouts.current.delete(node.id);
+        }, UNPIN_DELAY);
+
+        unpinTimeouts.current.set(node.id, timeoutId);
+      });
+
+      if (draggedNodes.current.size === 0) {
+        simulation.current.alpha(0.15).restart();
+      }
+    },
+    [],
+  );
+
+  return {
+    onNodeDrag,
+    onSelectionDrag,
+    onDragStop,
+    restart,
+  };
 }
