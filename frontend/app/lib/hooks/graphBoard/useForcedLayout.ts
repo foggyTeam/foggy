@@ -27,16 +27,16 @@ interface ForcedLayoutOptions {
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
 
 const DEFAULT_LINK_DISTANCE = 20;
-const DEFAULT_STRENGTH = 0.6;
-const DEFAULT_COLLIDE_PADDING = 8;
+const DEFAULT_STRENGTH = 0.6; // сила натяжения ребра
+const DEFAULT_COLLIDE_PADDING = 16;
 
-const POSITION_THRESHOLD = 0.2;
-const VELOCITY_DECAY = 0.8;
-const ALPHA_DECAY = 0.028;
-const FORCE_STRENGTH = -100;
-const MAX_DISTANCE = 600;
-const COLLIDE_STRENGTH = 0.2;
-const UNPIN_DELAY = 640;
+const POSITION_THRESHOLD = 0.1; // нет ререндера, если позиция изменилась на меньшее значение
+const VELOCITY_DECAY = 0.6; // сила сопротивления среды
+const ALPHA_DECAY = 0.05; // скорость затухания анимации
+const FORCE_STRENGTH = -100; // сила отталкивания узлов
+const MAX_DISTANCE = 600; // максимальная дистанция между узлами
+const COLLIDE_STRENGTH = 0.3; // жесткость столкновений тел
+const UNPIN_DELAY = 1000; // время разблокировки узла после окончания drag
 const SYNC_DEBOUNCE = 256;
 
 export default function useForcedLayout(
