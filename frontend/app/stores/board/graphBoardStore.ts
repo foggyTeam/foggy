@@ -3,11 +3,12 @@ import {
   IObservableArray,
   makeAutoObservable,
   observable,
+  ObservableMap,
   reaction,
 } from 'mobx';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
-import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { EdgeChange, NodeChange } from '@xyflow/react';
 
 const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
@@ -21,6 +22,9 @@ class GraphBoardStore {
   boardNodes: IObservableArray<GNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
 
+  nodesDataMap: ObservableMap<GNode['id'], GNode['data']> | undefined =
+    undefined;
+
   nodesApplyUpdatesTrigger: boolean = false;
   edgesApplyUpdatesTrigger: boolean = false;
 
@@ -31,8 +35,10 @@ class GraphBoardStore {
       boardEdges: observable,
       nodesApplyUpdatesTrigger: observable,
       edgesApplyUpdatesTrigger: observable,
+      nodesDataMap: observable,
 
       setGraphData: action,
+      updateNodeData: action,
     });
 
     reaction(
@@ -68,6 +74,19 @@ class GraphBoardStore {
       this.edgesExternalUpdatesQueue.push(changes);
       this.edgesApplyUpdatesTrigger = !this.edgesApplyUpdatesTrigger;
     });
+
+    socket.on(
+      'nodeDataUpdate',
+      ({
+        nodeId,
+        newAttrs,
+      }: {
+        nodeId: GNode['id'];
+        newAttrs: Partial<GNode['data']>;
+      }) => {
+        this.updateNodeData(nodeId, newAttrs, true);
+      },
+    );
   }
   private socketRemoveEventListeners(socket: Socket) {
     for (const event of GraphBoardEvents) socket.removeAllListeners(event);
@@ -96,8 +115,33 @@ class GraphBoardStore {
       this.boardNodes = undefined;
       return;
     }
+
+    const nodeData = data.nodes?.map((node) => {
+      return [node.id, observable(node.data)];
+    });
     this.boardNodes = observable.array(data.nodes || []);
+    this.nodesDataMap = observable.map(nodeData);
     this.boardEdges = observable.array(data.edges || []);
+  }
+
+  // NODE DATA
+  updateNodeData(
+    nodeId: GNode['id'],
+    newAttrs: Partial<GNode['data']>,
+    external?: boolean,
+  ) {
+    if (!this.nodesDataMap || !this.boardNodes) return;
+
+    if (!this.nodesDataMap.has(nodeId)) {
+      const nodeIndex = this.boardNodes?.findIndex(
+        (node) => node.id === nodeId,
+      );
+      if (nodeIndex < 0) return;
+      this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
+    }
+    const node = this.nodesDataMap.get(nodeId);
+    Object.assign(node, newAttrs);
+    if (!external) this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs });
   }
 }
 

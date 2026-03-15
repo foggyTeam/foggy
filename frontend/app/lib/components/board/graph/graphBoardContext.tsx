@@ -12,7 +12,8 @@ import projectsStore from '@/app/stores/projectsStore';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import { useReactFlow } from '@xyflow/react';
 import { GNode } from '@/app/lib/types/definitions';
-import getHash from '@/app/lib/utils/getStringHash';
+import debounce from 'lodash/debounce';
+import graphBoardStore from '@/app/stores/board/graphBoardStore';
 
 export type GraphTool =
   | 'custom-node'
@@ -32,6 +33,10 @@ interface BoardContextProps {
     e: MouseEvent,
     tool: GraphTool | undefined,
   ) => GNode | null;
+  updateElement: (
+    elementId: GNode['id'],
+    newAttrs: Partial<GNode['data']>,
+  ) => void;
 }
 
 const BoardContext = createContext<BoardContextProps | undefined>(undefined);
@@ -83,6 +88,11 @@ export const GraphBoardProvider = observer(
       }
       return newNode as GNode;
     };
+    const updateElement = debounce(
+      (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
+        graphBoardStore.updateNodeData(elementId, newAttrs),
+      256,
+    );
 
     return (
       <BoardContext.Provider
@@ -93,6 +103,7 @@ export const GraphBoardProvider = observer(
           toolCursor,
           toolsDisabled: false,
           createNewElement,
+          updateElement,
         }}
       >
         {children}
