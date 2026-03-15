@@ -158,7 +158,7 @@ export interface SimpleBoard extends BaseBoard {
 
 export interface GraphBoard extends BaseBoard {
   type: 'GRAPH';
-  graphNodes: GBaseNode[];
+  graphNodes: GNode[];
   graphEdges: GEdge[];
 }
 
@@ -206,18 +206,63 @@ export interface LineElement extends SBaseElement {
 }
 
 // GRAPH BOARD
-export interface GBaseNode {
+export type GNode =
+  | GCustomNode
+  | GExternalLinkNode
+  | GInternalLinkNode
+  | GNodeLinkNode;
+interface GBaseNode {
   id: string;
   type?: string;
   position: { x: number; y: number };
-  data: GNodeData;
   hidden?: boolean;
   parentId?: string;
   handles?: GNodeHandle[];
 }
 
-interface GNodeData {
-  label?: string;
+interface GBaseNodeData {
+  shape?: 'rect' | 'circle' | 'oval';
+  borderWidth?: number;
+  borderColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+}
+
+export interface GCustomNode extends GBaseNode {
+  type: 'customNode';
+  data: {
+    title?: string;
+    description?: string;
+  } & GBaseNodeData;
+}
+
+export interface GExternalLinkNode extends GBaseNode {
+  type: 'externalLinkNode';
+  data: {
+    url?: string;
+    thumbnailUrl?: string;
+    favicon?: string;
+    domain?: string;
+    description?: string;
+  } & GBaseNodeData;
+}
+
+export interface GInternalLinkNode extends GBaseNode {
+  type: 'internalLinkNode';
+  data: {
+    type?: ProjectElementTypes;
+    title?: string;
+    path?: string[];
+  } & GBaseNodeData;
+}
+
+export interface GNodeLinkNode extends GBaseNode {
+  type: 'nodeLinkNode';
+  data: {
+    title?: string;
+    path?: string[];
+    nodeId?: string;
+  } & GBaseNodeData;
 }
 
 interface GNodeHandle {

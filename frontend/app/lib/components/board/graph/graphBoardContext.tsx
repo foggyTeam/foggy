@@ -10,16 +10,15 @@ import React, {
 import { observer } from 'mobx-react-lite';
 import projectsStore from '@/app/stores/projectsStore';
 import cursorAdd from '@/app/lib/components/svg/cursorAdd';
-import { GBaseNode } from '@/app/lib/types/definitions';
 import { useReactFlow } from '@xyflow/react';
-import cursorGrab from '@/app/lib/components/svg/cursorGrab';
+import { GNode } from '@/app/lib/types/definitions';
+import getHash from '@/app/lib/utils/getStringHash';
 
-type GraphTool =
+export type GraphTool =
   | 'custom-node'
   | 'internal-link'
   | 'external-link'
-  | 'node-link'
-  | 'delete';
+  | 'node-link';
 interface BoardContextProps {
   // TOOLS
   allToolsDisabled: boolean;
@@ -29,13 +28,18 @@ interface BoardContextProps {
   toolCursor: string;
 
   // OPERATIONS
-  addElement: (element: GBaseNode) => void;
+  createNewElement: (
+    e: MouseEvent,
+    tool: GraphTool | undefined,
+  ) => GNode | null;
 }
 
 const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 
 export const GraphBoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
+    const { screenToFlowPosition } = useReactFlow();
+
     // TOOLS
     const allToolsDisabled = projectsStore.myRole === 'reader';
     const [activeTool, setActiveTool] = useState<GraphTool | undefined>();
@@ -50,8 +54,34 @@ export const GraphBoardProvider = observer(
     }, [activeTool]);
 
     // OPERATIONS
-    const addElement = (element: any) => {
-      console.log(element);
+    const createNewElement = (
+      e: MouseEvent,
+      tool: GraphTool | undefined,
+    ): GNode | null => {
+      if (!tool) return null;
+
+      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      let newNode = {
+        id: `${tool}-${Date.now().toString()}`,
+        position: position,
+        data: {},
+        type: '',
+      };
+      switch (tool) {
+        case 'custom-node':
+          newNode.type = 'customNode';
+          break;
+        case 'internal-link':
+          newNode.type = 'internalLinkNode';
+          break;
+        case 'external-link':
+          newNode.type = 'externalLinkNode';
+          break;
+        case 'node-link':
+          newNode.type = 'nodeLinkNode';
+          break;
+      }
+      return newNode as GNode;
     };
 
     return (
@@ -62,7 +92,7 @@ export const GraphBoardProvider = observer(
           setActiveTool,
           toolCursor,
           toolsDisabled: false,
-          addElement,
+          createNewElement,
         }}
       >
         {children}

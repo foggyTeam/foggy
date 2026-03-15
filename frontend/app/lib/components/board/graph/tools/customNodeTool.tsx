@@ -7,17 +7,13 @@ import { CircleIcon, ShapesIcon } from 'lucide-react';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { handleMouseDown } from '@/app/lib/components/board/simple/tools/drawingHandlers';
+import { useReactFlow } from '@xyflow/react';
 
 export default function CustomNodeTool() {
   const { commonSize } = useAdaptiveParams();
-  const {
-    toolsDisabled,
-    activeTool,
-    setActiveTool,
-    addElement,
-    allToolsDisabled,
-  } = useGraphBoardContext();
-
+  const { toolsDisabled, activeTool, setActiveTool, allToolsDisabled } =
+    useGraphBoardContext();
   return (
     <FTooltip content={settingsStore.t.toolTips.tools.customNodeTool}>
       <Button

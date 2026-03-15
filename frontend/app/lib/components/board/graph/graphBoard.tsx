@@ -25,17 +25,24 @@ import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoar
 import cursorGrab from '@/app/lib/components/svg/cursorGrab';
 import cursorMove from '@/app/lib/components/svg/cursorMove';
 import cursorPointer from '@/app/lib/components/svg/cursorPointer';
+import CustomNode from '@/app/lib/components/board/graph/nodes/customNode';
+import InternalLinkNode from '@/app/lib/components/board/graph/nodes/internalLinkNode';
+import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
   externalLink: ExternalLinkNode as any,
+  customNode: CustomNode as any,
+  internalLink: InternalLinkNode as any,
+  nodeLink: NodeLinkNode as any,
 };
 
 const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const { fitView, updateNode } = useReactFlow();
-  const { toolCursor } = useGraphBoardContext();
+  const { activeTool, setActiveTool, toolCursor, createNewElement } =
+    useGraphBoardContext();
 
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
@@ -108,6 +115,13 @@ const GraphBoard = observer(() => {
     },
     [edges, onEdgesChange],
   );
+  const handleClick = (e: MouseEvent) => {
+    const newElement = createNewElement(e, activeTool);
+    if (newElement) {
+      setNodes([...nodes, newElement]);
+      setActiveTool(undefined);
+    }
+  };
 
   return (
     <div
@@ -133,6 +147,7 @@ const GraphBoard = observer(() => {
         fitView
         onConnect={handleConnect}
         panOnDrag={[2]}
+        onPaneClick={handleClick}
         selectionOnDrag
         colorMode={theme}
         reconnectRadius={16}

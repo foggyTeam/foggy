@@ -7,7 +7,7 @@ import {
 } from 'mobx';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
-import { GBaseNode, GEdge } from '@/app/lib/types/definitions';
+import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
 import { EdgeChange, NodeChange } from '@xyflow/react';
 
 const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
@@ -18,7 +18,7 @@ class GraphBoardStore {
   nodesExternalUpdatesQueue: NodeChange[][] = [];
   edgesExternalUpdatesQueue: EdgeChange[][] = [];
 
-  boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
+  boardNodes: IObservableArray<GNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
 
   nodesApplyUpdatesTrigger: boolean = false;
@@ -88,7 +88,7 @@ class GraphBoardStore {
   // GENERAL
   setGraphData(
     data:
-      | { nodes: GBaseNode[] | undefined; edges: GEdge[] | undefined }
+      | { nodes: GNode[] | undefined; edges: GEdge[] | undefined }
       | undefined,
   ) {
     if (!data) {
