@@ -2,19 +2,18 @@
 
 import React, {
   createContext,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   useCallback,
   useContext,
-  useMemo,
   useState,
 } from 'react';
 import { observer } from 'mobx-react-lite';
-import projectsStore from '@/app/stores/projectsStore';
-import cursorAdd from '@/app/lib/components/svg/cursorAdd';
-import { useReactFlow } from '@xyflow/react';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
 import debounce from 'lodash/debounce';
-import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import useGraphTool from '@/app/lib/hooks/graphBoard/useGraphTool';
+import useGraphOperations from '@/app/lib/hooks/graphBoard/useGraphOperations';
 
 export type GraphTool =
   | 'custom-node'
@@ -26,7 +25,7 @@ interface BoardContextProps {
   allToolsDisabled: boolean;
   toolsDisabled: boolean;
   activeTool: GraphTool | undefined;
-  setActiveTool: (tool: GraphTool | undefined) => void;
+  setActiveTool: Dispatch<SetStateAction<GraphTool | undefined>>;
   toolCursor: string;
 
   // SELECTION
@@ -49,68 +48,10 @@ const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 
 export const GraphBoardProvider = observer(
   ({ children }: { children: ReactNode }) => {
-    const { screenToFlowPosition, deleteElements } = useReactFlow();
-
+    // SELECTION
     const [selectedElements, setSelectedElements] = useState<(GNode | GEdge)[]>(
       [],
     );
-
-    // TOOLS
-    const allToolsDisabled = projectsStore.myRole === 'reader';
-    const [activeTool, setActiveTool] = useState<GraphTool | undefined>();
-    const toolCursor = useMemo(() => {
-      switch (activeTool) {
-        case undefined:
-          return 'default';
-
-        default:
-          return `url(${cursorAdd}) 12 12, auto`;
-      }
-    }, [activeTool]);
-
-    // OPERATIONS
-    const createNewElement = (
-      e: MouseEvent,
-      tool: GraphTool | undefined,
-    ): GNode | null => {
-      if (!tool) return null;
-
-      const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-      let newNode = {
-        id: `${tool}-${Date.now().toString()}`,
-        position: position,
-        data: {},
-        type: '',
-      };
-      switch (tool) {
-        case 'custom-node':
-          newNode.type = 'customNode';
-          break;
-        case 'internal-link':
-          newNode.type = 'internalLinkNode';
-          break;
-        case 'external-link':
-          newNode.type = 'externalLinkNode';
-          break;
-        case 'node-link':
-          newNode.type = 'nodeLinkNode';
-          break;
-      }
-      return newNode as GNode;
-    };
-    const updateElement = useCallback(
-      debounce(
-        (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
-          graphBoardStore.updateNodeData(elementId, newAttrs),
-        256,
-      ) as any,
-      [],
-    );
-    const deleteSelectedElements = async () => {
-      const edges = selectedElements.filter((e) => 'source' in e);
-      const nodes = selectedElements.slice(edges.length);
-      await deleteElements({ nodes, edges });
-    };
     const onSelectionChange = useCallback(
       debounce(({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
         setSelectedElements([...edges, ...nodes]);
@@ -118,15 +59,25 @@ export const GraphBoardProvider = observer(
       [],
     );
 
+    // TOOLS
+    const { activeTool, setActiveTool, allToolsDisabled, toolCursor } =
+      useGraphTool();
+
+    // OPERATIONS
+    const { createNewElement, updateElement, deleteSelectedElements } =
+      useGraphOperations(selectedElements);
+
     return (
       <BoardContext.Provider
         value={{
           // TOOLS
-          allToolsDisabled,
           activeTool,
           setActiveTool,
           toolCursor,
-          toolsDisabled: false,
+          allToolsDisabled,
+          toolsDisabled: !!(
+            selectedElements.length === 1 && selectedElements[0]
+          ),
           // SELECTION
           selectedElements,
           onSelectionChange,
