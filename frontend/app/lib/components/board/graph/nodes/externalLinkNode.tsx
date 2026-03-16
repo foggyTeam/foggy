@@ -13,6 +13,8 @@ import debounce from 'lodash/debounce';
 import getLinkPreview from '@/app/lib/utils/getLinkPreview';
 import { Avatar } from '@heroui/avatar';
 
+type UrlData = Partial<GExternalLinkNode['data']>;
+
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   const { smallerSize } = useAdaptiveParams();
   const data: GExternalLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
@@ -20,15 +22,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   );
   const [isEditing, setIsEditing] = useState(!data.url);
   const [isLoading, setIsLoading] = useState(false);
-  const [isVertical, setIsVertical] = useState(false);
 
   const [url, setUrl] = useState(data.url || '');
-  const [urlData, setUrlData] = useState({
-    thumbnailUrl: data.thumbnailUrl,
-    favicon: data.favicon,
-    domain: data.domain,
-    description: data.description,
-  });
 
   useEffect(() => {
     if (isEditing && url !== data.url) setUrl(data.url || '');
@@ -37,26 +32,25 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   const loadLinkData = debounce(async (newUrl: string | undefined) => {
     setIsLoading(true);
     const data = await getLinkPreview(newUrl);
-    if (data) {
-      setUrlData({
-        thumbnailUrl: data.preview || '',
-        favicon: data.favicon,
-        domain: data.title || data.domain,
-        description: data.description || '',
-      });
-    } else {
-      setUrlData({
-        thumbnailUrl: '',
-        favicon: '',
-        domain: '',
-        description: '',
-      });
-    }
+    const urlData: UrlData = data
+      ? {
+          thumbnailUrl: data.preview || '',
+          favicon: data.favicon,
+          domain: data.title || data.domain,
+          description: data.description || '',
+        }
+      : {
+          thumbnailUrl: '',
+          favicon: '',
+          domain: '',
+          description: '',
+        };
+
     setIsLoading(false);
-    handleUrlChange(newUrl);
+    handleUrlChange(newUrl, urlData);
   }, 512);
 
-  const handleUrlChange = (newUrl: string | undefined) => {
+  const handleUrlChange = (newUrl: string | undefined, urlData: UrlData) => {
     if (data.url !== newUrl)
       graphBoardStore.updateNodeData(node.id, {
         url: newUrl || undefined,
@@ -91,7 +85,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           </h1>
         </div>
 
-        <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs">
+        <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs italic">
           {data.description || 'No description'}
         </p>
       </div>
