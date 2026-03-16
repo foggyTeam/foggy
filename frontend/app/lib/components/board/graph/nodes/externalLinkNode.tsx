@@ -10,6 +10,8 @@ import { Input } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import debounce from 'lodash/debounce';
+import getLinkPreview from '@/app/lib/utils/getLinkPreview';
+import { Avatar } from '@heroui/avatar';
 
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   const { smallerSize } = useAdaptiveParams();
@@ -17,28 +19,47 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     node.id,
   );
   const [isEditing, setIsEditing] = useState(!data.url);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isVertical, setIsVertical] = useState(false);
+
   const [url, setUrl] = useState(data.url || '');
   const [urlData, setUrlData] = useState({
     thumbnailUrl: data.thumbnailUrl,
     favicon: data.favicon,
+    domain: data.domain,
     description: data.description,
   });
 
   useEffect(() => {
     if (isEditing && url !== data.url) setUrl(data.url || '');
-    if (!isEditing) handleUrlChange();
   }, [isEditing]);
 
   const loadLinkData = debounce(async (newUrl: string | undefined) => {
-    if (!newUrl?.length) return;
-    console.log(newUrl, 'loading thumb...');
-    // setUrlData
+    setIsLoading(true);
+    const data = await getLinkPreview(newUrl);
+    if (data) {
+      setUrlData({
+        thumbnailUrl: data.preview || '',
+        favicon: data.favicon,
+        domain: data.title || data.domain,
+        description: data.description || '',
+      });
+    } else {
+      setUrlData({
+        thumbnailUrl: '',
+        favicon: '',
+        domain: '',
+        description: '',
+      });
+    }
+    setIsLoading(false);
+    handleUrlChange(newUrl);
   }, 512);
 
-  const handleUrlChange = () => {
-    if (data.url !== url)
+  const handleUrlChange = (newUrl: string | undefined) => {
+    if (data.url !== newUrl)
       graphBoardStore.updateNodeData(node.id, {
-        url: url || undefined,
+        url: newUrl || undefined,
         ...urlData,
       });
   };
@@ -47,20 +68,36 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     <NodeWrapper>
       {!!data.thumbnailUrl?.length && (
         <Image
+          isLoading={isLoading}
           alt="Link thumbnail"
           src={data.thumbnailUrl}
-          className="h-32 w-52"
+          className="max-h-56 w-full overflow-clip"
           isZoomed
+          width={208}
         />
       )}
-      <div className="ga-1 flex flex-col">
-        <b>{data.domain || 'No domain'}</b>
-        <p className="text-default-500">
+
+      <div className="flex flex-col gap-1">
+        <div className="flex h-full w-full items-center justify-start gap-1">
+          <Avatar
+            classNames={{
+              base: 'h-7 w-7',
+            }}
+            src={data.favicon}
+            name={data.domain}
+          />
+          <h1 className="line-clamp-1 w-fit max-w-24 truncate font-medium text-nowrap">
+            {data.domain || 'No domain'}
+          </h1>
+        </div>
+
+        <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs">
           {data.description || 'No description'}
         </p>
       </div>
 
       <Input
+        isLoading={isLoading}
         placeholder={settingsStore.t.toolBar.linkPlaceholder}
         label={settingsStore.t.toolBar.linkLabel}
         type="link"
@@ -74,7 +111,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         color="primary"
         variant="underlined"
         size={smallerSize}
-        className="w-52"
+        className="w-full"
         classNames={{
           input: 'text-default-500 font-medium',
         }}
