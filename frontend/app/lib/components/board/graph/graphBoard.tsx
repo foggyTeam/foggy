@@ -183,7 +183,7 @@ const GraphBoard = observer(() => {
         selectionMode="partial"
         nodeTypes={NODE_TYPES}
         proOptions={{ hideAttribution: true }}
-        fitViewOptions={{ maxZoom: 1.5 }}
+        fitViewOptions={{ maxZoom: 1 }}
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
         <Panel position="bottom-center">
