@@ -379,9 +379,11 @@
     "textToolPlaceholder": "Напишите что-нибудь...",
     "linkPlaceholder": "https://hoggyfoggy.com",
     "linkLabel": "Ссылка",
-    "linkDescriptionLabel": "Описание",
-    "linkDescriptionPlaceholder": "Веб-приложение для тебя и твоей команды",
 
+    "descriptionLabel": "Описание",
+    "descriptionPlaceholder": "Веб-приложение для тебя и твоей команды",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Новая запись",
     "emptyLinkDomain": "Нет домена",
     "emptyLinkDescription": "Нет описания"
   },

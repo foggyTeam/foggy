@@ -49,7 +49,7 @@ export default function NodeWrapper({
         className={clsx(
           'w-56 px-1 py-2 text-sm',
           bg_container_no_padding,
-          isSelected && 'border-primary/50 border-1.5',
+          isSelected && 'border-primary dark:border-primary-100 border-1.5',
           className,
         )}
       >

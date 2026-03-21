@@ -13,8 +13,8 @@ import debounce from 'lodash/debounce';
 import getLinkPreview from '@/app/lib/utils/getLinkPreview';
 import { Avatar } from '@heroui/avatar';
 import { GlobeIcon } from 'lucide-react';
-import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
+import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 
 type UrlData = Partial<GExternalLinkNode['data']>;
 
@@ -24,22 +24,19 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   );
 
   const { smallerSize } = useAdaptiveParams();
-  const { selectedElements } = useGraphBoardContext();
 
-  const [isEditing, setIsEditing] = useState(!data.url);
   const [url, setUrl] = useState(data.url || '');
   const [description, setDescription] = useState(data.description || '');
   const [isLoading, setIsLoading] = useState(false);
+
+  const { isEditing, isSelected, debouncedUpdate, onBlur, toggleEdit } =
+    useGraphNode(node.id, !!data.url, () => loadLinkData.current.cancel());
 
   useEffect(() => {
     if (isEditing && url !== data.url) setUrl(data.url || '');
     if (isEditing && description !== data.description)
       setDescription(data.description || '');
   }, [isEditing]);
-  useEffect(() => {
-    if (selectedElements.length !== 1 || selectedElements[0].id !== node.id)
-      handleBlur();
-  }, [selectedElements]);
 
   useEffect(() => {
     if (data.url !== url) loadLinkData.current(url, description);
@@ -47,21 +44,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   useEffect(() => {
     if (data.description !== description)
-      debouncedDataUpdate.current({ description });
+      debouncedUpdate.current({ description });
   }, [description]);
-
-  useEffect(() => {
-    return () => {
-      debouncedDataUpdate.current.cancel();
-      loadLinkData.current.cancel();
-    };
-  }, []);
-
-  const debouncedDataUpdate = useRef(
-    debounce((newAttrs: Partial<GExternalLinkNode['data']>) => {
-      graphBoardStore.updateNodeData(node.id, newAttrs);
-    }, 512),
-  );
 
   const loadLinkData = useRef(
     debounce(async (newUrl: string | undefined, description: string) => {
@@ -84,13 +68,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           };
 
       setIsLoading(false);
-      debouncedDataUpdate.current(urlData);
+      debouncedUpdate.current(urlData);
     }, 512),
   );
-
-  const handleBlur = () => {
-    if (data.url) setIsEditing(false);
-  };
 
   const openLink = (e: MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
@@ -101,13 +81,11 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   return (
     <NodeWrapper
-      isSelected={
-        selectedElements.length === 1 && selectedElements[0].id === node.id
-      }
+      isSelected={isSelected}
       onPress={openLink}
-      onBlur={handleBlur}
+      onBlur={onBlur}
       toolbarProps={{
-        toggleEdit: () => setIsEditing((prev) => !prev),
+        toggleEdit,
       }}
     >
       {(isEditing || data.thumbnailUrl) && (
@@ -140,7 +118,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           </div>
 
           {data.description && (
-            <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs italic">
+            <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs whitespace-pre-wrap italic">
               {data.description}
             </p>
           )}
@@ -154,6 +132,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           onClick={(e) => e.stopPropagation()}
           onBlur={(e) => e.stopPropagation()}
         >
+          {/*TODO: add zod rules */}
           <Input
             isLoading={isLoading}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
@@ -175,10 +154,10 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             color="primary"
             variant="underlined"
             maxRows={2}
-            label={settingsStore.t.toolBar.linkDescriptionLabel}
+            label={settingsStore.t.toolBar.descriptionLabel}
             labelPlacement="inside"
             name="description"
-            placeholder={settingsStore.t.toolBar.linkDescriptionPlaceholder}
+            placeholder={settingsStore.t.toolBar.descriptionPlaceholder}
             type="description"
             autoComplete="description"
             size={smallerSize}

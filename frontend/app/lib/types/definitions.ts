@@ -220,20 +220,17 @@ interface GBaseNode {
   handles?: GNodeHandle[];
 }
 
-interface GBaseNodeData {
-  shape?: 'rect' | 'circle' | 'oval';
-  borderWidth?: number;
-  borderColor?: string;
-  backgroundColor?: string;
-  textColor?: string;
-}
-
 export interface GCustomNode extends GBaseNode {
   type: 'customNode';
   data: {
     title?: string;
     description?: string;
-  } & GBaseNodeData;
+    shape?: 'rect' | 'circle' | 'oval';
+    borderWidth?: number;
+    borderColor?: string;
+    backgroundColor?: string;
+    textColor?: string;
+  };
 }
 
 export interface GExternalLinkNode extends GBaseNode {
@@ -244,7 +241,7 @@ export interface GExternalLinkNode extends GBaseNode {
     favicon?: string;
     domain?: string;
     description?: string;
-  } & GBaseNodeData;
+  };
 }
 
 export interface GInternalLinkNode extends GBaseNode {
@@ -253,7 +250,7 @@ export interface GInternalLinkNode extends GBaseNode {
     type?: ProjectElementTypes;
     title?: string;
     path?: string[];
-  } & GBaseNodeData;
+  };
 }
 
 export interface GNodeLinkNode extends GBaseNode {
@@ -262,7 +259,7 @@ export interface GNodeLinkNode extends GBaseNode {
     title?: string;
     path?: string[];
     nodeId?: string;
-  } & GBaseNodeData;
+  };
 }
 
 interface GNodeHandle {
