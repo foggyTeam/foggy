@@ -6,29 +6,39 @@ import { Card, CardBody } from '@heroui/card';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import GraphTooltipToolbar from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
-import { useCallback, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 export default function NodeWrapper({
-  className,
   isSelected,
-  children,
-  toggleEdit,
   onBlur,
   onPress,
+  toolbarProps,
+  toolbarTools,
+  children,
+  className,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const delayedMenu = useCallback(
-    debounce((newValue: boolean) => setIsMenuOpen(newValue), 256) as any,
-    [setIsMenuOpen],
+  useEffect(() => {
+    return () => {
+      delayedMenu.current.cancel();
+    };
+  }, []);
+
+  const delayedMenu = useRef(
+    debounce((newValue: boolean) => setIsMenuOpen(newValue), 256),
   );
   return (
     <div
-      onMouseEnter={() => delayedMenu(true)}
-      onMouseLeave={() => delayedMenu(false)}
+      onMouseEnter={() => delayedMenu.current(true)}
+      onMouseLeave={() => delayedMenu.current(false)}
     >
-      <GraphTooltipToolbar toggleEdit={toggleEdit} isOpen={isMenuOpen} />
+      <GraphTooltipToolbar
+        {...toolbarProps}
+        tools={toolbarTools}
+        isOpen={isMenuOpen}
+      />
 
       <Card
         onPress={onPress}

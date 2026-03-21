@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GExternalLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { Image } from '@heroui/image';
@@ -14,59 +14,80 @@ import getLinkPreview from '@/app/lib/utils/getLinkPreview';
 import { Avatar } from '@heroui/avatar';
 import { GlobeIcon } from 'lucide-react';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
 
 type UrlData = Partial<GExternalLinkNode['data']>;
 
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
-  const { smallerSize } = useAdaptiveParams();
-  const { selectedElements } = useGraphBoardContext();
-
   const data: GExternalLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
     node.id,
   );
-  const [isEditing, setIsEditing] = useState(!data.url);
-  const [isLoading, setIsLoading] = useState(false);
 
+  const { smallerSize } = useAdaptiveParams();
+  const { selectedElements } = useGraphBoardContext();
+
+  const [isEditing, setIsEditing] = useState(!data.url);
   const [url, setUrl] = useState(data.url || '');
   const [description, setDescription] = useState(data.description || '');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isEditing && url !== data.url) setUrl(data.url || '');
+    if (isEditing && description !== data.description)
+      setDescription(data.description || '');
   }, [isEditing]);
+  useEffect(() => {
+    if (selectedElements.length !== 1 || selectedElements[0].id !== node.id)
+      handleBlur();
+  }, [selectedElements]);
 
-  const loadLinkData = debounce(async (newUrl: string | undefined) => {
-    setIsLoading(true);
-    const data = await getLinkPreview(newUrl);
-    const urlData: UrlData = data
-      ? {
-          thumbnailUrl: data.preview || '',
-          favicon: data.favicon,
-          domain: data.title || data.domain,
-          description: description || data.description || '',
-        }
-      : {
-          thumbnailUrl: '',
-          favicon: '',
-          domain: '',
-          description: description,
-        };
+  useEffect(() => {
+    if (data.url !== url) loadLinkData.current(url, description);
+  }, [url]);
 
-    setIsLoading(false);
-    handleUrlChange(newUrl, urlData);
-  }, 512);
-  const saveDescription = debounce(async (value: string | undefined) => {
-    graphBoardStore.updateNodeData(node.id, {
-      description: value,
-    });
-  }, 512);
+  useEffect(() => {
+    if (data.description !== description)
+      debouncedDataUpdate.current({ description });
+  }, [description]);
 
-  const handleUrlChange = (newUrl: string | undefined, urlData: UrlData) => {
-    if (data.url !== newUrl)
-      graphBoardStore.updateNodeData(node.id, {
-        url: newUrl || undefined,
-        ...urlData,
-      });
-  };
+  useEffect(() => {
+    return () => {
+      debouncedDataUpdate.current.cancel();
+      loadLinkData.current.cancel();
+    };
+  }, []);
+
+  const debouncedDataUpdate = useRef(
+    debounce((newAttrs: Partial<GExternalLinkNode['data']>) => {
+      graphBoardStore.updateNodeData(node.id, newAttrs);
+    }, 512),
+  );
+
+  const loadLinkData = useRef(
+    debounce(async (newUrl: string | undefined, description: string) => {
+      setIsLoading(true);
+      const data = await getLinkPreview(newUrl);
+      const urlData: UrlData = data
+        ? {
+            url: newUrl || undefined,
+            thumbnailUrl: data.preview || '',
+            favicon: data.favicon,
+            domain: data.title || data.domain,
+            description: description || data.description || '',
+          }
+        : {
+            url: newUrl || undefined,
+            thumbnailUrl: '',
+            favicon: '',
+            domain: '',
+            description: description,
+          };
+
+      setIsLoading(false);
+      debouncedDataUpdate.current(urlData);
+    }, 512),
+  );
+
   const handleBlur = () => {
     if (data.url) setIsEditing(false);
   };
@@ -78,11 +99,6 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     }
   };
 
-  useEffect(() => {
-    if (selectedElements.length !== 1 || selectedElements[0].id !== node.id)
-      handleBlur();
-  }, [selectedElements]);
-
   return (
     <NodeWrapper
       isSelected={
@@ -90,13 +106,15 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
       }
       onPress={openLink}
       onBlur={handleBlur}
-      toggleEdit={() => setIsEditing((prev) => !prev)}
+      toolbarProps={{
+        toggleEdit: () => setIsEditing((prev) => !prev),
+      }}
     >
-      {!!data.thumbnailUrl?.length && (
+      {(isEditing || data.thumbnailUrl) && (
         <Image
           isLoading={isLoading}
           alt="Link thumbnail"
-          src={data.thumbnailUrl}
+          src={data.thumbnailUrl || ImagePlaceholder.src}
           className="max-h-56 w-full overflow-clip"
           isZoomed
           width={208}
@@ -133,6 +151,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         <div
           className="flex flex-col gap-1"
           onKeyDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          onBlur={(e) => e.stopPropagation()}
         >
           <Input
             isLoading={isLoading}
@@ -140,14 +160,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             label={settingsStore.t.toolBar.linkLabel}
             type="link"
             value={url}
-            onFocus={() => setIsEditing(true)}
-            onBlur={handleBlur}
-            onValueChange={async (value: string) => {
-              setUrl(value);
-              await loadLinkData(value);
-            }}
+            onValueChange={setUrl}
             autoFocus
-            onMouseEnter={() => setIsEditing(false)}
             color="primary"
             variant="underlined"
             size={smallerSize}
@@ -158,7 +172,6 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
-            onMouseEnter={() => setIsEditing(false)}
             color="primary"
             variant="underlined"
             maxRows={2}
@@ -170,10 +183,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             autoComplete="description"
             size={smallerSize}
             value={description}
-            onValueChange={async (value) => {
-              setDescription(value);
-              await saveDescription(value);
-            }}
+            onValueChange={setDescription}
             classNames={{
               input: 'text-default-500 font-medium',
             }}

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { JSX } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -13,9 +13,11 @@ import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 export default function GraphTooltipToolbar({
   isOpen,
   toggleEdit,
+  tools,
 }: {
   isOpen: boolean;
-  toggleEdit: () => void;
+  toggleEdit?: () => void;
+  tools?: JSX.Element;
 }) {
   const { commonSize } = useAdaptiveParams();
 
@@ -49,6 +51,7 @@ export default function GraphTooltipToolbar({
               <PencilIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
+          {tools}
         </motion.div>
       )}
     </AnimatePresence>
