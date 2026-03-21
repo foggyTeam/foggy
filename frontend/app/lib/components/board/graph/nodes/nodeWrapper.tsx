@@ -5,16 +5,38 @@ import { Position } from '@xyflow/react';
 import { Card, CardBody } from '@heroui/card';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import GraphTooltipToolbar from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
+import { useCallback, useState } from 'react';
+import debounce from 'lodash/debounce';
 
-export default function NodeWrapper({ className, children }) {
+export default function NodeWrapper({
+  className,
+  children,
+  toggleEdit,
+  onBlur,
+  onPress,
+}) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const delayedMenu = useCallback(
+    debounce((newValue: boolean) => setIsMenuOpen(newValue), 256) as any,
+    [setIsMenuOpen],
+  );
   return (
-    <div>
+    <div
+      onMouseEnter={() => delayedMenu(true)}
+      onMouseLeave={() => delayedMenu(false)}
+    >
+      <GraphTooltipToolbar toggleEdit={toggleEdit} isOpen={isMenuOpen} />
+
       <Card
+        onPress={onPress}
+        onBlur={onBlur}
         allowTextSelectionOnPress
         disableRipple
         isPressable
         className={clsx(
-          'w-52 px-1 py-2 text-sm',
+          'w-56 px-1 py-2 text-sm',
           bg_container_no_padding,
           className,
         )}

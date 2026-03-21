@@ -378,7 +378,12 @@
     "rotation": "Поворот",
     "textToolPlaceholder": "Напишите что-нибудь...",
     "linkPlaceholder": "https://hoggyfoggy.com",
-    "linkLabel": "Ссылка"
+    "linkLabel": "Ссылка",
+    "linkDescriptionLabel": "Описание",
+    "linkDescriptionPlaceholder": "Веб-приложение для тебя и твоей команды",
+
+    "emptyLinkDomain": "Нет домена",
+    "emptyLinkDescription": "Нет описания"
   },
 
   "toolTips": {
@@ -408,7 +413,8 @@
       "customNodeTool": "Кастомный узел",
       "internalLinkTool": "Ссылка на другой элемент проекта",
       "externalLinkTool": "Любая ссылка в Интернете",
-      "nodeLinkTool": "Ссылка на другой узел"
+      "nodeLinkTool": "Ссылка на другой узел",
+      "toggleEdit": "Редактировать содержимое"
     },
     "resetStage": "Сбросить смещение",
     "uploadButton": "Получить временную ссылку на изображение доски"

@@ -379,7 +379,12 @@
     "rotation": "Rotation",
     "textToolPlaceholder": "Type something...",
     "linkPlaceholder": "https://hoggyfoggy.com",
-    "linkLabel": "Link"
+    "linkLabel": "Link",
+    "linkDescriptionLabel": "Description",
+    "linkDescriptionPlaceholder": "Web-app for you and your team",
+
+    "emptyLinkDomain": "No domain",
+    "emptyLinkDescription": "No description"
   },
 
   "toolTips": {
@@ -409,7 +414,8 @@
       "customNodeTool": "Custom node",
       "internalLinkTool": "Link to another project element",
       "externalLinkTool": "Link to anywhere in the Web",
-      "nodeLinkTool": "Link to other node"
+      "nodeLinkTool": "Link to other node",
+      "toggleEdit": "Edit contents"
     },
     "resetStage": "Reset position",
     "uploadButton": "Get board image temporary link"
