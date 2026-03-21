@@ -85,6 +85,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   return (
     <NodeWrapper
+      isSelected={
+        selectedElements.length === 1 && selectedElements[0].id === node.id
+      }
       onPress={openLink}
       onBlur={handleBlur}
       toggleEdit={() => setIsEditing((prev) => !prev)}
@@ -143,6 +146,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
               setUrl(value);
               await loadLinkData(value);
             }}
+            autoFocus
+            onMouseEnter={() => setIsEditing(false)}
             color="primary"
             variant="underlined"
             size={smallerSize}
@@ -153,6 +158,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
+            onMouseEnter={() => setIsEditing(false)}
             color="primary"
             variant="underlined"
             maxRows={2}

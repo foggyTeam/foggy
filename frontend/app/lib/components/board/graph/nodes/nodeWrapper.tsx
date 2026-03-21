@@ -11,6 +11,7 @@ import debounce from 'lodash/debounce';
 
 export default function NodeWrapper({
   className,
+  isSelected,
   children,
   toggleEdit,
   onBlur,
@@ -38,6 +39,7 @@ export default function NodeWrapper({
         className={clsx(
           'w-56 px-1 py-2 text-sm',
           bg_container_no_padding,
+          isSelected && 'border-primary/50 border-1.5',
           className,
         )}
       >
