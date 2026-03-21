@@ -35,7 +35,27 @@
 }
 @media (min-width: 640px) {
   .toolbar {
-    margin-top: 1rem !important;/* 16px */;
-    margin-bottom: 1rem !important;/* 16px */;
+    margin-top: 1rem !important; /* 16px */
+    margin-bottom: 1rem !important; /* 16px */
   }
+}
+
+.shape-circle {
+  border-radius: 50%;
+  padding: 20% 20%;
+}
+
+.shape-diamond {
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  padding: 28% 28%;
+}
+
+.shape-triangle {
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  padding: 60% 25% 1rem;
+}
+
+.shape-pentagon {
+  clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  padding: 15% 22% 15%;
 }

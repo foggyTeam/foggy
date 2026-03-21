@@ -39,6 +39,7 @@ export default function GraphTooltipToolbar({
             ease: 'easeInOut',
           }}
         >
+          {tools}
           <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
             <Button
               data-testid="toggle-edit-mode-btn"
@@ -51,7 +52,6 @@ export default function GraphTooltipToolbar({
               <PencilIcon className="stroke-default-600" />
             </Button>
           </FTooltip>
-          {tools}
         </motion.div>
       )}
     </AnimatePresence>

@@ -9,7 +9,15 @@ import { Input, Textarea } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
+import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
 
+const shapeStyleMap = {
+  rect: '',
+  circle: 'shape-circle w-fit',
+  triangle: 'shape-triangle w-fit',
+  pentagon: 'shape-pentagon w-fit',
+  diamond: 'shape-diamond w-fit',
+};
 const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
@@ -28,6 +36,15 @@ const CustomNode = observer((node: GCustomNode) => {
       toolbarProps={{
         toggleEdit,
       }}
+      className={shapeStyleMap[data.shape || 'rect']}
+      toolbarTools={
+        <>
+          <ShapeTool
+            shape={data.shape}
+            setShape={(value) => dispatch({ shape: value })}
+          />
+        </>
+      }
     >
       {!isEditing && (
         <div className="flex flex-col gap-1">
