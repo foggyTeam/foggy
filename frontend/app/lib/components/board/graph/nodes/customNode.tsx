@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { GCustomNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -14,25 +14,12 @@ const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
 
-  const [title, setTitle] = useState(data.title || '');
-  const [description, setDescription] = useState(data.description || '');
-  const { isEditing, isSelected, debouncedUpdate, onBlur, toggleEdit } =
-    useGraphNode(node.id, !!(data.title || data.description));
-
-  useEffect(() => {
-    if (isEditing && title !== data.title) setTitle(data.title || '');
-    if (isEditing && description !== data.description)
-      setDescription(data.description || '');
-  }, [isEditing]);
-
-  useEffect(() => {
-    if (data.title !== title) debouncedUpdate.current({ title });
-  }, [title]);
-
-  useEffect(() => {
-    if (data.description !== description)
-      debouncedUpdate.current({ description });
-  }, [description]);
+  const { nodeState, dispatch, isEditing, isSelected, onBlur, toggleEdit } =
+    useGraphNode<GCustomNode['data']>(
+      node.id,
+      data,
+      !!(data.title || data.description),
+    );
 
   return (
     <NodeWrapper
@@ -70,8 +57,8 @@ const CustomNode = observer((node: GCustomNode) => {
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
             label={settingsStore.t.toolBar.titleLabel}
             type="title"
-            value={title}
-            onValueChange={setTitle}
+            value={nodeState.title}
+            onValueChange={(value) => dispatch({ title: value })}
             autoFocus
             color="primary"
             variant="underlined"
@@ -94,8 +81,8 @@ const CustomNode = observer((node: GCustomNode) => {
             type="description"
             autoComplete="description"
             size={smallerSize}
-            value={description}
-            onValueChange={setDescription}
+            value={nodeState.description}
+            onValueChange={(value) => dispatch({ description: value })}
             classNames={{
               input: 'text-default-500 font-medium',
             }}

@@ -28,3 +28,14 @@
 .react-flow__handle:hover {
   box-shadow: 0 0 0 3px hsl(var(--heroui-primary-400) / 0.4);
 }
+
+.toolbar {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+@media (min-width: 640px) {
+  .toolbar {
+    margin-top: 1rem !important;/* 16px */;
+    margin-bottom: 1rem !important;/* 16px */;
+  }
+}

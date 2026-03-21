@@ -25,51 +25,51 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   const { smallerSize } = useAdaptiveParams();
 
-  const [url, setUrl] = useState(data.url || '');
-  const [description, setDescription] = useState(data.description || '');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { isEditing, isSelected, debouncedUpdate, onBlur, toggleEdit } =
-    useGraphNode(node.id, !!data.url, () => loadLinkData.current.cancel());
+  const {
+    nodeState,
+    dispatch,
+    isEditing,
+    isSelected,
+    debouncedUpdate,
+    onBlur,
+    toggleEdit,
+  } = useGraphNode<GExternalLinkNode['data']>(node.id, data, !!data.url, () =>
+    loadLinkData.current.cancel(),
+  );
 
   useEffect(() => {
-    if (isEditing && url !== data.url) setUrl(data.url || '');
-    if (isEditing && description !== data.description)
-      setDescription(data.description || '');
-  }, [isEditing]);
-
-  useEffect(() => {
-    if (data.url !== url) loadLinkData.current(url, description);
-  }, [url]);
-
-  useEffect(() => {
-    if (data.description !== description)
-      debouncedUpdate.current({ description });
-  }, [description]);
+    if (data.url !== nodeState.url)
+      loadLinkData.current(nodeState.url, nodeState.description);
+  }, [nodeState.url]);
 
   const loadLinkData = useRef(
-    debounce(async (newUrl: string | undefined, description: string) => {
-      setIsLoading(true);
-      const data = await getLinkPreview(newUrl);
-      const urlData: UrlData = data
-        ? {
-            url: newUrl || undefined,
-            thumbnailUrl: data.preview || '',
-            favicon: data.favicon,
-            domain: data.title || data.domain,
-            description: description || data.description || '',
-          }
-        : {
-            url: newUrl || undefined,
-            thumbnailUrl: '',
-            favicon: '',
-            domain: '',
-            description: description,
-          };
+    debounce(
+      async (newUrl: string | undefined, description: string | undefined) => {
+        setIsLoading(true);
+        const data = await getLinkPreview(newUrl);
+        const urlData: UrlData = data
+          ? {
+              url: newUrl || undefined,
+              thumbnailUrl: data.preview || '',
+              favicon: data.favicon,
+              domain: data.title || data.domain,
+              description: description || data.description || '',
+            }
+          : {
+              url: newUrl || undefined,
+              thumbnailUrl: '',
+              favicon: '',
+              domain: '',
+              description,
+            };
 
-      setIsLoading(false);
-      debouncedUpdate.current(urlData);
-    }, 512),
+        setIsLoading(false);
+        debouncedUpdate.current(urlData);
+      },
+      512,
+    ),
   );
 
   const openLink = (e: MouseEvent) => {
@@ -113,7 +113,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
               name={data.domain}
             />
             <h1 className="line-clamp-1 w-fit truncate font-medium text-nowrap">
-              {data.domain || settingsStore.t.toolBar.emptyLinkDomain}
+              {data.domain || data.url}
             </h1>
           </div>
 
@@ -138,8 +138,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
             type="link"
-            value={url}
-            onValueChange={setUrl}
+            value={nodeState.url}
+            onValueChange={(value) => dispatch({ url: value })}
             autoFocus
             color="primary"
             variant="underlined"
@@ -161,8 +161,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             type="description"
             autoComplete="description"
             size={smallerSize}
-            value={description}
-            onValueChange={setDescription}
+            value={nodeState.description}
+            onValueChange={(value) => dispatch({ description: value })}
             classNames={{
               input: 'text-default-500 font-medium',
             }}

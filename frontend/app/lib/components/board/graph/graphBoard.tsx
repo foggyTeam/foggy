@@ -186,7 +186,7 @@ const GraphBoard = observer(() => {
         fitViewOptions={{ maxZoom: 1 }}
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
-        <Panel position="bottom-center">
+        <Panel position="bottom-center" className="toolbar w-full sm:w-fit">
           <GraphToolbar />
         </Panel>
         <ResetStageButton
