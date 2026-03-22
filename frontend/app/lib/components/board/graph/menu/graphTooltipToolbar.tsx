@@ -1,7 +1,6 @@
 'use client';
 
 import React, { JSX } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -22,38 +21,30 @@ export default function GraphTooltipToolbar({
   const { commonSize } = useAdaptiveParams();
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className={clsx(
-            'absolute -top-14 right-0 z-30 w-fit p-1 sm:z-50',
-            bg_container_no_padding,
-            'flex justify-center gap-1 overflow-visible',
-          )}
-          data-testid="board-tooltip-toolbar"
-          initial={{ opacity: 0, scale: 0.95, y: 8 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 8 }}
-          transition={{
-            duration: 0.05,
-            ease: 'easeInOut',
-          }}
-        >
-          {tools}
-          <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
-            <Button
-              data-testid="toggle-edit-mode-btn"
-              onPress={toggleEdit}
-              variant="light"
-              color="default"
-              isIconOnly
-              size={commonSize}
-            >
-              <PencilIcon className="stroke-default-600" />
-            </Button>
-          </FTooltip>
-        </motion.div>
+    <div
+      className={clsx(
+        'absolute -top-14 right-0 z-30 w-fit p-1 transition-all duration-100 sm:z-50',
+        bg_container_no_padding,
+        'flex justify-center gap-1 overflow-visible',
+        isOpen
+          ? 'scale-100 opacity-100'
+          : 'pointer-events-none scale-75 opacity-0',
       )}
-    </AnimatePresence>
+      data-testid="board-tooltip-toolbar"
+    >
+      {tools}
+      <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
+        <Button
+          data-testid="toggle-edit-mode-btn"
+          onPress={toggleEdit}
+          variant="light"
+          color="default"
+          isIconOnly
+          size={commonSize}
+        >
+          <PencilIcon className="stroke-default-600" />
+        </Button>
+      </FTooltip>
+    </div>
   );
 }

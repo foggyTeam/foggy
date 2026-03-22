@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { GCustomNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -42,6 +42,7 @@ const CustomNode = observer((node: GCustomNode) => {
   const { nodeState, dispatch, isEditing, isSelected, onBlur, toggleEdit } =
     useGraphNode<GCustomNode['data']>(
       node.id,
+      node.selected,
       data,
       !!(data.title || data.description),
     );
@@ -51,6 +52,12 @@ const CustomNode = observer((node: GCustomNode) => {
       : ' dark'
     : '';
   const alignClass = data.align ? alignClassMap[data.align] : '';
+
+  const setTitle = useCallback((v) => dispatch({ title: v }), []);
+  const setDescription = useCallback((v) => dispatch({ description: v }), []);
+  const setShape = useCallback((v) => dispatch({ shape: v }), []);
+  const setColor = useCallback((v) => dispatch({ color: v }), []);
+  const setAlign = useCallback((v) => dispatch({ align: v }), []);
 
   return (
     <NodeWrapper
@@ -62,18 +69,9 @@ const CustomNode = observer((node: GCustomNode) => {
       className={shapeStyleMap[data.shape || 'rect'] + themeClass}
       toolbarTools={
         <>
-          <ShapeTool
-            shape={data.shape}
-            setShape={(value) => dispatch({ shape: value })}
-          />
-          <GraphColorTool
-            color={data.color || ''}
-            setColor={(value) => dispatch({ color: value })}
-          />
-          <AlignTool
-            align={data.align || 'start'}
-            setAlign={(value) => dispatch({ align: value })}
-          />
+          <ShapeTool shape={data.shape} setShape={setShape} />
+          <GraphColorTool color={data.color || ''} setColor={setColor} />
+          <AlignTool align={data.align || 'start'} setAlign={setAlign} />
         </>
       }
       underlay={
@@ -113,7 +111,7 @@ const CustomNode = observer((node: GCustomNode) => {
             label={settingsStore.t.toolBar.titleLabel}
             type="title"
             value={nodeState.title}
-            onValueChange={(value) => dispatch({ title: value })}
+            onValueChange={setTitle}
             autoFocus
             color="primary"
             variant="underlined"
@@ -137,7 +135,7 @@ const CustomNode = observer((node: GCustomNode) => {
             autoComplete="description"
             size={smallerSize}
             value={nodeState.description}
-            onValueChange={(value) => dispatch({ description: value })}
+            onValueChange={setDescription}
             classNames={{
               input: 'text-default-500 font-medium',
             }}

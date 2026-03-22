@@ -2,18 +2,15 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
-import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 export default function useGraphNode<T>(
   nodeId: string,
+  isSelected: boolean,
   initialData: T,
   hasContent: boolean,
   returnCallback?: () => void,
 ) {
   const isSynced = useRef(true);
-  const { selectedElements } = useGraphBoardContext();
-  const isSelected =
-    selectedElements.length === 1 && selectedElements[0].id === nodeId;
   const [isEditing, setIsEditing] = useState(!hasContent);
 
   const [nodeState, dispatch] = useReducer((state: T, patch: Partial<T>) => {

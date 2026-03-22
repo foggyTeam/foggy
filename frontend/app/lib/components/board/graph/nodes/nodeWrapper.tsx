@@ -6,10 +6,10 @@ import { Card, CardBody } from '@heroui/card';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import GraphTooltipToolbar from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 
-export default function NodeWrapper({
+function NodeWrapper({
   isSelected,
   onBlur,
   onPress,
@@ -77,3 +77,5 @@ export default function NodeWrapper({
     </div>
   );
 }
+
+export default React.memo(NodeWrapper);

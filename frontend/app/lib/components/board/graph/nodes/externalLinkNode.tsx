@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { GExternalLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { Image } from '@heroui/image';
@@ -35,9 +35,15 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     debouncedUpdate,
     onBlur,
     toggleEdit,
-  } = useGraphNode<GExternalLinkNode['data']>(node.id, data, !!data.url, () =>
-    loadLinkData.current.cancel(),
+  } = useGraphNode<GExternalLinkNode['data']>(
+    node.id,
+    node.selected,
+    data,
+    !!data.url,
+    () => loadLinkData.current.cancel(),
   );
+  const setUrl = useCallback((v) => dispatch({ url: v }), []);
+  const setDescription = useCallback((v) => dispatch({ description: v }), []);
 
   useEffect(() => {
     if (data.url !== nodeState.url)
@@ -141,7 +147,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             label={settingsStore.t.toolBar.linkLabel}
             type="link"
             value={nodeState.url}
-            onValueChange={(value) => dispatch({ url: value })}
+            onValueChange={setUrl}
             autoFocus
             color="primary"
             variant="underlined"
@@ -164,7 +170,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             autoComplete="description"
             size={smallerSize}
             value={nodeState.description}
-            onValueChange={(value) => dispatch({ description: value })}
+            onValueChange={setDescription}
             classNames={{
               input: 'text-default-500 font-medium',
             }}

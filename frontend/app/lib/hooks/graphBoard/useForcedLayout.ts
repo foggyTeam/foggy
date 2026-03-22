@@ -26,18 +26,23 @@ interface ForcedLayoutOptions {
 
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
 
-const DEFAULT_LINK_DISTANCE = 256;
-const DEFAULT_STRENGTH = 0.5; // сила натяжения ребра
-const DEFAULT_COLLIDE_PADDING = 8;
+const DEFAULT_LINK_DISTANCE = 324;
+const FORCE_STRENGTH = -1400;
+const MAX_DISTANCE = 400;
 
-const POSITION_THRESHOLD = 0.1; // нет ререндера, если позиция изменилась на меньшее значение
-const VELOCITY_DECAY = 0.6; // сила сопротивления среды
-const ALPHA_DECAY = 0.05; // скорость затухания анимации
-const FORCE_STRENGTH = -100; // сила отталкивания узлов
-const MAX_DISTANCE = 128; // максимальная дистанция между узлами
-const COLLIDE_STRENGTH = 0.2; // жесткость столкновений тел
-const UNPIN_DELAY = 1000; // время разблокировки узла после окончания drag
+const DEFAULT_STRENGTH = 0.06;
+
+const DEFAULT_COLLIDE_PADDING = 24;
+const COLLIDE_STRENGTH = 0.85;
+
+const POSITION_THRESHOLD = 0.5;
+const VELOCITY_DECAY = 0.55;
+const ALPHA_DECAY = 0.05;
+
+const UNPIN_DELAY = 1000;
 const SYNC_DEBOUNCE = 256;
+
+const DRAG_ALPHA = 0.25;
 
 export default function useForcedLayout(
   nodes: Node[],
@@ -58,6 +63,9 @@ export default function useForcedLayout(
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
   const nodeIds = nodes.map((n) => n.id).join(',');
   const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
+  const nodeSizes = nodes
+    .map((n) => `${n.id}:${n.measured?.width ?? 0}x${n.measured?.height ?? 0}`)
+    .join(',');
 
   const dirtyNodesSet = useRef(new Set<Node['id']>());
   const positionsMap = useRef(new Map<Node['id'], { x: number; y: number }>());
@@ -73,7 +81,6 @@ export default function useForcedLayout(
 
   const restart = useCallback((alpha: number = 0.15) => {
     const sim = simulation.current;
-
     if (sim.alpha() < sim.alphaMin()) sim.alpha(alpha).restart();
     else sim.alpha(Math.max(sim.alpha(), alpha));
   }, []);
@@ -227,7 +234,7 @@ export default function useForcedLayout(
       prevNodeIds.current,
       prevEdgeKeys.current,
     );
-  }, [nodeIds, edgeKeys]);
+  }, [nodeIds, edgeKeys, nodeSizes]);
 
   const onNodeDrag = useCallback((_event: MouseEvent, node: Node) => {
     draggedNodes.current.add(node.id);
@@ -240,7 +247,7 @@ export default function useForcedLayout(
     d3node.x = node.position.x;
     d3node.y = node.position.y;
 
-    simulation.current.alpha(0.05).restart();
+    simulation.current.alpha(DRAG_ALPHA).restart();
   }, []);
 
   const onSelectionDrag = useCallback((_event: MouseEvent, nodes: Node[]) => {
@@ -253,6 +260,7 @@ export default function useForcedLayout(
         d3node.fy = node.position.y;
       }
     });
+    simulation.current.alpha(DRAG_ALPHA).restart();
   }, []);
 
   const onDragStop = useCallback(
