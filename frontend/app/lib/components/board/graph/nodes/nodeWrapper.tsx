@@ -15,6 +15,7 @@ export default function NodeWrapper({
   onPress,
   toolbarProps,
   toolbarTools,
+  underlay,
   children,
   className,
 }) {
@@ -34,6 +35,17 @@ export default function NodeWrapper({
       onMouseEnter={() => delayedMenu.current(true)}
       onMouseLeave={() => delayedMenu.current(false)}
     >
+      {underlay && (
+        <div
+          className={clsx(
+            'pointer-events-none absolute inset-0',
+            isSelected &&
+              'border-primary dark:border-primary-100 border-1.5 overflow-clip rounded-xl',
+          )}
+        >
+          {underlay}
+        </div>
+      )}
       <GraphTooltipToolbar
         {...toolbarProps}
         tools={toolbarTools}
@@ -50,6 +62,8 @@ export default function NodeWrapper({
           'w-56 px-1 py-2 text-sm',
           bg_container_no_padding,
           isSelected && 'border-primary dark:border-primary-100 border-1.5',
+          underlay &&
+            'bg-opacity-0 rounded-none border-none bg-none shadow-none backdrop-blur-none',
           className,
         )}
       >

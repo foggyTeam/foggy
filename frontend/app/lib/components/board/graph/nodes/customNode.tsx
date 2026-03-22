@@ -10,14 +10,41 @@ import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
+import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
+import clsx from 'clsx';
 
 const shapeStyleMap = {
   rect: '',
-  circle: 'shape-circle w-fit',
-  triangle: 'shape-triangle w-fit',
-  pentagon: 'shape-pentagon w-fit',
-  diamond: 'shape-diamond w-fit',
+  circle: 'shape-circle',
+  triangle: 'shape-triangle',
+  pentagon: 'shape-pentagon',
+  diamond: 'shape-diamond',
 };
+
+function getDarkenedColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  const factor = 0.3;
+
+  const dr = Math.round(r * factor);
+  const dg = Math.round(g * factor);
+  const db = Math.round(b * factor);
+
+  return `rgb(${dr}, ${dg}, ${db})`;
+}
+
+function getTextColor(hex: string): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+  if (luminance > 0.5) return getDarkenedColor(hex);
+  else return '#fff';
+}
+
 const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
@@ -36,7 +63,10 @@ const CustomNode = observer((node: GCustomNode) => {
       toolbarProps={{
         toggleEdit,
       }}
-      className={shapeStyleMap[data.shape || 'rect']}
+      className={clsx(
+        shapeStyleMap[data.shape || 'rect'],
+        data.color && `color-${getTextColor(data.color)}`,
+      )}
       toolbarTools={
         <>
           <ShapeTool
@@ -45,11 +75,14 @@ const CustomNode = observer((node: GCustomNode) => {
           />
         </>
       }
+      underlay={
+        <ShapedUnderlay shape={data.shape || 'rect'} color={data.color} />
+      }
     >
       {!isEditing && (
         <div className="flex flex-col gap-1">
           {data.title && (
-            <h1 className="line-clamp-1 w-fit truncate font-medium text-nowrap">
+            <h1 className="line-clamp-1 w-full truncate font-medium text-nowrap">
               {data.title}
             </h1>
           )}
@@ -64,7 +97,7 @@ const CustomNode = observer((node: GCustomNode) => {
 
       {isEditing && (
         <div
-          className="flex flex-col gap-1"
+          className="nopan nodrag nowheel flex flex-col gap-1"
           onKeyDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
           onBlur={(e) => e.stopPropagation()}

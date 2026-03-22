@@ -226,10 +226,7 @@ export interface GCustomNode extends GBaseNode {
     title?: string;
     description?: string;
     shape?: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
-    borderWidth?: number;
-    borderColor?: string;
-    backgroundColor?: string;
-    textColor?: string;
+    color?: string;
   };
 }
 
