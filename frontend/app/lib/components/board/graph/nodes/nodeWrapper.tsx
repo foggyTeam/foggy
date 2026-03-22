@@ -18,6 +18,7 @@ export default function NodeWrapper({
   underlay,
   children,
   className,
+  style,
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,9 +39,8 @@ export default function NodeWrapper({
       {underlay && (
         <div
           className={clsx(
-            'pointer-events-none absolute inset-0',
-            isSelected &&
-              'border-primary dark:border-primary-100 border-1.5 overflow-clip rounded-xl',
+            'pointer-events-none absolute inset-0 overflow-clip rounded-xl',
+            isSelected && 'border-primary dark:border-primary-100 border-1.5',
           )}
         >
           {underlay}
@@ -66,6 +66,7 @@ export default function NodeWrapper({
             'bg-opacity-0 rounded-none border-none bg-none shadow-none backdrop-blur-none',
           className,
         )}
+        style={style}
       >
         <CardBody className="flex flex-col gap-2">{children}</CardBody>
       </Card>

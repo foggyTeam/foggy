@@ -11,7 +11,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
 import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
-import clsx from 'clsx';
+import GraphColorTool from '@/app/lib/components/board/graph/tools/graphColorTool';
 
 const shapeStyleMap = {
   rect: '',
@@ -21,16 +21,14 @@ const shapeStyleMap = {
   diamond: 'shape-diamond',
 };
 
-function getDarkenedColor(hex: string): string {
+function getDarkenedColor(hex: string, amount = 0.6): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
 
-  const factor = 0.3;
-
-  const dr = Math.round(r * factor);
-  const dg = Math.round(g * factor);
-  const db = Math.round(b * factor);
+  const dr = Math.round(r * (1 - amount));
+  const dg = Math.round(g * (1 - amount));
+  const db = Math.round(b * (1 - amount));
 
   return `rgb(${dr}, ${dg}, ${db})`;
 }
@@ -63,15 +61,21 @@ const CustomNode = observer((node: GCustomNode) => {
       toolbarProps={{
         toggleEdit,
       }}
-      className={clsx(
-        shapeStyleMap[data.shape || 'rect'],
-        data.color && `color-${getTextColor(data.color)}`,
-      )}
+      className={shapeStyleMap[data.shape || 'rect']}
+      style={{
+        color: data.color
+          ? getTextColor(data.color)
+          : 'var(--heroui-foreground)',
+      }}
       toolbarTools={
         <>
           <ShapeTool
             shape={data.shape}
             setShape={(value) => dispatch({ shape: value })}
+          />
+          <GraphColorTool
+            color={data.color || ''}
+            setColor={(value) => dispatch({ color: value })}
           />
         </>
       }

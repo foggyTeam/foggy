@@ -35,21 +35,25 @@ export default function ShapedUnderlay({
   shape: GCustomNode['data']['shape'];
   color?: string;
 }) {
+  const path = shapePaths[shape](100, 100);
+
   return (
     <svg
       width="100%"
       height="100%"
-      viewBox="-1 -1 102 102"
+      viewBox="-0.5 -0.5 101.5 101.5"
       preserveAspectRatio="none"
+      style={{
+        filter: color
+          ? `drop-shadow(0 0 1px rgba(${to_rgb(color)}, 0.2))`
+          : 'drop-shadow(0 0 1px hsl(var(--heroui-foreground)/0.1))',
+      }}
     >
       <path
-        d={shapePaths[shape](100, 100)}
-        className={bg_container_no_padding + ' stroke'}
+        d={path}
+        className={bg_container_no_padding}
         style={{
-          fill: color ? color : 'hsl(var(--heroui-background)/0.5)',
-          stroke: color
-            ? `rgba(${to_rgb(color)}, 0.2)`
-            : 'hsl(var(--heroui-background)/0.1)',
+          fill: color ? color : 'hsl(var(--heroui-background))',
         }}
       />
     </svg>
