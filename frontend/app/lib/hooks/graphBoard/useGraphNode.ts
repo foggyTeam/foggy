@@ -48,8 +48,10 @@ export default function useGraphNode<T>(
     if (!isSynced.current) debouncedUpdate.current(nodeState);
   }, [nodeState]);
 
-  const onBlur = () => {
-    if (hasContent) setIsEditing(false);
+  const onBlur = (e) => {
+    console.log(e.currentTarget.contains(e.relatedTarget as Element));
+    if (hasContent && !e.currentTarget.contains(e.relatedTarget as Element))
+      setIsEditing(false);
   };
   const toggleEdit = () => setIsEditing((prev) => !prev);
 

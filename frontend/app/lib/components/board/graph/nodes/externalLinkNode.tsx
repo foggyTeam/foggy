@@ -138,7 +138,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           className="nopan nodrag nowheel flex flex-col gap-1"
           onKeyDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
-          onBlur={(e) => e.stopPropagation()}
+          onBlur={onBlur}
         >
           {/*TODO: add zod rules */}
           <Input
