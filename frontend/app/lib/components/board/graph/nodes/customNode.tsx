@@ -21,26 +21,11 @@ const shapeStyleMap = {
   diamond: 'shape-diamond',
 };
 
-function getDarkenedColor(hex: string, amount = 0.6): string {
+function isLightColor(hex: string): boolean {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
-
-  const dr = Math.round(r * (1 - amount));
-  const dg = Math.round(g * (1 - amount));
-  const db = Math.round(b * (1 - amount));
-
-  return `rgb(${dr}, ${dg}, ${db})`;
-}
-
-function getTextColor(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-
-  if (luminance > 0.5) return getDarkenedColor(hex);
-  else return '#fff';
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.5;
 }
 
 const CustomNode = observer((node: GCustomNode) => {
@@ -53,6 +38,11 @@ const CustomNode = observer((node: GCustomNode) => {
       data,
       !!(data.title || data.description),
     );
+  const themeClass = data.color
+    ? isLightColor(data.color)
+      ? ' light'
+      : ' dark'
+    : '';
 
   return (
     <NodeWrapper
@@ -61,12 +51,7 @@ const CustomNode = observer((node: GCustomNode) => {
       toolbarProps={{
         toggleEdit,
       }}
-      className={shapeStyleMap[data.shape || 'rect']}
-      style={{
-        color: data.color
-          ? getTextColor(data.color)
-          : 'var(--heroui-foreground)',
-      }}
+      className={shapeStyleMap[data.shape || 'rect'] + themeClass}
       toolbarTools={
         <>
           <ShapeTool
@@ -92,7 +77,7 @@ const CustomNode = observer((node: GCustomNode) => {
           )}
 
           {data.description && (
-            <p className="text-default-700 line-clamp-8 h-fit w-full text-start text-xs whitespace-pre-wrap italic">
+            <p className="line-clamp-8 h-fit w-full text-start text-xs whitespace-pre-wrap italic">
               {data.description}
             </p>
           )}

@@ -41,19 +41,17 @@ export default function ShapedUnderlay({
     <svg
       width="100%"
       height="100%"
-      viewBox="-0.5 -0.5 101.5 101.5"
+      viewBox="0 0 100 100"
       preserveAspectRatio="none"
-      style={{
-        filter: color
-          ? `drop-shadow(0 0 1px rgba(${to_rgb(color)}, 0.2))`
-          : 'drop-shadow(0 0 1px hsl(var(--heroui-foreground)/0.1))',
-      }}
     >
       <path
         d={path}
         className={bg_container_no_padding}
         style={{
           fill: color ? color : 'hsl(var(--heroui-background))',
+          stroke: color
+            ? `rgba(${to_rgb(color)}, 0.1)`
+            : 'hsl(var(--heroui-foreground)/0.08)',
         }}
       />
     </svg>
