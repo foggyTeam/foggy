@@ -84,10 +84,7 @@ const CustomNode = observer((node: GCustomNode) => {
         <div className="flex flex-col gap-1">
           {data.title && (
             <h1
-              className={
-                'line-clamp-1 w-full truncate font-medium text-nowrap ' +
-                alignClass
-              }
+              className={`line-clamp-1 flex h-7 w-full items-center truncate font-medium text-nowrap ${alignClass}`}
             >
               {data.title}
             </h1>
@@ -95,10 +92,7 @@ const CustomNode = observer((node: GCustomNode) => {
 
           {data.description && (
             <p
-              className={
-                'line-clamp-8 h-fit w-full text-xs whitespace-pre-wrap ' +
-                alignClass
-              }
+              className={`line-clamp-8 flex h-fit w-full text-xs whitespace-pre-wrap ${alignClass}`}
             >
               {data.description}
             </p>

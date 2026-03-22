@@ -1,7 +1,7 @@
 'use client';
 
 import { GNode } from '@/app/lib/types/definitions';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
@@ -53,6 +53,10 @@ export default function useGraphOperations(selectedElements) {
     const nodes = selectedRef.current.slice(edges.length);
     await deleteElements({ nodes, edges });
   };
+
+  useEffect(() => {
+    selectedRef.current = selectedElements;
+  }, [selectedElements]);
 
   return { updateElement, createNewElement, deleteSelectedElements };
 }

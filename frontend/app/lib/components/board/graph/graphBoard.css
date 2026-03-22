@@ -45,17 +45,17 @@
 }
 
 .shape-circle {
-  padding: 10% 15%;
+  padding: 5% 5%;
 }
 
 .shape-diamond {
-  padding: 28% 28%;
+  padding: 15% 15%;
 }
 
 .shape-triangle {
-  padding: 45% 25% 1rem;
+  padding: 25% 28% 0;
 }
 
 .shape-pentagon {
-  padding: 20% 20% 1em;
+  padding: 10% 15% 0;
 }

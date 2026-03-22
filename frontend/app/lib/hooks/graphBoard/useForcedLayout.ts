@@ -56,6 +56,9 @@ export default function useForcedLayout(
   const draggedNodes = useRef<Set<string>>(new Set());
 
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
+  const nodeIds = nodes.map((n) => n.id).join(',');
+  const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
+
   const dirtyNodesSet = useRef(new Set<Node['id']>());
   const positionsMap = useRef(new Map<Node['id'], { x: number; y: number }>());
   const prevNodeIds = useRef(new Set<string>());
@@ -224,7 +227,7 @@ export default function useForcedLayout(
       prevNodeIds.current,
       prevEdgeKeys.current,
     );
-  }, [nodes, edges]);
+  }, [nodeIds, edgeKeys]);
 
   const onNodeDrag = useCallback((_event: MouseEvent, node: Node) => {
     draggedNodes.current.add(node.id);

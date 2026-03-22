@@ -69,7 +69,7 @@ export default function useInternalUpdates({
   useEffect(() => {
     setNodes(graphBoardStore.boardNodes ?? []);
     setEdges(graphBoardStore.boardEdges ?? []);
-  }, [graphBoardStore.boardNodes, graphBoardStore.boardEdges]);
+  }, []);
 
   // CLEANUP
   useEffect(() => {

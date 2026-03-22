@@ -113,7 +113,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
               name={data.domain}
             />
             <h1 className="line-clamp-1 w-fit truncate font-medium text-nowrap">
-              {data.domain || data.url}
+              {data.domain ||
+                data.url ||
+                settingsStore.t.toolBar.emptyLinkDomain}
             </h1>
           </div>
 
