@@ -227,6 +227,7 @@ export interface GCustomNode extends GBaseNode {
     description?: string;
     shape?: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
     color?: string;
+    align?: 'start' | 'center' | 'end';
   };
 }
 

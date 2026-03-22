@@ -12,6 +12,7 @@ import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
 import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
 import GraphColorTool from '@/app/lib/components/board/graph/tools/graphColorTool';
+import AlignTool from '@/app/lib/components/board/graph/tools/alignTool';
 
 const shapeStyleMap = {
   rect: '',
@@ -19,6 +20,12 @@ const shapeStyleMap = {
   triangle: 'shape-triangle',
   pentagon: 'shape-pentagon',
   diamond: 'shape-diamond',
+};
+
+const alignClassMap = {
+  start: 'justify-start text-start',
+  center: 'justify-center text-center',
+  end: 'justify-end text-end',
 };
 
 function isLightColor(hex: string): boolean {
@@ -43,6 +50,7 @@ const CustomNode = observer((node: GCustomNode) => {
       ? ' light'
       : ' dark'
     : '';
+  const alignClass = data.align ? alignClassMap[data.align] : '';
 
   return (
     <NodeWrapper
@@ -62,6 +70,10 @@ const CustomNode = observer((node: GCustomNode) => {
             color={data.color || ''}
             setColor={(value) => dispatch({ color: value })}
           />
+          <AlignTool
+            align={data.align || 'start'}
+            setAlign={(value) => dispatch({ align: value })}
+          />
         </>
       }
       underlay={
@@ -71,13 +83,23 @@ const CustomNode = observer((node: GCustomNode) => {
       {!isEditing && (
         <div className="flex flex-col gap-1">
           {data.title && (
-            <h1 className="line-clamp-1 w-full truncate font-medium text-nowrap">
+            <h1
+              className={
+                'line-clamp-1 w-full truncate font-medium text-nowrap ' +
+                alignClass
+              }
+            >
               {data.title}
             </h1>
           )}
 
           {data.description && (
-            <p className="line-clamp-8 h-fit w-full text-start text-xs whitespace-pre-wrap italic">
+            <p
+              className={
+                'line-clamp-8 h-fit w-full text-xs whitespace-pre-wrap ' +
+                alignClass
+              }
+            >
               {data.description}
             </p>
           )}
