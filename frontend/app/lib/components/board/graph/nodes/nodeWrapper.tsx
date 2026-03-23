@@ -50,16 +50,6 @@ function NodeWrapper({
       onMouseEnter={() => delayedMenu.current(true)}
       onMouseLeave={() => delayedMenu.current(false)}
     >
-      {underlay && (
-        <div
-          className={clsx(
-            'pointer-events-none absolute inset-0 overflow-clip rounded-xl',
-            isSelected && 'border-primary dark:border-primary-100 border-1.5',
-          )}
-        >
-          {underlay}
-        </div>
-      )}
       <GraphTooltipToolbar
         {...toolbarProps}
         tools={toolbarTools}
@@ -75,13 +65,18 @@ function NodeWrapper({
         className={clsx(
           'w-56 px-1 py-2 text-sm',
           bg_container_no_padding,
-          isSelected && 'border-primary dark:border-primary-100 border-1.5',
           underlay &&
-            'bg-opacity-0 rounded-none border-none bg-none shadow-none backdrop-blur-none',
+            'bg-opacity-0 border-0 bg-none shadow-none backdrop-blur-none',
+          isSelected && 'border-primary dark:border-primary-100 border-1.5',
           className,
         )}
         style={style}
       >
+        {underlay && (
+          <div className={clsx('pointer-events-none absolute inset-0')}>
+            {underlay}
+          </div>
+        )}
         <CardBody className="flex flex-col gap-2">{children}</CardBody>
       </Card>
       <DoubledHandle position={Position.Top} id="top" />

@@ -27,7 +27,7 @@ interface ForcedLayoutOptions {
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
 
 const DEFAULT_LINK_DISTANCE = 324;
-const FORCE_STRENGTH = -1400;
+const FORCE_STRENGTH = -400;
 const MAX_DISTANCE = 400;
 
 const DEFAULT_STRENGTH = 0.06;
