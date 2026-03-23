@@ -8,10 +8,11 @@ import {
 } from '@heroui/dropdown';
 import { Button } from '@heroui/button';
 import {
-  CornerDownRightIcon,
-  MinusIcon,
-  MoveRightIcon,
+  CornerRightDownIcon,
+  MoveDownRightIcon,
+  RedoIcon,
   SplineIcon,
+  TrendingDownIcon,
 } from 'lucide-react';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import clsx from 'clsx';
@@ -28,10 +29,10 @@ const options: {
   value: EdgeType;
   Icon: React.ComponentType<{ className?: string }>;
 }[] = [
-  { value: 'default', Icon: SplineIcon },
-  { value: 'smoothstep', Icon: CornerDownRightIcon },
-  { value: 'step', Icon: MoveRightIcon },
-  { value: 'straight', Icon: MinusIcon },
+  { value: 'default', Icon: RedoIcon },
+  { value: 'smoothstep', Icon: CornerRightDownIcon },
+  { value: 'step', Icon: TrendingDownIcon },
+  { value: 'straight', Icon: MoveDownRightIcon },
 ];
 
 export default function StepTypeTool({

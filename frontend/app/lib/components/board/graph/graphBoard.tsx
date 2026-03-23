@@ -3,6 +3,7 @@
 import '@xyflow/react/dist/style.css';
 import './graphBoard.css';
 import './graphBoardCursors.css';
+import './graphBoardEdges.css';
 import {
   Background,
   Connection,

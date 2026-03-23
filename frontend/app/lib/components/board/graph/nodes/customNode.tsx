@@ -52,15 +52,15 @@ const CustomNode = observer((node: GCustomNode) => {
     node.id,
     node.selected,
     data,
-    !!(data.title || data.description),
+    !!(data?.title || data?.description),
     customNodeSchema,
   );
-  const themeClass = data.color
+  const themeClass = data?.color
     ? isLightColor(data.color)
       ? ' light'
       : ' dark'
     : '';
-  const alignClass = data.align ? alignClassMap[data.align] : '';
+  const alignClass = data?.align ? alignClassMap[data.align] : '';
 
   const setTitle = useCallback((v) => dispatch({ title: v }), []);
   const setDescription = useCallback((v) => dispatch({ description: v }), []);
@@ -76,21 +76,21 @@ const CustomNode = observer((node: GCustomNode) => {
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
       }}
-      className={shapeStyleMap[data.shape || 'rect'] + themeClass}
+      className={shapeStyleMap[data?.shape || 'rect'] + themeClass}
       toolbarTools={
         <>
-          <ShapeTool shape={data.shape} setShape={setShape} />
-          <GraphColorTool color={data.color || ''} setColor={setColor} />
-          <AlignTool align={data.align || 'start'} setAlign={setAlign} />
+          <ShapeTool shape={data?.shape} setShape={setShape} />
+          <GraphColorTool color={data?.color || ''} setColor={setColor} />
+          <AlignTool align={data?.align || 'start'} setAlign={setAlign} />
         </>
       }
       underlay={
-        <ShapedUnderlay shape={data.shape || 'rect'} color={data.color} />
+        <ShapedUnderlay shape={data?.shape || 'rect'} color={data?.color} />
       }
     >
       {!isEditing && (
         <div className="flex flex-col gap-1">
-          {data.title && (
+          {data?.title && (
             <h1
               className={`line-clamp-1 flex h-7 w-full items-center truncate font-medium text-nowrap ${alignClass}`}
             >
@@ -98,7 +98,7 @@ const CustomNode = observer((node: GCustomNode) => {
             </h1>
           )}
 
-          {data.description && (
+          {data?.description && (
             <p
               className={`line-clamp-8 flex h-fit w-full text-xs whitespace-pre-wrap ${alignClass}`}
             >
