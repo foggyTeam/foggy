@@ -45,6 +45,8 @@ interface BoardContextProps {
     newAttrs: Partial<GNode['data']>,
   ) => void;
   deleteSelectedElements: () => void;
+
+  // BOARD
   zoomNode: (nodeId: string) => void;
 }
 
@@ -101,6 +103,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
         createNewElement,
         updateElement,
         deleteSelectedElements,
+        // BOARD
         zoomNode,
       }}
     >

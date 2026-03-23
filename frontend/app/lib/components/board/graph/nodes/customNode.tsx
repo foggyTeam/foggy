@@ -13,6 +13,7 @@ import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
 import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
 import GraphColorTool from '@/app/lib/components/board/graph/tools/graphColorTool';
 import AlignTool from '@/app/lib/components/board/graph/tools/alignTool';
+import { customNodeSchema } from '@/app/lib/types/schemas';
 
 const shapeStyleMap = {
   rect: '',
@@ -39,13 +40,21 @@ const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
 
-  const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
-    useGraphNode<GCustomNode['data']>(
-      node.id,
-      node.selected,
-      data,
-      !!(data.title || data.description),
-    );
+  const {
+    nodeState,
+    dispatch,
+    errors,
+    isEditing,
+    onBlur,
+    toggleEdit,
+    onCopyLink,
+  } = useGraphNode<GCustomNode['data']>(
+    node.id,
+    node.selected,
+    data,
+    !!(data.title || data.description),
+    customNodeSchema,
+  );
   const themeClass = data.color
     ? isLightColor(data.color)
       ? ' light'
@@ -108,6 +117,8 @@ const CustomNode = observer((node: GCustomNode) => {
         >
           {/*TODO: add zod rules */}
           <Input
+            isInvalid={errors.current.title}
+            errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
             label={settingsStore.t.toolBar.titleLabel}
             type="title"
@@ -124,6 +135,8 @@ const CustomNode = observer((node: GCustomNode) => {
           />
 
           <Textarea
+            isInvalid={errors.current.description}
+            errorMessage={errors.current.description}
             color="primary"
             variant="underlined"
             maxRows={4}

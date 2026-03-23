@@ -43,6 +43,13 @@
     "requestMessage": {
       "maxLength": "Message must be no more than 300 characters long",
       "invalidSymbols": "Message may contain only letters, digits and special symbols"
+    },
+    "graphNode": {
+      "maxUrlLength": "Link must be no more than 1024 characters long",
+      "invalidUrl": "Invalid link",
+      "maxTitleLength": "Title must be no more than 20 characters long",
+      "maxDescriptionLength": "Description name must be no more than 300 characters long",
+      "invalidSymbols": "Text may contain only letters, digits and special symbols"
     }
   },
 

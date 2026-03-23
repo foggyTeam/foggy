@@ -12,6 +12,7 @@ import { LinkIcon } from 'lucide-react';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { usePathname } from 'next/navigation';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { nodeToNodeLinkSchema } from '@/app/lib/types/schemas';
 
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
@@ -22,13 +23,21 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
 
   const { smallerSize } = useAdaptiveParams();
 
-  const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
-    useGraphNode<GNodeLinkNode['data']>(
-      node.id,
-      node.selected,
-      data,
-      !!data.url,
-    );
+  const {
+    nodeState,
+    dispatch,
+    errors,
+    isEditing,
+    onBlur,
+    toggleEdit,
+    onCopyLink,
+  } = useGraphNode<GNodeLinkNode['data']>(
+    node.id,
+    node.selected,
+    data,
+    !!data.url,
+    nodeToNodeLinkSchema,
+  );
   const getNodeId = (v) => {
     try {
       const url = new URL(v);
@@ -80,6 +89,8 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
         >
           {/*TODO: add zod rules */}
           <Input
+            isInvalid={errors.current.url}
+            errorMessage={errors.current.url}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
             type="link"
@@ -96,6 +107,8 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           />
 
           <Input
+            isInvalid={errors.current.title}
+            errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
             label={settingsStore.t.toolBar.titleLabel}
             type="title"

@@ -15,6 +15,7 @@ import { Avatar } from '@heroui/avatar';
 import { GlobeIcon } from 'lucide-react';
 import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
+import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
 
 type UrlData = Partial<GExternalLinkNode['data']>;
 
@@ -30,6 +31,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   const {
     nodeState,
     dispatch,
+    errors,
     isEditing,
     debouncedUpdate,
     onBlur,
@@ -40,6 +42,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     node.selected,
     data,
     !!data.url,
+    externalLinkNodeSchema,
     () => loadLinkData.current.cancel(),
   );
   const setUrl = useCallback((v) => dispatch({ url: v }), []);
@@ -143,6 +146,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         >
           {/*TODO: add zod rules */}
           <Input
+            isInvalid={errors.current.url}
+            errorMessage={errors.current.url}
             isLoading={isLoading}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
@@ -160,6 +165,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
+            isInvalid={errors.current.description}
+            errorMessage={errors.current.description}
             color="primary"
             variant="underlined"
             maxRows={2}
