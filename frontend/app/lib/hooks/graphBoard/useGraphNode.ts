@@ -2,14 +2,17 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
+import { usePathname } from 'next/navigation';
 
 export default function useGraphNode<T>(
   nodeId: string,
-  isSelected: boolean,
+  isSelected: boolean | undefined,
   initialData: T,
   hasContent: boolean,
   returnCallback?: () => void,
 ) {
+  const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;
   const isSynced = useRef(true);
   const [isEditing, setIsEditing] = useState(!hasContent);
 
@@ -49,20 +52,22 @@ export default function useGraphNode<T>(
   }, [nodeState]);
 
   const onBlur = (e) => {
-    console.log(e.currentTarget.contains(e.relatedTarget as Element));
     if (hasContent && !e.currentTarget.contains(e.relatedTarget as Element))
       setIsEditing(false);
   };
   const toggleEdit = () => setIsEditing((prev) => !prev);
+  const onCopyLink = async () => {
+    await CopyToClipboard(link);
+  };
 
   return {
     nodeState,
     dispatch,
     isEditing,
     setIsEditing,
-    isSelected,
-    onBlur,
     debouncedUpdate,
+    onBlur,
     toggleEdit,
+    onCopyLink,
   };
 }

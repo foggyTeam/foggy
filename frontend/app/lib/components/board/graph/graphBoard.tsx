@@ -3,7 +3,6 @@
 import '@xyflow/react/dist/style.css';
 import './graphBoard.css';
 import './graphBoardCursors.css';
-import { observer } from 'mobx-react-lite';
 import {
   Background,
   Connection,
@@ -42,9 +41,10 @@ const NODE_TYPES: NodeTypes = {
   nodeLinkNode: NodeLinkNode as any,
 };
 
-const GraphBoard = observer(() => {
+export default function GraphBoard() {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
   const { fitView, updateNode } = useReactFlow();
   const {
     activeTool,
@@ -142,7 +142,6 @@ const GraphBoard = observer(() => {
 
   const debouncedClearNodesData = useCallback(
     debounce((currentNodes: GNode[]) => {
-      if (graphBoardStore.nodesDataMap?.size % 10) return;
       graphBoardStore.clearRemovedNodes(currentNodes);
     }, 512) as any,
     [],
@@ -195,6 +194,4 @@ const GraphBoard = observer(() => {
       </ReactFlow>
     </div>
   );
-});
-
-export default GraphBoard;
+}

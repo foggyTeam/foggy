@@ -31,10 +31,10 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     nodeState,
     dispatch,
     isEditing,
-    isSelected,
     debouncedUpdate,
     onBlur,
     toggleEdit,
+    onCopyLink,
   } = useGraphNode<GExternalLinkNode['data']>(
     node.id,
     node.selected,
@@ -87,11 +87,12 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   return (
     <NodeWrapper
-      isSelected={isSelected}
+      isSelected={node.selected}
       onPress={openLink}
       onBlur={onBlur}
       toolbarProps={{
-        toggleEdit,
+        onToggleEdit: toggleEdit,
+        onCopyNodeLink: onCopyLink,
       }}
     >
       {(isEditing || data.thumbnailUrl) && (

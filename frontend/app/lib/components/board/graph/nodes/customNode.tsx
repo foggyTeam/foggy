@@ -39,7 +39,7 @@ const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
 
-  const { nodeState, dispatch, isEditing, isSelected, onBlur, toggleEdit } =
+  const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
     useGraphNode<GCustomNode['data']>(
       node.id,
       node.selected,
@@ -61,10 +61,11 @@ const CustomNode = observer((node: GCustomNode) => {
 
   return (
     <NodeWrapper
-      isSelected={isSelected}
+      isSelected={!!node.selected}
       onBlur={onBlur}
       toolbarProps={{
-        toggleEdit,
+        onToggleEdit: toggleEdit,
+        onCopyNodeLink: onCopyLink,
       }}
       className={shapeStyleMap[data.shape || 'rect'] + themeClass}
       toolbarTools={

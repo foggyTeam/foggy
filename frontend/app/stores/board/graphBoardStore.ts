@@ -152,6 +152,7 @@ class GraphBoardStore {
       this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
   }
   clearRemovedNodes(nodes: GNode[]) {
+    if (graphBoardStore.nodesDataMap?.size % 10) return;
     for (const [id] of this.nodesDataMap?.entries()) {
       const nodeIndex = nodes?.findIndex((node) => node.id === id);
       if (nodeIndex < 0) this.nodesDataMap?.delete(id);

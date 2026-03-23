@@ -6,18 +6,22 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
-import { PencilIcon } from 'lucide-react';
+import { LinkIcon, PencilIcon } from 'lucide-react';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+
+export interface GraphToolbarProps {
+  isOpen: boolean;
+  tools?: JSX.Element;
+  onToggleEdit?: () => void;
+  onCopyNodeLink?: () => void;
+}
 
 export default function GraphTooltipToolbar({
   isOpen,
-  toggleEdit,
+  onToggleEdit,
+  onCopyNodeLink,
   tools,
-}: {
-  isOpen: boolean;
-  toggleEdit?: () => void;
-  tools?: JSX.Element;
-}) {
+}: GraphToolbarProps) {
   const { commonSize } = useAdaptiveParams();
 
   return (
@@ -35,8 +39,20 @@ export default function GraphTooltipToolbar({
       {tools}
       <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
         <Button
+          data-testid="copy-link-btn"
+          onPress={onCopyNodeLink}
+          variant="light"
+          color="default"
+          isIconOnly
+          size={commonSize}
+        >
+          <LinkIcon className="stroke-default-600" />
+        </Button>
+      </FTooltip>
+      <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
+        <Button
           data-testid="toggle-edit-mode-btn"
-          onPress={toggleEdit}
+          onPress={onToggleEdit}
           variant="light"
           color="default"
           isIconOnly

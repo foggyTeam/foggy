@@ -24,8 +24,18 @@ const GraphMockData: Pick<GraphBoard, 'graphEdges' | 'graphNodes'> = {
     },
     {
       id: 'n2',
-      position: { x: 0, y: 100 },
+      position: { x: 200, y: 100 },
       data: { title: 'Node 2' },
+      type: 'customNode',
+    },
+    {
+      id: 'n3',
+      position: { x: 1500, y: 1500 },
+      data: {
+        title: 'Node 2',
+        description: 'Node to navigate',
+        shape: 'diamond',
+      },
       type: 'customNode',
     },
   ],

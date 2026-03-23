@@ -5,9 +5,23 @@ import { Position } from '@xyflow/react';
 import { Card, CardBody } from '@heroui/card';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import GraphTooltipToolbar from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
-import React, { useEffect, useRef, useState } from 'react';
+import GraphTooltipToolbar, {
+  GraphToolbarProps,
+} from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
+import React, { CSSProperties, JSX, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
+
+interface NodeWrapperProps {
+  isSelected: boolean;
+  onBlur?: (e: MouseEvent) => void;
+  onPress?: (e: MouseEvent) => void;
+  toolbarProps?: Omit<GraphToolbarProps, 'isOpen' | 'tools'>;
+  tools?: Pick<GraphToolbarProps, 'tools'>;
+  underlay?: JSX.Element;
+  className?: string;
+  style?: CSSProperties;
+  children: any;
+}
 
 function NodeWrapper({
   isSelected,
@@ -19,7 +33,7 @@ function NodeWrapper({
   children,
   className,
   style,
-}) {
+}: NodeWrapperProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {

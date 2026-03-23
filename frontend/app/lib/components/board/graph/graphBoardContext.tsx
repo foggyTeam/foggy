@@ -7,12 +7,15 @@ import React, {
   SetStateAction,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
 import debounce from 'lodash/debounce';
 import useGraphTool from '@/app/lib/hooks/graphBoard/useGraphTool';
 import useGraphOperations from '@/app/lib/hooks/graphBoard/useGraphOperations';
+import { useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { useSearchParams } from 'next/navigation';
 
 export type GraphTool =
   | 'custom-node'
@@ -41,11 +44,16 @@ interface BoardContextProps {
     newAttrs: Partial<GNode['data']>,
   ) => void;
   deleteSelectedElements: () => void;
+  zoomNode: (nodeId: string) => void;
 }
 
 const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 
 export function GraphBoardProvider({ children }: { children: ReactNode }) {
+  const query = useSearchParams();
+  const initialized = useNodesInitialized();
+  const { fitView } = useReactFlow();
+
   // SELECTION
   const [selectedElements, setSelectedElements] = useState<(GNode | GEdge)[]>(
     [],
@@ -65,6 +73,14 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
   const { createNewElement, updateElement, deleteSelectedElements } =
     useGraphOperations(selectedElements);
 
+  async function zoomNode(nodeId: string) {
+    await fitView({ maxZoom: 1, nodes: [{ id: nodeId }] });
+  }
+  useEffect(() => {
+    const nodeId = query.get('node_id');
+    if (nodeId && initialized) zoomNode(nodeId);
+  }, [initialized]);
+
   return (
     <BoardContext.Provider
       value={{
@@ -81,6 +97,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
         createNewElement,
         updateElement,
         deleteSelectedElements,
+        zoomNode,
       }}
     >
       {children}
