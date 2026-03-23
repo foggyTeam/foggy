@@ -50,6 +50,7 @@ export default function AlignTool({
         </Button>
       </DropdownTrigger>
       <DropdownMenu
+        disallowEmptySelection
         selectedKeys={new Set([align])}
         selectionMode="single"
         variant="flat"

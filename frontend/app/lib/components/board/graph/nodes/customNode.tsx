@@ -11,7 +11,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import ShapeTool from '@/app/lib/components/board/graph/tools/tooltipTools/shapeTool';
 import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
-import GraphColorTool from '@/app/lib/components/board/graph/tools/graphColorTool';
+import GraphColorTool from '@/app/lib/components/board/graph/tools/tooltipTools/graphColorTool';
 import AlignTool from '@/app/lib/components/board/graph/tools/tooltipTools/alignTool';
 import { customNodeSchema } from '@/app/lib/types/schemas';
 

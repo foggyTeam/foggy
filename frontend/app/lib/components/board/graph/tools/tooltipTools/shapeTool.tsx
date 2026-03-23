@@ -56,6 +56,7 @@ export default function ShapeTool({
         </Button>
       </DropdownTrigger>
       <DropdownMenu
+        disallowEmptySelection
         selectedKeys={new Set([shape])}
         selectionMode="single"
         variant="flat"

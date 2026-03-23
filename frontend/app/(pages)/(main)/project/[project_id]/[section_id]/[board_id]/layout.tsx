@@ -47,6 +47,7 @@ const GraphMockData: Pick<GraphBoard, 'graphEdges' | 'graphNodes'> = {
       sourceHandle: 'top-source',
       target: 'n1',
       targetHandle: 'bottom-target',
+      style: { strokeWidth: 1.5 },
     },
   ],
 };

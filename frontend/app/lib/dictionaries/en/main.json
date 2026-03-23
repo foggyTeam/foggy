@@ -427,7 +427,11 @@
       "externalLinkTool": "Link to anywhere in the Web",
       "nodeLinkTool": "Link to other node",
       "toggleEdit": "Edit contents",
-      "copyNodeLink": "Copy link to node"
+      "copyNodeLink": "Copy link to node",
+      "edgeType":  "Line type",
+      "edgeArrow": "Arrows",
+      "edgeDash":  "Dashed line",
+      "edgeLabel": "Label"
     },
     "resetStage": "Reset position",
     "uploadButton": "Get board image temporary link"

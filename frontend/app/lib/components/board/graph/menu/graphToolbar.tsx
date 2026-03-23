@@ -41,7 +41,7 @@ export default function GraphToolbar({
     >
       {edgeSelected && (
         <GraphEdgeToolbar
-          edge={selectedElements[0]}
+          edgeId={selectedElements[0].id}
           onEdgeUpdate={onEdgeUpdate}
         />
       )}

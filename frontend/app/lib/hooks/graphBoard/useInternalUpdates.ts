@@ -10,6 +10,7 @@ import {
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GEdge } from '@/app/lib/types/definitions';
+import { toJS } from 'mobx';
 
 interface InternalUpdatesParams {
   setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
@@ -82,8 +83,8 @@ export default function useInternalUpdates({
 
   // INITIAL STATE WATCHER
   useEffect(() => {
-    setNodes(graphBoardStore.boardNodes ?? []);
-    setEdges(graphBoardStore.boardEdges ?? []);
+    setNodes(toJS(graphBoardStore.boardNodes) ?? []);
+    setEdges(toJS(graphBoardStore.boardEdges) ?? []);
   }, []);
 
   // CLEANUP

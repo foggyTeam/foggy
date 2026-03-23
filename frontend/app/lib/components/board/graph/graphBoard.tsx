@@ -94,6 +94,7 @@ export default function GraphBoard() {
           type: 'add',
           item: {
             ...connection,
+            style: { strokeWidth: 1.5 },
             id: `${connection.source}-${connection.target}-${Date.now()}`,
             type: 'default',
           },
@@ -122,9 +123,9 @@ export default function GraphBoard() {
         {
           type: 'add',
           item: {
+            ...oldEdge,
             ...newConnection,
             id: `${newConnection.source}-${newConnection.target}-${Date.now()}`,
-            type: 'default',
           },
         },
       ]);

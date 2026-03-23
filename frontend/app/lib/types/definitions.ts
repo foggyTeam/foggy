@@ -278,7 +278,6 @@ export interface GEdge extends Edge {
   sourceHandle?: string; // source node handle id
   targetHandle?: string; // target node handle id
   label?: string;
-  data?: any;
   style?: { stroke?: string; strokeWidth?: number; strokeDasharray?: string };
   markerStart?: { type: MarkerType };
   markerEnd?: { type: MarkerType };
