@@ -8,6 +8,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
@@ -52,6 +53,7 @@ const BoardContext = createContext<BoardContextProps | undefined>(undefined);
 export function GraphBoardProvider({ children }: { children: ReactNode }) {
   const query = useSearchParams();
   const initialized = useNodesInitialized();
+  const navigated = useRef(false);
   const { fitView } = useReactFlow();
 
   // SELECTION
@@ -74,9 +76,11 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     useGraphOperations(selectedElements);
 
   async function zoomNode(nodeId: string) {
-    await fitView({ maxZoom: 1, nodes: [{ id: nodeId }] });
+    await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
   }
   useEffect(() => {
+    if (navigated.current) return;
+    navigated.current = true;
     const nodeId = query.get('node_id');
     if (nodeId && initialized) zoomNode(nodeId);
   }, [initialized]);

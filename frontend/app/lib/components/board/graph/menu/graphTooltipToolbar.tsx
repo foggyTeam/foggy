@@ -37,7 +37,7 @@ export default function GraphTooltipToolbar({
       data-testid="board-tooltip-toolbar"
     >
       {tools}
-      <FTooltip content={settingsStore.t.toolTips.tools.toggleEdit}>
+      <FTooltip content={settingsStore.t.toolTips.tools.copyNodeLink}>
         <Button
           data-testid="copy-link-btn"
           onPress={onCopyNodeLink}

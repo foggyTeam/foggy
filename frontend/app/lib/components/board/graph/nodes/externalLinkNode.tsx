@@ -108,11 +108,11 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
       {!isEditing && (
         <div className="flex flex-col gap-1">
-          <div className="flex h-full w-full items-center justify-start gap-1">
+          <div className="flex h-full w-full items-center justify-start gap-2">
             <Avatar
-              fallback={<GlobeIcon className="text-default-500 h-5 w-5" />}
+              fallback={<GlobeIcon className="text-f_accent-500 h-5 w-5" />}
               showFallback
-              className="flex-shrink-0"
+              className="shrink-0"
               classNames={{
                 base: 'h-7 w-7',
               }}

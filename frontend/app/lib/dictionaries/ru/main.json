@@ -385,6 +385,7 @@
     "titleLabel": "Заголовок",
     "titlePlaceholder": "Новая запись",
     "emptyLinkDomain": "Нет домена",
+    "emptyLink": "Нет ссылки",
     "emptyLinkDescription": "Нет описания"
   },
 
@@ -416,7 +417,8 @@
       "internalLinkTool": "Ссылка на другой элемент проекта",
       "externalLinkTool": "Любая ссылка в Интернете",
       "nodeLinkTool": "Ссылка на другой узел",
-      "toggleEdit": "Редактировать содержимое"
+      "toggleEdit": "Редактировать содержимое",
+      "copyNodeLink": "Скопировать ссылку на узел"
     },
     "resetStage": "Сбросить смещение",
     "uploadButton": "Получить временную ссылку на изображение доски"

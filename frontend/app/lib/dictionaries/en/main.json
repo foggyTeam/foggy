@@ -387,6 +387,7 @@
     "titlePlaceholder": "New note",
 
     "emptyLinkDomain": "No domain",
+    "emptyLink": "No link",
     "emptyLinkDescription": "No description"
   },
 
@@ -418,7 +419,8 @@
       "internalLinkTool": "Link to another project element",
       "externalLinkTool": "Link to anywhere in the Web",
       "nodeLinkTool": "Link to other node",
-      "toggleEdit": "Edit contents"
+      "toggleEdit": "Edit contents",
+      "copyNodeLink": "Copy link to node"
     },
     "resetStage": "Reset position",
     "uploadButton": "Get board image temporary link"
