@@ -1,5 +1,7 @@
 'use client';
 
+// TODO: поймать краш на data.url cannot read properties of undefined
+
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
 import React, { useCallback } from 'react';
 import { GNodeLinkNode } from '@/app/lib/types/definitions';
@@ -54,7 +56,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
 
   const openLink = async (e: MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
-      if (data.url && !isEditing) {
+      if (data?.url && !isEditing) {
         if (data.url.includes(path) && data.nodeId) await zoomNode(data.nodeId);
         else window.open(data.url, '_blank');
       }
@@ -75,7 +77,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
         <div className="flex h-7 w-full items-center justify-start gap-2">
           <LinkIcon className="text-f_accent-500 h-5 w-5 shrink-0" />
           <h1 className="line-clamp-1 w-fit truncate font-medium text-nowrap">
-            {data.title || data.url || settingsStore.t.toolBar.emptyLink}
+            {data?.title || data?.url || settingsStore.t.toolBar.emptyLink}
           </h1>
         </div>
       )}

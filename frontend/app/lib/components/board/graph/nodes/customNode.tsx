@@ -37,7 +37,8 @@ function isLightColor(hex: string): boolean {
 }
 
 const CustomNode = observer((node: GCustomNode) => {
-  const data: GCustomNode['data'] = graphBoardStore.nodesDataMap?.get(node.id);
+  const data: GCustomNode['data'] | undefined =
+    graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
 
   const {

@@ -20,9 +20,8 @@ import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
 type UrlData = Partial<GExternalLinkNode['data']>;
 
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
-  const data: GExternalLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
-    node.id,
-  );
+  const data: GExternalLinkNode['data'] | undefined =
+    graphBoardStore.nodesDataMap?.get(node.id);
 
   const { smallerSize } = useAdaptiveParams();
 
@@ -41,7 +40,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     node.id,
     node.selected,
     data,
-    !!data.url,
+    !!data?.url,
     externalLinkNodeSchema,
     () => loadLinkData.current.cancel(),
   );
@@ -49,7 +48,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   const setDescription = useCallback((v) => dispatch({ description: v }), []);
 
   useEffect(() => {
-    if (data.url !== nodeState.url)
+    if (data?.url !== nodeState.url)
       loadLinkData.current(nodeState.url, nodeState.description);
   }, [nodeState.url]);
 
@@ -83,7 +82,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
   const openLink = (e: MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
-      if (data.url && data.domain && !isEditing)
+      if (data?.url && data?.domain && !isEditing)
         window.open(data.url, '_blank');
     }
   };
@@ -98,11 +97,11 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         onCopyNodeLink: onCopyLink,
       }}
     >
-      {(isEditing || data.thumbnailUrl) && (
+      {(isEditing || data?.thumbnailUrl) && (
         <Image
           isLoading={isLoading}
           alt="Link thumbnail"
-          src={data.thumbnailUrl || ImagePlaceholder.src}
+          src={data?.thumbnailUrl || ImagePlaceholder.src}
           className="max-h-56 w-full overflow-clip"
           isZoomed
           width={208}
@@ -119,17 +118,17 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
               classNames={{
                 base: 'h-7 w-7',
               }}
-              src={data.favicon}
-              name={data.domain}
+              src={data?.favicon}
+              name={data?.domain}
             />
             <h1 className="line-clamp-1 w-fit truncate font-medium text-nowrap">
-              {data.domain ||
-                data.url ||
+              {data?.domain ||
+                data?.url ||
                 settingsStore.t.toolBar.emptyLinkDomain}
             </h1>
           </div>
 
-          {data.description && (
+          {data?.description && (
             <p className="text-default-700 line-clamp-2 h-fit w-full text-start text-xs whitespace-pre-wrap italic">
               {data.description}
             </p>
