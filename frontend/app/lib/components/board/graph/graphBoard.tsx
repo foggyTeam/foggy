@@ -6,6 +6,7 @@ import './graphBoardCursors.css';
 import {
   Background,
   Connection,
+  ConnectionMode,
   Edge,
   Node,
   NodeAddChange,
@@ -64,7 +65,7 @@ export default function GraphBoard() {
     updateNode,
   );
 
-  const { onNodesChange, onEdgesChange } = useInternalUpdates({
+  const { onNodesChange, onEdgesChange, onEdgeUpdate } = useInternalUpdates({
     setNodes,
     setEdges,
   });
@@ -130,21 +131,25 @@ export default function GraphBoard() {
     },
     [edges, onEdgesChange],
   );
-  const handleClick = (e: MouseEvent) => {
-    const newElement = createNewElement(e, activeTool);
-    if (newElement) {
-      onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
-      graphBoardStore.updateNodeData(newElement.id, newElement.data, true);
-      debouncedClearNodesData(nodes);
-      setActiveTool(undefined);
-    }
-  };
 
   const debouncedClearNodesData = useCallback(
     debounce((currentNodes: GNode[]) => {
       graphBoardStore.clearRemovedNodes(currentNodes);
     }, 512) as any,
     [],
+  );
+
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      const newElement = createNewElement(e, activeTool);
+      if (newElement) {
+        onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
+        graphBoardStore.updateNodeData(newElement.id, newElement.data, true);
+        debouncedClearNodesData(nodes);
+        setActiveTool(undefined);
+      }
+    },
+    [activeTool, debouncedClearNodesData, setActiveTool],
   );
 
   return (
@@ -161,6 +166,7 @@ export default function GraphBoard() {
       className="relative h-full w-full overflow-hidden"
     >
       <ReactFlow
+        connectionMode={ConnectionMode.Loose}
         onNodeDrag={onNodeDrag}
         onSelectionDrag={onSelectionDrag}
         onNodeDragStop={onDragStop}
@@ -186,7 +192,7 @@ export default function GraphBoard() {
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
         <Panel position="bottom-center" className="toolbar w-full sm:w-fit">
-          <GraphToolbar />
+          <GraphToolbar onEdgeUpdate={onEdgeUpdate} />
         </Panel>
         <ResetStageButton
           callback={() => fitView({ duration: 300, maxZoom: 1 })}

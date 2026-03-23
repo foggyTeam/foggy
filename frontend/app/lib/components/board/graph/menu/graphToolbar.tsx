@@ -10,9 +10,17 @@ import NodeLinkTool from '@/app/lib/components/board/graph/tools/nodeLinkTool';
 import { Divider } from '@heroui/divider';
 import DeleteTool from '@/app/lib/components/board/graph/tools/deleteTool';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { GEdge } from '@/app/lib/types/definitions';
+import GraphEdgeToolbar from '@/app/lib/components/board/graph/menu/graphEdgeToolbar';
 
-export default function GraphToolbar() {
+export default function GraphToolbar({
+  onEdgeUpdate,
+}: {
+  onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
+}) {
   const { selectedElements } = useGraphBoardContext();
+  const edgeSelected =
+    selectedElements.length === 1 && 'source' in selectedElements[0];
   const tools = [
     InternalLinkTool,
     ExternalLinkTool,
@@ -31,6 +39,13 @@ export default function GraphToolbar() {
         'overflow-visible',
       )}
     >
+      {edgeSelected && (
+        <GraphEdgeToolbar
+          edge={selectedElements[0]}
+          onEdgeUpdate={onEdgeUpdate}
+        />
+      )}
+      {edgeSelected && <Divider />}
       <div className="flex justify-center gap-1">
         {tools.map((Tool, index) => (
           <Tool key={index} />

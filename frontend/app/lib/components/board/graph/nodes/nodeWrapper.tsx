@@ -1,6 +1,5 @@
 'use client';
 
-import DoubledHandle from '@/app/lib/components/board/graph/doubledHandle';
 import { Position } from '@xyflow/react';
 import { Card, CardBody } from '@heroui/card';
 import clsx from 'clsx';
@@ -10,13 +9,14 @@ import GraphTooltipToolbar, {
 } from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
 import React, { CSSProperties, JSX, useEffect, useRef, useState } from 'react';
 import debounce from 'lodash/debounce';
+import DoubledHandle from '@/app/lib/components/board/graph/doubledHandle';
 
 interface NodeWrapperProps {
   isSelected: boolean;
   onBlur?: (e: MouseEvent) => void;
   onPress?: (e: MouseEvent) => void;
   toolbarProps?: Omit<GraphToolbarProps, 'isOpen' | 'tools'>;
-  tools?: Pick<GraphToolbarProps, 'tools'>;
+  toolbarTools?: JSX.Element;
   underlay?: JSX.Element;
   className?: string;
   style?: CSSProperties;

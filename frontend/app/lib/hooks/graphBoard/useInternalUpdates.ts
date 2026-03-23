@@ -9,6 +9,7 @@ import {
   NodeChange,
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import { GEdge } from '@/app/lib/types/definitions';
 
 interface InternalUpdatesParams {
   setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
@@ -64,6 +65,20 @@ export default function useInternalUpdates({
     },
     [flushEdgeEmit],
   );
+  const onEdgeUpdate = useCallback(
+    (edgeId: string, updatedEdge: GEdge) => {
+      const change: EdgeChange = {
+        type: 'replace',
+        id: edgeId,
+        item: updatedEdge,
+      };
+      setEdges((prev) => applyEdgeChanges([change], prev));
+
+      pendingEdgeChanges.current.push(change);
+      flushEdgeEmit();
+    },
+    [flushEdgeEmit],
+  );
 
   // INITIAL STATE WATCHER
   useEffect(() => {
@@ -79,5 +94,5 @@ export default function useInternalUpdates({
     };
   }, [flushEdgeEmit, flushNodeEmit]);
 
-  return { onNodesChange, onEdgesChange };
+  return { onNodesChange, onEdgesChange, onEdgeUpdate };
 }

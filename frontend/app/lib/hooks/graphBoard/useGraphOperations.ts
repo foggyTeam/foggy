@@ -1,13 +1,15 @@
 'use client';
 
-import { GNode } from '@/app/lib/types/definitions';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { useCallback, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
 import { useReactFlow } from '@xyflow/react';
 
-export default function useGraphOperations(selectedElements) {
+export default function useGraphOperations(
+  selectedElements: (GNode | GEdge)[],
+) {
   const { screenToFlowPosition, deleteElements } = useReactFlow();
   const selectedRef = useRef(selectedElements);
 

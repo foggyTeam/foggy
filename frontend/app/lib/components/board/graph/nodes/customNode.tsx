@@ -9,10 +9,10 @@ import { Input, Textarea } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
-import ShapeTool from '@/app/lib/components/board/graph/tools/shapeTool';
+import ShapeTool from '@/app/lib/components/board/graph/tools/tooltipTools/shapeTool';
 import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderlay';
 import GraphColorTool from '@/app/lib/components/board/graph/tools/graphColorTool';
-import AlignTool from '@/app/lib/components/board/graph/tools/alignTool';
+import AlignTool from '@/app/lib/components/board/graph/tools/tooltipTools/alignTool';
 import { customNodeSchema } from '@/app/lib/types/schemas';
 
 const shapeStyleMap = {

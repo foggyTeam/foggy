@@ -206,7 +206,7 @@ export interface LineElement extends SBaseElement {
 }
 
 // GRAPH BOARD
-import type { Handle, Node } from '@xyflow/react';
+import type { Handle, MarkerType, Node, Edge } from '@xyflow/react';
 
 export type GNode =
   | GCustomNode
@@ -270,7 +270,7 @@ interface GNodeHandle extends Handle {
   type: 'source' | 'target';
 }
 
-export interface GEdge {
+export interface GEdge extends Edge {
   id: string;
   type: 'default' | 'smoothstep' | 'straight' | 'step' | 'simplebezier';
   source: string; // source node id
@@ -279,4 +279,7 @@ export interface GEdge {
   targetHandle?: string; // target node handle id
   label?: string;
   data?: any;
+  style?: { stroke?: string; strokeWidth?: number; strokeDasharray?: string };
+  markerStart?: { type: MarkerType };
+  markerEnd?: { type: MarkerType };
 }
