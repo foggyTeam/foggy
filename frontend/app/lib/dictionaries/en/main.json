@@ -395,7 +395,11 @@
 
     "emptyLinkDomain": "No domain",
     "emptyLink": "No link",
-    "emptyLinkDescription": "No description"
+    "emptyLinkDescription": "No description",
+
+    "edgeLabel": "Label",
+    "edgeLabelPlaceholder": "New edge",
+    "animateEdge": "Animate"
   },
 
   "toolTips": {
@@ -428,9 +432,9 @@
       "nodeLinkTool": "Link to other node",
       "toggleEdit": "Edit contents",
       "copyNodeLink": "Copy link to node",
-      "edgeType":  "Line type",
+      "edgeType": "Line type",
       "edgeArrow": "Arrows",
-      "edgeDash":  "Dashed line",
+      "edgeDash": "Dashed line",
       "edgeLabel": "Label"
     },
     "resetStage": "Reset position",

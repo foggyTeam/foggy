@@ -9,6 +9,7 @@ import {
 import { Button } from '@heroui/button';
 import {
   MinusIcon,
+  MoveDiagonalIcon,
   MoveHorizontalIcon,
   MoveLeftIcon,
   MoveRightIcon,
@@ -61,13 +62,11 @@ export default function EndsTool({
     new Set([defineOption(edge.markerStart, edge.markerEnd)]),
   );
 
-  const CurrentIcon =
-    options.find((o) => o.value === currentOption.keys()[0])?.Icon ?? MinusIcon;
-
   const getArrow = () => {
     return {
       type: MarkerType.ArrowClosed,
-      width: 32,
+      width: 20,
+      strokeWidth: 1.5,
       color: edge.style?.stroke || 'hsl(var(--heroui-default-400))',
     };
   };
@@ -81,6 +80,7 @@ export default function EndsTool({
       markerEnd: value === 'end' || value === 'both' ? getArrow() : undefined,
     });
   };
+
   return (
     <Dropdown
       classNames={{ content: `${bg_container_no_padding} w-fit min-w-20` }}
@@ -94,7 +94,7 @@ export default function EndsTool({
           size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.edgeArrow}>
-            <CurrentIcon className="stroke-default-600" />
+            <MoveDiagonalIcon className="stroke-default-600" />
           </FTooltip>
         </Button>
       </DropdownTrigger>

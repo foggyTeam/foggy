@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@heroui/button';
-import { TagIcon } from 'lucide-react';
+import { CaseSensitiveIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
@@ -24,9 +24,7 @@ export default function LabelTool({
   const { commonSize, smallerSize } = useAdaptiveParams();
   const { allToolsDisabled } = useGraphBoardContext();
 
-  const [value, setValue] = useState<string>(
-    typeof edge.label === 'string' ? edge.label : '',
-  );
+  const [value, setValue] = useState<string>(edge.label || '');
 
   const debouncedOnChange = useRef(
     debounce((label: string) => onChange({ label: label || undefined }), 256),
@@ -37,23 +35,21 @@ export default function LabelTool({
     debouncedOnChange.current(newValue);
   };
 
-  const hasLabel = !!value;
-
   return (
     <Popover>
       <PopoverTrigger>
         <Button
           data-testid="edge-label-tool-btn"
           isDisabled={allToolsDisabled}
-          variant={hasLabel ? 'flat' : 'light'}
-          color={hasLabel ? 'primary' : 'default'}
+          variant={!!value ? 'flat' : 'light'}
+          color={!!value ? 'primary' : 'default'}
           isIconOnly
           size={commonSize}
         >
           <FTooltip content={settingsStore.t.toolTips.tools.edgeLabel}>
-            <TagIcon
+            <CaseSensitiveIcon
               className={clsx(
-                hasLabel ? 'stroke-primary' : 'stroke-default-600',
+                !!value ? 'stroke-primary' : 'stroke-default-600',
               )}
             />
           </FTooltip>
@@ -70,11 +66,10 @@ export default function LabelTool({
           size={smallerSize}
           variant="underlined"
           color="primary"
-          label={settingsStore.t.toolBar.titleLabel}
-          placeholder={settingsStore.t.toolBar.titlePlaceholder}
+          label={settingsStore.t.toolBar.edgeLabel}
+          placeholder={settingsStore.t.toolBar.edgeLabelPlaceholder}
           value={value}
           onValueChange={handleChange}
-          onKeyDown={(e) => e.stopPropagation()}
           className="w-48"
           classNames={{ input: 'text-default-500' }}
         />

@@ -81,7 +81,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
   }
   useEffect(() => {
-    if (navigated.current) return;
+    if (navigated.current || !initialized) return;
     navigated.current = true;
     const nodeId = query.get('node_id');
     if (nodeId && initialized) zoomNode(nodeId);

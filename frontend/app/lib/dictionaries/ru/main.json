@@ -393,7 +393,11 @@
     "titlePlaceholder": "Новая запись",
     "emptyLinkDomain": "Нет домена",
     "emptyLink": "Нет ссылки",
-    "emptyLinkDescription": "Нет описания"
+    "emptyLinkDescription": "Нет описания",
+
+    "edgeLabel": "Подпись",
+    "edgeLabelPlaceholder": "Новое ребро",
+    "animateEdge": "Анимация"
   },
 
   "toolTips": {
@@ -426,9 +430,9 @@
       "nodeLinkTool": "Ссылка на другой узел",
       "toggleEdit": "Редактировать содержимое",
       "copyNodeLink": "Скопировать ссылку на узел",
-      "edgeType":  "Тип ребра",
+      "edgeType": "Тип ребра",
       "edgeArrow": "Концы ребра",
-      "edgeDash":  "Пунктирное ребро",
+      "edgeDash": "Пунктирное ребро",
       "edgeLabel": "Подпись"
     },
     "resetStage": "Сбросить смещение",
