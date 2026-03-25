@@ -47,7 +47,7 @@ export default function GraphBoard() {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
-  const { fitView, updateNode } = useReactFlow();
+  const { fitView, updateNode, getNodes } = useReactFlow();
   const {
     activeTool,
     setActiveTool,
@@ -135,24 +135,34 @@ export default function GraphBoard() {
   );
 
   const debouncedClearNodesData = useCallback(
-    debounce((currentNodes: GNode[]) => {
-      graphBoardStore.clearRemovedNodes(currentNodes);
+    debounce(() => {
+      graphBoardStore.clearRemovedNodes(getNodes() as GNode[]);
     }, 512) as any,
-    [],
+    [getNodes],
   );
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
       const newElement = createNewElement(e, activeTool);
-      if (newElement) {
+      if (!newElement) return;
+
+      const success = graphBoardStore.updateNodeData(
+        newElement.id,
+        newElement.data,
+        true,
+      );
+      if (success)
         onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
-        graphBoardStore.updateNodeData(newElement.id, newElement.data, true);
-        debouncedClearNodesData(nodes);
-        setActiveTool(undefined);
-      }
+
+      debouncedClearNodesData();
+      setActiveTool(undefined);
     },
     [activeTool, debouncedClearNodesData, setActiveTool],
   );
+
+  useEffect(() => {
+    return () => debouncedClearNodesData.cancel();
+  }, [debouncedClearNodesData]);
 
   return (
     <div

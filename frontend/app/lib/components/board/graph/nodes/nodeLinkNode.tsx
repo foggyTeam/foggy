@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: поймать краш на data.url cannot read properties of undefined
-
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
 import React, { useCallback } from 'react';
 import { GNodeLinkNode } from '@/app/lib/types/definitions';

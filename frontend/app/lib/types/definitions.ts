@@ -208,14 +208,9 @@ export interface LineElement extends SBaseElement {
 // GRAPH BOARD
 import type { Edge, Handle, MarkerType, Node } from '@xyflow/react';
 
-export type GNode =
-  | GCustomNode
-  | GExternalLinkNode
-  | GInternalLinkNode
-  | GNodeLinkNode;
-interface GBaseNode extends Node {
+export interface GBaseNode extends Node {
   id: string;
-  type?: string;
+  type: string;
   position: { x: number; y: number };
   hidden?: boolean;
   parentId?: string;
@@ -227,9 +222,9 @@ export interface GCustomNode extends GBaseNode {
   data: {
     title?: string;
     description?: string;
-    shape?: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
+    shape: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
     color?: string;
-    align?: 'start' | 'center' | 'end';
+    align: 'start' | 'center' | 'end';
   };
 }
 
@@ -247,8 +242,8 @@ export interface GExternalLinkNode extends GBaseNode {
 export interface GInternalLinkNode extends GBaseNode {
   type: 'internalLinkNode';
   data: {
-    type: ProjectElementTypes;
-    title: string;
+    type?: ProjectElementTypes;
+    title?: string;
     path?: string[];
   };
 }
@@ -257,10 +252,16 @@ export interface GNodeLinkNode extends GBaseNode {
   type: 'nodeLinkNode';
   data: {
     title?: string;
-    url: string;
-    nodeId: string;
+    url?: string;
+    nodeId?: string;
   };
 }
+
+export type GNode =
+  | GCustomNode
+  | GExternalLinkNode
+  | GInternalLinkNode
+  | GNodeLinkNode;
 
 interface GNodeHandle extends Handle {
   id?: string | null;

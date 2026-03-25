@@ -134,7 +134,7 @@ class GraphBoardStore {
     isNew?: boolean,
     external?: boolean,
   ) {
-    if (!this.nodesDataMap || !this.boardNodes) return;
+    if (!this.nodesDataMap || !this.boardNodes) return false;
     if (isNew) {
       this.nodesDataMap.set(nodeId, observable(newAttrs));
     } else {
@@ -142,7 +142,7 @@ class GraphBoardStore {
         const nodeIndex = this.boardNodes?.findIndex(
           (node) => node.id === nodeId,
         );
-        if (nodeIndex < 0) return;
+        if (nodeIndex < 0) return false;
         this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
       }
       const node = this.nodesDataMap.get(nodeId);
@@ -150,11 +150,12 @@ class GraphBoardStore {
     }
     if (!external)
       this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
+    return true;
   }
   clearRemovedNodes(nodes: GNode[]) {
     // очистка устаревших нод, только если их число кратно 10
     if (graphBoardStore.nodesDataMap?.size % 10) return;
-    for (const [id] of this.nodesDataMap?.entries()) {
+    for (const id of Array.from(this.nodesDataMap?.keys())) {
       const nodeIndex = nodes?.findIndex((node) => node.id === id);
       if (nodeIndex < 0) this.nodesDataMap?.delete(id);
     }

@@ -1,6 +1,6 @@
 'use client';
 
-import { GEdge, GNode } from '@/app/lib/types/definitions';
+import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
 import { useCallback, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -20,21 +20,23 @@ export default function useGraphOperations(
     if (!tool) return null;
 
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-    let newNode = {
+    let newNode: GBaseNode = {
       id: `${tool}-${Date.now().toString()}`,
-      position: position,
-      data: {},
+      position,
       type: '',
+      data: {},
+      hidden: false,
     };
     switch (tool) {
+      case 'external-link':
+        newNode.type = 'externalLinkNode';
+        break;
       case 'custom-node':
         newNode.type = 'customNode';
+        newNode.data = { shape: 'rect', align: 'start' };
         break;
       case 'internal-link':
         newNode.type = 'internalLinkNode';
-        break;
-      case 'external-link':
-        newNode.type = 'externalLinkNode';
         break;
       case 'node-link':
         newNode.type = 'nodeLinkNode';
