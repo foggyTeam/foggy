@@ -45,7 +45,7 @@ const SYNC_DEBOUNCE = 256;
 const DRAG_ALPHA = 0.25;
 
 export default function useForcedLayout(
-  nodes: Node[],
+  getNodes: () => Node[],
   edges: Edge[],
   updateNode: (id: string, nodeUpdate: Partial<Node>) => void,
   options: ForcedLayoutOptions = {},
@@ -61,9 +61,11 @@ export default function useForcedLayout(
   const draggedNodes = useRef<Set<string>>(new Set());
 
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
-  const nodeIds = nodes.map((n) => n.id).join(',');
+  const nodeIds = getNodes()
+    .map((n) => n.id)
+    .join(',');
   const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
-  const nodeSizes = nodes
+  const nodeSizes = getNodes()
     .map((n) => `${n.id}:${n.measured?.width ?? 0}x${n.measured?.height ?? 0}`)
     .join(',');
 
@@ -129,14 +131,14 @@ export default function useForcedLayout(
         prevNIds: Set<string>,
         prevEKeys: Set<string>,
       ) => {
-        const currentNodeIds = new Set(nodes.map((n) => n.id));
+        const currentNodeIds = new Set(getNodes().map((n) => n.id));
         const currentEdgeKeys = new Set(
           edges.map((e) => `${e.source}->${e.target}`),
         );
 
         let hasStructuralChanges = false;
 
-        for (const node of nodes) {
+        for (const node of getNodes()) {
           if (!prevNIds.has(node.id)) {
             sMap.set(node.id, {
               id: node.id,
@@ -226,7 +228,7 @@ export default function useForcedLayout(
 
   useEffect(() => {
     syncStructure.current(
-      nodes,
+      getNodes(),
       edges,
       simulationNodesMap.current,
       positionsMap.current,

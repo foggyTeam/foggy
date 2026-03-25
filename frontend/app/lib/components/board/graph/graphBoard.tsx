@@ -1,5 +1,7 @@
 'use client';
 
+// TODO: rethink all updates as internal ReactFlow state synced with MobX state
+
 import '@xyflow/react/dist/style.css';
 import './graphBoard.css';
 import './graphBoardCursors.css';
@@ -34,6 +36,8 @@ import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import debounce from 'lodash/debounce';
 import { GNode } from '@/app/lib/types/definitions';
+import { observer } from 'mobx-react-lite';
+import { toJS } from 'mobx';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -43,11 +47,11 @@ const NODE_TYPES: NodeTypes = {
   nodeLinkNode: NodeLinkNode as any,
 };
 
-export default function GraphBoard() {
+const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
-  const { fitView, updateNode, getNodes } = useReactFlow();
+  const { fitView, updateNode, getNodes, setNodes } = useReactFlow();
   const {
     activeTool,
     setActiveTool,
@@ -57,11 +61,11 @@ export default function GraphBoard() {
     onSelectionChange,
   } = useGraphBoardContext();
 
-  const [nodes, setNodes] = useState<Node[]>([]);
+  const [initialNodes, setInitialNodes] = useState<Node[]>([]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
   const { onNodeDrag, onSelectionDrag, onDragStop } = useForcedLayout(
-    nodes,
+    getNodes,
     edges,
     updateNode,
   );
@@ -69,6 +73,7 @@ export default function GraphBoard() {
   const { onNodesChange, onEdgesChange, onEdgeUpdate } = useInternalUpdates({
     setNodes,
     setEdges,
+    updateNode,
   });
   useExternalUpdates({
     setNodes,
@@ -164,7 +169,13 @@ export default function GraphBoard() {
     return () => debouncedClearNodesData.cancel();
   }, [debouncedClearNodesData]);
 
-  return (
+  // INITIAL STATE WATCHER
+  useEffect(() => {
+    setInitialNodes(toJS(graphBoardStore.boardNodes) ?? []);
+    setEdges(toJS(graphBoardStore.boardEdges) ?? []);
+  }, []);
+
+  return !initialNodes.length ? null : (
     <div
       data-testid="graph-board"
       style={
@@ -183,7 +194,7 @@ export default function GraphBoard() {
         onSelectionDrag={onSelectionDrag}
         onNodeDragStop={onDragStop}
         onSelectionDragStop={onDragStop}
-        nodes={nodes}
+        defaultNodes={initialNodes}
         onSelectionChange={onSelectionChange}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -212,4 +223,5 @@ export default function GraphBoard() {
       </ReactFlow>
     </div>
   );
-}
+});
+export default GraphBoard;

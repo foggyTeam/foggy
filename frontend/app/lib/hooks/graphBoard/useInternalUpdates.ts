@@ -6,20 +6,32 @@ import {
   applyEdgeChanges,
   applyNodeChanges,
   EdgeChange,
+  Node,
   NodeChange,
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GEdge } from '@/app/lib/types/definitions';
-import { toJS } from 'mobx';
+import applyGraphNodeChange from '@/app/lib/utils/applyGraphNodeChange';
 
 interface InternalUpdatesParams {
   setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
   setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
+  updateNode: (
+    id: string,
+    nodeUpdater: (node: Node) => Partial<Node>,
+    options?: { replace: boolean },
+  ) => void;
 }
+
+const structureChangesTypes: Set<NodeChange['type']> = new Set([
+  'add',
+  'remove',
+]);
 
 export default function useInternalUpdates({
   setNodes,
   setEdges,
+  updateNode,
 }: InternalUpdatesParams) {
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
@@ -48,13 +60,26 @@ export default function useInternalUpdates({
   // UPDATES HANDLERS
   const onNodesChange = useCallback(
     (changes: NodeChange[], external?: boolean) => {
-      setNodes((prev) => applyNodeChanges(changes, prev));
+      const structureChanges: NodeChange[] = [];
+      for (const change of changes) {
+        if (structureChangesTypes.has(change.type))
+          structureChanges.push(change);
+        else {
+          updateNode(change.id, applyGraphNodeChange(change), {
+            replace: change.type === 'replace',
+          });
+        }
+      }
+
+      if (!structureChanges.length) return;
+
+      setNodes((prev) => applyNodeChanges(structureChanges, prev));
       if (!external) {
         pendingNodeChanges.current.push(...changes);
         flushNodeEmit();
       }
     },
-    [flushNodeEmit],
+    [flushNodeEmit, updateNode],
   );
   const onEdgesChange = useCallback(
     (changes: EdgeChange[], external?: boolean) => {
@@ -80,12 +105,6 @@ export default function useInternalUpdates({
     },
     [flushEdgeEmit],
   );
-
-  // INITIAL STATE WATCHER
-  useEffect(() => {
-    setNodes(toJS(graphBoardStore.boardNodes) ?? []);
-    setEdges(toJS(graphBoardStore.boardEdges) ?? []);
-  }, []);
 
   // CLEANUP
   useEffect(() => {
