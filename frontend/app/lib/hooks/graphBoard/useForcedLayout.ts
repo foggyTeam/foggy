@@ -1,5 +1,7 @@
 'use client';
 
+// TODO: replace updateNode with setNodes if updated.length > (nodes.length / 2)
+
 import { useCallback, useEffect, useRef } from 'react';
 import {
   forceCollide,
@@ -46,8 +48,10 @@ const DRAG_ALPHA = 0.25;
 
 export default function useForcedLayout(
   getNodes: () => Node[],
-  edges: Edge[],
   updateNode: (id: string, nodeUpdate: Partial<Node>) => void,
+  setNodes: (value: ((prevState: Node[]) => Node[]) | Node[]) => void,
+
+  getEdges: () => Edge[],
   options: ForcedLayoutOptions = {},
 ) {
   const {
@@ -64,7 +68,9 @@ export default function useForcedLayout(
   const nodeIds = getNodes()
     .map((n) => n.id)
     .join(',');
-  const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
+  const edgeKeys = getEdges()
+    .map((e) => `${e.source}-${e.target}`)
+    .join(',');
   const nodeSizes = getNodes()
     .map((n) => `${n.id}:${n.measured?.width ?? 0}x${n.measured?.height ?? 0}`)
     .join(',');
@@ -111,20 +117,15 @@ export default function useForcedLayout(
       const dirty = dirtyNodesSet.current;
       dirtyNodesSet.current = new Set();
 
-      for (const nodeId of dirty) {
-        const d3node = simulationNodesMap.current.get(nodeId);
-        if (!d3node) continue;
-        positionsMap.current.set(nodeId, { x: d3node.x!, y: d3node.y! });
-        updateNode(nodeId, { position: { x: d3node.x!, y: d3node.y! } });
-      }
+      const nodes = getNodes();
+      if (dirty.size < nodes.length / 2) updateEach(dirty);
+      else updateAll(dirty);
     });
-  }, [updateNode]);
+  }, [getNodes]);
 
   const syncStructure = useRef(
     debounce(
       (
-        nodes: Node[],
-        edges: Edge[],
         sMap: Map<Node['id'], D3Node>,
         pMap: Map<Node['id'], { x: number; y: number }>,
         restartFn: (alpha?: number) => void,
@@ -133,7 +134,7 @@ export default function useForcedLayout(
       ) => {
         const currentNodeIds = new Set(getNodes().map((n) => n.id));
         const currentEdgeKeys = new Set(
-          edges.map((e) => `${e.source}->${e.target}`),
+          getEdges().map((e) => `${e.source}->${e.target}`),
         );
 
         let hasStructuralChanges = false;
@@ -177,7 +178,9 @@ export default function useForcedLayout(
         simulation.current.nodes([...sMap.values()]);
         simulation.current
           .force('link')
-          .links(edges.map((e) => ({ source: e.source, target: e.target })));
+          .links(
+            getEdges().map((e) => ({ source: e.source, target: e.target })),
+          );
 
         if (hasStructuralChanges) {
           restartFn(0.25);
@@ -228,8 +231,6 @@ export default function useForcedLayout(
 
   useEffect(() => {
     syncStructure.current(
-      getNodes(),
-      edges,
       simulationNodesMap.current,
       positionsMap.current,
       restart,
@@ -301,6 +302,27 @@ export default function useForcedLayout(
     },
     [],
   );
+
+  function updateEach(dirty: Set<Node['id']>) {
+    for (const nodeId of dirty) {
+      const d3node = simulationNodesMap.current.get(nodeId);
+      if (!d3node) continue;
+      positionsMap.current.set(nodeId, { x: d3node.x!, y: d3node.y! });
+      updateNode(nodeId, { position: { x: d3node.x!, y: d3node.y! } });
+    }
+  }
+  function updateAll(dirty: Set<Node['id']>) {
+    setNodes((prev) =>
+      prev.map((node) => {
+        const d3node = simulationNodesMap.current.get(node.id);
+        if (dirty.has(node.id))
+          positionsMap.current.set(node.id, { x: d3node.x!, y: d3node.y! });
+        return dirty.has(node.id)
+          ? { ...node, position: { x: d3node.x!, y: d3node.y! } }
+          : node;
+      }),
+    );
+  }
 
   return {
     onNodeDrag,

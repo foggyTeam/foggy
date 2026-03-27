@@ -10,9 +10,6 @@ import {
   Background,
   Connection,
   ConnectionMode,
-  Edge,
-  Node,
-  NodeAddChange,
   NodeTypes,
   Panel,
   ReactFlow,
@@ -35,7 +32,7 @@ import InternalLinkNode from '@/app/lib/components/board/graph/nodes/internalLin
 import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import debounce from 'lodash/debounce';
-import { GNode } from '@/app/lib/types/definitions';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 
@@ -51,7 +48,9 @@ const GraphBoard = observer(() => {
   const { resolvedTheme } = useTheme();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
-  const { fitView, updateNode, getNodes, setNodes } = useReactFlow();
+  const initialNodes = toJS(graphBoardStore.boardNodes);
+  const initialEdges = toJS(graphBoardStore.boardEdges);
+
   const {
     activeTool,
     setActiveTool,
@@ -60,90 +59,78 @@ const GraphBoard = observer(() => {
     deleteSelectedElements,
     onSelectionChange,
   } = useGraphBoardContext();
-
-  const [initialNodes, setInitialNodes] = useState<Node[]>([]);
-  const [edges, setEdges] = useState<Edge[]>([]);
+  const rf = useReactFlow();
 
   const { onNodeDrag, onSelectionDrag, onDragStop } = useForcedLayout(
-    getNodes,
-    edges,
-    updateNode,
+    rf.getNodes,
+    rf.updateNode,
+    rf.setNodes,
+    rf.getEdges,
   );
 
-  const { onNodesChange, onEdgesChange, onEdgeUpdate } = useInternalUpdates({
-    setNodes,
-    setEdges,
-    updateNode,
-  });
-  useExternalUpdates({
-    setNodes,
-    setEdges,
-  });
-
-  useEffect(() => {
-    setTheme((resolvedTheme as 'light' | 'dark') ?? 'light');
-  }, [resolvedTheme]);
-
-  const handleConnect = useCallback(
-    (connection: Connection) => {
-      const isDuplicate = edges.some(
-        (edge) =>
-          edge.source === connection.source &&
-          edge.target === connection.target &&
-          edge.sourceHandle === connection.sourceHandle &&
-          edge.targetHandle === connection.targetHandle,
-      );
-      if (isDuplicate) return;
-
-      onEdgesChange([
-        {
-          type: 'add',
-          item: {
-            ...connection,
-            style: { strokeWidth: 1.5 },
-            id: `${connection.source}-${connection.target}-${Date.now()}`,
-            type: 'default',
-          },
-        },
-      ]);
-    },
-    [edges, onEdgesChange],
-  );
-  const handleReconnect = useCallback(
-    (oldEdge: Edge, newConnection: Connection) => {
-      const isDuplicate = edges.some(
-        (edge) =>
-          edge.id !== oldEdge.id &&
-          edge.source === newConnection.source &&
-          edge.target === newConnection.target &&
-          edge.sourceHandle === newConnection.sourceHandle &&
-          edge.targetHandle === newConnection.targetHandle,
-      );
-      if (isDuplicate) {
-        onEdgesChange([{ type: 'remove', id: oldEdge.id }]);
-        return;
-      }
-
-      onEdgesChange([
-        { type: 'remove', id: oldEdge.id },
-        {
-          type: 'add',
-          item: {
-            ...oldEdge,
-            ...newConnection,
-            id: `${newConnection.source}-${newConnection.target}-${Date.now()}`,
-          },
-        },
-      ]);
-    },
-    [edges, onEdgesChange],
-  );
+  const { onNodeAction, onEdgeAction, onNodeUpdate, onEdgeUpdate } =
+    useInternalUpdates(
+      rf.updateNode,
+      rf.addNodes,
+      rf.updateEdge,
+      rf.addEdges,
+      rf.deleteElements,
+    );
+  useExternalUpdates(rf.setNodes, rf.setEdges);
 
   const debouncedClearNodesData = useCallback(
     debounce(() => {
-      graphBoardStore.clearRemovedNodes(getNodes() as GNode[]);
+      graphBoardStore.clearRemovedNodes(rf.getNodes() as GNode[]);
     }, 512) as any,
-    [getNodes],
+    [],
+  );
+
+  const handleConnect = useCallback(
+    (connection: Connection) => {
+      const isDuplicate = rf
+        .getEdges()
+        .some(
+          (edge) =>
+            edge.source === connection.source &&
+            edge.target === connection.target &&
+            edge.sourceHandle === connection.sourceHandle &&
+            edge.targetHandle === connection.targetHandle,
+        );
+      if (isDuplicate) return;
+
+      onEdgeAction({
+        type: 'add',
+        newItem: {
+          ...connection,
+          style: { strokeWidth: 1.5 },
+          id: `${connection.source}-${connection.target}-${Date.now()}`,
+          type: 'default',
+        } as GEdge,
+      });
+    },
+    [onEdgeAction],
+  );
+  const handleReconnect = useCallback(
+    (oldEdge: GEdge, newConnection: Connection) => {
+      const isDuplicate = rf
+        .getEdges()
+        .some(
+          (edge) =>
+            edge.id !== oldEdge.id &&
+            edge.source === newConnection.source &&
+            edge.target === newConnection.target &&
+            edge.sourceHandle === newConnection.sourceHandle &&
+            edge.targetHandle === newConnection.targetHandle,
+        );
+
+      if (isDuplicate) return;
+
+      onEdgeUpdate(oldEdge.id, {
+        ...oldEdge,
+        ...newConnection,
+      } as GEdge);
+    },
+    [onEdgeUpdate],
   );
 
   const handleClick = useCallback(
@@ -156,26 +143,36 @@ const GraphBoard = observer(() => {
         newElement.data,
         true,
       );
-      if (success)
-        onNodesChange([{ type: 'add', item: newElement } as NodeAddChange]);
+      if (success) onNodeAction({ type: 'add', newItem: newElement });
 
       debouncedClearNodesData();
       setActiveTool(undefined);
     },
-    [activeTool, debouncedClearNodesData, setActiveTool],
+    [activeTool, debouncedClearNodesData, setActiveTool, onNodeAction],
+  );
+  const handleNodeDrag = useCallback(
+    (_event: MouseEvent, node: GNode) => {
+      onNodeDrag(_event, node);
+      onNodeUpdate(node.id, node);
+    },
+    [onNodeDrag, onNodeUpdate],
+  );
+  const handleNodeDragStop = useCallback(
+    (_event: MouseEvent, node: GNode) => {
+      onDragStop(_event, node);
+      onNodeUpdate(node.id, node);
+    },
+    [onNodeDrag, onNodeUpdate],
   );
 
+  useEffect(() => {
+    setTheme((resolvedTheme as 'light' | 'dark') ?? 'light');
+  }, [resolvedTheme]);
   useEffect(() => {
     return () => debouncedClearNodesData.cancel();
   }, [debouncedClearNodesData]);
 
-  // INITIAL STATE WATCHER
-  useEffect(() => {
-    setInitialNodes(toJS(graphBoardStore.boardNodes) ?? []);
-    setEdges(toJS(graphBoardStore.boardEdges) ?? []);
-  }, []);
-
-  return !initialNodes.length ? null : (
+  return initialEdges === undefined || initialNodes === undefined ? null : (
     <div
       data-testid="graph-board"
       style={
@@ -190,15 +187,13 @@ const GraphBoard = observer(() => {
     >
       <ReactFlow
         connectionMode={ConnectionMode.Loose}
-        onNodeDrag={onNodeDrag}
+        onNodeDrag={handleNodeDrag}
         onSelectionDrag={onSelectionDrag}
-        onNodeDragStop={onDragStop}
+        onNodeDragStop={handleNodeDragStop}
         onSelectionDragStop={onDragStop}
         defaultNodes={initialNodes}
+        defaultEdges={initialEdges}
         onSelectionChange={onSelectionChange}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
         onReconnect={handleReconnect}
         fitView
         onDelete={deleteSelectedElements}
@@ -218,7 +213,7 @@ const GraphBoard = observer(() => {
           <GraphToolbar onEdgeUpdate={onEdgeUpdate} />
         </Panel>
         <ResetStageButton
-          callback={() => fitView({ duration: 300, maxZoom: 1 })}
+          callback={() => rf.fitView({ duration: 300, maxZoom: 1 })}
         />
       </ReactFlow>
     </div>

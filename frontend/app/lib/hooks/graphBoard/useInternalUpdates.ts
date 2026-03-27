@@ -3,36 +3,27 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import {
-  applyEdgeChanges,
-  applyNodeChanges,
+  EdgeAddChange,
   EdgeChange,
-  Node,
+  EdgeRemoveChange,
+  NodeAddChange,
   NodeChange,
+  NodeRemoveChange,
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
-import { GEdge } from '@/app/lib/types/definitions';
-import applyGraphNodeChange from '@/app/lib/utils/applyGraphNodeChange';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 
-interface InternalUpdatesParams {
-  setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  updateNode: (
-    id: string,
-    nodeUpdater: (node: Node) => Partial<Node>,
-    options?: { replace: boolean },
-  ) => void;
-}
+type ItemAction<T extends { id: GEdge['id'] | GNode['id'] }> =
+  | { type: 'add'; newItem: T; external?: boolean }
+  | { type: 'remove'; id: T['id']; external?: boolean };
 
-const structureChangesTypes: Set<NodeChange['type']> = new Set([
-  'add',
-  'remove',
-]);
-
-export default function useInternalUpdates({
-  setNodes,
-  setEdges,
+export default function useInternalUpdates(
   updateNode,
-}: InternalUpdatesParams) {
+  addNodes,
+  updateEdge,
+  addEdges,
+  deleteElements,
+) {
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
 
@@ -58,47 +49,55 @@ export default function useInternalUpdates({
   );
 
   // UPDATES HANDLERS
-  const onNodesChange = useCallback(
-    (changes: NodeChange[], external?: boolean) => {
-      const structureChanges: NodeChange[] = [];
-      for (const change of changes) {
-        if (structureChangesTypes.has(change.type))
-          structureChanges.push(change);
-        else {
-          updateNode(change.id, applyGraphNodeChange(change), {
-            replace: change.type === 'replace',
-          });
-        }
-      }
-
-      if (!structureChanges.length) return;
-
-      setNodes((prev) => applyNodeChanges(structureChanges, prev));
-      if (!external) {
-        pendingNodeChanges.current.push(...changes);
-        flushNodeEmit();
-      }
+  const onNodeAction = (action: ItemAction<GNode>) => {
+    let change: NodeAddChange | NodeRemoveChange;
+    switch (action.type) {
+      case 'add':
+        addNodes([action.newItem]);
+        change = { type: 'add', item: action.newItem };
+        break;
+      case 'remove':
+        deleteElements({ nodes: [{ id: action.id }] });
+        change = { type: 'remove', id: action.id };
+        break;
+    }
+    if (!action.external) {
+      pendingNodeChanges.current.push(change);
+      flushNodeEmit();
+    }
+  };
+  const onNodeUpdate = useCallback(
+    (nodeId: string, updatedNode: GNode) => {
+      // TODO: think on pushing changes via webSockets
+      console.log(nodeId, updatedNode);
     },
-    [flushNodeEmit, updateNode],
+    [flushNodeEmit],
   );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[], external?: boolean) => {
-      setEdges((prev) => applyEdgeChanges(changes, prev));
-      if (!external) {
-        pendingEdgeChanges.current.push(...changes);
-        flushEdgeEmit();
-      }
-    },
-    [flushEdgeEmit],
-  );
+  const onEdgeAction = (action: ItemAction<GEdge>) => {
+    let change: EdgeAddChange | EdgeRemoveChange;
+    switch (action.type) {
+      case 'add':
+        addEdges([action.newItem]);
+        change = { type: 'add', item: action.newItem };
+        break;
+      case 'remove':
+        deleteElements({ edges: [{ id: action.id }] });
+        change = { type: 'remove', id: action.id };
+        break;
+    }
+    if (!action.external) {
+      pendingEdgeChanges.current.push(change);
+      flushEdgeEmit();
+    }
+  };
   const onEdgeUpdate = useCallback(
     (edgeId: string, updatedEdge: GEdge) => {
+      updateEdge(edgeId, updatedEdge);
       const change: EdgeChange = {
         type: 'replace',
         id: edgeId,
         item: updatedEdge,
       };
-      setEdges((prev) => applyEdgeChanges([change], prev));
 
       pendingEdgeChanges.current.push(change);
       flushEdgeEmit();
@@ -114,5 +113,10 @@ export default function useInternalUpdates({
     };
   }, [flushEdgeEmit, flushNodeEmit]);
 
-  return { onNodesChange, onEdgesChange, onEdgeUpdate };
+  return {
+    onNodeAction,
+    onNodeUpdate,
+    onEdgeAction,
+    onEdgeUpdate,
+  };
 }

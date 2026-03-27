@@ -6,11 +6,6 @@ import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import batchGraphUpdates from '@/app/lib/utils/batchGraphUpdates';
 import { applyEdgeChanges, applyNodeChanges } from '@xyflow/react';
 
-interface ExternalUpdatesParams {
-  setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
-}
-
 function applyLockUpdates<T extends { id: string }>(
   items: T[],
   lockUpdates: { id: string; lock: boolean }[],
@@ -32,10 +27,7 @@ function applyLockUpdates<T extends { id: string }>(
   });
 }
 
-export default function useExternalUpdates({
-  setNodes,
-  setEdges,
-}: ExternalUpdatesParams) {
+export default function useExternalUpdates(setNodes, setEdges) {
   // UPDATES HANDLERS
   const onExternalNodesChange = useMemo(
     () =>
