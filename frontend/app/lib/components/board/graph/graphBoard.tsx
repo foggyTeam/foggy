@@ -35,6 +35,8 @@ import debounce from 'lodash/debounce';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
+import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -44,12 +46,25 @@ const NODE_TYPES: NodeTypes = {
   nodeLinkNode: NodeLinkNode as any,
 };
 
-const GraphBoard = observer(() => {
+const GraphBoardObserver = observer(() => {
+  const isReady =
+    graphBoardStore.boardNodes !== undefined &&
+    graphBoardStore.boardEdges !== undefined;
+  useEffect(() => {
+    if (isReady) settingsStore.endLoading();
+  }, [isReady]);
+  if (!isReady) return null;
+
+  return <GraphBoard />;
+});
+
+function GraphBoard() {
   const { resolvedTheme } = useTheme();
+  const { isMobile } = useAdaptiveParams();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
-  const initialNodes = toJS(graphBoardStore.boardNodes);
-  const initialEdges = toJS(graphBoardStore.boardEdges);
+  const [initialNodes] = useState(() => toJS(graphBoardStore.boardNodes)!);
+  const [initialEdges] = useState(() => toJS(graphBoardStore.boardEdges)!);
 
   const {
     activeTool,
@@ -61,22 +76,36 @@ const GraphBoard = observer(() => {
   } = useGraphBoardContext();
   const rf = useReactFlow();
 
-  const { onNodeDrag, onSelectionDrag, onDragStop } = useForcedLayout(
+  const { onNodeDrag, onSelectionDrag, onDragStop, syncD3 } = useForcedLayout(
     rf.getNodes,
     rf.updateNode,
     rf.setNodes,
     rf.getEdges,
   );
 
-  const { onNodeAction, onEdgeAction, onNodeUpdate, onEdgeUpdate } =
-    useInternalUpdates(
-      rf.updateNode,
-      rf.addNodes,
-      rf.updateEdge,
-      rf.addEdges,
-      rf.deleteElements,
-    );
-  useExternalUpdates(rf.setNodes, rf.setEdges);
+  const {
+    onNodeAction,
+    onEdgeAction,
+    onNodeUpdate,
+    onEdgeUpdate,
+    emitSelectionChange,
+  } = useInternalUpdates(
+    rf.getNode,
+    rf.updateNode,
+    rf.addNodes,
+    rf.getEdge,
+    rf.updateEdge,
+    rf.addEdges,
+    rf.deleteElements,
+  );
+  useExternalUpdates(
+    rf.updateNode,
+    rf.addNodes,
+    rf.updateEdge,
+    rf.addEdges,
+    rf.deleteElements,
+    syncD3,
+  );
 
   const debouncedClearNodesData = useCallback(
     debounce(() => {
@@ -143,7 +172,9 @@ const GraphBoard = observer(() => {
         newElement.data,
         true,
       );
-      if (success) onNodeAction({ type: 'add', newItem: newElement });
+      if (success) {
+        onNodeAction({ type: 'add', newItem: newElement });
+      }
 
       debouncedClearNodesData();
       setActiveTool(undefined);
@@ -162,7 +193,22 @@ const GraphBoard = observer(() => {
       onDragStop(_event, node);
       onNodeUpdate(node.id, node);
     },
-    [onNodeDrag, onNodeUpdate],
+    [onDragStop, onNodeUpdate],
+  );
+  const handleSelectionDragStop = useCallback(
+    (_event: MouseEvent, nodes: GNode[]) => {
+      onDragStop(_event, nodes);
+      nodes.forEach((node) => onNodeUpdate(node.id, node));
+    },
+    [onDragStop, onNodeUpdate],
+  );
+
+  const handleSelectionChange = useCallback(
+    (params: any) => {
+      onSelectionChange(params);
+      emitSelectionChange(params);
+    },
+    [onNodeUpdate, onEdgeUpdate, onSelectionChange, emitSelectionChange],
   );
 
   useEffect(() => {
@@ -172,7 +218,7 @@ const GraphBoard = observer(() => {
     return () => debouncedClearNodesData.cancel();
   }, [debouncedClearNodesData]);
 
-  return initialEdges === undefined || initialNodes === undefined ? null : (
+  return (
     <div
       data-testid="graph-board"
       style={
@@ -190,17 +236,17 @@ const GraphBoard = observer(() => {
         onNodeDrag={handleNodeDrag}
         onSelectionDrag={onSelectionDrag}
         onNodeDragStop={handleNodeDragStop}
-        onSelectionDragStop={onDragStop}
+        onSelectionDragStop={handleSelectionDragStop}
         defaultNodes={initialNodes}
         defaultEdges={initialEdges}
-        onSelectionChange={onSelectionChange}
+        onSelectionChange={handleSelectionChange}
         onReconnect={handleReconnect}
         fitView
         onDelete={deleteSelectedElements}
         onConnect={handleConnect}
         panOnDrag={[2]}
         onPaneClick={handleClick}
-        selectionOnDrag
+        selectionOnDrag={!isMobile}
         colorMode={theme}
         reconnectRadius={16}
         selectionMode="partial"
@@ -218,5 +264,5 @@ const GraphBoard = observer(() => {
       </ReactFlow>
     </div>
   );
-});
-export default GraphBoard;
+}
+export default GraphBoardObserver;

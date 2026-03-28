@@ -13,6 +13,7 @@ import {
 } from 'd3-force';
 import type { Edge, Node } from '@xyflow/react';
 import debounce from 'lodash/debounce';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 interface D3Node extends SimulationNodeDatum {
   id: string;
@@ -54,6 +55,7 @@ export default function useForcedLayout(
   getEdges: () => Edge[],
   options: ForcedLayoutOptions = {},
 ) {
+  const { isMobile } = useAdaptiveParams();
   const {
     linkDistance = DEFAULT_LINK_DISTANCE,
     chargeStrength = DEFAULT_STRENGTH,
@@ -89,8 +91,9 @@ export default function useForcedLayout(
 
   const restart = useCallback((alpha: number = 0.15) => {
     const sim = simulation.current;
-    if (sim.alpha() < sim.alphaMin()) sim.alpha(alpha).restart();
-    else sim.alpha(Math.max(sim.alpha(), alpha));
+    const newAlpha = Math.max(sim.alpha(), alpha);
+    if (newAlpha < sim.alphaMin()) return;
+    sim.alpha(newAlpha).restart();
   }, []);
 
   const scheduleRAFRerender = useCallback(() => {
@@ -239,35 +242,45 @@ export default function useForcedLayout(
     );
   }, [nodeIds, edgeKeys, nodeSizes]);
 
-  const onNodeDrag = useCallback((_event: MouseEvent, node: Node) => {
-    draggedNodes.current.add(node.id);
+  const onNodeDrag = useCallback(
+    (_event: MouseEvent, node: Node) => {
+      if (isMobile) return;
 
-    const d3node = simulationNodesMap.current.get(node.id);
-    if (!d3node) return;
-
-    d3node.fx = node.position.x;
-    d3node.fy = node.position.y;
-    d3node.x = node.position.x;
-    d3node.y = node.position.y;
-
-    simulation.current.alpha(DRAG_ALPHA).restart();
-  }, []);
-
-  const onSelectionDrag = useCallback((_event: MouseEvent, nodes: Node[]) => {
-    nodes.forEach((node) => {
       draggedNodes.current.add(node.id);
 
       const d3node = simulationNodesMap.current.get(node.id);
-      if (d3node) {
-        d3node.fx = node.position.x;
-        d3node.fy = node.position.y;
-      }
-    });
-    simulation.current.alpha(DRAG_ALPHA).restart();
-  }, []);
+      if (!d3node) return;
+
+      d3node.fx = node.position.x;
+      d3node.fy = node.position.y;
+      d3node.x = node.position.x;
+      d3node.y = node.position.y;
+
+      simulation.current.alpha(DRAG_ALPHA).restart();
+    },
+    [isMobile],
+  );
+
+  const onSelectionDrag = useCallback(
+    (_event: MouseEvent, nodes: Node[]) => {
+      if (isMobile) return;
+      nodes.forEach((node) => {
+        draggedNodes.current.add(node.id);
+
+        const d3node = simulationNodesMap.current.get(node.id);
+        if (d3node) {
+          d3node.fx = node.position.x;
+          d3node.fy = node.position.y;
+        }
+      });
+      simulation.current.alpha(DRAG_ALPHA).restart();
+    },
+    [isMobile],
+  );
 
   const onDragStop = useCallback(
     (_event: MouseEvent, nodeOrNodes: Node | Node[]) => {
+      if (isMobile) return;
       const nodesArray = Array.isArray(nodeOrNodes)
         ? nodeOrNodes
         : [nodeOrNodes];
@@ -296,12 +309,22 @@ export default function useForcedLayout(
         unpinTimeouts.current.set(node.id, timeoutId);
       });
 
-      if (draggedNodes.current.size === 0) {
+      if (draggedNodes.current.size === 0)
         simulation.current.alpha(0.15).restart();
-      }
     },
-    [],
+    [isMobile],
   );
+
+  const syncD3 = useCallback(() => {
+    if (isMobile) return;
+    syncStructure.current(
+      simulationNodesMap.current,
+      positionsMap.current,
+      restart,
+      prevNodeIds.current,
+      prevEdgeKeys.current,
+    );
+  }, [isMobile, restart]);
 
   function updateEach(dirty: Set<Node['id']>) {
     for (const nodeId of dirty) {
@@ -324,10 +347,21 @@ export default function useForcedLayout(
     );
   }
 
+  useEffect(() => {
+    if (isMobile) {
+      simulation.current.stop();
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current);
+        rafId.current = null;
+      }
+    } else restart(0.3);
+  }, [isMobile]);
+
   return {
     onNodeDrag,
     onSelectionDrag,
     onDragStop,
     restart,
+    syncD3,
   };
 }

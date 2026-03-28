@@ -18,12 +18,16 @@ type ItemAction<T extends { id: GEdge['id'] | GNode['id'] }> =
   | { type: 'remove'; id: T['id']; external?: boolean };
 
 export default function useInternalUpdates(
+  getNode,
   updateNode,
   addNodes,
+  getEdge,
   updateEdge,
   addEdges,
   deleteElements,
 ) {
+  const selectedSet = useRef(new Set<string>()); // stores last selection as set of `edge|node-{id}` strings
+
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
 
@@ -68,8 +72,24 @@ export default function useInternalUpdates(
   };
   const onNodeUpdate = useCallback(
     (nodeId: string, updatedNode: GNode) => {
-      // TODO: think on pushing changes via webSockets
-      console.log(nodeId, updatedNode);
+      const changes: NodeChange[] = [];
+
+      changes.push({
+        type: 'position',
+        id: nodeId,
+        position: updatedNode.position,
+        dragging: false,
+      });
+
+      if (updatedNode.selected !== undefined) {
+        changes.push({
+          type: 'select',
+          id: nodeId,
+          selected: updatedNode.selected,
+        });
+      }
+      pendingNodeChanges.current.push(...changes);
+      flushNodeEmit();
     },
     [flushNodeEmit],
   );
@@ -105,6 +125,33 @@ export default function useInternalUpdates(
     [flushEdgeEmit],
   );
 
+  const emitSelectionChange = ({ nodes, edges }) => {
+    const newSelected = new Set<string>();
+    nodes.forEach((node) => newSelected.add(`node-${node.id}`));
+    edges.forEach((edge) => newSelected.add(`edge-${edge.id}`));
+
+    const all: Set<string> = newSelected.union(selectedSet.current);
+
+    all.forEach((key) => {
+      const [type, id] = key.split('-');
+      const selected = newSelected.has(key);
+      switch (type) {
+        case 'node':
+          onNodeUpdate(id, {
+            ...getNode(id),
+            selected,
+          } as GNode);
+          break;
+        case 'edge':
+          onEdgeUpdate(id, {
+            ...getEdge(id),
+            selected,
+          } as GEdge);
+      }
+    });
+    selectedSet.current = newSelected;
+  };
+
   // CLEANUP
   useEffect(() => {
     return () => {
@@ -118,5 +165,6 @@ export default function useInternalUpdates(
     onNodeUpdate,
     onEdgeAction,
     onEdgeUpdate,
+    emitSelectionChange,
   };
 }
