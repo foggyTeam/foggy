@@ -143,7 +143,6 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           onClick={(e) => e.stopPropagation()}
           onBlur={onBlur}
         >
-          {/*TODO: add zod rules */}
           <Input
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}

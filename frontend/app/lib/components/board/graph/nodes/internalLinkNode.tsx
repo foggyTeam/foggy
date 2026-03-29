@@ -17,7 +17,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     node.id,
   );
 
-  const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
+  const { nodeState, dispatch, isEditing, toggleEdit, onCopyLink } =
     useGraphNode<GInternalLinkNode['data']>(
       node.id,
       node.selected,
@@ -32,9 +32,11 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     if (e.ctrlKey || e.metaKey) {
       if (data?.element?.path && !isEditing) {
         let url = `${window.location.origin}/project/${projectsStore.activeProject?.id}`;
+        const pathLength = data.element.path.length;
         if (data.element.type === 'SECTION')
-          url += `?section_id=${data.element.path[-1]}`;
-        else url += `/${data.element.path[-2]}/${data.element.path[-1]}`;
+          url += `?section_id=${data.element.path[pathLength - 1]}`;
+        else
+          url += `/${data.element.path[pathLength - 2]}/${data.element.path[pathLength - 1]}/${data.element.type.toLowerCase()}`;
         window.open(url, '_blank');
       }
     }
@@ -44,7 +46,6 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     <NodeWrapper
       isSelected={node.selected}
       onPress={openLink}
-      onBlur={onBlur}
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
@@ -72,11 +73,12 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
           className="nopan nodrag nowheel flex flex-col gap-1"
           onKeyDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
-          onBlur={onBlur}
+          onBlur={(e) => e.stopPropagation()}
         >
           <ProjectElementSelect
             value={nodeState.element}
             onValueChange={setElement}
+            onMenuClose={toggleEdit}
           />
         </div>
       )}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -16,13 +16,18 @@ type ElementType = GInternalLinkNode['data']['element'] | undefined;
 export default function ProjectElementSelect({
   value,
   onValueChange,
+  onMenuClose,
 }: {
   value: ElementType;
   onValueChange: (newValue: ElementType) => void;
+  onMenuClose?: () => void;
 }) {
   const { smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  useEffect(() => {
+    if (!isMenuOpen) onMenuClose();
+  }, [isMenuOpen]);
   return (
     <Popover
       placement="bottom"

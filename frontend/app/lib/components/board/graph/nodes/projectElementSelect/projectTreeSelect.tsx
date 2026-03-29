@@ -37,7 +37,8 @@ const ProjectTreeSelect = observer(
   }) => {
     const pathSet = useMemo(() => new Set(selectedPath), [selectedPath]);
     const selectedId = useMemo(
-      () => (selectedPath.length ? selectedPath[-1] : null),
+      () =>
+        selectedPath.length ? selectedPath[selectedPath.length - 1] : null,
       [selectedPath],
     );
 
