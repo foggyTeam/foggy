@@ -33,6 +33,7 @@ import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import LockGraphButton from '@/app/lib/components/board/graph/lockGraphButton';
 
 const GRID_SIZE = 16;
 const NODE_TYPES: NodeTypes = {
@@ -50,8 +51,13 @@ function GraphBoard() {
   const [initialNodes] = useState(() => toJS(graphBoardStore.boardNodes)!);
   const [initialEdges] = useState(() => toJS(graphBoardStore.boardEdges)!);
 
-  const { toolCursor, deleteSelectedElements, onSelectionChange } =
-    useGraphBoardContext();
+  const {
+    toolCursor,
+    deleteSelectedElements,
+    onSelectionChange,
+    allToolsDisabled,
+    toolsDisabled,
+  } = useGraphBoardContext();
   const { fitView } = useReactFlow();
 
   const { onNodeDrag, onSelectionDrag, onDragStop, syncD3 } = useForcedLayout();
@@ -114,32 +120,39 @@ function GraphBoard() {
       className="relative h-full w-full overflow-hidden"
     >
       <ReactFlow
-        connectionMode={ConnectionMode.Loose}
+        nodeTypes={NODE_TYPES}
+        defaultNodes={initialNodes}
+        defaultEdges={initialEdges}
         onNodeDrag={handleNodeDrag}
         onSelectionDrag={onSelectionDrag}
         onNodeDragStop={handleNodeDragStop}
         onSelectionDragStop={handleSelectionDragStop}
-        defaultNodes={initialNodes}
-        defaultEdges={initialEdges}
         onSelectionChange={handleSelectionChange}
-        onReconnect={reconnectEdge}
-        fitView
-        onDelete={deleteSelectedElements}
-        onConnect={createEdge}
-        panOnDrag={[2]}
         onPaneClick={createNode}
+        onConnect={createEdge}
+        onReconnect={reconnectEdge}
+        onDelete={deleteSelectedElements}
+        panOnDrag={[2]}
+        deleteKeyCode={allToolsDisabled ? null : ['Delete', 'Backspace', 'Del']}
         selectionOnDrag={!isMobile}
         colorMode={theme}
         reconnectRadius={16}
         selectionMode="partial"
-        nodeTypes={NODE_TYPES}
+        connectionMode={ConnectionMode.Loose}
         proOptions={{ hideAttribution: true }}
+        fitView
         fitViewOptions={{ maxZoom: 1 }}
+        nodesDraggable={!allToolsDisabled}
+        nodesFocusable={!(allToolsDisabled || toolsDisabled)}
+        nodesConnectable={!(allToolsDisabled || toolsDisabled)}
+        edgesFocusable={!(allToolsDisabled || toolsDisabled)}
+        edgesReconnectable={!(allToolsDisabled || toolsDisabled)}
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
         <Panel position="bottom-center" className="toolbar w-full sm:w-fit">
           <GraphToolbar onEdgeUpdate={onEdgeUpdate} />
         </Panel>
+        <LockGraphButton />
         <ResetStageButton
           callback={() => fitView({ duration: 300, maxZoom: 1 })}
         />

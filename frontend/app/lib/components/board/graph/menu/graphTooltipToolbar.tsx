@@ -8,6 +8,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
 import { LinkIcon, PencilIcon } from 'lucide-react';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 export interface GraphToolbarProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export default function GraphTooltipToolbar({
   tools,
 }: GraphToolbarProps) {
   const { commonSize } = useAdaptiveParams();
+  const { allToolsDisabled } = useGraphBoardContext();
 
   return (
     <div
@@ -56,6 +58,7 @@ export default function GraphTooltipToolbar({
           variant="light"
           color="default"
           isIconOnly
+          isDisabled={allToolsDisabled}
           size={commonSize}
         >
           <PencilIcon className="stroke-default-600" />

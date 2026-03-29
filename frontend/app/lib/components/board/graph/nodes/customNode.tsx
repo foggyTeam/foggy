@@ -14,6 +14,7 @@ import ShapedUnderlay from '@/app/lib/components/board/graph/nodes/shapedUnderla
 import GraphColorTool from '@/app/lib/components/board/graph/tools/tooltipTools/graphColorTool';
 import AlignTool from '@/app/lib/components/board/graph/tools/tooltipTools/alignTool';
 import { customNodeSchema } from '@/app/lib/types/schemas';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 const shapeStyleMap = {
   rect: '',
@@ -40,6 +41,7 @@ const CustomNode = observer((node: GCustomNode) => {
   const data: GCustomNode['data'] | undefined =
     graphBoardStore.nodesDataMap?.get(node.id);
   const { smallerSize } = useAdaptiveParams();
+  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
 
   const {
     nodeState,
@@ -116,8 +118,8 @@ const CustomNode = observer((node: GCustomNode) => {
           onClick={(e) => e.stopPropagation()}
           onBlur={onBlur}
         >
-          {/*TODO: add zod rules */}
           <Input
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.title}
             errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
@@ -136,6 +138,7 @@ const CustomNode = observer((node: GCustomNode) => {
           />
 
           <Textarea
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.description}
             errorMessage={errors.current.description}
             color="primary"

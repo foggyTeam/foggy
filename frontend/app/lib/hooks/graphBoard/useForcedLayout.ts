@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: replace updateNode with setNodes if updated.length > (nodes.length / 2)
-
 import { useCallback, useEffect, useRef } from 'react';
 import {
   forceCollide,

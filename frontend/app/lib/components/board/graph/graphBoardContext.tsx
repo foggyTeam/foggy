@@ -50,6 +50,8 @@ interface BoardContextProps {
 
   // ADDITIONAL
   isDuplicatedEdge: (connection: Connection) => boolean;
+  isGraphLocked: boolean;
+  lockGraph: (lock: boolean) => void;
 
   // BOARD
   zoomNode: (nodeId: string) => void;
@@ -80,8 +82,14 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
   );
 
   // TOOLS
-  const { activeTool, setActiveTool, allToolsDisabled, toolCursor } =
-    useGraphTool();
+  const {
+    activeTool,
+    setActiveTool,
+    allToolsDisabled,
+    toolCursor,
+    lockGraph,
+    isGraphLocked,
+  } = useGraphTool();
 
   // OPERATIONS
   const {
@@ -90,7 +98,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     updateElement,
     deleteSelectedElements,
     isDuplicatedEdge,
-  } = useGraphOperations(selectedElementsRef);
+  } = useGraphOperations(selectedElementsRef, allToolsDisabled);
 
   async function zoomNode(nodeId: string) {
     await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
@@ -122,6 +130,8 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
         createNewEdge,
         // ADDITIONAL
         isDuplicatedEdge,
+        lockGraph,
+        isGraphLocked,
         // BOARD
         zoomNode,
       }}

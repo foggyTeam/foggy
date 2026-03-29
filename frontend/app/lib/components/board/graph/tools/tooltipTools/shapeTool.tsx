@@ -47,7 +47,7 @@ export default function ShapeTool({
     >
       <DropdownTrigger>
         <Button
-          disabled={allToolsDisabled}
+          isDisabled={allToolsDisabled}
           variant="light"
           isIconOnly
           size={commonSize}

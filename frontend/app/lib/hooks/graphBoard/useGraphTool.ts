@@ -5,8 +5,9 @@ import cursorAdd from '@/app/lib/components/svg/cursorAdd';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
 
 export default function useGraphTool() {
-  const allToolsDisabled = projectsStore.myRole === 'reader';
+  const [isGraphLocked, lockGraph] = useState(false);
   const [activeTool, setActiveTool] = useState<GraphTool | undefined>();
+  const allToolsDisabled = projectsStore.myRole === 'reader' || isGraphLocked;
   const toolCursor = useMemo(() => {
     switch (activeTool) {
       case undefined:
@@ -17,5 +18,12 @@ export default function useGraphTool() {
     }
   }, [activeTool]);
 
-  return { allToolsDisabled, activeTool, setActiveTool, toolCursor };
+  return {
+    allToolsDisabled,
+    activeTool,
+    setActiveTool,
+    isGraphLocked,
+    lockGraph,
+    toolCursor,
+  };
 }

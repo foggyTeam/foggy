@@ -17,7 +17,7 @@ const ResetStageButton = observer(({ callback }: { callback?: () => void }) => {
         color="secondary"
         variant="light"
         size="md"
-        className="invisible absolute right-24 bottom-4 z-50 font-semibold sm:visible"
+        className="invisible absolute right-[92] bottom-4 z-50 font-semibold sm:visible"
       >
         <MaximizeIcon />
       </Button>

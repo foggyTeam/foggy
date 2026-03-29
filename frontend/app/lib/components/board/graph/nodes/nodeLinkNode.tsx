@@ -16,7 +16,7 @@ import { nodeToNodeLinkSchema } from '@/app/lib/types/schemas';
 
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
-  const { zoomNode } = useGraphBoardContext();
+  const { zoomNode, allToolsDisabled, toolsDisabled } = useGraphBoardContext();
   const data: GNodeLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
     node.id,
   );
@@ -88,6 +88,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           onBlur={onBlur}
         >
           <Input
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
@@ -106,6 +107,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           />
 
           <Input
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.title}
             errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}

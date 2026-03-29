@@ -439,6 +439,8 @@
       "edgeLabel": "Label"
     },
     "resetStage": "Reset position",
+    "lockGraph": "Lock graph view",
+    "unlockGraph": "Unlock graph view",
     "uploadButton": "Get board image temporary link"
   },
 

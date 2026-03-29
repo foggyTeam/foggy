@@ -80,6 +80,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
             value={nodeState.element}
             onValueChange={setElement}
             onMenuClose={toggleEdit}
+            isDraggable={node.draggable}
           />
         </div>
       )}

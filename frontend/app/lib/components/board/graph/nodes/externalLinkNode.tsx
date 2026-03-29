@@ -16,6 +16,7 @@ import { GlobeIcon } from 'lucide-react';
 import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 type UrlData = Partial<GExternalLinkNode['data']>;
 
@@ -24,7 +25,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     graphBoardStore.nodesDataMap?.get(node.id);
 
   const { smallerSize } = useAdaptiveParams();
-
+  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -144,6 +145,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           onBlur={onBlur}
         >
           <Input
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}
             isLoading={isLoading}
@@ -163,6 +165,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
+            isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.description}
             errorMessage={errors.current.description}
             color="primary"

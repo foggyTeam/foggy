@@ -9,6 +9,7 @@ import { Connection, useReactFlow } from '@xyflow/react';
 
 export default function useGraphOperations(
   selectedElements: RefObject<Set<string>>,
+  isDisabled: boolean,
 ) {
   const { screenToFlowPosition, deleteElements, getEdges } = useReactFlow();
 
@@ -16,7 +17,7 @@ export default function useGraphOperations(
     e: MouseEvent,
     tool: GraphTool | undefined,
   ): GNode | null => {
-    if (!tool) return null;
+    if (!tool || isDisabled) return null;
 
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
     let newNode: GBaseNode = {
@@ -67,6 +68,8 @@ export default function useGraphOperations(
   );
 
   const deleteSelectedElements = useCallback(async () => {
+    if (isDisabled) return;
+
     const edges = [];
     const nodes = [];
     selectedElements.current.forEach((key) => {
@@ -75,7 +78,7 @@ export default function useGraphOperations(
       else nodes.push({ id });
     });
     await deleteElements({ nodes, edges });
-  }, [deleteElements]);
+  }, [deleteElements, isDisabled]);
 
   const isDuplicatedEdge = useCallback(
     (connection: Connection) => {

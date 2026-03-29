@@ -11,17 +11,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
 import ProjectTreeSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectTreeSelect';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 type ElementType = GInternalLinkNode['data']['element'] | undefined;
 export default function ProjectElementSelect({
   value,
   onValueChange,
   onMenuClose,
+  isDraggable,
 }: {
   value: ElementType;
   onValueChange: (newValue: ElementType) => void;
+  isDraggable: boolean;
   onMenuClose?: () => void;
 }) {
+  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
   const { smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -32,7 +36,11 @@ export default function ProjectElementSelect({
     <Popover
       placement="bottom"
       isOpen={isMenuOpen}
-      onOpenChange={(open) => setIsMenuOpen(open)}
+      onOpenChange={(open) =>
+        allToolsDisabled || toolsDisabled || !isDraggable
+          ? setIsMenuOpen(open)
+          : null
+      }
     >
       <PopoverTrigger>
         <div className="w-full">

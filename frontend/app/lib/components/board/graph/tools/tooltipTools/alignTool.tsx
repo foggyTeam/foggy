@@ -41,7 +41,7 @@ export default function AlignTool({
     >
       <DropdownTrigger>
         <Button
-          disabled={allToolsDisabled}
+          isDisabled={allToolsDisabled}
           variant="light"
           isIconOnly
           size={commonSize}
