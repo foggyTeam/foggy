@@ -17,7 +17,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     node.id,
   );
 
-  const { nodeState, dispatch, isEditing, toggleEdit, onCopyLink } =
+  const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
     useGraphNode<GInternalLinkNode['data']>(
       node.id,
       node.selected,
@@ -46,6 +46,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     <NodeWrapper
       isSelected={node.selected}
       onPress={openLink}
+      onBlur={onBlur}
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,

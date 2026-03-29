@@ -1,7 +1,5 @@
 'use client';
 
-// TODO: rethink all updates as internal ReactFlow state synced with MobX state
-
 import '@xyflow/react/dist/style.css';
 import './graphBoard.css';
 import './graphBoardCursors.css';

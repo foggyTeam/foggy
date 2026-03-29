@@ -89,7 +89,7 @@ export default function useInternalUpdates() {
         flushNodeEmit();
       }
     },
-    [addEdges, deleteElements, flushEdgeEmit],
+    [addNodes, deleteElements, flushEdgeEmit],
   );
   const onNodeUpdate = useCallback(
     (nodeId: string, updatedNode: GNode) => {

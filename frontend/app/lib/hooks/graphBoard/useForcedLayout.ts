@@ -344,12 +344,16 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
 
   useEffect(() => {
     if (isMobile) {
+      simulation.current.alphaDecay(0.15);
       simulation.current.stop();
       if (rafId.current !== null) {
         cancelAnimationFrame(rafId.current);
         rafId.current = null;
       }
-    } else restart(0.3);
+    } else {
+      simulation.current.alphaDecay(0.05);
+      restart(0.3);
+    }
   }, [isMobile]);
 
   return {
