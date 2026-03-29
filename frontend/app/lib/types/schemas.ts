@@ -161,3 +161,14 @@ export const customNodeSchema = z.object({
     )
     .nullish(),
 });
+
+export const internalLinkNodeSchema = z.object({
+  title: z
+    .string()
+    .max(20, settingsStore.t.validationErrors.graphNode.maxTitleLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.graphNode.invalidSymbols,
+    )
+    .nullish(),
+});

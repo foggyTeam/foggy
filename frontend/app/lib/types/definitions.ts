@@ -242,9 +242,11 @@ export interface GExternalLinkNode extends GBaseNode {
 export interface GInternalLinkNode extends GBaseNode {
   type: 'internalLinkNode';
   data: {
-    type?: ProjectElementTypes;
-    title?: string;
-    path?: string[];
+    element?: {
+      type: ProjectElementTypes;
+      title: string;
+      path: string[];
+    };
   };
 }
 

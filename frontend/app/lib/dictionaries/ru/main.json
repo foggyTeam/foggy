@@ -394,6 +394,7 @@
     "emptyLinkDomain": "Нет домена",
     "emptyLink": "Нет ссылки",
     "emptyLinkDescription": "Нет описания",
+    "selectElementPlaceholder": "Выберите элемент проекта",
 
     "edgeLabel": "Подпись",
     "edgeLabelPlaceholder": "Новое ребро",

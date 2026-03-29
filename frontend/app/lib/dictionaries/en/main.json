@@ -396,6 +396,7 @@
     "emptyLinkDomain": "No domain",
     "emptyLink": "No link",
     "emptyLinkDescription": "No description",
+    "selectElementPlaceholder": "Select project item",
 
     "edgeLabel": "Label",
     "edgeLabelPlaceholder": "New edge",
