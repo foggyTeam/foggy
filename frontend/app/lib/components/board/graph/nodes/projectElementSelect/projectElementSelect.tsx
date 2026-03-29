@@ -25,7 +25,7 @@ export default function ProjectElementSelect({
   isDraggable: boolean;
   onMenuClose?: () => void;
 }) {
-  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { allToolsDisabled } = useGraphBoardContext();
   const { smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -37,9 +37,7 @@ export default function ProjectElementSelect({
       placement="bottom"
       isOpen={isMenuOpen}
       onOpenChange={(open) =>
-        allToolsDisabled || toolsDisabled || !isDraggable
-          ? setIsMenuOpen(open)
-          : null
+        allToolsDisabled || !isDraggable ? null : setIsMenuOpen(open)
       }
     >
       <PopoverTrigger>

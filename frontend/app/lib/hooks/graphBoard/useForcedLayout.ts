@@ -28,23 +28,23 @@ interface ForcedLayoutOptions {
 
 const DEFAULT_NODE_SIZE = { width: 150, height: 50 };
 
-const DEFAULT_LINK_DISTANCE = 324;
-const FORCE_STRENGTH = -400;
-const MAX_DISTANCE = 400;
+const DEFAULT_LINK_DISTANCE = 280;
+const FORCE_STRENGTH = -180;
+const MAX_DISTANCE = 180;
 
 const DEFAULT_STRENGTH = 0.06;
 
-const DEFAULT_COLLIDE_PADDING = 8;
-const COLLIDE_STRENGTH = 0.85;
+const DEFAULT_COLLIDE_PADDING = 12;
+const COLLIDE_STRENGTH = 0.35;
 
 const POSITION_THRESHOLD = 0.5;
-const VELOCITY_DECAY = 0.55;
-const ALPHA_DECAY = 0.05;
+const VELOCITY_DECAY = 0.75;
+const ALPHA_DECAY = 0.08;
 
 const UNPIN_DELAY = 1000;
 const SYNC_DEBOUNCE = 256;
 
-const DRAG_ALPHA = 0.25;
+const DRAG_ALPHA = 0.16;
 
 export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
   const { isMobile } = useAdaptiveParams();
@@ -179,7 +179,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
           );
 
         if (hasStructuralChanges) {
-          restartFn(0.25);
+          restartFn(0.12);
         }
       },
       SYNC_DEBOUNCE,
