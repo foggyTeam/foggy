@@ -4,6 +4,7 @@ import React, {
   createContext,
   Dispatch,
   ReactNode,
+  RefObject,
   SetStateAction,
   useCallback,
   useContext,
@@ -12,10 +13,9 @@ import React, {
   useState,
 } from 'react';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
-import debounce from 'lodash/debounce';
 import useGraphTool from '@/app/lib/hooks/graphBoard/useGraphTool';
 import useGraphOperations from '@/app/lib/hooks/graphBoard/useGraphOperations';
-import { useNodesInitialized, useReactFlow } from '@xyflow/react';
+import { Connection, useNodesInitialized, useReactFlow } from '@xyflow/react';
 import { useSearchParams } from 'next/navigation';
 
 export type GraphTool =
@@ -32,7 +32,8 @@ interface BoardContextProps {
   toolCursor: string;
 
   // SELECTION
-  selectedElements: (GNode | GEdge)[];
+  selectedElementsRef: RefObject<Set<string>>; // stores `{type}|{id}`
+  selectedElements: Set<string>; // stores `{type}|{id}`
   onSelectionChange: (params: { nodes: any[]; edges: any[] }) => void;
 
   // OPERATIONS
@@ -40,11 +41,15 @@ interface BoardContextProps {
     e: MouseEvent,
     tool: GraphTool | undefined,
   ) => GNode | null;
+  createNewEdge: (connection: Connection) => GEdge | null;
   updateElement: (
     elementId: GNode['id'],
     newAttrs: Partial<GNode['data']>,
   ) => void;
   deleteSelectedElements: () => void;
+
+  // ADDITIONAL
+  isDuplicatedEdge: (connection: Connection) => boolean;
 
   // BOARD
   zoomNode: (nodeId: string) => void;
@@ -59,13 +64,18 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
   const { fitView } = useReactFlow();
 
   // SELECTION
-  const [selectedElements, setSelectedElements] = useState<(GNode | GEdge)[]>(
-    [],
-  );
+  const selectedElementsRef = useRef(new Set<string>());
+  const [selectedElements, setSelectedElements] = useState(new Set<string>());
   const onSelectionChange = useCallback(
-    debounce(({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
-      setSelectedElements([...edges, ...nodes]);
-    }, 128) as any,
+    ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
+      const newSet = new Set();
+
+      nodes.forEach((node) => newSet.add(`node|${node.id}`));
+      edges.forEach((edge) => newSet.add(`edge|${edge.id}`));
+
+      selectedElementsRef.current = newSet;
+      setSelectedElements(newSet);
+    },
     [],
   );
 
@@ -74,8 +84,13 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     useGraphTool();
 
   // OPERATIONS
-  const { createNewElement, updateElement, deleteSelectedElements } =
-    useGraphOperations(selectedElements);
+  const {
+    createNewElement,
+    createNewEdge,
+    updateElement,
+    deleteSelectedElements,
+    isDuplicatedEdge,
+  } = useGraphOperations(selectedElementsRef);
 
   async function zoomNode(nodeId: string) {
     await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
@@ -95,14 +110,18 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
         setActiveTool,
         toolCursor,
         allToolsDisabled,
-        toolsDisabled: !!(selectedElements.length === 1 && selectedElements[0]),
+        toolsDisabled: selectedElements.size === 1,
         // SELECTION
+        selectedElementsRef,
         selectedElements,
         onSelectionChange,
         // OPERATIONS
         createNewElement,
         updateElement,
         deleteSelectedElements,
+        createNewEdge,
+        // ADDITIONAL
+        isDuplicatedEdge,
         // BOARD
         zoomNode,
       }}

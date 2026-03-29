@@ -1,17 +1,16 @@
 'use client';
 
 import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
-import { useCallback, useEffect, useRef } from 'react';
+import { RefObject, useCallback, useEffect, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
-import { useReactFlow } from '@xyflow/react';
+import { Connection, useReactFlow } from '@xyflow/react';
 
 export default function useGraphOperations(
-  selectedElements: (GNode | GEdge)[],
+  selectedElements: RefObject<Set<string>>,
 ) {
-  const { screenToFlowPosition, deleteElements } = useReactFlow();
-  const selectedRef = useRef(selectedElements);
+  const { screenToFlowPosition, deleteElements, getEdges } = useReactFlow();
 
   const createNewElement = (
     e: MouseEvent,
@@ -44,23 +43,62 @@ export default function useGraphOperations(
     }
     return newNode as GNode;
   };
-  const updateElement = useCallback(
-    debounce(
-      (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
-        graphBoardStore.updateNodeData(elementId, newAttrs),
-      256,
-    ) as any,
-    [],
-  );
-  const deleteSelectedElements = async () => {
-    const edges = selectedRef.current.filter((e) => 'source' in e);
-    const nodes = selectedRef.current.slice(edges.length);
-    await deleteElements({ nodes, edges });
+  const createNewEdge = (connection: Connection): GEdge | null => {
+    if (isDuplicatedEdge(connection)) return null;
+
+    const newEdge = {
+      ...connection,
+      style: { strokeWidth: 1.5 },
+      id: `${connection.source}-${connection.target}-${Date.now().toString()}`,
+      type: 'default',
+    };
+
+    return newEdge as GEdge;
   };
 
-  useEffect(() => {
-    selectedRef.current = selectedElements;
-  }, [selectedElements]);
+  const updateElement = useMemo(
+    () =>
+      debounce(
+        (elementId: GNode['id'], newAttrs: Partial<GNode['data']>) =>
+          graphBoardStore.updateNodeData(elementId, newAttrs),
+        256,
+      ),
+    [graphBoardStore.updateNodeData],
+  );
 
-  return { updateElement, createNewElement, deleteSelectedElements };
+  const deleteSelectedElements = useCallback(async () => {
+    const edges = [];
+    const nodes = [];
+    selectedElements.current.forEach((key) => {
+      const [type, id] = key.split('|');
+      if (type === 'edge') edges.push({ id });
+      else nodes.push({ id });
+    });
+    await deleteElements({ nodes, edges });
+  }, [deleteElements]);
+
+  const isDuplicatedEdge = useCallback(
+    (connection: Connection) => {
+      return getEdges().some(
+        (edge) =>
+          edge.source === connection.source &&
+          edge.target === connection.target &&
+          edge.sourceHandle === connection.sourceHandle &&
+          edge.targetHandle === connection.targetHandle,
+      );
+    },
+    [getEdges],
+  );
+
+  useEffect(() => {
+    return () => updateElement.cancel();
+  }, [updateElement]);
+
+  return {
+    updateElement,
+    createNewElement,
+    createNewEdge,
+    deleteSelectedElements,
+    isDuplicatedEdge,
+  };
 }

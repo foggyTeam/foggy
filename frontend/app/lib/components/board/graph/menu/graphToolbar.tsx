@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React from 'react';
+import React, { useMemo } from 'react';
 import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeTool';
 import InternalLinkTool from '@/app/lib/components/board/graph/tools/internalLinkTool';
 import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLinkTool';
@@ -19,8 +19,13 @@ export default function GraphToolbar({
   onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
 }) {
   const { selectedElements } = useGraphBoardContext();
-  const edgeSelected =
-    selectedElements.length === 1 && 'source' in selectedElements[0];
+  const selectedEdgeId = useMemo(() => {
+    if (selectedElements.size !== 1) return null;
+    const e = selectedElements.values().next().value as string;
+    const [type, id] = e.split('|');
+    return type === 'edge' ? id : null;
+  }, [selectedElements]);
+
   const tools = [
     InternalLinkTool,
     ExternalLinkTool,
@@ -39,18 +44,15 @@ export default function GraphToolbar({
         'overflow-visible',
       )}
     >
-      {edgeSelected && (
-        <GraphEdgeToolbar
-          edgeId={selectedElements[0].id}
-          onEdgeUpdate={onEdgeUpdate}
-        />
+      {selectedEdgeId && (
+        <GraphEdgeToolbar edgeId={selectedEdgeId} onEdgeUpdate={onEdgeUpdate} />
       )}
-      {edgeSelected && <Divider />}
+      {selectedEdgeId && <Divider />}
       <div className="flex justify-center gap-1">
         {tools.map((Tool, index) => (
           <Tool key={index} />
         ))}
-        {!!selectedElements.length && (
+        {!!selectedElements.size && (
           <>
             <Divider orientation="vertical" />
             <DeleteTool />

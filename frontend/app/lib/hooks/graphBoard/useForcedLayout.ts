@@ -11,7 +11,8 @@ import {
   type SimulationLinkDatum,
   type SimulationNodeDatum,
 } from 'd3-force';
-import type { Edge, Node } from '@xyflow/react';
+import type { Node } from '@xyflow/react';
+import { useReactFlow } from '@xyflow/react';
 import debounce from 'lodash/debounce';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
@@ -47,15 +48,9 @@ const SYNC_DEBOUNCE = 256;
 
 const DRAG_ALPHA = 0.25;
 
-export default function useForcedLayout(
-  getNodes: () => Node[],
-  updateNode: (id: string, nodeUpdate: Partial<Node>) => void,
-  setNodes: (value: ((prevState: Node[]) => Node[]) | Node[]) => void,
-
-  getEdges: () => Edge[],
-  options: ForcedLayoutOptions = {},
-) {
+export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
   const { isMobile } = useAdaptiveParams();
+  const { getNodes, updateNode, setNodes, getEdges } = useReactFlow();
   const {
     linkDistance = DEFAULT_LINK_DISTANCE,
     chargeStrength = DEFAULT_STRENGTH,

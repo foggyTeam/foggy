@@ -8,7 +8,6 @@ import './graphBoardCursors.css';
 import './graphBoardEdges.css';
 import {
   Background,
-  Connection,
   ConnectionMode,
   NodeTypes,
   Panel,
@@ -31,8 +30,7 @@ import CustomNode from '@/app/lib/components/board/graph/nodes/customNode';
 import InternalLinkNode from '@/app/lib/components/board/graph/nodes/internalLinkNode';
 import NodeLinkNode from '@/app/lib/components/board/graph/nodes/nodeLinkNode';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
-import debounce from 'lodash/debounce';
-import { GEdge, GNode } from '@/app/lib/types/definitions';
+import { GNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { toJS } from 'mobx';
 import settingsStore from '@/app/stores/settingsStore';
@@ -46,18 +44,6 @@ const NODE_TYPES: NodeTypes = {
   nodeLinkNode: NodeLinkNode as any,
 };
 
-const GraphBoardObserver = observer(() => {
-  const isReady =
-    graphBoardStore.boardNodes !== undefined &&
-    graphBoardStore.boardEdges !== undefined;
-  useEffect(() => {
-    if (isReady) settingsStore.endLoading();
-  }, [isReady]);
-  if (!isReady) return null;
-
-  return <GraphBoard />;
-});
-
 function GraphBoard() {
   const { resolvedTheme } = useTheme();
   const { isMobile } = useAdaptiveParams();
@@ -66,121 +52,22 @@ function GraphBoard() {
   const [initialNodes] = useState(() => toJS(graphBoardStore.boardNodes)!);
   const [initialEdges] = useState(() => toJS(graphBoardStore.boardEdges)!);
 
-  const {
-    activeTool,
-    setActiveTool,
-    toolCursor,
-    createNewElement,
-    deleteSelectedElements,
-    onSelectionChange,
-  } = useGraphBoardContext();
-  const rf = useReactFlow();
+  const { toolCursor, deleteSelectedElements, onSelectionChange } =
+    useGraphBoardContext();
+  const { fitView } = useReactFlow();
 
-  const { onNodeDrag, onSelectionDrag, onDragStop, syncD3 } = useForcedLayout(
-    rf.getNodes,
-    rf.updateNode,
-    rf.setNodes,
-    rf.getEdges,
-  );
+  const { onNodeDrag, onSelectionDrag, onDragStop, syncD3 } = useForcedLayout();
 
   const {
-    onNodeAction,
-    onEdgeAction,
+    createNode,
+    createEdge,
+    reconnectEdge,
     onNodeUpdate,
     onEdgeUpdate,
     emitSelectionChange,
-  } = useInternalUpdates(
-    rf.getNode,
-    rf.updateNode,
-    rf.addNodes,
-    rf.getEdge,
-    rf.updateEdge,
-    rf.addEdges,
-    rf.deleteElements,
-  );
-  useExternalUpdates(
-    rf.updateNode,
-    rf.addNodes,
-    rf.updateEdge,
-    rf.addEdges,
-    rf.deleteElements,
-    syncD3,
-  );
+  } = useInternalUpdates();
+  useExternalUpdates(syncD3);
 
-  const debouncedClearNodesData = useCallback(
-    debounce(() => {
-      graphBoardStore.clearRemovedNodes(rf.getNodes() as GNode[]);
-    }, 512) as any,
-    [],
-  );
-
-  const handleConnect = useCallback(
-    (connection: Connection) => {
-      const isDuplicate = rf
-        .getEdges()
-        .some(
-          (edge) =>
-            edge.source === connection.source &&
-            edge.target === connection.target &&
-            edge.sourceHandle === connection.sourceHandle &&
-            edge.targetHandle === connection.targetHandle,
-        );
-      if (isDuplicate) return;
-
-      onEdgeAction({
-        type: 'add',
-        newItem: {
-          ...connection,
-          style: { strokeWidth: 1.5 },
-          id: `${connection.source}-${connection.target}-${Date.now()}`,
-          type: 'default',
-        } as GEdge,
-      });
-    },
-    [onEdgeAction],
-  );
-  const handleReconnect = useCallback(
-    (oldEdge: GEdge, newConnection: Connection) => {
-      const isDuplicate = rf
-        .getEdges()
-        .some(
-          (edge) =>
-            edge.id !== oldEdge.id &&
-            edge.source === newConnection.source &&
-            edge.target === newConnection.target &&
-            edge.sourceHandle === newConnection.sourceHandle &&
-            edge.targetHandle === newConnection.targetHandle,
-        );
-
-      if (isDuplicate) return;
-
-      onEdgeUpdate(oldEdge.id, {
-        ...oldEdge,
-        ...newConnection,
-      } as GEdge);
-    },
-    [onEdgeUpdate],
-  );
-
-  const handleClick = useCallback(
-    (e: MouseEvent) => {
-      const newElement = createNewElement(e, activeTool);
-      if (!newElement) return;
-
-      const success = graphBoardStore.updateNodeData(
-        newElement.id,
-        newElement.data,
-        true,
-      );
-      if (success) {
-        onNodeAction({ type: 'add', newItem: newElement });
-      }
-
-      debouncedClearNodesData();
-      setActiveTool(undefined);
-    },
-    [activeTool, debouncedClearNodesData, setActiveTool, onNodeAction],
-  );
   const handleNodeDrag = useCallback(
     (_event: MouseEvent, node: GNode) => {
       onNodeDrag(_event, node);
@@ -205,18 +92,15 @@ function GraphBoard() {
 
   const handleSelectionChange = useCallback(
     (params: any) => {
-      onSelectionChange(params);
       emitSelectionChange(params);
+      onSelectionChange(params);
     },
-    [onNodeUpdate, onEdgeUpdate, onSelectionChange, emitSelectionChange],
+    [onSelectionChange, emitSelectionChange],
   );
 
   useEffect(() => {
     setTheme((resolvedTheme as 'light' | 'dark') ?? 'light');
   }, [resolvedTheme]);
-  useEffect(() => {
-    return () => debouncedClearNodesData.cancel();
-  }, [debouncedClearNodesData]);
 
   return (
     <div
@@ -240,12 +124,12 @@ function GraphBoard() {
         defaultNodes={initialNodes}
         defaultEdges={initialEdges}
         onSelectionChange={handleSelectionChange}
-        onReconnect={handleReconnect}
+        onReconnect={reconnectEdge}
         fitView
         onDelete={deleteSelectedElements}
-        onConnect={handleConnect}
+        onConnect={createEdge}
         panOnDrag={[2]}
-        onPaneClick={handleClick}
+        onPaneClick={createNode}
         selectionOnDrag={!isMobile}
         colorMode={theme}
         reconnectRadius={16}
@@ -259,10 +143,22 @@ function GraphBoard() {
           <GraphToolbar onEdgeUpdate={onEdgeUpdate} />
         </Panel>
         <ResetStageButton
-          callback={() => rf.fitView({ duration: 300, maxZoom: 1 })}
+          callback={() => fitView({ duration: 300, maxZoom: 1 })}
         />
       </ReactFlow>
     </div>
   );
 }
+
+const GraphBoardObserver = observer(() => {
+  const isReady =
+    graphBoardStore.boardNodes !== undefined &&
+    graphBoardStore.boardEdges !== undefined;
+  useEffect(() => {
+    if (isReady) settingsStore.endLoading();
+  }, [isReady]);
+  if (!isReady) return null;
+
+  return <GraphBoard />;
+});
 export default GraphBoardObserver;
