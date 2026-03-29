@@ -10,9 +10,10 @@ import { ChevronRightIcon, GlobeIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
+import ProjectTreeSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectTreeSelect';
 
 type ElementType = GInternalLinkNode['data']['element'] | undefined;
-export default function SelectProjectElement({
+export default function ProjectElementSelect({
   value,
   onValueChange,
 }: {
@@ -21,7 +22,6 @@ export default function SelectProjectElement({
 }) {
   const { smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [selected, setSelected] = useState();
 
   return (
     <Popover
@@ -68,12 +68,20 @@ export default function SelectProjectElement({
       <PopoverContent
         className={clsx(
           bg_container_no_padding,
-          'flex w-fit flex-col gap-2 px-1 py-2 sm:px-1 sm:py-3',
+          'flex w-full px-1 py-2 sm:px-1 sm:py-3',
         )}
       >
-        <div className="px-1 py-2">
-          <div className="text-small font-bold">Popover Content</div>
-          <div className="text-tiny">This is the popover content</div>
+        <div
+          className={clsx(
+            'relative h-fit max-h-56 max-w-96 min-w-56 flex-1 overflow-y-auto pl-1',
+            'scrollbar-thin scrollbar-track-[hsl(var(--heroui-background))]/20 scrollbar-thumb-default-300',
+            'scrollbar-track-rounded-full scrollbar-thumb-rounded-full',
+          )}
+        >
+          <ProjectTreeSelect
+            onSelect={onValueChange}
+            selectedPath={value?.path || []}
+          />
         </div>
       </PopoverContent>
     </Popover>

@@ -6,27 +6,24 @@ import { GInternalLinkNode, GNodeLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import settingsStore from '@/app/stores/settingsStore';
-import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import { GlobeIcon } from 'lucide-react';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
-import { internalLinkNodeSchema } from '@/app/lib/types/schemas';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
-import SelectProjectElement from '@/app/lib/components/board/graph/nodes/selectProjectElement';
+import ProjectElementSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectElementSelect';
+import projectsStore from '@/app/stores/projectsStore';
 
 const InternalLinkNode = observer((node: GNodeLinkNode) => {
   const data: GInternalLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
     node.id,
   );
 
-  const { smallerSize } = useAdaptiveParams();
-
   const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
-    useGraphNode<GNodeLinkNode['data']>(
+    useGraphNode<GInternalLinkNode['data']>(
       node.id,
       node.selected,
       data,
-      !!data?.element,
-      internalLinkNodeSchema,
+      !!data?.element?.path,
+      null,
     );
 
   const setElement = useCallback((v) => dispatch({ element: v }), [dispatch]);
@@ -34,7 +31,10 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
   const openLink = async (e: MouseEvent) => {
     if (e.ctrlKey || e.metaKey) {
       if (data?.element?.path && !isEditing) {
-        const url = ``;
+        let url = `${window.location.origin}/project/${projectsStore.activeProject?.id}`;
+        if (data.element.type === 'SECTION')
+          url += `?section_id=${data.element.path[-1]}`;
+        else url += `/${data.element.path[-2]}/${data.element.path[-1]}`;
         window.open(url, '_blank');
       }
     }
@@ -74,8 +74,8 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
           onClick={(e) => e.stopPropagation()}
           onBlur={onBlur}
         >
-          <SelectProjectElement
-            value={data?.element}
+          <ProjectElementSelect
+            value={nodeState.element}
             onValueChange={setElement}
           />
         </div>

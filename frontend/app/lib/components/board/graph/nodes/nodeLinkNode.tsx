@@ -87,7 +87,6 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           onClick={(e) => e.stopPropagation()}
           onBlur={onBlur}
         >
-          {/*TODO: add zod rules */}
           <Input
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}

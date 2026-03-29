@@ -12,7 +12,7 @@ export default function useGraphNode<T>(
   isSelected: boolean | undefined,
   initialData: T,
   hasContent: boolean,
-  errorSchema: ZodObject<Partial<T>>,
+  errorSchema: ZodObject<Partial<T>> | null,
   returnCallback?: () => void,
 ) {
   const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;
@@ -56,9 +56,10 @@ export default function useGraphNode<T>(
   useEffect(() => {
     if (!isSynced.current) debouncedUpdate.current(nodeState);
 
-    IsFormValid(nodeState, errorSchema, (value) => {
-      errors.current = value;
-    });
+    if (errorSchema)
+      IsFormValid(nodeState, errorSchema, (value) => {
+        errors.current = value;
+      });
   }, [nodeState]);
 
   const onBlur = (e) => {
