@@ -43,7 +43,7 @@ const NODE_TYPES: NodeTypes = {
   nodeLinkNode: NodeLinkNode as any,
 };
 
-function GraphBoard() {
+const GraphBoard = React.memo(function GraphBoard() {
   const { resolvedTheme } = useTheme();
   const { isMobile } = useAdaptiveParams();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
@@ -159,7 +159,7 @@ function GraphBoard() {
       </ReactFlow>
     </div>
   );
-}
+});
 
 const GraphBoardObserver = observer(() => {
   const isReady =

@@ -31,9 +31,7 @@ export default function useInternalUpdates() {
     selectedElementsRef,
   } = useGraphBoardContext();
   const {
-    getNode,
     addNodes,
-    getEdge,
     updateEdge,
     addEdges,
     deleteElements,
@@ -159,22 +157,26 @@ export default function useInternalUpdates() {
       all.forEach((key) => {
         const [type, id] = key.split('|');
         const selected = newSelected.has(key);
+        // Only emit selection-state changes — position is irrelevant here and
+        // sending it would create redundant network traffic on every click.
         switch (type) {
           case 'node':
-            onNodeUpdate(id, {
-              ...getNode(id),
-              selected,
-            } as GNode);
+            pendingNodeChanges.current.push({ type: 'select', id, selected });
             break;
           case 'edge':
-            onEdgeUpdate(id, {
-              ...getEdge(id),
+            pendingEdgeChanges.current.push({
+              type: 'select',
+              id,
               selected,
-            } as GEdge);
+            } as EdgeChange);
+            break;
         }
       });
+
+      flushNodeEmit();
+      flushEdgeEmit();
     },
-    [onNodeUpdate, onEdgeUpdate, getNode, getEdge],
+    [flushNodeEmit, flushEdgeEmit],
   );
 
   // ACTIONS

@@ -33,7 +33,10 @@ interface BoardContextProps {
 
   // SELECTION
   selectedElementsRef: RefObject<Set<string>>; // stores `{type}|{id}`
+  /** @deprecated Use selectedEdgeId / hasSelection to avoid re-renders on every click */
   selectedElements: Set<string>; // stores `{type}|{id}`
+  selectedEdgeId: string | null;
+  hasSelection: boolean;
   onSelectionChange: (params: { nodes: any[]; edges: any[] }) => void;
 
   // OPERATIONS
@@ -67,16 +70,44 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
 
   // SELECTION
   const selectedElementsRef = useRef(new Set<string>());
-  const [selectedElements, setSelectedElements] = useState(new Set<string>());
+  // Granular derived states instead of the full Set to minimise re-renders:
+  // – toolsDisabled changes only when selection count crosses the 1-boundary
+  // – selectedEdgeId changes only when the selected edge identity changes
+  // – hasSelection changes only when going 0↔1+ elements
+  const [toolsDisabled, setToolsDisabled] = useState(false);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const [hasSelection, setHasSelection] = useState(false);
+
   const onSelectionChange = useCallback(
     ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
-      const newSet = new Set();
-
+      const newSet = new Set<string>();
       nodes.forEach((node) => newSet.add(`node|${node.id}`));
       edges.forEach((edge) => newSet.add(`edge|${edge.id}`));
 
       selectedElementsRef.current = newSet;
-      setSelectedElements(newSet);
+
+      const newSize = newSet.size;
+
+      setToolsDisabled((prev: boolean) => {
+        const next = newSize === 1;
+        return prev !== next ? next : prev;
+      });
+
+      setHasSelection((prev: boolean) => {
+        const next = newSize > 0;
+        return prev !== next ? next : prev;
+      });
+
+      // Derive selected edge id: only set when exactly one edge is selected
+      let nextEdgeId: string | null = null;
+      if (newSize === 1) {
+        const entry = newSet.values().next().value as string;
+        const [type, id] = entry.split('|');
+        if (type === 'edge') nextEdgeId = id;
+      }
+      setSelectedEdgeId((prev: string | null) =>
+        prev !== nextEdgeId ? nextEdgeId : prev,
+      );
     },
     [],
   );
@@ -100,9 +131,13 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     isDuplicatedEdge,
   } = useGraphOperations(selectedElementsRef, allToolsDisabled);
 
-  async function zoomNode(nodeId: string) {
-    await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
-  }
+  const zoomNode = useCallback(
+    async (nodeId: string) => {
+      await fitView({ maxZoom: 1, nodes: [{ id: nodeId }], duration: 500 });
+    },
+    [fitView],
+  );
+
   useEffect(() => {
     if (navigated.current || !initialized) return;
     navigated.current = true;
@@ -118,10 +153,12 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
         setActiveTool,
         toolCursor,
         allToolsDisabled,
-        toolsDisabled: selectedElements.size === 1,
+        toolsDisabled,
         // SELECTION
         selectedElementsRef,
-        selectedElements,
+        selectedElements: selectedElementsRef.current,
+        selectedEdgeId,
+        hasSelection,
         onSelectionChange,
         // OPERATIONS
         createNewElement,

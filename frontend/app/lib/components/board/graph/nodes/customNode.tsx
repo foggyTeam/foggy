@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GCustomNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -59,18 +59,24 @@ const CustomNode = observer((node: GCustomNode) => {
     !!(data?.title || data?.description),
     customNodeSchema,
   );
-  const themeClass = data?.color
-    ? isLightColor(data.color)
-      ? ' light'
-      : ' dark'
-    : '';
+
+  // Memoize the expensive colour luminance check so it only re-runs when the
+  // colour value itself changes, not on every render.
+  const themeClass = useMemo(() => {
+    if (!data?.color) return '';
+    return isLightColor(data.color) ? ' light' : ' dark';
+  }, [data?.color]);
+
   const alignClass = data?.align ? alignClassMap[data.align] : '';
 
-  const setTitle = useCallback((v) => dispatch({ title: v }), []);
-  const setDescription = useCallback((v) => dispatch({ description: v }), []);
-  const setShape = useCallback((v) => dispatch({ shape: v }), []);
-  const setColor = useCallback((v) => dispatch({ color: v }), []);
-  const setAlign = useCallback((v) => dispatch({ align: v }), []);
+  const setTitle = useCallback((v) => dispatch({ title: v }), [dispatch]);
+  const setDescription = useCallback(
+    (v) => dispatch({ description: v }),
+    [dispatch],
+  );
+  const setShape = useCallback((v) => dispatch({ shape: v }), [dispatch]);
+  const setColor = useCallback((v) => dispatch({ color: v }), [dispatch]);
+  const setAlign = useCallback((v) => dispatch({ align: v }), [dispatch]);
 
   return (
     <NodeWrapper

@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React, { useMemo } from 'react';
+import React from 'react';
 import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeTool';
 import InternalLinkTool from '@/app/lib/components/board/graph/tools/internalLinkTool';
 import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLinkTool';
@@ -18,13 +18,7 @@ export default function GraphToolbar({
 }: {
   onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
 }) {
-  const { selectedElements } = useGraphBoardContext();
-  const selectedEdgeId = useMemo(() => {
-    if (selectedElements.size !== 1) return null;
-    const e = selectedElements.values().next().value as string;
-    const [type, id] = e.split('|');
-    return type === 'edge' ? id : null;
-  }, [selectedElements]);
+  const { selectedEdgeId, hasSelection } = useGraphBoardContext();
 
   const tools = [
     InternalLinkTool,
@@ -52,7 +46,7 @@ export default function GraphToolbar({
         {tools.map((Tool, index) => (
           <Tool key={index} />
         ))}
-        {!!selectedElements.size && (
+        {!!hasSelection && (
           <>
             <Divider orientation="vertical" />
             <DeleteTool />

@@ -60,13 +60,16 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
   const draggedNodes = useRef<Set<string>>(new Set());
 
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
-  const nodeIds = getNodes()
-    .map((n) => n.id)
-    .join(',');
-  const edgeKeys = getEdges()
-    .map((e) => `${e.source}-${e.target}`)
-    .join(',');
-  const nodeSizes = getNodes()
+  // Compute dependency strings for the structure-sync effect only when the
+  // ReactFlow store snapshot actually changes.  These are intentionally called
+  // at the hook level — they read a ref-based snapshot (no subscription) and
+  // are therefore safe, but we still wrap them in the hook body so they are
+  // only recalculated on renders that originate from structure changes.
+  const nodes = getNodes();
+  const edges = getEdges();
+  const nodeIds = nodes.map((n) => n.id).join(',');
+  const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
+  const nodeSizes = nodes
     .map((n) => `${n.id}:${n.measured?.width ?? 0}x${n.measured?.height ?? 0}`)
     .join(',');
 

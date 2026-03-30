@@ -59,3 +59,11 @@
 .shape-pentagon {
   padding: 20% 15% 0;
 }
+
+/* Promote actively-dragged nodes to their own compositor layers so that CSS
+   transform updates are handled on the GPU without triggering layout or paint
+   on the rest of the page.  Only .dragging is targeted (not .selected) to
+   avoid excessive GPU memory consumption when many nodes remain selected. */
+.react-flow__node.dragging {
+  will-change: transform;
+}

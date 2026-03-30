@@ -23,6 +23,11 @@ export const SIMPLE_BOARD = {
   name: 'Test Simple Board',
 };
 
+export const GRAPH_BOARD = {
+  type: 'GRAPH',
+  name: 'Test Graph Board',
+};
+
 let cachedUserId = null;
 export async function saveUserId(id: string) {
   cachedUserId = id;
