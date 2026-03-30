@@ -212,8 +212,6 @@ export interface GBaseNode extends Node {
   id: string;
   type: string;
   position: { x: number; y: number };
-  hidden?: boolean;
-  parentId?: string;
   handles?: GNodeHandle[];
 }
 
@@ -278,8 +276,8 @@ export interface GEdge extends Edge {
   type: 'default' | 'smoothstep' | 'straight' | 'step' | 'simplebezier';
   source: string; // source node id
   target: string; // target node id
-  sourceHandle?: string; // source node handle id
-  targetHandle?: string; // target node handle id
+  sourceHandle: string; // source node handle id
+  targetHandle: string; // target node handle id
   label?: string;
   style?: {
     stroke?: string;

@@ -30,13 +30,8 @@ export default function useInternalUpdates() {
     isDuplicatedEdge,
     selectedElementsRef,
   } = useGraphBoardContext();
-  const {
-    addNodes,
-    updateEdge,
-    addEdges,
-    deleteElements,
-    getNodes,
-  } = useReactFlow();
+  const { addNodes, updateEdge, addEdges, deleteElements, getNodes } =
+    useReactFlow();
 
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
@@ -89,6 +84,7 @@ export default function useInternalUpdates() {
     },
     [addNodes, deleteElements, flushEdgeEmit],
   );
+
   const onNodeUpdate = useCallback(
     (nodeId: string, updatedNode: GNode) => {
       const changes: NodeChange[] = [];
@@ -112,6 +108,7 @@ export default function useInternalUpdates() {
     },
     [flushNodeEmit],
   );
+
   const onEdgeAction = useCallback(
     (action: ItemAction<GEdge>) => {
       let change: EdgeAddChange | EdgeRemoveChange;
@@ -132,6 +129,7 @@ export default function useInternalUpdates() {
     },
     [addEdges, deleteElements, flushEdgeEmit],
   );
+
   const onEdgeUpdate = useCallback(
     (edgeId: string, updatedEdge: GEdge) => {
       updateEdge(edgeId, updatedEdge); // used for reconnections
@@ -146,37 +144,41 @@ export default function useInternalUpdates() {
     },
     [flushEdgeEmit],
   );
+
   const emitSelectionChange = useCallback(
-    ({ nodes, edges }) => {
+    ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
       const newSelected = new Set<string>();
       nodes.forEach((node) => newSelected.add(`node|${node.id}`));
       edges.forEach((edge) => newSelected.add(`edge|${edge.id}`));
 
       const all: Set<string> = newSelected.union(selectedElementsRef.current);
 
+      const nodeChanges: NodeChange[] = [];
+      const edgeChanges: EdgeChange[] = [];
+
       all.forEach((key) => {
         const [type, id] = key.split('|');
         const selected = newSelected.has(key);
-        // Only emit selection-state changes — position is irrelevant here and
-        // sending it would create redundant network traffic on every click.
         switch (type) {
           case 'node':
-            pendingNodeChanges.current.push({ type: 'select', id, selected });
+            nodeChanges.push({ type: 'select', id, selected });
             break;
           case 'edge':
-            pendingEdgeChanges.current.push({
-              type: 'select',
-              id,
-              selected,
-            } as EdgeChange);
+            edgeChanges.push({ type: 'select', id, selected });
             break;
         }
       });
 
-      flushNodeEmit();
-      flushEdgeEmit();
+      if (nodeChanges.length) {
+        pendingNodeChanges.current.push(...nodeChanges);
+        flushNodeEmit();
+      }
+      if (edgeChanges.length) {
+        pendingEdgeChanges.current.push(...edgeChanges);
+        flushEdgeEmit();
+      }
     },
-    [flushNodeEmit, flushEdgeEmit],
+    [flushNodeEmit, flushEdgeEmit, selectedElementsRef],
   );
 
   // ACTIONS

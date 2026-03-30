@@ -9,6 +9,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -23,7 +24,8 @@ export type GraphTool =
   | 'internal-link'
   | 'external-link'
   | 'node-link';
-interface BoardContextProps {
+
+interface StableContextProps {
   // TOOLS
   allToolsDisabled: boolean;
   toolsDisabled: boolean;
@@ -31,13 +33,7 @@ interface BoardContextProps {
   setActiveTool: Dispatch<SetStateAction<GraphTool | undefined>>;
   toolCursor: string;
 
-  // SELECTION
-  selectedElementsRef: RefObject<Set<string>>; // stores `{type}|{id}`
-  /** @deprecated Use selectedEdgeId / hasSelection to avoid re-renders on every click */
-  selectedElements: Set<string>; // stores `{type}|{id}`
-  selectedEdgeId: string | null;
-  hasSelection: boolean;
-  onSelectionChange: (params: { nodes: any[]; edges: any[] }) => void;
+  selectedElementsRef: RefObject<Set<string>>;
 
   // OPERATIONS
   createNewElement: (
@@ -60,7 +56,15 @@ interface BoardContextProps {
   zoomNode: (nodeId: string) => void;
 }
 
-const BoardContext = createContext<BoardContextProps | undefined>(undefined);
+interface SelectionContextProps {
+  selectedElements: Set<string>; // stores `{type}|{id}`
+  onSelectionChange: (params: { nodes: any[]; edges: any[] }) => void;
+}
+
+const BoardContext = createContext<StableContextProps | undefined>(undefined);
+const SelectionContext = createContext<SelectionContextProps | undefined>(
+  undefined,
+);
 
 export function GraphBoardProvider({ children }: { children: ReactNode }) {
   const query = useSearchParams();
@@ -68,15 +72,8 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
   const navigated = useRef(false);
   const { fitView } = useReactFlow();
 
-  // SELECTION
   const selectedElementsRef = useRef(new Set<string>());
-  // Granular derived states instead of the full Set to minimise re-renders:
-  // – toolsDisabled changes only when selection count crosses the 1-boundary
-  // – selectedEdgeId changes only when the selected edge identity changes
-  // – hasSelection changes only when going 0↔1+ elements
-  const [toolsDisabled, setToolsDisabled] = useState(false);
-  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
-  const [hasSelection, setHasSelection] = useState(false);
+  const [selectedElements, setSelectedElements] = useState(new Set<string>());
 
   const onSelectionChange = useCallback(
     ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
@@ -85,32 +82,12 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
       edges.forEach((edge) => newSet.add(`edge|${edge.id}`));
 
       selectedElementsRef.current = newSet;
-
-      const newSize = newSet.size;
-
-      setToolsDisabled((prev: boolean) => {
-        const next = newSize === 1;
-        return prev !== next ? next : prev;
-      });
-
-      setHasSelection((prev: boolean) => {
-        const next = newSize > 0;
-        return prev !== next ? next : prev;
-      });
-
-      // Derive selected edge id: only set when exactly one edge is selected
-      let nextEdgeId: string | null = null;
-      if (newSize === 1) {
-        const entry = newSet.values().next().value as string;
-        const [type, id] = entry.split('|');
-        if (type === 'edge') nextEdgeId = id;
-      }
-      setSelectedEdgeId((prev: string | null) =>
-        prev !== nextEdgeId ? nextEdgeId : prev,
-      );
+      setSelectedElements(newSet);
     },
     [],
   );
+
+  const toolsDisabled = !!selectedElements.size;
 
   // TOOLS
   const {
@@ -145,35 +122,49 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     if (nodeId && initialized) zoomNode(nodeId);
   }, [initialized]);
 
+  const boardContextValue = useMemo<StableContextProps>(
+    () => ({
+      activeTool,
+      setActiveTool,
+      toolCursor,
+      allToolsDisabled,
+      toolsDisabled,
+      selectedElementsRef,
+      createNewElement,
+      updateElement,
+      deleteSelectedElements,
+      createNewEdge,
+      isDuplicatedEdge,
+      lockGraph,
+      isGraphLocked,
+      zoomNode,
+    }),
+    [
+      activeTool,
+      setActiveTool,
+      toolCursor,
+      allToolsDisabled,
+      toolsDisabled,
+      createNewElement,
+      updateElement,
+      deleteSelectedElements,
+      createNewEdge,
+      isDuplicatedEdge,
+      lockGraph,
+      isGraphLocked,
+    ],
+  );
+
+  const selectionContextValue = useMemo<SelectionContextProps>(
+    () => ({ selectedElements, onSelectionChange }),
+    [selectedElements, onSelectionChange],
+  );
+
   return (
-    <BoardContext.Provider
-      value={{
-        // TOOLS
-        activeTool,
-        setActiveTool,
-        toolCursor,
-        allToolsDisabled,
-        toolsDisabled,
-        // SELECTION
-        selectedElementsRef,
-        selectedElements: selectedElementsRef.current,
-        selectedEdgeId,
-        hasSelection,
-        onSelectionChange,
-        // OPERATIONS
-        createNewElement,
-        updateElement,
-        deleteSelectedElements,
-        createNewEdge,
-        // ADDITIONAL
-        isDuplicatedEdge,
-        lockGraph,
-        isGraphLocked,
-        // BOARD
-        zoomNode,
-      }}
-    >
-      {children}
+    <BoardContext.Provider value={boardContextValue}>
+      <SelectionContext.Provider value={selectionContextValue}>
+        {children}
+      </SelectionContext.Provider>
     </BoardContext.Provider>
   );
 }
@@ -183,6 +174,16 @@ export const useGraphBoardContext = () => {
   if (!context) {
     throw new Error(
       'useGraphBoardContext must be used within a GraphBoardProvider',
+    );
+  }
+  return context;
+};
+
+export const useGraphBoardSelection = () => {
+  const context = useContext(SelectionContext);
+  if (!context) {
+    throw new Error(
+      'useGraphBoardSelection must be used within a GraphBoardProvider',
     );
   }
   return context;

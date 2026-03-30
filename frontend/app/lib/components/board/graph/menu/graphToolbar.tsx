@@ -2,14 +2,14 @@
 
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React from 'react';
+import React, { useMemo } from 'react';
 import CustomNodeTool from '@/app/lib/components/board/graph/tools/customNodeTool';
 import InternalLinkTool from '@/app/lib/components/board/graph/tools/internalLinkTool';
 import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLinkTool';
 import NodeLinkTool from '@/app/lib/components/board/graph/tools/nodeLinkTool';
 import { Divider } from '@heroui/divider';
 import DeleteTool from '@/app/lib/components/board/graph/tools/deleteTool';
-import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { useGraphBoardSelection } from '@/app/lib/components/board/graph/graphBoardContext';
 import { GEdge } from '@/app/lib/types/definitions';
 import GraphEdgeToolbar from '@/app/lib/components/board/graph/menu/graphEdgeToolbar';
 
@@ -18,7 +18,13 @@ export default function GraphToolbar({
 }: {
   onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
 }) {
-  const { selectedEdgeId, hasSelection } = useGraphBoardContext();
+  const { selectedElements } = useGraphBoardSelection();
+  const selectedEdgeId = useMemo(() => {
+    if (selectedElements.size !== 1) return null;
+    const e = selectedElements.values().next().value as string;
+    const [type, id] = e.split('|');
+    return type === 'edge' ? id : null;
+  }, [selectedElements]);
 
   const tools = [
     InternalLinkTool,
@@ -46,7 +52,7 @@ export default function GraphToolbar({
         {tools.map((Tool, index) => (
           <Tool key={index} />
         ))}
-        {!!hasSelection && (
+        {!!selectedElements.size && (
           <>
             <Divider orientation="vertical" />
             <DeleteTool />

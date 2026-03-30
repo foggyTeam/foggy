@@ -3,6 +3,10 @@
   border: 1px solid hsl(var(--heroui-primary-400));
 }
 
+.react-flow__node.dragging {
+  will-change: transform;
+}
+
 .react-flow__nodesselection-rect {
   background: hsl(var(--heroui-primary-400) / 0.15);
   border: 1px solid hsl(var(--heroui-primary-400));
@@ -60,10 +64,3 @@
   padding: 20% 15% 0;
 }
 
-/* Promote actively-dragged nodes to their own compositor layers so that CSS
-   transform updates are handled on the GPU without triggering layout or paint
-   on the rest of the page.  Only .dragging is targeted (not .selected) to
-   avoid excessive GPU memory consumption when many nodes remain selected. */
-.react-flow__node.dragging {
-  will-change: transform;
-}
