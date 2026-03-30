@@ -15,6 +15,7 @@ interface NodeWrapperProps {
   isSelected: boolean;
   onBlur?: (e: MouseEvent) => void;
   onPress?: (e: MouseEvent) => void;
+  onDblClick?: (e: MouseEvent) => void;
   toolbarProps?: Omit<GraphToolbarProps, 'isOpen' | 'tools'>;
   toolbarTools?: JSX.Element;
   underlay?: JSX.Element;
@@ -27,6 +28,7 @@ function NodeWrapper({
   isSelected,
   onBlur,
   onPress,
+  onDblClick,
   toolbarProps,
   toolbarTools,
   underlay,
@@ -45,8 +47,15 @@ function NodeWrapper({
   const delayedMenu = useRef(
     debounce((newValue: boolean) => setIsMenuOpen(newValue), 256),
   );
+
+  useEffect(() => {
+    if (!isSelected) delayedMenu.current(false);
+  }, [isSelected]);
   return (
     <div
+      data-testid="graph-board-node"
+      onDoubleClick={(e) => onDblClick?.(e as MouseEvent)}
+      onTouchEnd={() => delayedMenu.current(true)}
       onMouseEnter={() => delayedMenu.current(true)}
       onMouseLeave={() => delayedMenu.current(false)}
     >

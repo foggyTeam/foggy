@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { GCustomNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -99,9 +99,6 @@ const CustomNode = observer((node: GCustomNode) => {
     [data?.shape, data?.color, data?.align, setShape, setColor, setAlign],
   );
 
-  useEffect(() => {
-    console.log(clsx(shapeClass, themeClass));
-  }, [shapeClass, themeClass]);
   return (
     <NodeWrapper
       isSelected={!!node.selected}

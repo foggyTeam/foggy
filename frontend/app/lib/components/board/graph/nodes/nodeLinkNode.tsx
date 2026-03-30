@@ -52,8 +52,8 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
   );
   const setTitle = useCallback((v) => dispatch({ title: v }), []);
 
-  const openLink = async (e: MouseEvent) => {
-    if (e.ctrlKey || e.metaKey) {
+  const openLink = async (e: MouseEvent | TouchEvent, dbl = false) => {
+    if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && !isEditing) {
         if (data.url.includes(path) && data.nodeId) await zoomNode(data.nodeId);
         else window.open(data.url, '_blank');
@@ -65,6 +65,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
     <NodeWrapper
       isSelected={node.selected}
       onPress={openLink}
+      onDblClick={(e) => openLink(e, true)}
       onBlur={onBlur}
       toolbarProps={{
         onToggleEdit: toggleEdit,
@@ -88,12 +89,13 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           onBlur={onBlur}
         >
           <Input
+            inputMode="url"
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
-            type="link"
+            type="url"
             value={nodeState.url}
             onValueChange={setUrl}
             autoFocus

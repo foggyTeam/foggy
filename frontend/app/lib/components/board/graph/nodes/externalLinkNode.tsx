@@ -81,8 +81,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     ),
   );
 
-  const openLink = (e: MouseEvent) => {
-    if (e.ctrlKey || e.metaKey) {
+  const openLink = (e: MouseEvent | TouchEvent, dbl = false) => {
+    if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && data?.domain && !isEditing)
         window.open(data.url, '_blank');
     }
@@ -92,6 +92,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     <NodeWrapper
       isSelected={node.selected}
       onPress={openLink}
+      onDblClick={(e) => openLink(e, true)}
       onBlur={onBlur}
       toolbarProps={{
         onToggleEdit: toggleEdit,
@@ -145,13 +146,14 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           onBlur={onBlur}
         >
           <Input
+            inputMode="url"
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={errors.current.url}
             errorMessage={errors.current.url}
             isLoading={isLoading}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
-            type="link"
+            type="url"
             value={nodeState.url}
             onValueChange={setUrl}
             autoFocus

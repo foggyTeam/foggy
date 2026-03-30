@@ -28,8 +28,8 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
 
   const setElement = useCallback((v) => dispatch({ element: v }), [dispatch]);
 
-  const openLink = async (e: MouseEvent) => {
-    if (e.ctrlKey || e.metaKey) {
+  const openLink = async (e: MouseEvent | TouchEvent, dbl = false) => {
+    if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.element?.path && !isEditing) {
         let url = `${window.location.origin}/project/${projectsStore.activeProject?.id}`;
         const pathLength = data.element.path.length;
@@ -46,6 +46,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     <NodeWrapper
       isSelected={node.selected}
       onPress={openLink}
+      onDblClick={(e) => openLink(e, true)}
       onBlur={onBlur}
       toolbarProps={{
         onToggleEdit: toggleEdit,
