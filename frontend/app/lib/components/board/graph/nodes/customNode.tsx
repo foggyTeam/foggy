@@ -15,6 +15,7 @@ import GraphColorTool from '@/app/lib/components/board/graph/tools/tooltipTools/
 import AlignTool from '@/app/lib/components/board/graph/tools/tooltipTools/alignTool';
 import { customNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import clsx from 'clsx';
 
 const shapeStyleMap = {
   rect: '',
@@ -95,7 +96,10 @@ const CustomNode = observer((node: GCustomNode) => {
         <div className="flex flex-col gap-1">
           {data?.title && (
             <h1
-              className={`line-clamp-1 flex h-7 w-full items-center truncate font-medium text-nowrap ${alignClass}`}
+              className={clsx(
+                'line-clamp-1 w-full truncate font-medium text-nowrap',
+                alignClass,
+              )}
             >
               {data.title}
             </h1>
@@ -103,7 +107,10 @@ const CustomNode = observer((node: GCustomNode) => {
 
           {data?.description && (
             <p
-              className={`line-clamp-8 flex h-fit w-full text-xs whitespace-pre-wrap ${alignClass}`}
+              className={clsx(
+                'line-clamp-6 h-fit w-full truncate text-xs whitespace-pre-wrap',
+                alignClass,
+              )}
             >
               {data.description}
             </p>
