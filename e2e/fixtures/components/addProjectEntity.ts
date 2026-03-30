@@ -16,7 +16,7 @@ export default class AddProjectEntityFixture {
 
   constructor(public readonly page: Page) {}
 
-  async selectType(type: 'section' | 'simple' | 'graph' | 'tree') {
+  async selectType(type: 'section' | 'simple' | 'graph' | 'doc') {
     const tab = this.container.getByTestId(`${type}-btn`);
 
     await tab.click();
@@ -31,7 +31,7 @@ export default class AddProjectEntityFixture {
 
   async createEntity(
     name: string,
-    type: 'section' | 'simple' | 'graph' | 'tree' = 'simple',
+    type: 'section' | 'simple' | 'graph' | 'doc' = 'simple',
   ) {
     await this.selectType(type);
     await Promise.all([this.submit(), this.fillName(name)]);

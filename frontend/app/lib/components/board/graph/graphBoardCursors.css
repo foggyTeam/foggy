@@ -1,0 +1,39 @@
+.react-flow__pane {
+  cursor: var(--graph-board-cursor) !important;
+}
+
+.react-flow__pane.dragging {
+  cursor: var(--graph-board-grab-cursor) !important;
+}
+
+.react-flow__node {
+  cursor: var(--graph-board-pointer-cursor) !important;
+}
+
+.react-flow__node.dragging {
+  cursor: var(--graph-board-grab-cursor) !important;
+}
+
+.react-flow__nodesselection-rect {
+  cursor: var(--graph-board-move-cursor) !important;
+}
+
+.react-flow__nodesselection-rect.dragging {
+  cursor: var(--graph-board-move-cursor) !important;
+}
+
+.react-flow__edgeupdater {
+  cursor: var(--graph-board-move-cursor) !important;
+}
+
+.react-flow__handle {
+  cursor: var(--graph-board-move-cursor) !important;
+}
+
+.react-flow.connecting {
+  cursor: var(--graph-board-move-cursor) !important;
+}
+
+.react-flow__edge {
+  cursor: var(--graph-board-pointer-cursor) !important;
+}

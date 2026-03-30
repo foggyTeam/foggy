@@ -15,10 +15,10 @@ export default function NameInput({
   maxW = 'sm',
 }: {
   isReadonly: boolean;
-  setIsReadonly: any;
-  onBlur: (newValue: string) => void;
+  setIsReadonly?: any;
+  onBlur?: (newValue: string) => void;
   value: string;
-  onValueChange: any;
+  onValueChange?: any;
   upperCase?: boolean;
   size?: 'sm' | 'md' | 'lg';
   maxW?: 'sm' | 'md' | 'lg';

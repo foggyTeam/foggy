@@ -1,3 +1,5 @@
+import 'server-only';
+
 import crypto from 'crypto';
 
 export default function getHash(s: string): string {

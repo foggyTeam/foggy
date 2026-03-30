@@ -18,7 +18,7 @@ let projectId = undefined;
 let sectionId = undefined;
 let boardId = undefined;
 
-test.describe('Board', () => {
+test.describe('Simple Board', () => {
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
 
@@ -76,7 +76,7 @@ test.describe('Board', () => {
 
     expect(boardId).toBeTruthy();
 
-    await page.goto(`${BASE_URL}/project/${projectId}/${sectionId}/${boardId}`);
+    await page.goto(`${BASE_URL}/project/${projectId}/${sectionId}/${boardId}/simple`);
   });
   test('Board tools work', async () => {
     const boardPage = new BoardPageFixture(page);
