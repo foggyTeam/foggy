@@ -1,3 +1,12 @@
+.react-flow__renderer {
+  touch-action: none;
+}
+
+.react-flow__node,
+[data-testid='board-toolbar'] button {
+  touch-action: manipulation;
+}
+
 .react-flow__selection {
   background: hsl(var(--heroui-primary-400) / 0.15);
   border: 1px solid hsl(var(--heroui-primary-400));
