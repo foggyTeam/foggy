@@ -9,7 +9,7 @@ import ExternalLinkTool from '@/app/lib/components/board/graph/tools/externalLin
 import NodeLinkTool from '@/app/lib/components/board/graph/tools/nodeLinkTool';
 import { Divider } from '@heroui/divider';
 import DeleteTool from '@/app/lib/components/board/graph/tools/deleteTool';
-import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { useGraphBoardSelection } from '@/app/lib/components/board/graph/graphBoardContext';
 import { GEdge } from '@/app/lib/types/definitions';
 import GraphEdgeToolbar from '@/app/lib/components/board/graph/menu/graphEdgeToolbar';
 
@@ -18,7 +18,7 @@ export default function GraphToolbar({
 }: {
   onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
 }) {
-  const { selectedElements } = useGraphBoardContext();
+  const { selectedElements } = useGraphBoardSelection();
   const selectedEdgeId = useMemo(() => {
     if (selectedElements.size !== 1) return null;
     const e = selectedElements.values().next().value as string;

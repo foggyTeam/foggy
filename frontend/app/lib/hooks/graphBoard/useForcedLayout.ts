@@ -13,6 +13,7 @@ import type { Node } from '@xyflow/react';
 import { useReactFlow } from '@xyflow/react';
 import debounce from 'lodash/debounce';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 
 interface D3Node extends SimulationNodeDatum {
   id: string;
@@ -48,7 +49,7 @@ const DRAG_ALPHA = 0.16;
 
 export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
   const { isMobile } = useAdaptiveParams();
-  const { getNodes, updateNode, setNodes, getEdges } = useReactFlow();
+  const { getNodes, setNodes, getEdges } = useReactFlow();
   const {
     linkDistance = DEFAULT_LINK_DISTANCE,
     chargeStrength = DEFAULT_STRENGTH,
@@ -60,13 +61,11 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
   const draggedNodes = useRef<Set<string>>(new Set());
 
   const simulationNodesMap = useRef(new Map<Node['id'], D3Node>());
-  const nodeIds = getNodes()
-    .map((n) => n.id)
-    .join(',');
-  const edgeKeys = getEdges()
-    .map((e) => `${e.source}-${e.target}`)
-    .join(',');
-  const nodeSizes = getNodes()
+  const nodes = getNodes() as GNode[];
+  const edges = getEdges() as GEdge[];
+  const nodeIds = nodes.map((n) => n.id).join(',');
+  const edgeKeys = edges.map((e) => `${e.source}-${e.target}`).join(',');
+  const nodeSizes = nodes
     .map((n) => `${n.id}:${n.measured?.width ?? 0}x${n.measured?.height ?? 0}`)
     .join(',');
 
@@ -113,11 +112,17 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
       const dirty = dirtyNodesSet.current;
       dirtyNodesSet.current = new Set();
 
-      const nodes = getNodes();
-      if (dirty.size < nodes.length / 2) updateEach(dirty);
-      else updateAll(dirty);
+      setNodes((prev) =>
+        prev.map((node: GNode) => {
+          if (!dirty.has(node.id)) return node;
+          const d3node = simulationNodesMap.current.get(node.id);
+          if (!d3node) return node;
+          positionsMap.current.set(node.id, { x: d3node.x!, y: d3node.y! });
+          return { ...node, position: { x: d3node.x!, y: d3node.y! } };
+        }),
+      );
     });
-  }, [getNodes]);
+  }, []);
 
   const syncStructure = useRef(
     debounce(
@@ -128,14 +133,16 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
         prevNIds: Set<string>,
         prevEKeys: Set<string>,
       ) => {
-        const currentNodeIds = new Set(getNodes().map((n) => n.id));
+        const nodes = getNodes();
+        const edges = getEdges();
+        const currentNodeIds = new Set(nodes.map((n) => n.id));
         const currentEdgeKeys = new Set(
-          getEdges().map((e) => `${e.source}->${e.target}`),
+          edges.map((e) => `${e.source}->${e.target}`),
         );
 
         let hasStructuralChanges = false;
 
-        for (const node of getNodes()) {
+        for (const node of nodes) {
           if (!prevNIds.has(node.id)) {
             sMap.set(node.id, {
               id: node.id,
@@ -174,9 +181,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
         simulation.current.nodes([...sMap.values()]);
         simulation.current
           .force('link')
-          .links(
-            getEdges().map((e) => ({ source: e.source, target: e.target })),
-          );
+          .links(edges.map((e) => ({ source: e.source, target: e.target })));
 
         if (hasStructuralChanges) {
           restartFn(0.12);
@@ -318,27 +323,6 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
       prevEdgeKeys.current,
     );
   }, [isMobile, restart]);
-
-  function updateEach(dirty: Set<Node['id']>) {
-    for (const nodeId of dirty) {
-      const d3node = simulationNodesMap.current.get(nodeId);
-      if (!d3node) continue;
-      positionsMap.current.set(nodeId, { x: d3node.x!, y: d3node.y! });
-      updateNode(nodeId, { position: { x: d3node.x!, y: d3node.y! } });
-    }
-  }
-  function updateAll(dirty: Set<Node['id']>) {
-    setNodes((prev) =>
-      prev.map((node) => {
-        const d3node = simulationNodesMap.current.get(node.id);
-        if (dirty.has(node.id))
-          positionsMap.current.set(node.id, { x: d3node.x!, y: d3node.y! });
-        return dirty.has(node.id)
-          ? { ...node, position: { x: d3node.x!, y: d3node.y! } }
-          : node;
-      }),
-    );
-  }
 
   useEffect(() => {
     if (isMobile) {

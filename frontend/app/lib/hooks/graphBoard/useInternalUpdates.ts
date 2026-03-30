@@ -30,15 +30,8 @@ export default function useInternalUpdates() {
     isDuplicatedEdge,
     selectedElementsRef,
   } = useGraphBoardContext();
-  const {
-    getNode,
-    addNodes,
-    getEdge,
-    updateEdge,
-    addEdges,
-    deleteElements,
-    getNodes,
-  } = useReactFlow();
+  const { addNodes, updateEdge, addEdges, deleteElements, getNodes } =
+    useReactFlow();
 
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
@@ -91,6 +84,7 @@ export default function useInternalUpdates() {
     },
     [addNodes, deleteElements, flushEdgeEmit],
   );
+
   const onNodeUpdate = useCallback(
     (nodeId: string, updatedNode: GNode) => {
       const changes: NodeChange[] = [];
@@ -114,6 +108,7 @@ export default function useInternalUpdates() {
     },
     [flushNodeEmit],
   );
+
   const onEdgeAction = useCallback(
     (action: ItemAction<GEdge>) => {
       let change: EdgeAddChange | EdgeRemoveChange;
@@ -134,6 +129,7 @@ export default function useInternalUpdates() {
     },
     [addEdges, deleteElements, flushEdgeEmit],
   );
+
   const onEdgeUpdate = useCallback(
     (edgeId: string, updatedEdge: GEdge) => {
       updateEdge(edgeId, updatedEdge); // used for reconnections
@@ -148,33 +144,41 @@ export default function useInternalUpdates() {
     },
     [flushEdgeEmit],
   );
+
   const emitSelectionChange = useCallback(
-    ({ nodes, edges }) => {
+    ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
       const newSelected = new Set<string>();
       nodes.forEach((node) => newSelected.add(`node|${node.id}`));
       edges.forEach((edge) => newSelected.add(`edge|${edge.id}`));
 
       const all: Set<string> = newSelected.union(selectedElementsRef.current);
 
+      const nodeChanges: NodeChange[] = [];
+      const edgeChanges: EdgeChange[] = [];
+
       all.forEach((key) => {
         const [type, id] = key.split('|');
         const selected = newSelected.has(key);
         switch (type) {
           case 'node':
-            onNodeUpdate(id, {
-              ...getNode(id),
-              selected,
-            } as GNode);
+            nodeChanges.push({ type: 'select', id, selected });
             break;
           case 'edge':
-            onEdgeUpdate(id, {
-              ...getEdge(id),
-              selected,
-            } as GEdge);
+            edgeChanges.push({ type: 'select', id, selected });
+            break;
         }
       });
+
+      if (nodeChanges.length) {
+        pendingNodeChanges.current.push(...nodeChanges);
+        flushNodeEmit();
+      }
+      if (edgeChanges.length) {
+        pendingEdgeChanges.current.push(...edgeChanges);
+        flushEdgeEmit();
+      }
     },
-    [onNodeUpdate, onEdgeUpdate, getNode, getEdge],
+    [flushNodeEmit, flushEdgeEmit, selectedElementsRef],
   );
 
   // ACTIONS

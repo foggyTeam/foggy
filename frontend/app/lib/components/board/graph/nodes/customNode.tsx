@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { GCustomNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -17,7 +17,7 @@ import { customNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 import clsx from 'clsx';
 
-const shapeStyleMap = {
+const shapeStyleMap: Record<GCustomNode['data']['shape'], string> = {
   rect: '',
   circle: 'shape-circle',
   triangle: 'shape-triangle',
@@ -25,7 +25,7 @@ const shapeStyleMap = {
   diamond: 'shape-diamond',
 };
 
-const alignClassMap = {
+const alignClassMap: Record<GCustomNode['data']['align'], string> = {
   start: 'justify-start text-start',
   center: 'justify-center text-center',
   end: 'justify-end text-end',
@@ -59,19 +59,49 @@ const CustomNode = observer((node: GCustomNode) => {
     !!(data?.title || data?.description),
     customNodeSchema,
   );
-  const themeClass = data?.color
-    ? isLightColor(data.color)
-      ? ' light'
-      : ' dark'
-    : '';
-  const alignClass = data?.align ? alignClassMap[data.align] : '';
 
-  const setTitle = useCallback((v) => dispatch({ title: v }), []);
-  const setDescription = useCallback((v) => dispatch({ description: v }), []);
-  const setShape = useCallback((v) => dispatch({ shape: v }), []);
-  const setColor = useCallback((v) => dispatch({ color: v }), []);
-  const setAlign = useCallback((v) => dispatch({ align: v }), []);
+  const themeClass = useMemo(() => {
+    return data?.color ? (isLightColor(data.color) ? ' light' : ' dark') : '';
+  }, [data?.color]);
 
+  const alignClass = useMemo(
+    () => alignClassMap[data?.align || 'start'],
+    [data?.align],
+  );
+
+  const shapeClass = useMemo(
+    () => shapeStyleMap[data?.shape || 'rect'],
+    [data?.shape],
+  );
+
+  const setTitle = useCallback((v) => dispatch({ title: v }), [dispatch]);
+  const setDescription = useCallback(
+    (v) => dispatch({ description: v }),
+    [dispatch],
+  );
+  const setShape = useCallback((v) => dispatch({ shape: v }), [dispatch]);
+  const setColor = useCallback((v) => dispatch({ color: v }), [dispatch]);
+  const setAlign = useCallback((v) => dispatch({ align: v }), [dispatch]);
+
+  const underlay = useMemo(
+    () => <ShapedUnderlay shape={data?.shape || 'rect'} color={data?.color} />,
+    [data?.shape, data?.color],
+  );
+
+  const toolbarTools = useMemo(
+    () => (
+      <>
+        <ShapeTool shape={data?.shape || 'rect'} setShape={setShape} />
+        <GraphColorTool color={data?.color || ''} setColor={setColor} />
+        <AlignTool align={data?.align || 'start'} setAlign={setAlign} />
+      </>
+    ),
+    [data?.shape, data?.color, data?.align, setShape, setColor, setAlign],
+  );
+
+  useEffect(() => {
+    console.log(clsx(shapeClass, themeClass));
+  }, [shapeClass, themeClass]);
   return (
     <NodeWrapper
       isSelected={!!node.selected}
@@ -80,17 +110,9 @@ const CustomNode = observer((node: GCustomNode) => {
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
       }}
-      className={shapeStyleMap[data?.shape || 'rect'] + themeClass}
-      toolbarTools={
-        <>
-          <ShapeTool shape={data?.shape} setShape={setShape} />
-          <GraphColorTool color={data?.color || ''} setColor={setColor} />
-          <AlignTool align={data?.align || 'start'} setAlign={setAlign} />
-        </>
-      }
-      underlay={
-        <ShapedUnderlay shape={data?.shape || 'rect'} color={data?.color} />
-      }
+      toolbarTools={toolbarTools}
+      className={clsx(shapeClass, themeClass)}
+      underlay={underlay}
     >
       {!isEditing && (
         <div className="flex flex-col gap-1">

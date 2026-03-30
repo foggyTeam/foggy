@@ -20,7 +20,10 @@ import { useTheme } from 'next-themes';
 import ExternalLinkNode from '@/app/lib/components/board/graph/nodes/externalLinkNode';
 import useForcedLayout from '@/app/lib/hooks/graphBoard/useForcedLayout';
 import GraphToolbar from '@/app/lib/components/board/graph/menu/graphToolbar';
-import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import {
+  useGraphBoardContext,
+  useGraphBoardSelection,
+} from '@/app/lib/components/board/graph/graphBoardContext';
 import cursorGrab from '@/app/lib/components/svg/cursorGrab';
 import cursorMove from '@/app/lib/components/svg/cursorMove';
 import cursorPointer from '@/app/lib/components/svg/cursorPointer';
@@ -36,6 +39,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import LockGraphButton from '@/app/lib/components/board/graph/lockGraphButton';
 
 const GRID_SIZE = 16;
+
 const NODE_TYPES: NodeTypes = {
   externalLinkNode: ExternalLinkNode as any,
   customNode: CustomNode as any,
@@ -54,10 +58,12 @@ function GraphBoard() {
   const {
     toolCursor,
     deleteSelectedElements,
-    onSelectionChange,
     allToolsDisabled,
     toolsDisabled,
   } = useGraphBoardContext();
+
+  const { onSelectionChange } = useGraphBoardSelection();
+
   const { fitView } = useReactFlow();
 
   const { onNodeDrag, onSelectionDrag, onDragStop, syncD3 } = useForcedLayout();
@@ -70,6 +76,7 @@ function GraphBoard() {
     onEdgeUpdate,
     emitSelectionChange,
   } = useInternalUpdates();
+
   useExternalUpdates(syncD3);
 
   const handleNodeDrag = useCallback(
@@ -79,6 +86,7 @@ function GraphBoard() {
     },
     [onNodeDrag, onNodeUpdate],
   );
+
   const handleNodeDragStop = useCallback(
     (_event: MouseEvent, node: GNode) => {
       onDragStop(_event, node);
@@ -86,6 +94,7 @@ function GraphBoard() {
     },
     [onDragStop, onNodeUpdate],
   );
+
   const handleSelectionDragStop = useCallback(
     (_event: MouseEvent, nodes: GNode[]) => {
       onDragStop(_event, nodes);
@@ -161,6 +170,8 @@ function GraphBoard() {
   );
 }
 
+const MemoizedGraphBoard = React.memo(GraphBoard);
+
 const GraphBoardObserver = observer(() => {
   const isReady =
     graphBoardStore.boardNodes !== undefined &&
@@ -170,6 +181,6 @@ const GraphBoardObserver = observer(() => {
   }, [isReady]);
   if (!isReady) return null;
 
-  return <GraphBoard />;
+  return <MemoizedGraphBoard />;
 });
 export default GraphBoardObserver;

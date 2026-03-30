@@ -67,7 +67,7 @@ function NodeWrapper({
           bg_container_no_padding,
           underlay &&
             'bg-opacity-0 border-0 bg-none shadow-none backdrop-blur-none',
-          isSelected && 'border-primary dark:border-primary-100 border-1.5',
+          isSelected && '!border-primary dark:border-primary-100 border-1.5',
           className,
         )}
         style={style}

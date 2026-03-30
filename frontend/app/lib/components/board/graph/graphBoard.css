@@ -3,6 +3,10 @@
   border: 1px solid hsl(var(--heroui-primary-400));
 }
 
+.react-flow__node.dragging {
+  will-change: transform;
+}
+
 .react-flow__nodesselection-rect {
   background: hsl(var(--heroui-primary-400) / 0.15);
   border: 1px solid hsl(var(--heroui-primary-400));
