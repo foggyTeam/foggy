@@ -72,12 +72,12 @@ export default function LineStyleTool({
     new Set([defineOption(edge.style)]),
   );
 
-  const handleChange = (keys) => {
+  const handleChange = (keys: any) => {
     const value = Object.values(keys)[0];
     setCurrentOption(keys);
     if (value === 'solid') setAnimated(false);
     onChange({
-      style: { ...edge.style, ...optionsMap[value].value },
+      style: { ...edge.style, ...optionsMap[value as typeof options].value },
     });
   };
 
@@ -132,7 +132,7 @@ export default function LineStyleTool({
               startContent={
                 <Icon
                   className={clsx(
-                    currentOption.keys()[0] === key
+                    [...currentOption.keys()][0] === key
                       ? 'stroke-f_accent'
                       : 'stroke-default-600',
                   )}

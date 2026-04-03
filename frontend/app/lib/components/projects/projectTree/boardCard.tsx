@@ -1,4 +1,4 @@
-import { SimpleBoard } from '@/app/lib/types/definitions';
+import { Board } from '@/app/lib/types/definitions';
 import { useState } from 'react';
 import projectsStore from '@/app/stores/projectsStore';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
@@ -20,7 +20,7 @@ export default function BoardCard({
   board,
 }: {
   parentList: string[];
-  board: Pick<SimpleBoard, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
+  board: Pick<Board, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
 }) {
   const { isMobile, smallerSize } = useAdaptiveParams();
   const { activeNodes, setActiveNodes, removeNode } = useActiveSectionContext();

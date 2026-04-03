@@ -30,7 +30,7 @@ export default function ProjectElementSelect({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isMenuOpen) onMenuClose();
+    if (!isMenuOpen && onMenuClose) onMenuClose();
   }, [isMenuOpen]);
   return (
     <Popover

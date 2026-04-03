@@ -19,7 +19,7 @@ import {
 } from '@heroui/dropdown';
 import React from 'react';
 
-const options: { value: string; Icon: React.ComponentType }[] = [
+const options: { value: string; Icon: any }[] = [
   { value: 'start', Icon: AlignLeftIcon },
   { value: 'center', Icon: AlignCenterIcon },
   { value: 'end', Icon: AlignRightIcon },

@@ -40,9 +40,7 @@ function isLightColor(hex: string): boolean {
 }
 
 const CustomNode = observer((node: GCustomNode) => {
-  const data: GCustomNodeData | undefined = graphBoardStore.nodesDataMap?.get(
-    node.id,
-  );
+  const data = graphBoardStore.nodesDataMap?.get(node.id) as GCustomNodeData;
   const { smallerSize } = useAdaptiveParams();
   const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
 

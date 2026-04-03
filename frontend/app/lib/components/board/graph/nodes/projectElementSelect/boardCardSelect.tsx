@@ -1,4 +1,4 @@
-import { SimpleBoard } from '@/app/lib/types/definitions';
+import { Board } from '@/app/lib/types/definitions';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import clsx from 'clsx';
 import { useSelectElementContext } from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectTreeSelect';
@@ -9,7 +9,7 @@ export default function BoardCardSelect({
   board,
 }: {
   parentList: string[];
-  board: Pick<SimpleBoard, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
+  board: Pick<Board, 'id' | 'sectionId' | 'name' | 'type' | 'lastChange'>;
 }) {
   const { selectedId, onSelect } = useSelectElementContext();
 

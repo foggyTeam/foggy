@@ -13,13 +13,14 @@ import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { usePathname } from 'next/navigation';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 import { nodeToNodeLinkSchema } from '@/app/lib/types/schemas';
+import { PressEvent } from '@heroui/button';
 
 type GNodeLinkNodeData = GNodeLinkNode['data'];
 
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
   const { zoomNode, allToolsDisabled, toolsDisabled } = useGraphBoardContext();
-  const data: GNodeLinkNodeData = graphBoardStore.nodesDataMap?.get(node.id);
+  const data = graphBoardStore.nodesDataMap?.get(node.id) as GNodeLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
 
@@ -57,7 +58,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
     [],
   );
 
-  const openLink = async (e: MouseEvent, dbl = false) => {
+  const openLink = async (e: MouseEvent | PressEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && !isEditing) {
         if (data.url.includes(path) && data.nodeId) await zoomNode(data.nodeId);

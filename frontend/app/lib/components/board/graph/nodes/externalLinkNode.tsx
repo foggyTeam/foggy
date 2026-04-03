@@ -2,11 +2,11 @@
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
 import React, {
+  MouseEvent,
   useCallback,
   useEffect,
   useRef,
   useState,
-  MouseEvent,
 } from 'react';
 import { GExternalLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
@@ -23,13 +23,15 @@ import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import { PressEvent } from '@heroui/button';
 
 type GExternalLinkNodeData = GExternalLinkNode['data'];
 type UrlData = Partial<GExternalLinkNode['data']>;
 
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
-  const data: GExternalLinkNodeData | undefined =
-    graphBoardStore.nodesDataMap?.get(node.id);
+  const data = graphBoardStore.nodesDataMap?.get(
+    node.id,
+  ) as GExternalLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
   const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
@@ -94,7 +96,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     ),
   );
 
-  const openLink = (e: MouseEvent, dbl = false) => {
+  const openLink = (e: MouseEvent | PressEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && data?.domain && !isEditing)
         window.open(data.url, '_blank');
@@ -163,7 +165,6 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.url}
             errorMessage={errors.current.url}
-            isLoading={isLoading}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
             type="url"

@@ -59,10 +59,10 @@ export default function EndsTool({
   const { allToolsDisabled } = useGraphBoardContext();
 
   const [currentOption, setCurrentOption] = useState(
-    new Set([defineOption(edge.markerStart, edge.markerEnd)]),
+    new Set([defineOption(edge.markerStart?.type, edge.markerEnd?.type)]),
   );
 
-  const getArrow = () => {
+  const getArrow = (): GEdge['markerStart'] | GEdge['markerEnd'] => {
     return {
       type: MarkerType.ArrowClosed,
       width: 20,
@@ -71,7 +71,7 @@ export default function EndsTool({
     };
   };
 
-  const handleChange = (keys) => {
+  const handleChange = (keys: any) => {
     const value = Object.values(keys)[0];
     setCurrentOption(keys);
     onChange({
@@ -114,7 +114,7 @@ export default function EndsTool({
             startContent={
               <Icon
                 className={clsx(
-                  currentOption.keys()[0] === value
+                  [...currentOption.keys()][0] === value
                     ? 'stroke-f_accent'
                     : 'stroke-default-600',
                 )}

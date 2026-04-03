@@ -5,14 +5,13 @@ import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 import { usePathname } from 'next/navigation';
 import IsFormValid from '@/app/lib/utils/isFormValid';
-import { ZodObject } from 'zod';
 
 export default function useGraphNode<T>(
   nodeId: string,
   isSelected: boolean | undefined,
   initialData: T,
   hasContent: boolean,
-  errorSchema: ZodObject<Partial<T>> | null,
+  errorSchema: any | null,
   returnCallback?: () => void,
 ) {
   const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;

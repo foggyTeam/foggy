@@ -11,13 +11,14 @@ import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import ProjectElementSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectElementSelect';
 import projectsStore from '@/app/stores/projectsStore';
+import { PressEvent } from '@heroui/button';
 
 type GInternalLinkNodeData = GInternalLinkNode['data'];
 
 const InternalLinkNode = observer((node: GNodeLinkNode) => {
-  const data: GInternalLinkNodeData = graphBoardStore.nodesDataMap?.get(
+  const data = graphBoardStore.nodesDataMap?.get(
     node.id,
-  );
+  ) as GInternalLinkNodeData;
 
   const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
     useGraphNode<GInternalLinkNodeData>(
@@ -33,7 +34,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     [dispatch],
   );
 
-  const openLink = async (e: MouseEvent, dbl = false) => {
+  const openLink = async (e: MouseEvent | PressEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.element?.path && !isEditing) {
         let url = `${window.location.origin}/project/${projectsStore.activeProject?.id}`;

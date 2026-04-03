@@ -17,12 +17,13 @@ import React, {
 } from 'react';
 import debounce from 'lodash/debounce';
 import DoubledHandle from '@/app/lib/components/board/graph/doubledHandle';
+import { PressEvent } from '@heroui/button';
 
 interface NodeWrapperProps {
-  isSelected: boolean;
-  onBlur?: (e: MouseEvent) => void;
-  onPress?: (e: MouseEvent) => void;
-  onDblClick?: (e: MouseEvent) => void;
+  isSelected: boolean | undefined;
+  onBlur?: (e: any) => void;
+  onPress?: (e: MouseEvent | PressEvent) => void;
+  onDblClick?: (e: any) => void;
   toolbarProps?: Omit<GraphToolbarProps, 'isOpen' | 'tools'>;
   toolbarTools?: JSX.Element;
   underlay?: JSX.Element;
