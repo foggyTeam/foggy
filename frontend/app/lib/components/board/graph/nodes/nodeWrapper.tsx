@@ -7,7 +7,14 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import GraphTooltipToolbar, {
   GraphToolbarProps,
 } from '@/app/lib/components/board/graph/menu/graphTooltipToolbar';
-import React, { CSSProperties, JSX, useEffect, useRef, useState } from 'react';
+import React, {
+  CSSProperties,
+  JSX,
+  useEffect,
+  useRef,
+  useState,
+  MouseEvent,
+} from 'react';
 import debounce from 'lodash/debounce';
 import DoubledHandle from '@/app/lib/components/board/graph/doubledHandle';
 

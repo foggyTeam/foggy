@@ -3,6 +3,7 @@
 import React, {
   createContext,
   Dispatch,
+  MouseEvent,
   ReactNode,
   RefObject,
   SetStateAction,

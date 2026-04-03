@@ -1,7 +1,13 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  MouseEvent,
+} from 'react';
 import { GExternalLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import { Image } from '@heroui/image';
@@ -18,10 +24,11 @@ import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
+type GExternalLinkNodeData = GExternalLinkNode['data'];
 type UrlData = Partial<GExternalLinkNode['data']>;
 
 const ExternalLinkNode = observer((node: GExternalLinkNode) => {
-  const data: GExternalLinkNode['data'] | undefined =
+  const data: GExternalLinkNodeData | undefined =
     graphBoardStore.nodesDataMap?.get(node.id);
 
   const { smallerSize } = useAdaptiveParams();
@@ -37,7 +44,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     onBlur,
     toggleEdit,
     onCopyLink,
-  } = useGraphNode<GExternalLinkNode['data']>(
+  } = useGraphNode<GExternalLinkNodeData>(
     node.id,
     node.selected,
     data,
@@ -45,8 +52,14 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     externalLinkNodeSchema,
     () => loadLinkData.current.cancel(),
   );
-  const setUrl = useCallback((v) => dispatch({ url: v }), []);
-  const setDescription = useCallback((v) => dispatch({ description: v }), []);
+  const setUrl = useCallback(
+    (v: GExternalLinkNodeData['url']) => dispatch({ url: v }),
+    [],
+  );
+  const setDescription = useCallback(
+    (v: GExternalLinkNodeData['description']) => dispatch({ description: v }),
+    [],
+  );
 
   useEffect(() => {
     if (data?.url !== nodeState.url)
@@ -81,7 +94,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     ),
   );
 
-  const openLink = (e: MouseEvent | TouchEvent, dbl = false) => {
+  const openLink = (e: MouseEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && data?.domain && !isEditing)
         window.open(data.url, '_blank');
@@ -148,7 +161,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           <Input
             inputMode="url"
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.url}
+            isInvalid={!!errors.current.url}
             errorMessage={errors.current.url}
             isLoading={isLoading}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
@@ -168,7 +181,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
 
           <Textarea
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.description}
+            isInvalid={!!errors.current.description}
             errorMessage={errors.current.description}
             color="primary"
             variant="underlined"

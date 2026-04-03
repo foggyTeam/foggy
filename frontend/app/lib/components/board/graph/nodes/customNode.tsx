@@ -17,7 +17,8 @@ import { customNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 import clsx from 'clsx';
 
-const shapeStyleMap: Record<GCustomNode['data']['shape'], string> = {
+type GCustomNodeData = GCustomNode['data'];
+const shapeStyleMap: Record<GCustomNodeData['shape'], string> = {
   rect: '',
   circle: 'shape-circle',
   triangle: 'shape-triangle',
@@ -25,7 +26,7 @@ const shapeStyleMap: Record<GCustomNode['data']['shape'], string> = {
   diamond: 'shape-diamond',
 };
 
-const alignClassMap: Record<GCustomNode['data']['align'], string> = {
+const alignClassMap: Record<GCustomNodeData['align'], string> = {
   start: 'justify-start text-start',
   center: 'justify-center text-center',
   end: 'justify-end text-end',
@@ -39,8 +40,9 @@ function isLightColor(hex: string): boolean {
 }
 
 const CustomNode = observer((node: GCustomNode) => {
-  const data: GCustomNode['data'] | undefined =
-    graphBoardStore.nodesDataMap?.get(node.id);
+  const data: GCustomNodeData | undefined = graphBoardStore.nodesDataMap?.get(
+    node.id,
+  );
   const { smallerSize } = useAdaptiveParams();
   const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
 
@@ -74,14 +76,26 @@ const CustomNode = observer((node: GCustomNode) => {
     [data?.shape],
   );
 
-  const setTitle = useCallback((v) => dispatch({ title: v }), [dispatch]);
-  const setDescription = useCallback(
-    (v) => dispatch({ description: v }),
+  const setTitle = useCallback(
+    (v: GCustomNodeData['title']) => dispatch({ title: v }),
     [dispatch],
   );
-  const setShape = useCallback((v) => dispatch({ shape: v }), [dispatch]);
-  const setColor = useCallback((v) => dispatch({ color: v }), [dispatch]);
-  const setAlign = useCallback((v) => dispatch({ align: v }), [dispatch]);
+  const setDescription = useCallback(
+    (v: GCustomNodeData['description']) => dispatch({ description: v }),
+    [dispatch],
+  );
+  const setShape = useCallback(
+    (v: GCustomNodeData['shape']) => dispatch({ shape: v }),
+    [dispatch],
+  );
+  const setColor = useCallback(
+    (v: GCustomNodeData['color']) => dispatch({ color: v }),
+    [dispatch],
+  );
+  const setAlign = useCallback(
+    (v: GCustomNodeData['align']) => dispatch({ align: v }),
+    [dispatch],
+  );
 
   const underlay = useMemo(
     () => <ShapedUnderlay shape={data?.shape || 'rect'} color={data?.color} />,
@@ -146,7 +160,7 @@ const CustomNode = observer((node: GCustomNode) => {
         >
           <Input
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.title}
+            isInvalid={!!errors.current.title}
             errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
             label={settingsStore.t.toolBar.titleLabel}
@@ -165,7 +179,7 @@ const CustomNode = observer((node: GCustomNode) => {
 
           <Textarea
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.description}
+            isInvalid={!!errors.current.description}
             errorMessage={errors.current.description}
             color="primary"
             variant="underlined"

@@ -1,7 +1,7 @@
 'use client';
 
 import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
-import { RefObject, useCallback, useEffect, useMemo } from 'react';
+import { RefObject, useCallback, useEffect, useMemo, MouseEvent } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';

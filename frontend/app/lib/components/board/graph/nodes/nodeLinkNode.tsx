@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback } from 'react';
+import React, { MouseEvent, useCallback } from 'react';
 import { GNodeLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -14,12 +14,12 @@ import { usePathname } from 'next/navigation';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 import { nodeToNodeLinkSchema } from '@/app/lib/types/schemas';
 
+type GNodeLinkNodeData = GNodeLinkNode['data'];
+
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
   const { zoomNode, allToolsDisabled, toolsDisabled } = useGraphBoardContext();
-  const data: GNodeLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
-    node.id,
-  );
+  const data: GNodeLinkNodeData = graphBoardStore.nodesDataMap?.get(node.id);
 
   const { smallerSize } = useAdaptiveParams();
 
@@ -31,14 +31,16 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
     onBlur,
     toggleEdit,
     onCopyLink,
-  } = useGraphNode<GNodeLinkNode['data']>(
+  } = useGraphNode<GNodeLinkNodeData>(
     node.id,
     node.selected,
     data,
     !!data.url,
     nodeToNodeLinkSchema,
   );
-  const getNodeId = (v) => {
+  const getNodeId = (v: string | undefined) => {
+    if (!v) return undefined;
+
     try {
       const url = new URL(v);
       return url.searchParams.get('node_id') || undefined;
@@ -47,12 +49,15 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
     }
   };
   const setUrl = useCallback(
-    (v) => dispatch({ url: v, nodeId: getNodeId(v) }),
+    (v: GNodeLinkNodeData['url']) => dispatch({ url: v, nodeId: getNodeId(v) }),
     [],
   );
-  const setTitle = useCallback((v) => dispatch({ title: v }), []);
+  const setTitle = useCallback(
+    (v: GNodeLinkNodeData['title']) => dispatch({ title: v }),
+    [],
+  );
 
-  const openLink = async (e: MouseEvent | TouchEvent, dbl = false) => {
+  const openLink = async (e: MouseEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.url && !isEditing) {
         if (data.url.includes(path) && data.nodeId) await zoomNode(data.nodeId);
@@ -91,7 +96,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           <Input
             inputMode="url"
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.url}
+            isInvalid={!!errors.current.url}
             errorMessage={errors.current.url}
             placeholder={settingsStore.t.toolBar.linkPlaceholder}
             label={settingsStore.t.toolBar.linkLabel}
@@ -110,7 +115,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
 
           <Input
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
-            isInvalid={errors.current.title}
+            isInvalid={!!errors.current.title}
             errorMessage={errors.current.title}
             placeholder={settingsStore.t.toolBar.titlePlaceholder}
             label={settingsStore.t.toolBar.titleLabel}

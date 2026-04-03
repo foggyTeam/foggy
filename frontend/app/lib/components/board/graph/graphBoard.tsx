@@ -10,9 +10,16 @@ import {
   NodeTypes,
   Panel,
   ReactFlow,
+  SelectionMode,
   useReactFlow,
 } from '@xyflow/react';
-import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
+import React, {
+  CSSProperties,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
 import useInternalUpdates from '@/app/lib/hooks/graphBoard/useInternalUpdates';
 import useExternalUpdates from '@/app/lib/hooks/graphBoard/useExternalUpdates';
 import ResetStageButton from '@/app/lib/components/board/resetStageButton';
@@ -146,7 +153,7 @@ function GraphBoard() {
         selectionOnDrag={!isMobile}
         colorMode={theme}
         reconnectRadius={16}
-        selectionMode="partial"
+        selectionMode={SelectionMode.Partial}
         connectionMode={ConnectionMode.Loose}
         proOptions={{ hideAttribution: true }}
         fitView

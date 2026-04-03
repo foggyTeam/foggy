@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, MouseEvent } from 'react';
 import {
   forceCollide,
   forceLink,

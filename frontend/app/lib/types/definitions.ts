@@ -282,7 +282,7 @@ export interface GEdge extends Edge {
   style?: {
     stroke?: string;
     strokeWidth?: number;
-    strokeLinecap?: string;
+    strokeLinecap?: 'butt' | 'round' | 'square';
     strokeDasharray?: string;
   };
   animated?: boolean;

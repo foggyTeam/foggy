@@ -1,7 +1,7 @@
 'use client';
 
 import NodeWrapper from '@/app/lib/components/board/graph/nodes/nodeWrapper';
-import React, { useCallback } from 'react';
+import React, { MouseEvent, useCallback } from 'react';
 import { GInternalLinkNode, GNodeLinkNode } from '@/app/lib/types/definitions';
 import { observer } from 'mobx-react-lite';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
@@ -12,13 +12,15 @@ import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import ProjectElementSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectElementSelect';
 import projectsStore from '@/app/stores/projectsStore';
 
+type GInternalLinkNodeData = GInternalLinkNode['data'];
+
 const InternalLinkNode = observer((node: GNodeLinkNode) => {
-  const data: GInternalLinkNode['data'] = graphBoardStore.nodesDataMap?.get(
+  const data: GInternalLinkNodeData = graphBoardStore.nodesDataMap?.get(
     node.id,
   );
 
   const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
-    useGraphNode<GInternalLinkNode['data']>(
+    useGraphNode<GInternalLinkNodeData>(
       node.id,
       node.selected,
       data,
@@ -26,9 +28,12 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
       null,
     );
 
-  const setElement = useCallback((v) => dispatch({ element: v }), [dispatch]);
+  const setElement = useCallback(
+    (v: GInternalLinkNodeData['element']) => dispatch({ element: v }),
+    [dispatch],
+  );
 
-  const openLink = async (e: MouseEvent | TouchEvent, dbl = false) => {
+  const openLink = async (e: MouseEvent, dbl = false) => {
     if (e.ctrlKey || e.metaKey || dbl) {
       if (data?.element?.path && !isEditing) {
         let url = `${window.location.origin}/project/${projectsStore.activeProject?.id}`;
@@ -81,7 +86,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
             value={nodeState.element}
             onValueChange={setElement}
             onMenuClose={toggleEdit}
-            isDraggable={node.draggable}
+            isDraggable={!!node.draggable}
           />
         </div>
       )}

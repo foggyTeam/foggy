@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, MouseEvent } from 'react';
 import throttle from 'lodash/throttle';
 import {
   Connection,
