@@ -117,9 +117,10 @@ export default function LineStyleTool({
             isDisabled={currentOption.has('solid')}
             size={smallerSize}
             isSelected={animated}
-            children={settingsStore.t.toolBar.animateEdge}
             onValueChange={setAnimated}
-          />
+          >
+            {settingsStore.t.toolBar.animateEdge}
+          </Checkbox>
         }
       >
         {options.map((key) => {
