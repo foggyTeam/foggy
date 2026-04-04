@@ -36,6 +36,7 @@ class BoardStore {
 
   connectSocket(boardId: string) {
     if (!userStore.user?.id) return;
+    this.disconnectSocket();
     if (boardId) {
       this.boardWebsocket = openBoardSocketConnection(
         boardId,

@@ -25,7 +25,7 @@ const LockGraphButton = observer(() => {
         color="secondary"
         variant="light"
         size="md"
-        className="invisible absolute right-[136] bottom-4 z-50 font-semibold sm:visible"
+        className="invisible absolute right-[136px] bottom-4 z-50 font-semibold sm:visible"
       >
         {isGraphLocked ? <LockIcon /> : <UnlockIcon />}
       </Button>

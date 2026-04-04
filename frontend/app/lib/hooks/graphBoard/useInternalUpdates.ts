@@ -82,7 +82,7 @@ export default function useInternalUpdates() {
         flushNodeEmit();
       }
     },
-    [addNodes, deleteElements, flushEdgeEmit],
+    [addNodes, deleteElements, flushNodeEmit],
   );
 
   const onNodeUpdate = useCallback(
@@ -151,7 +151,10 @@ export default function useInternalUpdates() {
       nodes.forEach((node) => newSelected.add(`node|${node.id}`));
       edges.forEach((edge) => newSelected.add(`edge|${edge.id}`));
 
-      const all: Set<string> = newSelected.union(selectedElementsRef.current);
+      const all: Set<string> = new Set([
+        ...newSelected,
+        ...selectedElementsRef.current,
+      ]);
 
       const nodeChanges: NodeChange[] = [];
       const edgeChanges: EdgeChange[] = [];

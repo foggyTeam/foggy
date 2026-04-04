@@ -1,5 +1,4 @@
 import { EdgeChange, NodeChange } from '@xyflow/react';
-import { toArray } from 'lodash';
 
 type Change = NodeChange | EdgeChange;
 type ChangeTypes = Change['type'];

@@ -53,6 +53,7 @@ const BoardLoader = ({
     return () => {
       boardStore.setActiveBoard(undefined);
       simpleBoardStore.setBoardLayers(undefined);
+      graphBoardStore.setGraphData(undefined);
     };
   }, [sectionData, boardData]);
 

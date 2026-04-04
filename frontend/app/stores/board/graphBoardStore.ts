@@ -155,7 +155,7 @@ class GraphBoardStore {
   clearRemovedNodes(nodes: GNode[]) {
     // очистка устаревших нод, только если их число кратно 10
     if (!this.nodesDataMap || this.nodesDataMap?.size % 10) return;
-    for (const id in [...this.nodesDataMap.keys()]) {
+    for (const id of [...this.nodesDataMap.keys()]) {
       const nodeIndex = nodes?.findIndex((node) => node.id === id);
       if (nodeIndex < 0) this.nodesDataMap?.delete(id);
     }

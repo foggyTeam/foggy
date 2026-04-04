@@ -23,8 +23,9 @@ export default function useExternalUpdates(syncD3: () => void) {
   const onExternalNodesChange = useMemo(
     () =>
       throttle(() => {
-        graphBoardStore.clearUpdatesQueue('nodes');
+        const nodesQueue = graphBoardStore.nodesExternalUpdatesQueue;
         if (nodesQueue.length === 0) return;
+        graphBoardStore.clearUpdatesQueue('nodes');
 
         const { changes, lockUpdates } = batchGraphUpdates(nodesQueue);
 
@@ -69,20 +70,15 @@ export default function useExternalUpdates(syncD3: () => void) {
 
         if (needsSync) syncD3();
       }, 640),
-    [
-      addNodes,
-      deleteElements,
-      updateNode,
-      nodesQueue,
-      graphBoardStore.clearUpdatesQueue,
-    ],
+    [addNodes, deleteElements, updateNode, nodesQueue],
   );
 
   const onExternalEdgesChange = useMemo(
     () =>
       throttle(() => {
-        graphBoardStore.clearUpdatesQueue('edges');
+        const edgesQueue = graphBoardStore.edgesExternalUpdatesQueue;
         if (edgesQueue.length === 0) return;
+        graphBoardStore.clearUpdatesQueue('edges');
 
         const { changes } = batchGraphUpdates(edgesQueue);
 
@@ -100,13 +96,7 @@ export default function useExternalUpdates(syncD3: () => void) {
           }
         }
       }, 640),
-    [
-      addEdges,
-      deleteElements,
-      updateEdge,
-      edgesQueue,
-      graphBoardStore.clearUpdatesQueue,
-    ],
+    [addEdges, deleteElements, updateEdge, edgesQueue],
   );
 
   // UPDATES WATCHERS
