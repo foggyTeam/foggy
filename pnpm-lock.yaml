@@ -394,6 +394,9 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
+      '@types/d3-force':
+        specifier: ^3.0.10
+        version: 3.0.10
       '@vitest/ui':
         specifier: ^2.1.9
         version: 2.1.9(vitest@2.1.9)
