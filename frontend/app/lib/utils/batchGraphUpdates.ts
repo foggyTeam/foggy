@@ -42,7 +42,7 @@ export default function batchGraphUpdates(updatesQueue: Change[][]): {
     }
   }
 
-  const lockUpdatesArray = toArray(lockUpdates.entries()).map((entry) => {
+  const lockUpdatesArray = [...lockUpdates.entries()].map((entry) => {
     return { id: entry[0], lock: entry[1] };
   });
 

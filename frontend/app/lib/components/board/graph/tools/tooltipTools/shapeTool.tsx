@@ -23,7 +23,7 @@ import {
 import React from 'react';
 
 type ShapeType = GCustomNode['data']['shape'];
-const options: { value: ShapeType; Icon: React.ComponentType }[] = [
+const options: { value: ShapeType; Icon: any }[] = [
   { value: 'rect', Icon: RectangleHorizontalIcon },
   { value: 'circle', Icon: CircleIcon },
   { value: 'diamond', Icon: DiamondIcon },

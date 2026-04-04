@@ -32,7 +32,7 @@ export default function NameInput({
   const handleBlur = () => {
     if (Object.keys(error).length < 1) onValueChange(localValue);
     else setLocalValue(value);
-    onBlur(localValue);
+    if (onBlur) onBlur(localValue);
   };
 
   return (

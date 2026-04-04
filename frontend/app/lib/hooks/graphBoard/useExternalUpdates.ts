@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import throttle from 'lodash/throttle';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import batchGraphUpdates from '@/app/lib/utils/batchGraphUpdates';
-import { Node, useReactFlow } from '@xyflow/react';
+import { EdgeChange, Node, NodeChange, useReactFlow } from '@xyflow/react';
 import { GNode } from '@/app/lib/types/definitions';
 import { autorun } from 'mobx';
 
@@ -30,7 +30,7 @@ export default function useExternalUpdates(syncD3: () => void) {
 
         let needsSync = false;
 
-        for (const change of changes) {
+        for (const change of changes as NodeChange[]) {
           switch (change.type) {
             case 'add':
               addNodes([change.item as GNode]);
@@ -86,7 +86,7 @@ export default function useExternalUpdates(syncD3: () => void) {
 
         const { changes } = batchGraphUpdates(edgesQueue);
 
-        for (const change of changes) {
+        for (const change of changes as EdgeChange[]) {
           switch (change.type) {
             case 'add':
               addEdges([change.item]);

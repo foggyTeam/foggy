@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, MouseEvent } from 'react';
+import { MouseEvent, useCallback, useEffect, useRef } from 'react';
 import {
   forceCollide,
   forceLink,
@@ -113,7 +113,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
       dirtyNodesSet.current = new Set();
 
       setNodes((prev) =>
-        prev.map((node: GNode) => {
+        prev.map((node: Node) => {
           if (!dirty.has(node.id)) return node;
           const d3node = simulationNodesMap.current.get(node.id);
           if (!d3node) return node;
@@ -180,7 +180,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
 
         simulation.current.nodes([...sMap.values()]);
         simulation.current
-          .force('link')
+          ?.force('link')
           .links(edges.map((e) => ({ source: e.source, target: e.target })));
 
         if (hasStructuralChanges) {
@@ -304,7 +304,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
           unpinTimeouts.current.delete(node.id);
         }, UNPIN_DELAY);
 
-        unpinTimeouts.current.set(node.id, timeoutId);
+        unpinTimeouts.current.set(node.id, timeoutId as number);
       });
 
       if (draggedNodes.current.size === 0)

@@ -70,8 +70,8 @@ export default function useGraphOperations(
   const deleteSelectedElements = useCallback(async () => {
     if (isDisabled) return;
 
-    const edges = [];
-    const nodes = [];
+    const edges: Pick<GEdge, 'id'>[] = [];
+    const nodes: Pick<GNode, 'id'>[] = [];
     selectedElements.current.forEach((key) => {
       const [type, id] = key.split('|');
       if (type === 'edge') edges.push({ id });

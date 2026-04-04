@@ -54,7 +54,7 @@ export default function AlignTool({
         selectedKeys={new Set([align])}
         selectionMode="single"
         variant="flat"
-        onSelectionChange={(keys) => setAlign([...keys][0])}
+        onSelectionChange={(keys: any) => setAlign([...keys][0])}
         closeOnSelect
         classNames={{ base: 'w-fit px-1 py-2 sm:px-1 sm:py-3', list: 'w-20' }}
       >

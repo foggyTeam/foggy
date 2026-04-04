@@ -160,7 +160,7 @@ const Cursors = observer(() => {
         return (
           <CursorChip
             key={id}
-            ref={(el) => {
+            ref={(el: HTMLDivElement | null) => {
               nodeRef.current[id] = el;
               if (el) requestAnimationFrame(redraw);
             }}

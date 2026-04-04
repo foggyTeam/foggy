@@ -19,7 +19,12 @@ import {
 import clsx from 'clsx';
 import { Checkbox } from '@heroui/checkbox';
 
-const optionsMap = {
+const optionsMap: {
+  [key: string]: {
+    value: GEdge['style'];
+    Icon: any;
+  };
+} = {
   solid: {
     value: {
       strokeDasharray: undefined,
@@ -77,7 +82,10 @@ export default function LineStyleTool({
     setCurrentOption(keys);
     if (value === 'solid') setAnimated(false);
     onChange({
-      style: { ...edge.style, ...optionsMap[value as typeof options].value },
+      style: {
+        ...edge.style,
+        ...optionsMap[value as keyof typeof optionsMap].value,
+      },
     });
   };
 
@@ -124,7 +132,7 @@ export default function LineStyleTool({
         }
       >
         {options.map((key) => {
-          const Icon = optionsMap[key].Icon;
+          const Icon = optionsMap[key as keyof typeof optionsMap].Icon;
           return (
             <DropdownItem
               textValue={key}

@@ -17,7 +17,7 @@ export default function useGraphNode<T>(
   const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;
   const isSynced = useRef(true);
   const [isEditing, setIsEditing] = useState(!hasContent);
-  const errors = useRef<Record<keyof T, string>>({});
+  const errors = useRef<Record<keyof T, string | undefined>>({});
 
   const [nodeState, dispatch] = useReducer((state: T, patch: Partial<T>) => {
     isSynced.current = false;
@@ -56,12 +56,16 @@ export default function useGraphNode<T>(
     if (!isSynced.current) debouncedUpdate.current(nodeState);
 
     if (errorSchema)
-      IsFormValid(nodeState, errorSchema, (value) => {
-        errors.current = value;
-      });
+      IsFormValid(
+        nodeState,
+        errorSchema,
+        (value: Record<keyof T, string | undefined>) => {
+          errors.current = value;
+        },
+      );
   }, [nodeState]);
 
-  const onBlur = (e) => {
+  const onBlur = (e: any) => {
     if (hasContent && !e.currentTarget.contains(e.relatedTarget as Element))
       setIsEditing(false);
   };

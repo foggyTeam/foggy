@@ -1,23 +1,34 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Board, BoardTypes } from '@/app/lib/types/definitions';
+import {
+  Board,
+  BoardTypes,
+  GraphBoard,
+  SimpleBoard,
+} from '@/app/lib/types/definitions';
 import projectsStore from '@/app/stores/projectsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 
+type Normalized<T extends Board> = Omit<T, 'type'> & {
+  type: Lowercase<T['type']>;
+  sectionIds: string[];
+};
+type BoardData = Normalized<SimpleBoard> | Normalized<GraphBoard>;
+
 const BoardLoader = ({
   boardData,
   sectionData,
 }: {
-  boardData: (Board & { sectionIds: string[] }) | undefined;
+  boardData: BoardData | undefined;
   sectionData: any | undefined;
 }) => {
   useEffect(() => {
     if (sectionData && boardData) {
       const sectionIds = [...boardData.sectionIds];
-      const sectionId: string = sectionIds.pop();
+      const sectionId = sectionIds.pop() as string;
       projectsStore.insertProjectChild(sectionIds, sectionData, true);
       boardStore.setActiveBoard({ ...boardData, sectionId });
       projectsStore.addRecentBoard(
@@ -28,12 +39,11 @@ const BoardLoader = ({
         boardData.type.toUpperCase() as BoardTypes,
       );
 
-      const boardType = boardData.type.toUpperCase();
-      if (boardType === 'SIMPLE') {
+      if (boardData.type === 'simple') {
         simpleBoardStore.setBoardLayers(boardData.layers);
       }
 
-      if (boardType === 'GRAPH') {
+      if (boardData.type === 'graph') {
         graphBoardStore.setGraphData({
           nodes: boardData.graphNodes,
           edges: boardData.graphEdges,
