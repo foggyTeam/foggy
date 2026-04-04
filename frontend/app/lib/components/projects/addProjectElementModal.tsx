@@ -32,13 +32,13 @@ export default function AddProjectElementModal({
   const disabledKeys: ProjectElementTypes[] = boardOnly
     ? ['SECTION']
     : sectionOnly
-      ? ['SIMPLE', 'GRAPH', 'TREE']
+      ? ['SIMPLE', 'GRAPH', 'DOC']
       : [];
   const filetypeTabs: ProjectElementTypes[] = [
     'SECTION',
     'SIMPLE',
     'GRAPH',
-    'TREE',
+    'DOC',
   ];
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function AddProjectElementModal({
       hideCloseButton
     >
       <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
-        {(onClose) =>
+        {() =>
           (
             <>
               <ModalHeader className="-mt-16 pb-0 pl-0">
@@ -84,7 +84,7 @@ export default function AddProjectElementModal({
                         | 'section'
                         | 'simple'
                         | 'graph'
-                        | 'tree'
+                        | 'doc'
                     ].new
                   }
                 </h1>
@@ -107,7 +107,7 @@ export default function AddProjectElementModal({
                         | 'section'
                         | 'simple'
                         | 'graph'
-                        | 'tree'
+                        | 'doc'
                     ].placeholder
                   }
                 />

@@ -52,6 +52,13 @@
     "requestMessage": {
       "maxLength": "Заявка не должна быть длиннее 300 символов",
       "invalidSymbols": "Заявка может состоять только из букв, цифр и специальных символов"
+    },
+    "graphNode": {
+      "maxUrlLength": "Ссылка не может быть длиннее 1024 символов",
+      "invalidUrl": "Ссылка некорректна",
+      "maxTitleLength": "Название не может быть длиннее 20 символов",
+      "maxDescriptionLength": "Описание не может быть длиннее 300 символов",
+      "invalidSymbols": "Текст может состоять только из букв, цифр и специальных символов"
     }
   },
 
@@ -186,9 +193,9 @@
         "new": "Новый граф",
         "placeholder": "Название графа"
       },
-      "tree": {
-        "new": "Новое дерево",
-        "placeholder": "Название дерева"
+      "doc": {
+        "new": "Новый документ",
+        "placeholder": "Название документа"
       },
       "create": "Создать"
     },
@@ -378,7 +385,20 @@
     "rotation": "Поворот",
     "textToolPlaceholder": "Напишите что-нибудь...",
     "linkPlaceholder": "https://hoggyfoggy.com",
-    "linkLabel": "Ссылка"
+    "linkLabel": "Ссылка",
+
+    "descriptionLabel": "Описание",
+    "descriptionPlaceholder": "Веб-приложение для тебя и твоей команды",
+    "titleLabel": "Заголовок",
+    "titlePlaceholder": "Новая запись",
+    "emptyLinkDomain": "Нет домена",
+    "emptyLink": "Нет ссылки",
+    "emptyLinkDescription": "Нет описания",
+    "selectElementPlaceholder": "Выберите элемент проекта",
+
+    "edgeLabel": "Подпись",
+    "edgeLabelPlaceholder": "Новое ребро",
+    "animateEdge": "Анимация"
   },
 
   "toolTips": {
@@ -403,9 +423,23 @@
       "layerBack": "Назад",
       "layerForward": "Вперед",
       "layerTop": "На передний слой",
-      "deleteTool": "Удалить"
+      "deleteTool": "Удалить",
+
+      "customNodeTool": "Кастомный узел",
+      "internalLinkTool": "Ссылка на другой элемент проекта",
+      "externalLinkTool": "Любая ссылка в Интернете",
+      "nodeLinkTool": "Ссылка на другой узел",
+      "toggleEdit": "Редактировать содержимое",
+      "copyNodeLink": "Скопировать ссылку на узел",
+      "edgeType": "Тип ребра",
+      "edgeArrow": "Концы ребра",
+      "edgeDash": "Пунктирное ребро",
+      "edgeLabel": "Подпись"
     },
-    "resetStage": "Сбросить смещение"
+    "resetStage": "Сбросить смещение",
+    "lockGraph": "Заморозить граф",
+    "unlockGraph": "Разморозить граф",
+    "uploadButton": "Получить временную ссылку на изображение доски"
   },
 
   "errors": {

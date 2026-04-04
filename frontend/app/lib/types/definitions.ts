@@ -17,71 +17,6 @@ export enum AvailableProviders {
 
 export type AvailableLocales = 'en' | 'ru';
 
-// BOARD
-export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'TREE';
-
-export type BoardElement =
-  | RectElement
-  | EllipseElement
-  | LineElement
-  | TextElement
-  | MarkerElement;
-
-interface BaseElement {
-  id: string;
-  type: string;
-  draggable: boolean;
-  dragDistance: 4;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-}
-
-export interface RectElement extends BaseElement {
-  type: 'rect';
-  cornerRadius: number;
-}
-
-export interface EllipseElement extends BaseElement {
-  type: 'ellipse';
-}
-
-export interface TextElement extends BaseElement {
-  // basically it is a Konva.image
-  type: 'text';
-  svg: string;
-  content: string;
-  cornerRadius: number;
-}
-
-export interface LineElement extends BaseElement {
-  type: 'line';
-  points: number[];
-  tension: number;
-  lineJoin: 'miter' | 'round' | 'bevel';
-  lineCap: 'butt' | 'round' | 'square';
-}
-
-export interface MarkerElement extends BaseElement {
-  type: 'marker';
-  points: number[];
-  opacity: number;
-}
-
-export interface Board {
-  id: string;
-  name: string;
-  type: BoardTypes;
-  layers: BoardElement[][];
-  sectionId: string;
-  lastChange: string;
-}
-
 // PROJECT
 export interface Project {
   id: string;
@@ -203,4 +138,164 @@ export interface Notification {
     inviterId?: string;
   };
   createdAt: string;
+}
+
+// BOARDS
+export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
+export type Board = SimpleBoard | GraphBoard;
+
+interface BaseBoard {
+  id: string;
+  name: string;
+  type: BoardTypes;
+  sectionId: string;
+  lastChange: string;
+}
+export interface SimpleBoard extends BaseBoard {
+  type: 'SIMPLE';
+  layers: SBoardElement[][];
+}
+
+export interface GraphBoard extends BaseBoard {
+  type: 'GRAPH';
+  graphNodes: GNode[];
+  graphEdges: GEdge[];
+}
+
+// SIMPLE BOARD
+export type SBoardElement =
+  | RectElement
+  | EllipseElement
+  | LineElement
+  | TextElement;
+
+interface SBaseElement {
+  id: string;
+  type: string;
+  draggable: boolean;
+  dragDistance: 4;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+}
+export interface RectElement extends SBaseElement {
+  type: 'rect';
+  cornerRadius: number;
+}
+export interface EllipseElement extends SBaseElement {
+  type: 'ellipse';
+}
+export interface TextElement extends SBaseElement {
+  // basically it is a Konva.image
+  type: 'text';
+  svg: string;
+  content: string;
+  cornerRadius: number;
+}
+export interface LineElement extends SBaseElement {
+  type: 'line';
+  points: number[];
+  tension: number;
+  lineJoin: 'miter' | 'round' | 'bevel';
+  lineCap: 'butt' | 'round' | 'square';
+}
+
+// GRAPH BOARD
+import type { Edge, Handle, MarkerType, Node } from '@xyflow/react';
+
+export interface GBaseNode extends Node {
+  id: string;
+  type: string;
+  position: { x: number; y: number };
+  handles?: GNodeHandle[];
+}
+
+export interface GCustomNode extends GBaseNode {
+  type: 'customNode';
+  data: {
+    title?: string;
+    description?: string;
+    shape: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
+    color?: string;
+    align: 'start' | 'center' | 'end';
+  };
+}
+
+export interface GExternalLinkNode extends GBaseNode {
+  type: 'externalLinkNode';
+  data: {
+    url?: string;
+    thumbnailUrl?: string;
+    favicon?: string;
+    domain?: string;
+    description?: string;
+  };
+}
+
+export interface GInternalLinkNode extends GBaseNode {
+  type: 'internalLinkNode';
+  data: {
+    element?: {
+      type: ProjectElementTypes;
+      title: string;
+      path: string[];
+    };
+  };
+}
+
+export interface GNodeLinkNode extends GBaseNode {
+  type: 'nodeLinkNode';
+  data: {
+    title?: string;
+    url?: string;
+    nodeId?: string;
+  };
+}
+
+export type GNode =
+  | GCustomNode
+  | GExternalLinkNode
+  | GInternalLinkNode
+  | GNodeLinkNode;
+
+interface GNodeHandle extends Handle {
+  id?: string | null;
+  nodeId: string;
+  x: number;
+  y: number;
+  type: 'source' | 'target';
+}
+
+export interface GEdge extends Edge {
+  id: string;
+  type: 'default' | 'smoothstep' | 'straight' | 'step' | 'simplebezier';
+  source: string; // source node id
+  target: string; // target node id
+  sourceHandle: string; // source node handle id
+  targetHandle: string; // target node handle id
+  label?: string;
+  style?: {
+    stroke?: string;
+    strokeWidth?: number;
+    strokeLinecap?: 'butt' | 'round' | 'square';
+    strokeDasharray?: string;
+  };
+  animated?: boolean;
+  markerStart?: {
+    type: MarkerType;
+    width: 20;
+    strokeWidth: 1.5 | 2;
+    color: string;
+  };
+  markerEnd?: {
+    type: MarkerType;
+    width: 20;
+    strokeWidth: 1.5 | 2;
+    color: string;
+  };
 }

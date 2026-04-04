@@ -1,8 +1,6 @@
-import io, { Socket } from 'socket.io-client';
-import { BoardElement } from '@/app/lib/types/definitions';
+import io from 'socket.io-client';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
 
 export default function openBoardSocketConnection(
   boardId: string,
@@ -39,36 +37,4 @@ export default function openBoardSocketConnection(
   });
 
   return socket;
-}
-
-export function socketAddEventListeners(socket: Socket) {
-  // addElement
-  socket.on('elementAdded', (newElement: BoardElement) => {
-    boardStore.addElement(newElement, true);
-  });
-  // updateElement
-  socket.on(
-    'elementUpdated',
-    (data: { id: string; newAttrs: Partial<BoardElement> }) => {
-      boardStore.updateElement(data.id, data.newAttrs, true);
-    },
-  );
-  // removeElement
-  socket.on('elementRemoved', (id: string) =>
-    boardStore.removeElement(id, true),
-  );
-  // changeElementLayer
-  socket.on(
-    'changeElementLayer',
-    (data: {
-      id: string;
-      prevPosition: { layer: number; index: number };
-      newPosition: { layer: number; index: number };
-    }) =>
-      boardStore.changeElementLayerSocket(
-        data.id,
-        data.prevPosition,
-        data.newPosition,
-      ),
-  );
 }

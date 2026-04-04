@@ -1,0 +1,81 @@
+import { EraserIcon } from 'lucide-react';
+import { Button } from '@heroui/button';
+import { useState } from 'react';
+import {
+  handleEndErasing,
+  handleErasing,
+  handleStartErasing,
+} from '@/app/lib/components/board/simple/tools/drawingHandlers';
+import settingsStore from '@/app/stores/settingsStore';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
+import useTool from '@/app/lib/hooks/simpleBoard/useTool';
+import debounce from 'lodash/debounce';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+
+export default function EraserTool() {
+  const { commonSize } = useAdaptiveParams();
+  const {
+    stageRef,
+    toolsDisabled,
+    activeTool,
+    setActiveTool,
+    removeElement,
+    allToolsDisabled,
+  } = useBoardContext();
+  const [drawing, setDrawing] = useState(false);
+
+  const mouseDownHandler = handleStartErasing({
+    stageRef,
+    activeTool,
+    setDrawing,
+  } as any);
+  const mouseMoveHandler = debounce(
+    handleErasing({
+      stageRef,
+      activeTool,
+      drawing,
+      setDrawing,
+      removeElement,
+    } as any),
+    4,
+  );
+  const mouseUpHandler = handleEndErasing({
+    drawing,
+    setDrawing,
+  } as any);
+
+  useTool({
+    toolName: 'eraser',
+    handlers: {
+      mouseDownHandler,
+      mouseMoveHandler,
+      mouseUpHandler,
+    },
+  });
+
+  return (
+    <FTooltip content={settingsStore.t.toolTips.tools.eraserTool}>
+      <Button
+        data-testid="eraser-tool-btn"
+        isDisabled={toolsDisabled || allToolsDisabled}
+        onPress={() => {
+          if (activeTool === 'eraser') setActiveTool('');
+          else setActiveTool('eraser');
+        }}
+        variant={activeTool === 'eraser' ? 'flat' : 'light'}
+        color={activeTool === 'eraser' ? 'primary' : 'default'}
+        isIconOnly
+        size={commonSize}
+      >
+        <EraserIcon
+          className={
+            activeTool === 'eraser'
+              ? 'stroke-primary-500'
+              : 'stroke-default-600'
+          }
+        />
+      </Button>
+    </FTooltip>
+  );
+}

@@ -64,7 +64,10 @@
       "deleteBoardError": "Failed to delete board",
       "deleteBoardSuccess": "Board deleted",
       "updateBoardError": "Failed to update board name",
-      "updateBoardSuccess": "Board name updated"
+      "updateBoardSuccess": "Board name updated",
+      "generateBoardImageError": "Failed to generate board image",
+      "uploadBoardImageError": "Failed to upload board image",
+      "uploadBoardImageSuccess": "Board image uploaded successfully!"
     },
     "image": {
       "deleteImageWarning": "Failed to delete the image",

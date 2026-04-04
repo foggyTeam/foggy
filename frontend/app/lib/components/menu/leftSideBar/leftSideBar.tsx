@@ -11,8 +11,10 @@ import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {
   Board,
+  GraphBoard,
   ProjectElementTypes,
   ProjectSection,
+  SimpleBoard,
 } from '@/app/lib/types/definitions';
 import {
   AddBoard,
@@ -20,11 +22,11 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
-    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}$`,
+    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}/(simple|graph|doc)$`,
   );
   const [isOpened, setIsOpened] = useState(false);
   const path = usePathname();
@@ -97,15 +99,27 @@ const LeftSideBar = observer(() => {
             }),
           )
           .then((response: { data: { id: string } }) => {
-            const newBoard: Board = {
+            const data:
+              | Pick<SimpleBoard, 'layers'>
+              | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+              | object =
+              nodeType === 'SIMPLE'
+                ? { layers: [[], [], []] }
+                : nodeType === 'GRAPH'
+                  ? { graphEdges: [], graphNodes: [] }
+                  : {};
+            const newBoard = {
               id: response.data.id,
               name: nodeName,
               type: nodeType,
-              layers: [[], [], []],
               sectionId: boardStore.activeBoard?.sectionId || '',
               lastChange: new Date().toISOString(),
             };
-            projectsStore.addProjectChild(fullParentList, newBoard, false);
+            projectsStore.addProjectChild(
+              fullParentList,
+              Object.assign(newBoard, data) as Board,
+              false,
+            );
           });
     }
     onAddChildOpenChange();
