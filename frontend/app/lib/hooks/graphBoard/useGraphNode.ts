@@ -17,7 +17,9 @@ export default function useGraphNode<T>(
   const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;
   const isSynced = useRef(true);
   const [isEditing, setIsEditing] = useState(!hasContent);
-  const errors = useRef<Record<keyof T, string | undefined>>({});
+  const errors = useRef<Record<keyof T, string | undefined>>(
+    {} as Record<keyof T, string | undefined>,
+  );
 
   const [nodeState, dispatch] = useReducer((state: T, patch: Partial<T>) => {
     isSynced.current = false;

@@ -119,7 +119,7 @@ class GraphBoardStore {
       return;
     }
 
-    const nodeData = data.nodes?.map((node) => {
+    const nodeData = data.nodes?.map((node): [string, GNode['data']] => {
       return [node.id, observable(node.data)];
     });
     this.boardNodes = observable.array(data.nodes || []);
@@ -146,7 +146,7 @@ class GraphBoardStore {
         this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
       }
       const node = this.nodesDataMap.get(nodeId);
-      Object.assign(node, newAttrs);
+      if (node) Object.assign(node, newAttrs);
     }
     if (!external)
       this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });

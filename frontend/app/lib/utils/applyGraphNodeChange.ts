@@ -3,7 +3,7 @@ import type { NodeChange } from '@xyflow/react';
 export default function applyGraphNodeChange(change: NodeChange) {
   switch (change.type) {
     case 'position':
-      const result: object = {};
+      const result: Record<string, unknown> = {};
       if (change.position !== undefined) result.position = change.position;
       if (change.dragging !== undefined) result.dragging = change.dragging;
       return result;

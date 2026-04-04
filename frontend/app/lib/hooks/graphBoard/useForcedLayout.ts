@@ -4,6 +4,7 @@ import { MouseEvent, useCallback, useEffect, useRef } from 'react';
 import {
   forceCollide,
   forceLink,
+  type ForceLink,
   forceManyBody,
   forceSimulation,
   type SimulationLinkDatum,
@@ -180,8 +181,8 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
 
         simulation.current.nodes([...sMap.values()]);
         simulation.current
-          ?.force('link')
-          .links(edges.map((e) => ({ source: e.source, target: e.target })));
+          ?.force<ForceLink<D3Node, SimulationLinkDatum<D3Node>>>('link')
+          ?.links(edges.map((e) => ({ source: e.source, target: e.target })));
 
         if (hasStructuralChanges) {
           restartFn(0.12);
@@ -304,7 +305,7 @@ export default function useForcedLayout(options: ForcedLayoutOptions = {}) {
           unpinTimeouts.current.delete(node.id);
         }, UNPIN_DELAY);
 
-        unpinTimeouts.current.set(node.id, timeoutId as number);
+        unpinTimeouts.current.set(node.id, timeoutId as unknown as number);
       });
 
       if (draggedNodes.current.size === 0)
