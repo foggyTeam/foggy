@@ -19,7 +19,6 @@ import debounce from 'lodash/debounce';
 import getLinkPreview from '@/app/lib/utils/getLinkPreview';
 import { Avatar } from '@heroui/avatar';
 import { GlobeIcon } from 'lucide-react';
-import ImagePlaceholder from '@/public/images/undraw_playful-cat_3ta5.png';
 import useGraphNode from '@/app/lib/hooks/graphBoard/useGraphNode';
 import { externalLinkNodeSchema } from '@/app/lib/types/schemas';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
@@ -118,7 +117,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         <Image
           isLoading={isLoading}
           alt="Link thumbnail"
-          src={data?.thumbnailUrl || ImagePlaceholder.src}
+          src={data?.thumbnailUrl || '/images/undraw_playful-cat_3ta5.png'}
           className="max-h-56 w-full overflow-clip"
           isZoomed
           width={208}
