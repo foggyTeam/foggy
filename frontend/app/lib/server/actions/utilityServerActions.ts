@@ -39,7 +39,7 @@ async function isSafeUrl(rawUrl: string): Promise<boolean> {
 }
 
 export async function FetchUrl(url: string) {
-  if (!isSafeUrl(url)) throw new Error('URL not allowed');
+  if (!(await isSafeUrl(url))) throw new Error('URL not allowed');
 
   return await externalGetRequest(url, {
     timeout: 5000,

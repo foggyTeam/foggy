@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { GEdge } from '@/app/lib/types/definitions';
 import StepTypeTool from '@/app/lib/components/board/graph/tools/edgeTools/stepTypeTool';
 import LineStyleTool from '@/app/lib/components/board/graph/tools/edgeTools/lineStyleTool';
@@ -30,6 +30,10 @@ export default function GraphEdgeToolbar({
     EdgeColorTool,
     LabelTool,
   ];
+
+  useEffect(() => {
+    edge.current = getEdge(edgeId);
+  }, [edgeId]);
 
   const applyChange = (newAttrs: EdgeUpdate) => {
     const updatedEdge = { ...getEdge(edgeId), ...newAttrs } as GEdge;

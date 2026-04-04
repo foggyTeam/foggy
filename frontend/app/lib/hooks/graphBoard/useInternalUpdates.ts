@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, MouseEvent } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import {
   Connection,
@@ -232,6 +232,18 @@ export default function useInternalUpdates() {
     [isDuplicatedEdge, onEdgeUpdate],
   );
 
+  const deleteNodes = useCallback(
+    (nodes: GNode[]) =>
+      nodes.forEach((node) => onNodeAction({ id: node.id, type: 'remove' })),
+    [onNodeAction],
+  );
+
+  const deleteEdges = useCallback(
+    (edges: GEdge[]) =>
+      edges.forEach((edge) => onEdgeAction({ id: edge.id, type: 'remove' })),
+    [onEdgeAction],
+  );
+
   // CLEANUP
   useEffect(() => {
     return () => {
@@ -247,8 +259,10 @@ export default function useInternalUpdates() {
     reconnectEdge,
     onNodeAction,
     onNodeUpdate,
+    deleteNodes,
     onEdgeAction,
     onEdgeUpdate,
+    deleteEdges,
     emitSelectionChange,
   };
 }

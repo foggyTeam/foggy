@@ -62,12 +62,8 @@ function GraphBoard() {
   const [initialNodes] = useState(() => toJS(graphBoardStore.boardNodes)!);
   const [initialEdges] = useState(() => toJS(graphBoardStore.boardEdges)!);
 
-  const {
-    toolCursor,
-    deleteSelectedElements,
-    allToolsDisabled,
-    toolsDisabled,
-  } = useGraphBoardContext();
+  const { toolCursor, allToolsDisabled, toolsDisabled } =
+    useGraphBoardContext();
 
   const { onSelectionChange } = useGraphBoardSelection();
 
@@ -78,9 +74,11 @@ function GraphBoard() {
   const {
     createNode,
     createEdge,
+    deleteNodes,
     reconnectEdge,
     onNodeUpdate,
     onEdgeUpdate,
+    deleteEdges,
     emitSelectionChange,
   } = useInternalUpdates();
 
@@ -147,7 +145,8 @@ function GraphBoard() {
         onPaneClick={createNode}
         onConnect={createEdge}
         onReconnect={reconnectEdge}
-        onDelete={deleteSelectedElements}
+        onNodesDelete={deleteNodes}
+        onEdgesDelete={deleteEdges}
         panOnDrag={[2]}
         deleteKeyCode={allToolsDisabled ? null : ['Delete', 'Backspace', 'Del']}
         selectionOnDrag={!isMobile}

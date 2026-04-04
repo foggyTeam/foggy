@@ -57,19 +57,32 @@ export default async function getLinkPreview(
   let title: string | null = null;
   let description: string | null = null;
 
-  const data = await FetchUrl(url);
+  try {
+    const data = await FetchUrl(url);
 
-  if (data) {
-    let raw = matchFirst(data, ogImageRegex);
-    if (raw && !raw.startsWith('http')) raw = new URL(raw, origin).href;
-    thumbnail = raw;
+    if (data) {
+      let raw = matchFirst(data, ogImageRegex);
+      if (raw && !raw.startsWith('http')) raw = new URL(raw, origin).href;
+      thumbnail = raw;
 
-    title =
-      matchFirst(data, ogTitleRegex) ?? data.match(titleTagRegex)?.[1] ?? null;
+      title =
+        matchFirst(data, ogTitleRegex) ??
+        data.match(titleTagRegex)?.[1] ??
+        null;
 
-    description =
-      matchFirst(data, ogDescRegex) ?? matchFirst(data, metaDescRegex);
+      description =
+        matchFirst(data, ogDescRegex) ?? matchFirst(data, metaDescRegex);
+    }
+
+    return {
+      domain: hostname,
+      favicon,
+      preview: thumbnail,
+      title,
+      description,
+    };
+  } catch (e: any) {
+    console.error('Failed to load link data');
+    return null;
   }
-
-  return { domain: hostname, favicon, preview: thumbnail, title, description };
 }
