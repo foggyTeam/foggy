@@ -67,7 +67,7 @@ export default function BoardCard({
     start();
     settingsStore.startLoading();
     router.push(
-      `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}`,
+      `${projectsStore.activeProject?.id}/${board.sectionId}/${board.id}/${board.type.toLowerCase()}`,
     );
   }
 

@@ -2,15 +2,18 @@
 
 import { Tooltip } from '@heroui/tooltip';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { JSX } from 'react';
 
 export default function FTooltip({
   content,
   children,
   placement,
+  showArrow = true,
 }: {
-  content: string;
+  content: string | JSX.Element;
   children: any;
   placement?: any;
+  showArrow?: boolean;
 }) {
   const { isMobile } = useAdaptiveParams();
 
@@ -18,7 +21,7 @@ export default function FTooltip({
 
   return (
     <Tooltip
-      showArrow
+      showArrow={showArrow}
       classNames={{
         base: 'before:shadow-container',
         content: 'shadow-container',

@@ -9,7 +9,7 @@ import settingsStore from '@/app/stores/settingsStore';
 const NotFound = observer(() => {
   const regexMap = {
     board: {
-      regex: /project\/[^\/]+\/[^\/]+\/[^\/]+$/,
+      regex: /project\/[^\/]+\/[^\/]+\/[^\/]+\/(simple|graph|doc)$/,
       text: settingsStore.t.projects.notFoundBoard,
     },
     section: {

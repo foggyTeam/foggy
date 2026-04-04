@@ -129,7 +129,7 @@ export default class ProjectPageFixture {
   async addBoard(
     name: string,
     parentList: string[],
-    type: 'simple' | 'graph' | 'tree' = 'simple',
+    type: 'simple' | 'graph' | 'doc' = 'simple',
   ) {
     const parent = await this.findProjectElement(parentList);
     await parent.hover();
@@ -156,7 +156,7 @@ export default class ProjectPageFixture {
 
   async checkPathExists(
     path: string[],
-    type: 'section' | 'simple' | 'graph' | 'tree' = 'simple',
+    type: 'section' | 'simple' | 'graph' | 'doc' = 'simple',
     create: boolean = true,
   ) {
     try {

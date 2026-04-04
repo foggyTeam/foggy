@@ -88,9 +88,9 @@ export default class BoardPageFixture {
     this.viewportHeight = viewport?.height ?? 600;
   }
 
-  async goto(projectId: string, sectionId: string, boardId: string) {
+  async goto(projectId: string, sectionId: string, boardId: string, boardType: 'graph' | 'doc' | 'simple') {
     await this.page.goto(
-      `${BASE_URL}/project/${projectId}/${sectionId}/${boardId}`,
+      `${BASE_URL}/project/${projectId}/${sectionId}/${boardId}/${boardType}`,
     );
   }
 

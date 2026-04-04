@@ -9,7 +9,6 @@ import { GetAllProjects } from '@/app/lib/server/actions/projectServerActions';
 import { GetUserById } from '@/app/lib/server/actions/userServerActions';
 import NotificationsLoader from '@/app/lib/components/dataLoaders/notificationsLoader';
 import { User } from 'next-auth';
-import BoardLoadingCard from '@/app/lib/components/board/boardLoadingCard';
 import { GetAllTeams } from '@/app/lib/server/actions/teamServerActions';
 import NavBar from '@/app/lib/components/menu/mobileNavBar/navBar';
 
@@ -61,7 +60,6 @@ export default async function MainLayout({
       <ProjectsLoader projectsData={userProjects} />
       <TeamsLoader teamsData={userTeams} />
       <NotificationsLoader />
-      <BoardLoadingCard />
 
       <div className="flex h-full w-full flex-col">
         <section className="hidden sm:block">

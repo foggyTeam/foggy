@@ -29,7 +29,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { Spinner } from '@heroui/spinner';
 import { addToast } from '@heroui/toast';
-import boardStore from '@/app/stores/boardStore';
+import boardStore from '@/app/stores/board/boardStore';
 
 const OpenedLeftSideBar = observer(
   ({
@@ -153,7 +153,7 @@ const OpenedLeftSideBar = observer(
       else {
         settingsStore.startLoading();
         router.push(
-          `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}`,
+          `/project/${projectsStore.activeProject?.id}/${child.sectionId}/${child.id}/${child.type.toLowerCase()}`,
         );
       }
     };

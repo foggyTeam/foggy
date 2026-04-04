@@ -1,5 +1,5 @@
 import {
-  Board,
+  SimpleBoard,
   Project,
   ProjectSection,
   RawProject,
@@ -12,12 +12,12 @@ export function ConvertRawSection(rawSection: any): ProjectSection {
   ): Map<
     string,
     | ProjectSection
-    | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+    | Pick<SimpleBoard, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
   > {
     const childMap = observable.map<
       string,
       | ProjectSection
-      | Pick<Board, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
+      | Pick<SimpleBoard, 'id' | 'name' | 'sectionId' | 'type' | 'lastChange'>
     >();
 
     (rawChildren || []).forEach((child: any) => {
