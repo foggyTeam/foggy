@@ -1,4 +1,5 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+import path from 'path';
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
 import {
@@ -28,6 +29,8 @@ import {
   finalFlushAndDelete,
   startSnapshotTimer,
 } from './snapshot';
+
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -306,5 +309,5 @@ cursors.on('connection', (rawSocket) => {
 httpServer.listen(PORT, () => {
   console.info(`sync_service running on port ${PORT}`);
   console.info(`  CORS origin : ${FRONTEND_ORIGIN}`);
-  console.info(`  Backend URL : ${process.env.BACKEND_URL ?? '(not set)'}`);
+  console.info(`  Backend URL : ${process.env.BACKEND_URI ?? '(not set)'}`);
 });
