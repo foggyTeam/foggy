@@ -4,7 +4,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 
 const PORT = Number(process.env.PORT) || 1234;
 
-/**HTTP Server has only /health endpoint for Render's healthcheck.**/
+/** HTTP Server has only /health endpoint for Render's healthcheck **/
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/health') {
     res.writeHead(200);
