@@ -29,6 +29,7 @@ import {
   finalFlushAndDelete,
   startSnapshotTimer,
 } from './snapshot';
+import { attachDocWebSocketServer } from './doc';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -273,6 +274,7 @@ cursors.on('connection', (rawSocket) => {
 });
 
 // START
+attachDocWebSocketServer(httpServer);
 httpServer.listen(PORT, () => {
   console.info(`sync_service running on port ${PORT}`);
   console.info(`  CORS origin : ${FRONTEND_ORIGIN}`);
