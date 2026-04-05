@@ -30,16 +30,17 @@ class BoardStore {
         type: board.type.toUpperCase() as BoardTypes,
       } as Board;
 
-      this.connectSocket(this.activeBoard.id || '');
+      this.connectSocket(this.activeBoard.id || '', this.activeBoard.type);
     }
   };
 
-  connectSocket(boardId: string) {
+  connectSocket(boardId: string, boardType: BoardTypes) {
     if (!userStore.user?.id) return;
     this.disconnectSocket();
     if (boardId) {
       this.boardWebsocket = openBoardSocketConnection(
         boardId,
+        boardType,
         userStore.user.id,
       );
     } else

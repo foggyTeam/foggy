@@ -4,20 +4,18 @@
   "private": true,
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
+    "dev": "tsx watch --env-file=../../.env src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node --env-file=../../.env dist/server.js"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
     "socket.io": "^4.8.1",
-    "ws": "^8.20.0",
     "y-websocket": "^2.1.0",
     "yjs": "^13.6.30"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",
-    "@types/ws": "^8.18.1",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
