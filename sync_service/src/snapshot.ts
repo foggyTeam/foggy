@@ -2,7 +2,7 @@ import { GraphBoardState, Room, SimpleBoardState } from './types';
 
 const SNAPSHOT_INTERVAL_MS = 10_000;
 
-// ─── Initial state fetch ─────────────────────────────────────────────────────
+// INITIAL STATE
 
 /**
  * Fetches the last saved snapshot from the backend REST API.
@@ -38,8 +38,7 @@ export async function fetchInitialSnapshot(
   }
 }
 
-// ─── Snapshot flush ──────────────────────────────────────────────────────────
-
+// Snapshot flush
 /**
  * POSTs the current in-memory state to the backend.
  * Clears the dirty flag on success.
@@ -74,7 +73,7 @@ export async function flushSnapshot(room: Room): Promise<void> {
   }
 }
 
-// ─── Interval scheduler ──────────────────────────────────────────────────────
+// Interval scheduler
 
 /**
  * Starts a periodic flush timer for the room.

@@ -31,7 +31,6 @@ export interface ElementsClientData {
 }
 
 // IN-MEMORY STATE
-
 export interface SimpleBoardState {
   /** Array-of-layers; each layer is an ordered array of elements */
   layers: any[][];
@@ -43,7 +42,6 @@ export interface GraphBoardState {
 }
 
 // ROOMS
-
 export interface Room {
   boardId: string;
   type: BoardType;
@@ -56,7 +54,6 @@ export interface Room {
 }
 
 // SOCKET
-
 /** socket.io Socket extended with our data shape (elements namespace) */
 export type ElementsSocket = Socket & { data: ElementsClientData };
 

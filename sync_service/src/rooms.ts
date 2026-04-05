@@ -1,7 +1,5 @@
 import { BoardType, GraphBoardState, Room, SimpleBoardState } from './types';
 
-// ─── Room registry ───────────────────────────────────────────────────────────
-
 const rooms = new Map<string, Room>();
 
 export function getOrCreateRoom(boardId: string, type: BoardType): Room {
@@ -26,15 +24,14 @@ export function deleteRoom(boardId: string): void {
   const room = rooms.get(boardId);
   if (room?.snapshotTimer) clearInterval(room.snapshotTimer);
   rooms.delete(boardId);
-  console.info(`[rooms] deleted room ${boardId}`);
+  console.warn(`[rooms] deleted room ${boardId}`);
 }
 
 export function markDirty(room: Room): void {
   room.dirty = true;
 }
 
-// ─── SIMPLE state mutations ──────────────────────────────────────────────────
-
+// SIMPLE state mutations
 export function simpleAddElement(state: SimpleBoardState, element: any): void {
   if (!state.layers.length) state.layers.push([]);
   state.layers[state.layers.length - 1].push(element);
@@ -75,17 +72,15 @@ export function simpleChangeElementLayer(
   const [element] = srcLayer.splice(prevPos.index, 1);
   if (!element) return;
 
-  // Ensure target layer exists
   while (state.layers.length <= newPos.layer) state.layers.push([]);
   state.layers[newPos.layer].splice(newPos.index, 0, element);
 }
 
-// ─── GRAPH state mutations ───────────────────────────────────────────────────
-//
-// ReactFlow sends NodeChange[] / EdgeChange[] with types:
-//   'add' | 'remove' | 'position' | 'dimensions' | 'select' | 'reset' (nodes)
-//   'add' | 'remove' | 'select' | 'reset' (edges)
-//
+// GRAPH state mutations
+
+// NodeChange[] / EdgeChange[]
+// 'add' | 'remove' | 'position' | 'dimensions' | 'select' | 'reset' (nodes)
+// 'add' | 'remove' | 'select' | 'reset' (edges)
 
 export function graphApplyNodeChanges(
   state: GraphBoardState,

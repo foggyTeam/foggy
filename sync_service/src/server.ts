@@ -32,13 +32,11 @@ import {
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// ─── Config ──────────────────────────────────────────────────────────────────
-
 const PORT = Number(process.env.PORT) || 1234;
 const FRONTEND_ORIGIN = process.env.FRONTEND_URI ?? '*';
+const BACKEND_ORIGIN = process.env.BACKEND_URI ?? '(not set)';
 
-// ─── HTTP server (only /health for Render healthcheck) ───────────────────────
-
+// HTTP SERVER
 const httpServer = http.createServer((req, res) => {
   if (req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -49,26 +47,21 @@ const httpServer = http.createServer((req, res) => {
   res.end();
 });
 
-// ─── Socket.IO server ────────────────────────────────────────────────────────
-
+// Socket.IO SERVER
 const io = new IOServer(httpServer, {
   cors: {
     origin: FRONTEND_ORIGIN,
     methods: ['GET', 'POST'],
     credentials: true,
   },
-  // Disconnect stale sockets quickly to keep in-memory rooms lean
   pingTimeout: 20_000,
   pingInterval: 25_000,
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Namespace: /elements
-//  Used for all board-element operations (SIMPLE + GRAPH boards).
-//  Auth:    socket.handshake.auth.boardId
-//           socket.handshake.auth.boardType  (optional, e.g. "SIMPLE"|"GRAPH")
-//  Headers: x-user-id
-// ─────────────────────────────────────────────────────────────────────────────
+// BOARD OPERATIONS
+// Auth:    socket.handshake.auth.boardId
+//          socket.handshake.auth.boardType  (optional, e.g. "SIMPLE"|"GRAPH")
+// Headers: x-user-id
 
 const elements = io.of('/elements');
 
@@ -95,16 +88,13 @@ elements.on('connection', async (rawSocket) => {
   const socket = rawSocket as ElementsSocket;
   const { boardId, userId } = socket.data;
 
-  // Infer board type from auth (fallback to SIMPLE)
   const authType = (
     socket.handshake.auth as { boardType?: string }
   ).boardType?.toUpperCase() as BoardType | undefined;
   const boardType: BoardType = authType ?? 'SIMPLE';
 
-  // Join the socket.io room named by boardId
   socket.join(boardId);
 
-  // Create room if first visitor; load initial state from backend
   const isNew = !getRoom(boardId);
   const room = getOrCreateRoom(boardId, boardType);
 
@@ -114,7 +104,6 @@ elements.on('connection', async (rawSocket) => {
     if (initialState) {
       room.state = initialState;
     } else {
-      // Bootstrap empty state so mutations have something to work with
       if (boardType === 'SIMPLE') {
         room.state = { layers: [[]] } satisfies SimpleBoardState;
       } else if (boardType === 'GRAPH') {
@@ -127,16 +116,12 @@ elements.on('connection', async (rawSocket) => {
     `[elements] user ${userId} joined board ${boardId} (${boardType}), total in room: ${(await elements.in(boardId).fetchSockets()).length}`,
   );
 
-  // ─────────────────────────────────────────────────────────────────────────
   //  SIMPLE board events
-  // ─────────────────────────────────────────────────────────────────────────
-
   socket.on('addElement', (element: any) => {
     if (room.type !== 'SIMPLE' || !element) return;
     const state = room.state as SimpleBoardState;
     simpleAddElement(state, element);
     markDirty(room);
-    // Broadcast to all *other* clients in the room
     socket.to(boardId).emit('elementAdded', element);
   });
 
@@ -175,15 +160,11 @@ elements.on('connection', async (rawSocket) => {
         data.newPosition,
       );
       markDirty(room);
-      // Note: frontend listens on 'changeElementLayer' (not 'elementMoved')
       socket.to(boardId).emit('changeElementLayer', data);
     },
   );
 
-  // ─────────────────────────────────────────────────────────────────────────
   //  GRAPH board events
-  // ─────────────────────────────────────────────────────────────────────────
-
   socket.on('nodesUpdate', (changes: any[]) => {
     if (room.type !== 'GRAPH' || !Array.isArray(changes)) return;
     const state = room.state as GraphBoardState;
@@ -220,35 +201,26 @@ elements.on('connection', async (rawSocket) => {
     },
   );
 
-  // ─────────────────────────────────────────────────────────────────────────
   //  Disconnect
-  // ─────────────────────────────────────────────────────────────────────────
-
   socket.on('disconnect', async () => {
     console.info(`[elements] user ${userId} left board ${boardId}`);
 
-    // Count remaining sockets in the room (after this one has left)
     const remaining = await elements.in(boardId).fetchSockets();
     if (remaining.length === 0) {
-      console.info(`[elements] room ${boardId} is empty — flushing snapshot`);
+      console.info(`[elements] room ${boardId} is empty - flushing snapshot`);
       await finalFlushAndDelete(room, deleteRoom);
     }
   });
 });
 
-// ─────────────────────────────────────────────────────────────────────────────
-//  Namespace: / (root)
-//  Used for cursor position broadcasting.
-//  Auth: { id, nickname, avatar, color, boardId }
-// ─────────────────────────────────────────────────────────────────────────────
-
+// CURSORS
+// Auth: { id, nickname, avatar, color, boardId }
 const cursors = io.of('/');
 
 cursors.use((socket, next) => {
   const auth = socket.handshake.auth as Partial<CursorClientData>;
 
   if (!auth.id || !auth.nickname || !auth.color || !auth.boardId) {
-    // Allow connection but without joining a board (e.g. healthcheck probes)
     return next();
   }
 
@@ -267,14 +239,11 @@ cursors.on('connection', (rawSocket) => {
   const socket = rawSocket as CursorSocket;
   const { id, nickname, avatar, color, boardId } = socket.data ?? {};
 
-  if (!boardId) return; // no board → nothing to do
+  if (!boardId) return;
 
   socket.join(boardId);
   console.info(`[cursors] ${nickname} (${id}) joined board ${boardId}`);
 
-  // ── cursorMove ────────────────────────────────────────────────────────────
-  // Frontend sends: { id, nickname, color, x, y }
-  // We re-broadcast with avatar added (stored in auth)
   socket.on(
     'cursorMove',
     (data: {
@@ -292,7 +261,6 @@ cursors.on('connection', (rawSocket) => {
     },
   );
 
-  // ── disconnect ────────────────────────────────────────────────────────────
   socket.on('disconnect', () => {
     console.info(`[cursors] ${nickname} (${id}) left board ${boardId}`);
     socket.to(boardId).emit('userDisconnected', {
@@ -304,10 +272,9 @@ cursors.on('connection', (rawSocket) => {
   });
 });
 
-// ─── Boot ─────────────────────────────────────────────────────────────────────
-
+// START
 httpServer.listen(PORT, () => {
   console.info(`sync_service running on port ${PORT}`);
   console.info(`  CORS origin : ${FRONTEND_ORIGIN}`);
-  console.info(`  Backend URL : ${process.env.BACKEND_URI ?? '(not set)'}`);
+  console.info(`  Backend URL : ${BACKEND_ORIGIN}`);
 });
