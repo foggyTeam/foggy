@@ -12,10 +12,10 @@
     "dotenv": "^17.2.3",
     "socket.io": "^4.8.1",
     "y-websocket": "^2.1.0",
-    "yjs": "^13.6.30"
+    "yjs": "^13.6.30",
+    "@types/node": "^25.5.2"
   },
   "devDependencies": {
-    "@types/node": "^25.5.2",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
