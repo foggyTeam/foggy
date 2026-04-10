@@ -1,5 +1,5 @@
-import React from 'react';
+import DocBoardClientWrapper from '@/app/lib/components/board/doc/docBoardClientWrapper';
 
 export default async function DocBoardPage() {
-  return <p>Doc page</p>;
+  return <DocBoardClientWrapper />;
 }
