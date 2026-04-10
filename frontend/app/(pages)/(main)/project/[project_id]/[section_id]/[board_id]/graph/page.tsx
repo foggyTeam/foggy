@@ -1,5 +1,5 @@
 import GraphBoardClientWrapper from '@/app/lib/components/board/graph/graphBoardClientWrapper';
 
-export default async function GraphBoardPage() {
+export default function GraphBoardPage() {
   return <GraphBoardClientWrapper />;
 }

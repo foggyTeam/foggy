@@ -2,11 +2,11 @@
 
 import io from 'socket.io-client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import userStore from '@/app/stores/userStore';
-import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
+import { useOnViewportChange, useReactFlow } from '@xyflow/react';
 import throttle from 'lodash/throttle';
 import { observer } from 'mobx-react-lite';
 import boardStore from '@/app/stores/board/boardStore';
+import userStore from '@/app/stores/userStore';
 import CursorChip, {
   CursorColor,
   cursorColors,
@@ -19,12 +19,11 @@ type CursorData = {
   color: CursorColor;
 };
 
-const Cursors = observer(() => {
-  const { stageRef, updateCursorsRef } = useBoardContext();
+const GraphBoardCursors = observer(() => {
+  const { screenToFlowPosition, flowToScreenPosition } = useReactFlow();
 
   const [cursorIds, setCursorIds] = useState<string[]>([]);
   const cursorIdsRef = useRef<string[]>([]);
-
   useEffect(() => {
     cursorIdsRef.current = cursorIds;
   }, [cursorIds]);
@@ -38,35 +37,17 @@ const Cursors = observer(() => {
   );
 
   const redraw = useCallback(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const container = stage.container();
-    const rect = container.getBoundingClientRect();
-    const s = stage.scaleX();
-    const offsetX = stage.x();
-    const offsetY = stage.y();
-
     for (const id of cursorIdsRef.current) {
       const el = nodeRef.current[id];
       const data = cursorsRef.current.get(id);
       if (!el || !data) continue;
 
-      const screenX = rect.left + (data.x * s + offsetX);
-      const screenY = rect.top + (data.y * s + offsetY);
-
-      el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0) scale(${s})`;
+      const { x, y } = flowToScreenPosition({ x: data.x, y: data.y });
+      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     }
-  }, [stageRef]);
+  }, [flowToScreenPosition]);
 
-  useEffect(() => {
-    updateCursorsRef.current = redraw;
-    requestAnimationFrame(redraw);
-
-    return () => {
-      if (updateCursorsRef.current === redraw) updateCursorsRef.current = null;
-    };
-  }, [updateCursorsRef, redraw]);
+  useOnViewportChange({ onChange: redraw });
 
   useEffect(() => {
     const boardId = boardStore.activeBoard?.id;
@@ -82,19 +63,14 @@ const Cursors = observer(() => {
       reconnectionDelay: 1000,
     });
 
-    const handleMouseMove = (_: MouseEvent) => {
-      const stage = stageRef.current;
-      if (!stage) return;
-
-      const relative = stage.getRelativePointerPosition();
-      if (!relative) return;
-
+    const handleMouseMove = (e: MouseEvent) => {
+      const { x, y } = screenToFlowPosition({ x: e.clientX, y: e.clientY });
       socket.emit('cursorMove', {
         id: userId,
         nickname,
         color: userColor,
-        x: relative.x,
-        y: relative.y,
+        x,
+        y,
       });
     };
 
@@ -122,10 +98,8 @@ const Cursors = observer(() => {
             redraw();
             return prev;
           }
-
-          const next = [...prev, data.id];
           requestAnimationFrame(redraw);
-          return next;
+          return [...prev, data.id];
         });
 
         redraw();
@@ -135,28 +109,24 @@ const Cursors = observer(() => {
     socket.on('userDisconnected', (data: { id: string }) => {
       cursorsRef.current.delete(data.id);
       nodeRef.current[data.id] = null;
-
       setCursorIds((prev) => prev.filter((id) => id !== data.id));
-
       requestAnimationFrame(redraw);
     });
 
     return () => {
       document.removeEventListener('mousemove', throttledMouseMove);
       throttledMouseMove.cancel();
-
       socket.off('cursorMove');
       socket.off('userDisconnected');
       socket.disconnect();
     };
-  }, [boardStore.activeBoard?.id, stageRef, userColor, redraw]);
+  }, [boardStore.activeBoard?.id, userColor, screenToFlowPosition, redraw]);
 
   return (
     <>
       {cursorIds.map((id) => {
         const data = cursorsRef.current.get(id);
         if (!data) return null;
-
         return (
           <CursorChip
             key={id}
@@ -173,4 +143,4 @@ const Cursors = observer(() => {
   );
 });
 
-export default Cursors;
+export default GraphBoardCursors;
