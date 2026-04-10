@@ -12,7 +12,7 @@ const SNAPSHOT_INTERVAL_MS = 10_000;
 export async function fetchInitialSnapshot(
   boardId: string,
 ): Promise<SimpleBoardState | GraphBoardState | null> {
-  const backendUrl = process.env.BACKEND_URL;
+  const backendUrl = process.env.BACKEND_URI;
   if (!backendUrl) return null;
 
   try {
@@ -46,7 +46,7 @@ export async function fetchInitialSnapshot(
 export async function flushSnapshot(room: Room): Promise<void> {
   if (!room.dirty || !room.state) return;
 
-  const backendUrl = process.env.BACKEND_URL;
+  const backendUrl = process.env.BACKEND_URI;
   if (!backendUrl) return;
 
   try {
