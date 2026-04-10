@@ -115,7 +115,7 @@ export function startSnapshotTimer(room: Room): void {
 
   room.snapshotTimer = setInterval(async () => {
     if (room.dirty) await flushSnapshot(room);
-  }, SNAPSHOT_INTERVAL_MS) as number;
+  }, SNAPSHOT_INTERVAL_MS);
 }
 
 /**

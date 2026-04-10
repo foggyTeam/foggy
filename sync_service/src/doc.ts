@@ -1,10 +1,10 @@
 import { WebSocket, WebSocketServer } from 'ws';
 import http from 'http';
 import * as Y from 'yjs';
-import { setPersistence, setupWSConnection } from 'y-websocket/bin/utils';
 import { LeveldbPersistence } from 'y-leveldb';
 import path from 'path';
 import { flushDocSnapshot } from './snapshot';
+import { setPersistence, setupWSConnection } from 'y-websocket/bin/utils';
 
 const persistence = new LeveldbPersistence(
   path.resolve(__dirname, '../yjs-data'),
