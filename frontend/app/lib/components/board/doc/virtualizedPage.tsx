@@ -5,7 +5,7 @@ import { ScrollShadow } from '@heroui/scroll-shadow';
 import React, { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
-const MOCK_BLOCKS: any[] = Array.from({ length: 50 }, (_, i) => ({
+const MOCK_BLOCKS: any[] = Array.from({ length: 1000 }, (_, i) => ({
   id: `block-${i}`,
   type: 'paragraph',
 }));
@@ -28,10 +28,9 @@ const VirtualizedPage = observer(() => {
             key={MOCK_BLOCKS[virtualItem.index].id}
             data-index={virtualItem.index}
             ref={virtualizer.measureElement}
+            className="absolute w-full py-1"
             style={{
-              position: 'absolute',
               top: virtualItem.start,
-              width: '100%',
             }}
           >
             <DocBlock block={MOCK_BLOCKS[virtualItem.index]} />

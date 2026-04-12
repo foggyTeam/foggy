@@ -3,6 +3,10 @@
   padding: 16px;
 }
 
+.p-0 .ql-editor {
+  padding: 0;
+}
+
 .ql-container.ql-snow {
   border: none;
   padding: 0;

@@ -14,13 +14,14 @@ interface Props {
 export default function DocBlock({ block }: Props) {
   const quillRef = useRef<QuillType | null>(null);
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
+  // TODO: actual content per block is from observer
   const [content, setContent] = useState(`${block.id} ${block.type}`);
 
   const { activeQuillRef, setSelectionFormat } = useDocBoardContext();
 
   useEffect(() => {
-    if (quillRef.current) {
-      quillRef.current.innerHTML = content || '';
+    if (editorContainerRef.current) {
+      editorContainerRef.current.innerHTML = content || '';
 
       import('quill').then((QuillModule) => {
         const Quill = QuillModule.default ?? QuillModule;
@@ -48,10 +49,17 @@ export default function DocBlock({ block }: Props) {
         });
       });
     }
-  }, [setContent]);
+    return () => {
+      quillRef.current?.off('selection-change');
+      quillRef.current?.off('text-change');
+      quillRef.current = null;
+      if (editorContainerRef.current) {
+        editorContainerRef.current.innerHTML = '';
+      }
+    };
+  }, []);
 
   function handleFocus() {
-    console.log('focus');
     activeQuillRef.current = quillRef.current;
   }
 
@@ -59,7 +67,7 @@ export default function DocBlock({ block }: Props) {
     <div
       onFocus={handleFocus}
       ref={editorContainerRef}
-      className="quill-editor-container caret-f_accent h-fit min-h-[32px] w-full"
+      className="quill-editor-container caret-f_accent h-fit min-h-[20px] w-full items-center p-0"
     />
   );
 }
