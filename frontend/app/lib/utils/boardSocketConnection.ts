@@ -8,13 +8,18 @@ export default function openBoardSocketConnection(
   boardType: BoardTypes,
   userId: string,
 ) {
-  const socket = io(`${process.env.NEXT_PUBLIC_SYNC_URI}/elements`, {
+  const socketUrl =
+    boardType !== 'DOC'
+      ? `${process.env.NEXT_PUBLIC_SYNC_URI}/elements`
+      : `${process.env.NEXT_PUBLIC_SYNC_URI}/doc`;
+  const socket = io(socketUrl, {
     auth: {
       boardId,
       boardType,
     },
     extraHeaders: {
       'x-user-id': userId,
+      'x-api-key': process.env.SYNC_VERIFICATION_KEY,
     },
     reconnectionAttempts: 3,
     reconnectionDelay: 1000,

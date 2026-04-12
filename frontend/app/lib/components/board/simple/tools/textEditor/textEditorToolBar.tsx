@@ -136,7 +136,7 @@ export default function TextEditorToolBar({
     <div
       className={clsx(
         bg_container_no_padding,
-        'flex flex-wrap justify-start gap-1 p-2 sm:h-14 sm:w-fit sm:flex-nowrap sm:p-3',
+        'flex h-fit w-full flex-wrap items-center justify-start gap-1 p-2 sm:h-14 sm:w-fit sm:flex-nowrap sm:p-3',
       )}
     >
       {tools.base.map((tool, index) => {
@@ -151,7 +151,11 @@ export default function TextEditorToolBar({
           />
         );
       })}
-      <Divider key={`base`} orientation={`vertical`} />
+      <Divider
+        key={`base`}
+        orientation="vertical"
+        className="h-12 border-none outline-none sm:h-10"
+      />
 
       <EditorToolButton
         id={tools.link.id}
@@ -165,7 +169,11 @@ export default function TextEditorToolBar({
         restoreSelection={restoreSelection}
       />
 
-      <Divider key={`link`} orientation={`vertical`} />
+      <Divider
+        key={`link`}
+        orientation={`vertical`}
+        className="h-12 border-none outline-none sm:h-10"
+      />
 
       {tools.color.map((tool, index) => {
         return (
@@ -184,7 +192,11 @@ export default function TextEditorToolBar({
         );
       })}
 
-      <Divider key={`color`} orientation={`vertical`} />
+      <Divider
+        key={`color`}
+        orientation="vertical"
+        className="h-12 border-none outline-none sm:h-10"
+      />
 
       {tools.dropdown.map((dropdown, index) => {
         return (
@@ -204,7 +216,11 @@ export default function TextEditorToolBar({
         );
       })}
 
-      <Divider key={`clear`} orientation={`vertical`} />
+      <Divider
+        key={`clear`}
+        orientation="vertical"
+        className="h-12 border-none outline-none sm:h-10"
+      />
 
       <EditorToolButton
         id={tools.clear.id}

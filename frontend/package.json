@@ -51,11 +51,11 @@
     "@next/env": "^15.5.12",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/d3-force": "^3.0.10",
     "@types/lodash": "^4.17.23",
     "@types/node": "^20.19.33",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/d3-force": "^3.0.10",
     "@xyflow/react": "^12.10.1",
     "add": "^2.0.6",
     "aws-sdk": "^2.1693.0",
@@ -91,6 +91,9 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
+    "y-quill": "^1.0.0",
+    "y-websocket": "^2.1.0",
+    "yjs": "^13.6.30",
     "zod": "^3.25.76"
   },
   "devDependencies": {
