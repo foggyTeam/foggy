@@ -43,7 +43,6 @@ class DocBoardStore {
   // WEBSOCKET
   private socketAddEventListeners(socket: Socket) {
     socket.on('docSync', (update: ArrayBuffer) => {
-      console.log('sync');
       if (this.yDoc) Y.applyUpdate(this.yDoc, new Uint8Array(update), 'sync');
     });
 
@@ -61,6 +60,7 @@ class DocBoardStore {
   }
 
   private socketRemoveEventListeners(socket: Socket) {
+    socket.off('docSync');
     socket.off('docUpdate');
     socket.off('awarenessUpdate');
   }

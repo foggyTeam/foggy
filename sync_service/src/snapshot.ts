@@ -4,7 +4,7 @@ import {
   GraphBoardState,
   Room,
   SimpleBoardState,
-} from './types';
+} from './types.js';
 
 const SNAPSHOT_INTERVAL_MS = 10_000;
 

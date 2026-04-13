@@ -1,4 +1,4 @@
-import { BoardType, GraphBoardState, Room, SimpleBoardState } from './types';
+import { BoardType, GraphBoardState, Room, SimpleBoardState } from './types.js';
 
 const rooms = new Map<string, Room>();
 

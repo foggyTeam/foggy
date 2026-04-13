@@ -40,9 +40,11 @@ export function DocBoardProvider({ children }: { children: ReactNode }) {
   };
 
   const restoreSelection = () => {
-    if (activeQuillRef.current && savedSelection) {
+    if (!activeQuillRef.current) return;
+
+    if (savedSelection) {
       requestAnimationFrame(() =>
-        activeQuillRef.current.setSelection(savedSelection),
+        activeQuillRef.current?.setSelection(savedSelection),
       );
     }
   };

@@ -7,7 +7,7 @@ import {
   ElementsSocket,
   GraphBoardState,
   SimpleBoardState,
-} from '../types';
+} from '../types.js';
 import {
   deleteRoom,
   getOrCreateRoom,
@@ -20,12 +20,12 @@ import {
   simpleChangeElementLayer,
   simpleRemoveElement,
   simpleUpdateElement,
-} from '../rooms';
+} from '../rooms.js';
 import {
   fetchInitialSnapshot,
   finalFlushAndDelete,
   startSnapshotTimer,
-} from '../snapshot';
+} from '../snapshot.js';
 
 export function registerElementsNamespace(io: IOServer): void {
   const elements = io.of('/elements');
@@ -78,7 +78,7 @@ export function registerElementsNamespace(io: IOServer): void {
         }
       } else {
         if (initialState) {
-          room.state = initialState;
+          room.state = initialState as GraphBoardState | SimpleBoardState;
         } else {
           room.state =
             boardType === 'GRAPH'
@@ -174,7 +174,8 @@ export function registerElementsNamespace(io: IOServer): void {
 
     // DOC
     socket.on('docUpdate', (update: ArrayBuffer) => {
-      if (room.type !== 'DOC' || !room.state?.yDoc) return;
+      if (room.type !== 'DOC' || !('yDoc' in room.state) || !room.state?.yDoc)
+        return;
 
       Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
       markDirty(room);

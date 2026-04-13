@@ -2,9 +2,9 @@ import dotenv from 'dotenv';
 import path from 'path';
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { handleHttpRequest } from './http/router';
-import { registerElementsNamespace } from './namespaces/elements';
-import { registerCursorsNamespace } from './namespaces/cursors';
+import { handleHttpRequest } from './http/router.js';
+import { registerElementsNamespace } from './namespaces/elements.js';
+import { registerCursorsNamespace } from './namespaces/cursors.js';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 

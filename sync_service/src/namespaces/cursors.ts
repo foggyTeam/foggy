@@ -1,5 +1,5 @@
 import { Server as IOServer } from 'socket.io';
-import { CursorClientData, CursorSocket } from '../types';
+import { CursorClientData, CursorSocket } from '../types.js';
 
 export function registerCursorsNamespace(io: IOServer): void {
   const cursors = io.of('/');

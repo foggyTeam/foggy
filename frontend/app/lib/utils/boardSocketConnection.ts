@@ -16,7 +16,7 @@ export default function openBoardSocketConnection(
     },
     extraHeaders: {
       'x-user-id': userId,
-      'x-api-key': process.env.SYNC_VERIFICATION_KEY,
+      'x-api-key': process.env.SYNC_VERIFICATION_KEY as string,
     },
     reconnectionAttempts: 3,
     reconnectionDelay: 1000,

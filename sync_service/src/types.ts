@@ -44,7 +44,7 @@ export interface GraphBoardState {
 
 export interface DocBoardState {
   document: number[]; // JSON-serializable массив байт
-  yDoc: Y.Doc; // инстанс документа в памяти сервера
+  yDoc: Y.Doc | undefined; // инстанс документа в памяти сервера
 }
 
 // ROOMS
