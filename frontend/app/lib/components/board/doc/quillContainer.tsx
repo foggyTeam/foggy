@@ -8,9 +8,10 @@ import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardConte
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
-  const [content, setContent] = useState('');
+  const [content, _] = useState('');
 
-  const { activeQuillRef, setSelectionFormat } = useDocBoardContext();
+  const { activeQuillRef, onSelectionChange, onTextChange } =
+    useDocBoardContext();
 
   useEffect(() => {
     if (editorContainerRef.current) {
@@ -29,26 +30,15 @@ export default function QuillContainer() {
 
         activeQuillRef.current = quill;
 
-        quill.on('selection-change', () => {
-          if (quill.getSelection()) {
-            const format = quill.getFormat();
-            setSelectionFormat(format);
-          }
-        });
-
-        quill.on('text-change', () => {
-          const content = quill.root.innerHTML;
-          setContent(content);
-        });
+        quill.on('selection-change', onSelectionChange);
+        quill.on('text-change', onTextChange);
       });
     }
     return () => {
       activeQuillRef.current?.off('selection-change');
       activeQuillRef.current?.off('text-change');
       activeQuillRef.current = null;
-      if (editorContainerRef.current) {
-        editorContainerRef.current.innerHTML = '';
-      }
+      if (editorContainerRef.current) editorContainerRef.current.innerHTML = '';
     };
   }, []);
 
