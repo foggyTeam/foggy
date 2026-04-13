@@ -2,11 +2,15 @@
 
 import 'quill/dist/quill.core.css';
 import '@/app/lib/components/board/simple/tools/textEditor/quillOverrides.css';
+import Quill from 'quill';
+import QuillCursors from 'quill-cursors';
 import { useEffect, useRef } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
 import docBoardStore from '@/app/stores/board/docBoardStore';
 import { QuillBinding } from 'y-quill';
+
+Quill.register('modules/cursors', QuillCursors);
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
@@ -16,30 +20,27 @@ export default function QuillContainer() {
 
   useEffect(() => {
     if (editorContainerRef.current) {
-      import('quill').then((QuillModule) => {
-        if (docBoardStore.yText === null || docBoardStore.awareness === null)
-          return;
-        const Quill = QuillModule.default ?? QuillModule;
+      if (docBoardStore.yText === null || docBoardStore.awareness === null)
+        return;
 
-        const quill = new Quill(editorContainerRef.current, {
-          theme: 'snow',
-          modules: {
-            toolbar: false,
-            cursors: true,
-          },
-          placeholder: settingsStore.t.toolBar.textToolPlaceholder,
-        });
-
-        activeQuillRef.current = quill;
-
-        bindingRef.current = new QuillBinding(
-          docBoardStore.yText,
-          quill,
-          docBoardStore.awareness,
-        );
-
-        quill.on('selection-change', onSelectionChange);
+      const quill = new Quill(editorContainerRef.current, {
+        theme: 'snow',
+        modules: {
+          toolbar: false,
+          cursors: true,
+        },
+        placeholder: settingsStore.t.toolBar.textToolPlaceholder,
       });
+
+      activeQuillRef.current = quill;
+
+      bindingRef.current = new QuillBinding(
+        docBoardStore.yText,
+        quill,
+        docBoardStore.awareness,
+      );
+
+      quill.on('selection-change', onSelectionChange);
     }
     return () => {
       bindingRef.current?.destroy();
