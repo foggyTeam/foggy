@@ -5,17 +5,10 @@ import '@/app/lib/components/board/simple/tools/textEditor/quillOverrides.css';
 import { useEffect, useRef, useState } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
-import QuillType from 'quill';
 
-interface Props {
-  block: any;
-}
-
-export default function DocBlock({ block }: Props) {
-  const quillRef = useRef<QuillType | null>(null);
+export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
-  // TODO: actual content per block is from observer
-  const [content, setContent] = useState(`${block.id} ${block.type}`);
+  const [content, setContent] = useState('');
 
   const { activeQuillRef, setSelectionFormat } = useDocBoardContext();
 
@@ -34,7 +27,7 @@ export default function DocBlock({ block }: Props) {
           placeholder: settingsStore.t.toolBar.textToolPlaceholder,
         });
 
-        quillRef.current = quill;
+        activeQuillRef.current = quill;
 
         quill.on('selection-change', () => {
           if (quill.getSelection()) {
@@ -50,24 +43,19 @@ export default function DocBlock({ block }: Props) {
       });
     }
     return () => {
-      quillRef.current?.off('selection-change');
-      quillRef.current?.off('text-change');
-      quillRef.current = null;
+      activeQuillRef.current?.off('selection-change');
+      activeQuillRef.current?.off('text-change');
+      activeQuillRef.current = null;
       if (editorContainerRef.current) {
         editorContainerRef.current.innerHTML = '';
       }
     };
   }, []);
 
-  function handleFocus() {
-    activeQuillRef.current = quillRef.current;
-  }
-
   return (
     <div
-      onFocus={handleFocus}
       ref={editorContainerRef}
-      className="quill-editor-container caret-f_accent h-fit min-h-[20px] w-full items-center p-0"
+      className="caret-f_accent flex w-full flex-1 flex-col p-0 [&>.ql-editor]:flex-1"
     />
   );
 }

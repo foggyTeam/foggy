@@ -6,8 +6,9 @@ import TextEditorToolBar from '@/app/lib/components/board/simple/tools/textEdito
 import React from 'react';
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
-import VirtualizedPage from '@/app/lib/components/board/doc/virtualizedPage';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
+import { ScrollShadow } from '@heroui/scroll-shadow';
+import QuillContainer from '@/app/lib/components/board/doc/quillContainer';
 
 export default function DocBoard() {
   const {
@@ -33,7 +34,11 @@ export default function DocBoard() {
           'flex h-full w-full overflow-hidden sm:px-8',
         )}
       >
-        <VirtualizedPage />
+        <ScrollShadow className="h-full w-full overflow-y-auto">
+          <div className="relative flex min-h-full flex-col pb-8">
+            <QuillContainer />
+          </div>
+        </ScrollShadow>
       </div>
     </>
   );

@@ -270,9 +270,6 @@ importers:
       '@tailwindcss/postcss':
         specifier: ^4.1.18
         version: 4.1.18
-      '@tanstack/react-virtual':
-        specifier: ^3.13.23
-        version: 3.13.23(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/d3-force':
         specifier: ^3.0.10
         version: 3.0.10
@@ -301,8 +298,8 @@ importers:
         specifier: ^1.15.0
         version: 1.15.0
       canvas:
-        specifier: 3.0.0-rc3
-        version: 3.0.0-rc3
+        specifier: ^3.2.3
+        version: 3.2.3
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -325,14 +322,8 @@ importers:
         specifier: ^9.3.22
         version: 9.3.22
       lodash:
-        specifier: ^4.17.23
-        version: 4.17.23
-      lodash.debounce:
-        specifier: ^4.0.8
-        version: 4.0.8
-      lodash.throttle:
-        specifier: ^4.1.1
-        version: 4.1.1
+        specifier: ^4.18.1
+        version: 4.18.1
       lucide-react:
         specifier: ^0.471.2
         version: 0.471.2(react@18.3.1)
@@ -3382,17 +3373,8 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
-  '@tanstack/react-virtual@3.13.23':
-    resolution: {integrity: sha512-XnMRnHQ23piOVj2bzJqHrRrLg4r+F86fuBcwteKfbIjJrtGxb4z7tIvPVAe4B+4UVwo9G4Giuz5fmapcrnZ0OQ==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
   '@tanstack/virtual-core@3.11.3':
     resolution: {integrity: sha512-v2mrNSnMwnPJtcVqNvV0c5roGCBqeogN8jDtgtuHCphdwBasOZ17x8UV8qpHUh+u0MLfX43c0uUHKje0s+Zb0w==}
-
-  '@tanstack/virtual-core@3.13.23':
-    resolution: {integrity: sha512-zSz2Z2HNyLjCplANTDyl3BcdQJc2k1+yyFoKhNRmCr7V7dY8o8q5m8uFTI1/Pg1kL+Hgrz6u3Xo6eFUB7l66cg==}
 
   '@tokenizer/inflate@0.2.7':
     resolution: {integrity: sha512-MADQgmZT1eKjp06jpI2yozxaU9uVs4GzzgSL+uEq7bVcJ9V1ZXQkeGNql1fsSI0gMy1vhvNTNbUqrx+pZfJVmg==}
@@ -4193,8 +4175,8 @@ packages:
   caniuse-lite@1.0.30001769:
     resolution: {integrity: sha512-BCfFL1sHijQlBGWBMuJyhZUhzo7wer5sVj9hqekB/7xn0Ypy+pER/edCYQm4exbXj4WiySGp40P8UuTh6w1srg==}
 
-  canvas@3.0.0-rc3:
-    resolution: {integrity: sha512-LJVkMp4AH7/IRoLvhLS6R09uBt9O3O0mhCYL34AQV/+OC39jmTv22pJTF5Mgfa3V2JnzGl21MVrhEKmtmPtfQA==}
+  canvas@3.2.3:
+    resolution: {integrity: sha512-PzE5nJZPz72YUAfo8oTp0u3fqqY7IzlTubneAihqDYAUcBk7ryeCmBbdJBEdaH0bptSOe2VT2Zwcb3UaFyaSWw==}
     engines: {node: ^18.12.0 || >= 20.9.0}
 
   chai@5.3.3:
@@ -4528,10 +4510,6 @@ packages:
 
   decimal.js@10.6.0:
     resolution: {integrity: sha512-YpgQiITW3JXGntzdUmyUR1V812Hn8T1YVXhCu+wO3OpS4eU9l4YdD3qjyiKdV6mvV29zapkMeD390UVEf2lkUg==}
-
-  decompress-response@4.2.1:
-    resolution: {integrity: sha512-jOSne2qbyE+/r8G1VU+G/82LBs2Fs4LAsTiLSHOCOMZQl2OKZ6i8i4IyHemTe+/yIXOtTcRQMzPcgyhoFlqPkw==}
-    engines: {node: '>=8'}
 
   decompress-response@6.0.0:
     resolution: {integrity: sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==}
@@ -6021,14 +5999,14 @@ packages:
   lodash.once@4.1.1:
     resolution: {integrity: sha512-Sb487aTOCr9drQVL8pIxOzVhafOjZN9UU54hiN8PU3uAiSV7lx1yYNpbNmex2PK6dSJoNTSJUUswT651yww3Mg==}
 
-  lodash.throttle@4.1.1:
-    resolution: {integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==}
-
   lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   lodash@4.17.23:
     resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
+
+  lodash@4.18.1:
+    resolution: {integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==}
 
   log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}
@@ -6146,10 +6124,6 @@ packages:
   mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
-
-  mimic-response@2.1.0:
-    resolution: {integrity: sha512-wXqjST+SLt7R009ySCglWBCFpjUygmCIfD790/kVbiGmUgfYGuB14PiTd5DwVxSV4NcYHjzMkoj5LjQZwTQLEA==}
-    engines: {node: '>=8'}
 
   mimic-response@3.1.0:
     resolution: {integrity: sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==}
@@ -6362,8 +6336,8 @@ packages:
       react: '>= 16.0.0'
       react-dom: '>= 16.0.0'
 
-  node-abi@3.87.0:
-    resolution: {integrity: sha512-+CGM1L1CgmtheLcBuleyYOn7NWPVu0s0EJH2C4puxgEZb9h8QpR9G2dBfZJOAUhi7VQxuBPMd0hiISWcTyiYyQ==}
+  node-abi@3.89.0:
+    resolution: {integrity: sha512-6u9UwL0HlAl21+agMN3YAMXcKByMqwGx+pq+P76vii5f7hTPtKDp08/H9py6DY+cfDw7kQNTGEj/rly3IgbNQA==}
     engines: {node: '>=10'}
 
   node-abort-controller@3.1.1:
@@ -6635,6 +6609,7 @@ packages:
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
+    deprecated: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
     hasBin: true
 
   prelude-ls@1.2.1:
@@ -6744,8 +6719,8 @@ packages:
   prr@1.0.1:
     resolution: {integrity: sha512-yPw4Sng1gWghHQWj0B3ZggWUm4qVbPwPFcRG8KyxiU7J2OHFSoEHKS+EZ3fv5l1t9CyCiop6l/ZYeWbrgoQejw==}
 
-  pump@3.0.3:
-    resolution: {integrity: sha512-todwxLMY7/heScKmntwQG8CXVkWUOdYxIvY2s0VWAAMh/nd8SoYiRaKjlr7+iCs984f2P8zvrfWcDDYVb73NfA==}
+  pump@3.0.4:
+    resolution: {integrity: sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==}
 
   punycode@1.3.2:
     resolution: {integrity: sha512-RofWgt/7fL5wP1Y7fxE7/EmTLzQVnB0ycyibJ0OOHIlJqTNzglYFxVwETOcIoJqJmpDXJ9xImDv+Fq34F/d4Dw==}
@@ -7084,9 +7059,6 @@ packages:
 
   simple-concat@1.0.1:
     resolution: {integrity: sha512-cSFtAPtRhljv69IK0hTVZQ+OfE9nePi/rtJmw5UjHeVyVroEqJXP1sFztKUy1qU+xvz3u/sfYJLa947b7nAN2Q==}
-
-  simple-get@3.1.1:
-    resolution: {integrity: sha512-CQ5LTKGfCpvE1K0n2us+kuMPbk/q0EKl82s4aheV9oXjFEz6W/Y7oQFVJuU6QG77hRT4Ghb5RURteF5vnWjupA==}
 
   simple-get@4.0.1:
     resolution: {integrity: sha512-brv7p5WgH0jmQJr1ZDDfKDOSeWWg+OVypG99A/5vYGPqJ6pxiaHLy8nxtFjBA7oMa01ebA9gfh1uMCFqOuXxvA==}
@@ -12185,15 +12157,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@tanstack/react-virtual@3.13.23(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
-    dependencies:
-      '@tanstack/virtual-core': 3.13.23
-      react: 18.3.1
-      react-dom: 18.3.1(react@18.3.1)
-
   '@tanstack/virtual-core@3.11.3': {}
-
-  '@tanstack/virtual-core@3.13.23': {}
 
   '@tokenizer/inflate@0.2.7':
     dependencies:
@@ -13242,11 +13206,10 @@ snapshots:
 
   caniuse-lite@1.0.30001769: {}
 
-  canvas@3.0.0-rc3:
+  canvas@3.2.3:
     dependencies:
       node-addon-api: 7.1.1
       prebuild-install: 7.1.3
-      simple-get: 3.1.1
 
   chai@5.3.3:
     dependencies:
@@ -13551,10 +13514,6 @@ snapshots:
       supports-color: 10.2.2
 
   decimal.js@10.6.0: {}
-
-  decompress-response@4.2.1:
-    dependencies:
-      mimic-response: 2.1.0
 
   decompress-response@6.0.0:
     dependencies:
@@ -15550,11 +15509,11 @@ snapshots:
 
   lodash.once@4.1.1: {}
 
-  lodash.throttle@4.1.1: {}
-
   lodash@4.17.21: {}
 
   lodash@4.17.23: {}
+
+  lodash@4.18.1: {}
 
   log-symbols@4.1.0:
     dependencies:
@@ -15646,8 +15605,6 @@ snapshots:
   mime@2.6.0: {}
 
   mimic-fn@2.1.0: {}
-
-  mimic-response@2.1.0: {}
 
   mimic-response@3.1.0: {}
 
@@ -15822,7 +15779,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  node-abi@3.87.0:
+  node-abi@3.89.0:
     dependencies:
       semver: 7.7.4
 
@@ -16084,8 +16041,8 @@ snapshots:
       minimist: 1.2.8
       mkdirp-classic: 0.5.3
       napi-build-utils: 2.0.0
-      node-abi: 3.87.0
-      pump: 3.0.3
+      node-abi: 3.89.0
+      pump: 3.0.4
       rc: 1.2.8
       simple-get: 4.0.1
       tar-fs: 2.1.4
@@ -16140,7 +16097,7 @@ snapshots:
   prr@1.0.1:
     optional: true
 
-  pump@3.0.3:
+  pump@3.0.4:
     dependencies:
       end-of-stream: 1.4.5
       once: 1.4.0
@@ -16597,12 +16554,6 @@ snapshots:
 
   simple-concat@1.0.1: {}
 
-  simple-get@3.1.1:
-    dependencies:
-      decompress-response: 4.2.1
-      once: 1.4.0
-      simple-concat: 1.0.1
-
   simple-get@4.0.1:
     dependencies:
       decompress-response: 6.0.0
@@ -16885,7 +16836,7 @@ snapshots:
     dependencies:
       chownr: 1.1.4
       mkdirp-classic: 0.5.3
-      pump: 3.0.3
+      pump: 3.0.4
       tar-stream: 2.2.0
 
   tar-stream@2.2.0:
