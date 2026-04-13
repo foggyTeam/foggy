@@ -8,10 +8,7 @@ export default function openBoardSocketConnection(
   boardType: BoardTypes,
   userId: string,
 ) {
-  const socketUrl =
-    boardType !== 'DOC'
-      ? `${process.env.NEXT_PUBLIC_SYNC_URI}/elements`
-      : `${process.env.NEXT_PUBLIC_SYNC_URI}/doc`;
+  const socketUrl = `${process.env.NEXT_PUBLIC_SYNC_URI}/elements`;
   const socket = io(socketUrl, {
     auth: {
       boardId,

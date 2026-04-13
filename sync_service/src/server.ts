@@ -5,7 +5,6 @@ import { Server as IOServer } from 'socket.io';
 import { handleHttpRequest } from './http/router';
 import { registerElementsNamespace } from './namespaces/elements';
 import { registerCursorsNamespace } from './namespaces/cursors';
-import { attachDocWebSocketServer } from './namespaces/doc';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -27,7 +26,6 @@ const io = new IOServer(httpServer, {
 
 registerElementsNamespace(io);
 registerCursorsNamespace(io);
-attachDocWebSocketServer(httpServer);
 
 httpServer.listen(PORT, () => {
   console.info(`sync_service running on port ${PORT}`);

@@ -1,4 +1,5 @@
 import type { Socket } from 'socket.io';
+import type * as Y from 'yjs';
 
 // BOARD TYPES
 export type BoardType = 'SIMPLE' | 'GRAPH' | 'DOC';
@@ -41,13 +42,17 @@ export interface GraphBoardState {
   edges: any[];
 }
 
+export interface DocBoardState {
+  document: number[]; // JSON-serializable массив байт
+  yDoc: Y.Doc; // инстанс документа в памяти сервера
+}
+
 // ROOMS
 export interface Room {
   boardId: string;
   type: BoardType;
   /** Current in-memory snapshot; null until first event or initial fetch */
-  state: SimpleBoardState | GraphBoardState | null;
-  /** True when state has changed since the last POST to the backend */
+  state: SimpleBoardState | GraphBoardState | DocBoardState | null;
   dirty: boolean;
   /** setInterval handle for periodic snapshot flushing */
   snapshotTimer: ReturnType<typeof setInterval> | null;

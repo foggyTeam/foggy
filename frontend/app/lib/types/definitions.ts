@@ -164,7 +164,6 @@ export interface GraphBoard extends BaseBoard {
 
 export interface DocBoard extends BaseBoard {
   type: 'DOC';
-  document: number[] | ArrayBuffer;
 }
 
 // SIMPLE BOARD

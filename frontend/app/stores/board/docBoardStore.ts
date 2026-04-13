@@ -42,6 +42,11 @@ class DocBoardStore {
 
   // WEBSOCKET
   private socketAddEventListeners(socket: Socket) {
+    socket.on('docSync', (update: ArrayBuffer) => {
+      console.log('sync');
+      if (this.yDoc) Y.applyUpdate(this.yDoc, new Uint8Array(update), 'sync');
+    });
+
     socket.on('docUpdate', (update: ArrayBuffer) => {
       if (this.yDoc) {
         Y.applyUpdate(this.yDoc, new Uint8Array(update), this);
@@ -63,9 +68,7 @@ class DocBoardStore {
   // YJS
   private handleDocUpdate = (update: Uint8Array, origin: any) => {
     // TODO: think on 'origin'
-    if (origin !== this) {
-      socketRef?.emit('docUpdate', update);
-    }
+    if (origin !== this) socketRef?.emit('docUpdate', update);
   };
 
   private handleAwarenessUpdate = (
@@ -80,7 +83,7 @@ class DocBoardStore {
   };
 
   // GENERAL
-  setDocData(document: number[] | ArrayBuffer | undefined) {
+  setDocData(data: true | undefined) {
     if (this.yDoc) {
       this.yDoc.off('update', this.handleDocUpdate);
       this.awareness?.off('update', this.handleAwarenessUpdate);
@@ -92,7 +95,7 @@ class DocBoardStore {
       this.awareness = null;
     }
 
-    if (document === undefined) return;
+    if (!data) return;
 
     this.yDoc = new Y.Doc();
     this.yText = this.yDoc.getText('quill-content');
@@ -100,8 +103,6 @@ class DocBoardStore {
 
     this.yDoc.on('update', this.handleDocUpdate);
     this.awareness.on('update', this.handleAwarenessUpdate);
-
-    Y.applyUpdate(this.yDoc, new Uint8Array(document));
   }
 }
 

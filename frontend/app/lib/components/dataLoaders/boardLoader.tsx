@@ -55,14 +55,13 @@ const BoardLoader = ({
         });
       }
 
-      if (boardData.type === 'doc') {
-        docBoardStore.setDocData(boardData.document);
-      }
+      if (boardData.type === 'doc') docBoardStore.setDocData(true);
     }
     return () => {
       boardStore.setActiveBoard(undefined);
       simpleBoardStore.setBoardLayers(undefined);
       graphBoardStore.setGraphData(undefined);
+      docBoardStore.setDocData(undefined);
     };
   }, [sectionData, boardData]);
 
