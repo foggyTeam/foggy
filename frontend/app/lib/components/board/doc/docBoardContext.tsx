@@ -12,8 +12,8 @@ import React, {
 import QuillType from 'quill';
 
 interface DocBoardContextProps {
-  // ACTIVE BLOCK
-  activeQuillRef: RefObject<QuillType>;
+  // ACTIVE QUILL
+  activeQuillRef: RefObject<QuillType | null>;
 
   // SELECTION
   onSelectionChange: () => void;
@@ -22,21 +22,20 @@ interface DocBoardContextProps {
   setSavedSelection: (value: any) => void;
   saveSelection: () => void;
   restoreSelection: () => void;
-
-  // CONTENT
-  onTextChange: () => void;
 }
 
 const BoardContext = createContext<DocBoardContextProps | undefined>(undefined);
 
 export function DocBoardProvider({ children }: { children: ReactNode }) {
-  const activeQuillRef = useRef<any>(null);
+  const activeQuillRef = useRef<QuillType | null>(null);
 
   const [selectionFormat, setSelectionFormat] = useState<any>({});
   const [savedSelection, setSavedSelection] = useState<any>(null);
 
   const saveSelection = () => {
-    const range = activeQuillRef.current?.getSelection();
+    if (!activeQuillRef.current) return;
+
+    const range = activeQuillRef.current.getSelection();
     if (range) setSavedSelection(range);
   };
 
@@ -49,16 +48,12 @@ export function DocBoardProvider({ children }: { children: ReactNode }) {
   };
 
   const onSelectionChange = useCallback(() => {
+    if (!activeQuillRef.current) return;
     if (activeQuillRef.current.getSelection()) {
       const format = activeQuillRef.current.getFormat();
       setSelectionFormat(format);
     }
   }, [setSelectionFormat]);
-
-  const onTextChange = useCallback(() => {
-    const content = activeQuillRef.current.root.innerHTML;
-    console.log(content);
-  }, []);
 
   return (
     <BoardContext.Provider
@@ -72,8 +67,6 @@ export function DocBoardProvider({ children }: { children: ReactNode }) {
         setSavedSelection,
         saveSelection,
         restoreSelection,
-        // CONTENT
-        onTextChange,
       }}
     >
       {children}

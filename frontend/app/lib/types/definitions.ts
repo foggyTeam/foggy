@@ -142,7 +142,7 @@ export interface Notification {
 
 // BOARDS
 export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
-export type Board = SimpleBoard | GraphBoard;
+export type Board = SimpleBoard | GraphBoard | DocBoard;
 
 interface BaseBoard {
   id: string;
@@ -160,6 +160,11 @@ export interface GraphBoard extends BaseBoard {
   type: 'GRAPH';
   graphNodes: GNode[];
   graphEdges: GEdge[];
+}
+
+export interface DocBoard extends BaseBoard {
+  type: 'DOC';
+  document: number[] | ArrayBuffer;
 }
 
 // SIMPLE BOARD

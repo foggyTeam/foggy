@@ -7,6 +7,7 @@ import {
 import { notFound } from 'next/navigation';
 import BoardLoadingCard from '@/app/lib/components/board/boardLoadingCard';
 import { GraphBoard } from '@/app/lib/types/definitions';
+import * as Y from 'yjs';
 
 interface BoardLayoutProps {
   project_id: string;
@@ -297,6 +298,21 @@ const GraphMockData: Pick<GraphBoard, 'graphEdges' | 'graphNodes'> = {
   ],
 };
 
+const generateMockDocData = () => {
+  const doc = new Y.Doc();
+  const text = doc.getText('quill-content');
+
+  text.insert(0, 'Добро пожаловать в текстовую доску Foggy! 📝\n');
+  text.insert(
+    text.length,
+    'Здесь вы можете редактировать текст совместно в реальном времени.\n',
+  );
+
+  text.format(0, 45, { bold: true, color: 'purple' });
+
+  return Array.from(Y.encodeStateAsUpdate(doc));
+};
+
 async function getSection(
   project_id: string,
   section_id: string,
@@ -311,6 +327,8 @@ async function getBoard(board_id: string): Promise<any | undefined> {
   if (!board) notFound();
   // TODO: remove when real data saved
   if (board.type === 'graph') return Object.assign(board, GraphMockData);
+  if (board.type === 'doc')
+    return Object.assign(board, { document: generateMockDocData() });
   return board;
 }
 

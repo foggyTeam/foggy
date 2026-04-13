@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import {
   Board,
   BoardTypes,
+  DocBoard,
   GraphBoard,
   SimpleBoard,
 } from '@/app/lib/types/definitions';
@@ -11,12 +12,16 @@ import projectsStore from '@/app/stores/projectsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import docBoardStore from '@/app/stores/board/docBoardStore';
 
 type Normalized<T extends Board> = Omit<T, 'type'> & {
   type: Lowercase<T['type']>;
   sectionIds: string[];
 };
-type BoardData = Normalized<SimpleBoard> | Normalized<GraphBoard>;
+type BoardData =
+  | Normalized<SimpleBoard>
+  | Normalized<GraphBoard>
+  | Normalized<DocBoard>;
 
 const BoardLoader = ({
   boardData,
@@ -48,6 +53,10 @@ const BoardLoader = ({
           nodes: boardData.graphNodes,
           edges: boardData.graphEdges,
         });
+      }
+
+      if (boardData.type === 'doc') {
+        docBoardStore.setDocData(boardData.document);
       }
     }
     return () => {

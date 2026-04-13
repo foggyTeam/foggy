@@ -2,41 +2,50 @@
 
 import 'quill/dist/quill.core.css';
 import '@/app/lib/components/board/simple/tools/textEditor/quillOverrides.css';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
+import docBoardStore from '@/app/stores/board/docBoardStore';
+import { QuillBinding } from 'y-quill';
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
-  const [content, _] = useState('');
+  const bindingRef = useRef<QuillBinding | null>(null);
 
-  const { activeQuillRef, onSelectionChange, onTextChange } =
-    useDocBoardContext();
+  const { activeQuillRef, onSelectionChange } = useDocBoardContext();
 
   useEffect(() => {
     if (editorContainerRef.current) {
-      editorContainerRef.current.innerHTML = content || '';
-
       import('quill').then((QuillModule) => {
+        if (docBoardStore.yText === null || docBoardStore.awareness === null)
+          return;
         const Quill = QuillModule.default ?? QuillModule;
 
         const quill = new Quill(editorContainerRef.current, {
           theme: 'snow',
           modules: {
             toolbar: false,
+            cursors: true,
           },
           placeholder: settingsStore.t.toolBar.textToolPlaceholder,
         });
 
         activeQuillRef.current = quill;
 
+        bindingRef.current = new QuillBinding(
+          docBoardStore.yText,
+          quill,
+          docBoardStore.awareness,
+        );
+
         quill.on('selection-change', onSelectionChange);
-        quill.on('text-change', onTextChange);
       });
     }
     return () => {
+      bindingRef.current?.destroy();
+      bindingRef.current = null;
+
       activeQuillRef.current?.off('selection-change');
-      activeQuillRef.current?.off('text-change');
       activeQuillRef.current = null;
       if (editorContainerRef.current) editorContainerRef.current.innerHTML = '';
     };

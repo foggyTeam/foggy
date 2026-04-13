@@ -89,8 +89,8 @@
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
+    "y-protocols": "^1.0.7",
     "y-quill": "^1.0.0",
-    "y-websocket": "^2.1.0",
     "yjs": "^13.6.30",
     "zod": "^3.25.76"
   },
