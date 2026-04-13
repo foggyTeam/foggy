@@ -2,26 +2,30 @@
 
 import 'quill/dist/quill.core.css';
 import '@/app/lib/components/board/simple/tools/textEditor/quillOverrides.css';
-import Quill from 'quill';
-import QuillCursors from 'quill-cursors';
 import { useEffect, useRef } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
 import docBoardStore from '@/app/stores/board/docBoardStore';
 import { QuillBinding } from 'y-quill';
-
-Quill.register('modules/cursors', QuillCursors);
+import { addToast } from '@heroui/toast';
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
   const bindingRef = useRef<QuillBinding | null>(null);
-
   const { activeQuillRef, onSelectionChange } = useDocBoardContext();
 
-  useEffect(() => {
-    if (editorContainerRef.current) {
-      if (docBoardStore.yText === null || docBoardStore.awareness === null)
-        return;
+  async function initializeQuill() {
+    if (docBoardStore.yText === null || docBoardStore.awareness === null)
+      return;
+
+    try {
+      const QuillModule = await import('quill');
+      const QuillCursorsModule = await import('quill-cursors');
+
+      const Quill = QuillModule.default ?? QuillModule;
+      const QuillCursors = QuillCursorsModule.default ?? QuillCursorsModule;
+
+      Quill.register('modules/cursors', QuillCursors);
 
       const quill = new Quill(editorContainerRef.current, {
         theme: 'snow',
@@ -37,18 +41,30 @@ export default function QuillContainer() {
       bindingRef.current = new QuillBinding(
         docBoardStore.yText,
         quill,
-        docBoardStore.awareness,
+        docBoardStore.awareness!,
       );
 
       quill.on('selection-change', onSelectionChange);
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.board.quillError,
+      });
     }
+  }
+
+  useEffect(() => {
+    if (editorContainerRef.current) initializeQuill();
+
     return () => {
       bindingRef.current?.destroy();
       bindingRef.current = null;
-
       activeQuillRef.current?.off('selection-change');
       activeQuillRef.current = null;
-      if (editorContainerRef.current) editorContainerRef.current.innerHTML = '';
+      if (editorContainerRef.current) {
+        editorContainerRef.current.innerHTML = '';
+      }
     };
   }, []);
 
