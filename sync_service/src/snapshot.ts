@@ -63,7 +63,8 @@ export async function flushSnapshot(room: Room): Promise<void> {
   let payload: any = room.state;
 
   if (room.type === 'DOC' && 'yDoc' in room.state && room.state.yDoc) {
-    const documentData = Array.from(Y.encodeStateAsUpdate(room.state.yDoc));
+    const update = Y.encodeStateAsUpdate(room.state.yDoc);
+    const documentData = Buffer.from(update).toString('base64');
     payload = { document: documentData };
   }
 

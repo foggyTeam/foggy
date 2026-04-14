@@ -67,14 +67,19 @@ export function registerElementsNamespace(io: IOServer): void {
 
       // Initializing DOC boards
       if (boardType === 'DOC') {
-        room.state = { yDoc: new Y.Doc(), document: [] };
+        room.state = { yDoc: new Y.Doc(), document: '' } as DocBoardState;
         if (initialState && 'document' in initialState) {
           const docState: DocBoardState = {
             document: initialState.document,
             yDoc: room.state.yDoc,
           };
-          if (docState.document && docState.document.length > 0)
-            Y.applyUpdate(room.state.yDoc, new Uint8Array(docState.document));
+          if (
+            typeof docState.document === 'string' &&
+            docState.document.length > 0
+          ) {
+            const update = Buffer.from(docState.document, 'base64');
+            Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
+          }
         }
       } else {
         if (initialState) {
@@ -177,9 +182,15 @@ export function registerElementsNamespace(io: IOServer): void {
       if (room.type !== 'DOC' || !('yDoc' in room.state) || !room.state?.yDoc)
         return;
 
-      Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
-      markDirty(room);
-      socket.to(boardId).emit('docUpdate', update);
+      try {
+        Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
+        markDirty(room);
+        socket.to(boardId).emit('docUpdate', update);
+      } catch (err) {
+        console.error(
+          `[elements] Invalid Yjs update from user ${userId} in room ${boardId}`,
+        );
+      }
     });
 
     socket.on('awarenessUpdate', (update: ArrayBuffer) => {

@@ -43,7 +43,7 @@ export interface GraphBoardState {
 }
 
 export interface DocBoardState {
-  document: number[]; // JSON-serializable массив байт
+  document: string; // Base64 строка
   yDoc: Y.Doc | undefined; // инстанс документа в памяти сервера
 }
 

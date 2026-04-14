@@ -63,7 +63,10 @@ const BoardLoader = ({
           themeColorsList[
             1 + Math.floor(Math.random() * (themeColorsList.length - 1))
           ];
-        docBoardStore.setDocData({ color, name: userStore.user.name });
+        docBoardStore.setDocData({
+          color,
+          name: userStore.user.name ?? 'Unknown user',
+        });
       }
     }
     return () => {

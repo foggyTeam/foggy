@@ -51,11 +51,11 @@ export default function QuillContainer() {
     }
   }
 
-  async function onTextChange(delta, oldDelta, source) {
+  async function onTextChange(delta: any, oldDelta: any, source: string) {
     if (activeQuillRef.current === null || source !== Quill.sources.USER)
       return;
 
-    const deletedOps = delta.ops.filter((op) => op.delete);
+    const deletedOps = delta.ops.filter((op: any) => op.delete);
 
     if (deletedOps.length > 0) {
       const deletedDelta = activeQuillRef.current.getContents().diff(oldDelta);
@@ -63,7 +63,7 @@ export default function QuillContainer() {
       await Promise.all(
         deletedDelta.ops.map((op) => {
           if (op.insert && typeof op.insert === 'object' && op.insert.image) {
-            const deletedImageUrl = op.insert.image;
+            const deletedImageUrl = op.insert.image.toString();
             return deleteImage(deletedImageUrl);
           }
           return null;
@@ -83,18 +83,19 @@ export default function QuillContainer() {
 
       const Quill = QuillModule.default ?? QuillModule;
       const QuillCursors = QuillCursorsModule.default ?? QuillCursorsModule;
-      const BlockEmbed = Quill.import('blots/block/embed');
+      const BlockEmbed = Quill.import('blots/block/embed') as any;
 
       class DividerBlot extends BlockEmbed {
+        static blotName = 'divider';
+        static tagName = 'hr';
+
         static create(value: any) {
           return super.create(value);
         }
       }
-      DividerBlot.blotName = 'divider';
-      DividerBlot.tagName = 'hr';
 
       Quill.register('modules/cursors', QuillCursors);
-      Quill.register(DividerBlot);
+      Quill.register(DividerBlot as any);
 
       const quill = new Quill(editorContainerRef.current, {
         theme: 'snow',

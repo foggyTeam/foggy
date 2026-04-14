@@ -151,7 +151,7 @@ export default function TextEditorToolBar({
 
   function handleTableActions(clickType: string, value?: number) {
     const quill = quillRef.current as Quill;
-    const tableModule = quill.getModule('table');
+    const tableModule = quill.getModule('table') as any;
 
     if (!tableModule) return;
 
