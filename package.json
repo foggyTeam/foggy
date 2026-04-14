@@ -6,18 +6,13 @@
     "frontend:dev": "cd frontend && pnpm dev",
     "frontend:network": "cd frontend && pnpm dev -- --hostname 0.0.0.0",
     "frontend": "cd frontend && pnpm start",
-
     "backend:dev": "cd backend && pnpm start:dev",
     "backend": "cd backend && pnpm start",
-
     "sync:dev": "cd sync_service && pnpm dev",
     "sync": "cd sync_service && pnpm start",
-
     "dev": "concurrently \"pnpm run frontend:dev\" \"pnpm run backend:dev\" \"pnpm run sync:dev\"",
     "start": "concurrently \"pnpm run frontend\" \"pnpm run backend\" \"pnpm run sync\"",
-
     "docker": "docker-compose up --build",
-
     "e2e": "pnpm exec playwright test --workers=1",
     "e2e-ui": "pnpm exec playwright test --ui",
     "performance": "npx playwright test -g \"Performance benchmark\" --project=chromium --headed --repeat-each=10 --workers=1",
@@ -29,11 +24,11 @@
     "sync_service"
   ],
   "devDependencies": {
-    "@playwright/test": "^1.57.0",
-    "@types/node": "^25.0.9",
-    "axios": "^1.13.2",
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0",
+    "axios": "^1.15.0",
     "concurrently": "^9.2.1",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.4.2",
     "husky": "^9.1.7"
   },
   "pnpm": {
