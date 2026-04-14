@@ -9,6 +9,7 @@ import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardConte
 import docBoardStore from '@/app/stores/board/docBoardStore';
 import { QuillBinding } from 'y-quill';
 import { addToast } from '@heroui/toast';
+import projectsStore from '@/app/stores/projectsStore';
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
@@ -45,6 +46,7 @@ export default function QuillContainer() {
         docBoardStore.awareness!,
       );
 
+      if (projectsStore.myRole === 'reader') quill.disable();
       quill.on('selection-change', onSelectionChange);
     } catch (e: any) {
       addToast({

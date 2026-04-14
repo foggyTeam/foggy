@@ -136,7 +136,7 @@ export default function TextEditorToolBar({
     <div
       className={clsx(
         bg_container_no_padding,
-        'flex h-fit w-full flex-wrap items-center justify-start gap-1 p-2 sm:h-14 sm:w-fit sm:flex-nowrap sm:p-3',
+        'flex h-fit w-full flex-wrap items-center justify-start gap-1 p-2 md:h-14 md:w-fit md:flex-nowrap md:p-3',
       )}
     >
       {tools.base.map((tool, index) => {
@@ -154,7 +154,7 @@ export default function TextEditorToolBar({
       <Divider
         key={`base`}
         orientation="vertical"
-        className="h-12 border-none outline-none sm:h-10"
+        className="h-12 border-none outline-none md:h-10"
       />
 
       <EditorToolButton
@@ -172,7 +172,7 @@ export default function TextEditorToolBar({
       <Divider
         key={`link`}
         orientation={`vertical`}
-        className="h-12 border-none outline-none sm:h-10"
+        className="h-12 border-none outline-none md:h-10"
       />
 
       {tools.color.map((tool, index) => {
@@ -195,7 +195,7 @@ export default function TextEditorToolBar({
       <Divider
         key={`color`}
         orientation="vertical"
-        className="h-12 border-none outline-none sm:h-10"
+        className="h-12 border-none outline-none md:h-10"
       />
 
       {tools.dropdown.map((dropdown, index) => {
@@ -219,7 +219,7 @@ export default function TextEditorToolBar({
       <Divider
         key={`clear`}
         orientation="vertical"
-        className="h-12 border-none outline-none sm:h-10"
+        className="h-12 border-none outline-none md:h-10"
       />
 
       <EditorToolButton

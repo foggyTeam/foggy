@@ -9,6 +9,7 @@ import { bg_container } from '@/app/lib/types/styles';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
 import { ScrollShadow } from '@heroui/scroll-shadow';
 import QuillContainer from '@/app/lib/components/board/doc/quillContainer';
+import projectsStore from '@/app/stores/projectsStore';
 
 export default function DocBoard() {
   const {
@@ -21,13 +22,15 @@ export default function DocBoard() {
 
   return (
     <>
-      <TextEditorToolBar
-        selectionFormat={selectionFormat}
-        setSelectionFormat={setSelectionFormat}
-        quillRef={activeQuillRef}
-        saveSelection={saveSelection}
-        restoreSelection={restoreSelection}
-      />
+      {projectsStore.myRole !== 'reader' && (
+        <TextEditorToolBar
+          selectionFormat={selectionFormat}
+          setSelectionFormat={setSelectionFormat}
+          quillRef={activeQuillRef}
+          saveSelection={saveSelection}
+          restoreSelection={restoreSelection}
+        />
+      )}
       <div
         className={clsx(
           bg_container,
