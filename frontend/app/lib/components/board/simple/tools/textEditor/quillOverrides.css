@@ -51,7 +51,8 @@
 
 .ql-editor .ql-code-block-container,
 .ql-editor table,
-.ql-editor blockquote, .ql-editor hr {
+.ql-editor blockquote,
+.ql-editor hr {
   margin: 8px 0 8px 0;
 }
 
@@ -70,7 +71,7 @@
 
   background-color: color-mix(
     in oklab,
-    hsl(var(--heroui-default) / 1) 40%,
+    hsl(var(--heroui-default-300) / 1) 40%,
     transparent
   );
   border-radius: var(--heroui-radius-small);
@@ -88,7 +89,7 @@
     'Liberation Mono', 'Courier New', monospace;
   background-color: color-mix(
     in oklab,
-    hsl(var(--heroui-default) / 1) 40%,
+    hsl(var(--heroui-default-300) / 1) 40%,
     transparent
   );
   border-radius: 4px;
@@ -102,7 +103,7 @@
 
   background-color: color-mix(
     in oklab,
-    hsl(var(--heroui-default) / 1) 40%,
+    hsl(var(--heroui-default-300) / 1) 40%,
     transparent
   );
   border-radius: var(--heroui-radius-small);

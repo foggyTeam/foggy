@@ -41,11 +41,17 @@ export default function CustomTextEditor({
           theme: 'snow',
           modules: {
             toolbar: false,
+            clipboard: true,
           },
           placeholder: settingsStore.t.toolBar.textToolPlaceholder,
         });
 
         quillRef.current = quill;
+
+        quill.clipboard.addMatcher('IMG', (node, delta) => {
+          const Delta = Quill.import('delta');
+          return new Delta();
+        });
 
         quill.on('selection-change', () => {
           if (quill.getSelection()) {

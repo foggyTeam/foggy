@@ -10,11 +10,39 @@ import docBoardStore from '@/app/stores/board/docBoardStore';
 import { QuillBinding } from 'y-quill';
 import { addToast } from '@heroui/toast';
 import projectsStore from '@/app/stores/projectsStore';
+import handleQuillPaste from '@/app/lib/utils/handleQuillPaste';
+import Quill from 'quill';
+import { deleteImage } from '@/app/lib/server/actions/handleImage';
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
   const bindingRef = useRef<QuillBinding | null>(null);
   const { activeQuillRef, onSelectionChange } = useDocBoardContext();
+
+  async function onPaste(e: ClipboardEvent) {
+    if (activeQuillRef.current === null) return;
+    await handleQuillPaste(e, activeQuillRef);
+  }
+  async function onTextChange(delta, oldDelta, source) {
+    if (activeQuillRef.current === null || source !== Quill.sources.USER)
+      return;
+
+    const deletedOps = delta.ops.filter((op) => op.delete);
+
+    if (deletedOps.length > 0) {
+      const deletedDelta = activeQuillRef.current.getContents().diff(oldDelta);
+
+      await Promise.all(
+        deletedDelta.ops.map((op) => {
+          if (op.insert && typeof op.insert === 'object' && op.insert.image) {
+            const deletedImageUrl = op.insert.image;
+            return deleteImage(deletedImageUrl);
+          }
+          return null;
+        }),
+      );
+    }
+  }
 
   async function initializeQuill() {
     if (docBoardStore.yText === null || docBoardStore.awareness === null)
@@ -45,6 +73,7 @@ export default function QuillContainer() {
           toolbar: false,
           cursors: true,
           table: true,
+          clipboard: true,
         },
         placeholder: settingsStore.t.toolBar.textToolPlaceholder,
       });
@@ -58,7 +87,12 @@ export default function QuillContainer() {
       );
 
       if (projectsStore.myRole === 'reader') quill.disable();
+
+      quill.clipboard.addMatcher('IMG', (node, delta) => delta);
+
+      quill.root.addEventListener('paste', onPaste);
       quill.on('selection-change', onSelectionChange);
+      quill.on('text-change', onTextChange);
     } catch (e: any) {
       addToast({
         color: 'danger',
