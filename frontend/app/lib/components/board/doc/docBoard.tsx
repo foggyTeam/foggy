@@ -29,6 +29,7 @@ export default function DocBoard() {
           quillRef={activeQuillRef}
           saveSelection={saveSelection}
           restoreSelection={restoreSelection}
+          isExtended
         />
       )}
       <div

@@ -26,14 +26,25 @@ export default function QuillContainer() {
 
       const Quill = QuillModule.default ?? QuillModule;
       const QuillCursors = QuillCursorsModule.default ?? QuillCursorsModule;
+      const BlockEmbed = Quill.import('blots/block/embed');
+
+      class DividerBlot extends BlockEmbed {
+        static create(value: any) {
+          return super.create(value);
+        }
+      }
+      DividerBlot.blotName = 'divider';
+      DividerBlot.tagName = 'hr';
 
       Quill.register('modules/cursors', QuillCursors);
+      Quill.register(DividerBlot);
 
       const quill = new Quill(editorContainerRef.current, {
         theme: 'snow',
         modules: {
           toolbar: false,
           cursors: true,
+          table: true,
         },
         placeholder: settingsStore.t.toolBar.textToolPlaceholder,
       });
