@@ -52,7 +52,8 @@
 .ql-editor .ql-code-block-container,
 .ql-editor table,
 .ql-editor blockquote,
-.ql-editor hr, .ql-editor iframe {
+.ql-editor hr,
+.ql-editor iframe {
   margin: 8px 0 8px 0;
 }
 
