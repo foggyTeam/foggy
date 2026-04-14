@@ -17,12 +17,40 @@ import { deleteImage } from '@/app/lib/server/actions/handleImage';
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
   const bindingRef = useRef<QuillBinding | null>(null);
-  const { activeQuillRef, onSelectionChange } = useDocBoardContext();
+  const { activeQuillRef, onSelectionChange, setIsLoading } =
+    useDocBoardContext();
 
-  async function onPaste(e: ClipboardEvent) {
-    if (activeQuillRef.current === null) return;
-    await handleQuillPaste(e, activeQuillRef);
+  function onPaste(e: ClipboardEvent) {
+    const clipboardData = e.clipboardData;
+    if (!clipboardData || activeQuillRef.current === null) return;
+
+    const html = clipboardData.getData('text/html');
+    const text = clipboardData.getData('text/plain');
+
+    const files: File[] = [];
+    if (clipboardData.items) {
+      for (let i = 0; i < clipboardData.items.length; i++) {
+        if (clipboardData.items[i].type.startsWith('image/')) {
+          const file = clipboardData.items[i].getAsFile();
+          if (file) files.push(file);
+        }
+      }
+    }
+
+    const htmlHasImages =
+      html && (html.includes('<img') || html.includes('data:image/'));
+
+    if (files.length > 0 || (text && !html) || htmlHasImages) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      setIsLoading(true);
+      handleQuillPaste(activeQuillRef.current, files, html, text).then(() =>
+        setIsLoading(false),
+      );
+    }
   }
+
   async function onTextChange(delta, oldDelta, source) {
     if (activeQuillRef.current === null || source !== Quill.sources.USER)
       return;
@@ -48,6 +76,7 @@ export default function QuillContainer() {
     if (docBoardStore.yText === null || docBoardStore.awareness === null)
       return;
 
+    setIsLoading(true);
     try {
       const QuillModule = await import('quill');
       const QuillCursorsModule = await import('quill-cursors');
@@ -90,7 +119,9 @@ export default function QuillContainer() {
 
       quill.clipboard.addMatcher('IMG', (node, delta) => delta);
 
-      quill.root.addEventListener('paste', onPaste);
+      quill.root.addEventListener('paste', onPaste, {
+        capture: true,
+      });
       quill.on('selection-change', onSelectionChange);
       quill.on('text-change', onTextChange);
     } catch (e: any) {
@@ -100,6 +131,7 @@ export default function QuillContainer() {
         title: settingsStore.t.toasts.board.quillError,
       });
     }
+    setIsLoading(false);
   }
 
   useEffect(() => {

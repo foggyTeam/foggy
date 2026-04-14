@@ -22,6 +22,10 @@ interface DocBoardContextProps {
   setSavedSelection: (value: any) => void;
   saveSelection: () => void;
   restoreSelection: () => void;
+
+  // LOADING
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
 }
 
 const BoardContext = createContext<DocBoardContextProps | undefined>(undefined);
@@ -29,6 +33,7 @@ const BoardContext = createContext<DocBoardContextProps | undefined>(undefined);
 export function DocBoardProvider({ children }: { children: ReactNode }) {
   const activeQuillRef = useRef<QuillType | null>(null);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [selectionFormat, setSelectionFormat] = useState<any>({});
   const [savedSelection, setSavedSelection] = useState<any>(null);
 
@@ -69,6 +74,9 @@ export function DocBoardProvider({ children }: { children: ReactNode }) {
         setSavedSelection,
         saveSelection,
         restoreSelection,
+        // LOADING
+        isLoading,
+        setIsLoading,
       }}
     >
       {children}

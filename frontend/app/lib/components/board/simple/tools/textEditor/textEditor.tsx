@@ -48,7 +48,7 @@ export default function CustomTextEditor({
 
         quillRef.current = quill;
 
-        quill.clipboard.addMatcher('IMG', (node, delta) => {
+        quill.clipboard.addMatcher('IMG', () => {
           const Delta = Quill.import('delta');
           return new Delta();
         });

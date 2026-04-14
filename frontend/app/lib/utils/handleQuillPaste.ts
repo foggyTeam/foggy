@@ -3,82 +3,89 @@
 import QuillType from 'quill';
 import Quill from 'quill';
 import { uploadImage } from '@/app/lib/server/actions/handleImage';
-import { RefObject } from 'react';
 
-async function uploadFile(imageFile: File) {
-  if (imageFile) {
-    try {
-      const response = await uploadImage(
-        'board_images',
-        imageFile,
-        'board_doc_',
-      );
-
-      if ('url' in response && response.url) return response.url;
-      else throw new Error(response?.error);
-    } catch (e: any) {
-      return null;
-    }
+async function uploadFile(imageFile: File | Blob) {
+  try {
+    const response = await uploadImage('board_images', imageFile, 'board_doc_');
+    if (response && 'url' in response && response.url) return response.url;
+    return null;
+  } catch (e: any) {
+    return null;
   }
 }
 
 export default async function handleQuillPaste(
-  e: ClipboardEvent,
-  quill: RefObject<QuillType>,
+  quill: QuillType,
+  files: File[],
+  html: string,
+  text: string,
 ) {
-  const clipboardData = e.clipboardData;
-  if (!clipboardData) return;
+  const range = quill.getSelection() || { index: quill.getLength() };
+  let currentIndex = range.index;
 
-  // FILES (IMAGES)
-  if (clipboardData.items) {
-    let hasImageFile = false;
-    for (let i = 0; i < clipboardData.items.length; i++) {
-      if (clipboardData.items[i].type.indexOf('image') !== -1) {
-        hasImageFile = true;
-        e.preventDefault();
-
-        const file = clipboardData.items[i].getAsFile();
-        if (file) {
-          const imageUrl = await uploadFile(file);
-
-          if (imageUrl) {
-            const range = quill.current.getSelection();
-            const index = range ? range.index : quill.getLength();
-
-            quill.current.insertEmbed(
-              index,
-              'image',
-              imageUrl,
-              Quill.sources.USER,
-            );
-            quill.current.setSelection(index + 1, 0, Quill.sources.SILENT);
-          }
-        }
+  // FILES
+  if (files.length > 0 && !text) {
+    for (const file of files) {
+      const imageUrl = await uploadFile(file);
+      if (imageUrl) {
+        quill.insertEmbed(currentIndex, 'image', imageUrl, Quill.sources.USER);
+        currentIndex += 1;
       }
     }
-    if (hasImageFile) return; // TODO: нет, картинки могут быть В тексте
+    quill.setSelection(currentIndex, 0, Quill.sources.SILENT);
+    return;
   }
 
-  // MARKDOWN CHECK
-  const html = clipboardData.getData('text/html');
-  const text = clipboardData.getData('text/plain');
+  // MARKDOWN
+  let isMarkdown = false;
+  let finalHtml = html;
 
-  if (html) return;
-
-  if (text) {
+  if (!html && text) {
     const { parse } = await import('marked');
     const parsedHtml = await parse(text);
-
-    const isMarkdown =
+    isMarkdown =
       parsedHtml !== `<p>${text}</p>\n` && parsedHtml !== `${text}\n`;
 
     if (isMarkdown) {
-      e.preventDefault();
-
-      const range = quill.current.getSelection();
-      const index = range ? range.index : quill.current.getLength();
-
-      quill.current.clipboard.dangerouslyPasteHTML(index, parsedHtml, 'user');
+      finalHtml = parsedHtml;
+    } else {
+      quill.insertText(currentIndex, text, Quill.sources.USER);
+      quill.setSelection(currentIndex + text.length, 0, Quill.sources.SILENT);
+      return;
     }
+  }
+
+  // INSERTING IMAGES
+  if (finalHtml) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(finalHtml, 'text/html');
+    const images = doc.querySelectorAll('img');
+
+    if (images.length > 0) {
+      await Promise.all(
+        Array.from(images).map(async (img) => {
+          const src = img.getAttribute('src');
+          if (
+            src &&
+            (src.startsWith('data:image') || src.startsWith('blob:'))
+          ) {
+            try {
+              const res = await fetch(src);
+              const blob = await res.blob();
+
+              const uploadedUrl = await uploadFile(blob);
+
+              if (uploadedUrl) img.setAttribute('src', uploadedUrl);
+              else img.remove();
+            } catch (err) {
+              img.remove();
+            }
+          }
+        }),
+      );
+      finalHtml = doc.body.innerHTML;
+    }
+
+    quill.clipboard.dangerouslyPasteHTML(currentIndex, finalHtml, 'user');
   }
 }
