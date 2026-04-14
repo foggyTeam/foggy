@@ -2,6 +2,7 @@
 
 import 'quill/dist/quill.core.css';
 import '@/app/lib/components/board/simple/tools/textEditor/quillOverrides.css';
+import '@/app/lib/components/board/doc/docBoardCursors.css';
 import { useEffect, useRef } from 'react';
 import settingsStore from '@/app/stores/settingsStore';
 import { useDocBoardContext } from '@/app/lib/components/board/doc/docBoardContext';
@@ -71,7 +72,7 @@ export default function QuillContainer() {
   return (
     <div
       ref={editorContainerRef}
-      className="caret-f_accent flex w-full flex-1 flex-col p-0 [&>.ql-editor]:flex-1"
+      className="caret-f_accent flex w-full flex-1 flex-col px-0.5 !py-2 [&>.ql-editor]:flex-1"
     />
   );
 }

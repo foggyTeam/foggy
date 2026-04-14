@@ -6,7 +6,7 @@ import { handleHttpRequest } from './http/router.js';
 import { registerElementsNamespace } from './namespaces/elements.js';
 import { registerCursorsNamespace } from './namespaces/cursors.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 const PORT = Number(process.env.PORT) || 1234;
 const FRONTEND_ORIGIN = process.env.FRONTEND_URI ?? '*';

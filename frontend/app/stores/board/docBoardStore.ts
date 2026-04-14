@@ -83,7 +83,7 @@ class DocBoardStore {
   };
 
   // GENERAL
-  setDocData(data: true | undefined) {
+  setDocData(userData: { name: string; color: string } | undefined) {
     if (this.yDoc) {
       this.yDoc.off('update', this.handleDocUpdate);
       this.awareness?.off('update', this.handleAwarenessUpdate);
@@ -95,11 +95,13 @@ class DocBoardStore {
       this.awareness = null;
     }
 
-    if (!data) return;
+    if (!userData) return;
 
     this.yDoc = new Y.Doc();
     this.yText = this.yDoc.getText('quill-content');
     this.awareness = new Awareness(this.yDoc);
+
+    this.awareness.setLocalStateField('user', userData);
 
     this.yDoc.on('update', this.handleDocUpdate);
     this.awareness.on('update', this.handleAwarenessUpdate);

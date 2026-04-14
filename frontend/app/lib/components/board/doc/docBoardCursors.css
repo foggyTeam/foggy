@@ -1,0 +1,29 @@
+.ql-container {
+  overflow: visible !important;
+}
+
+.ql-editor {
+  overflow-x: visible !important;
+}
+.ql-cursor-flag {
+  padding: 0 calc(var(--spacing) * 3) !important;
+  border-radius: 999999px !important;
+  height: calc(var(--spacing) * 6) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10;
+}
+
+.ql-cursor-name {
+  font-family: Montserrat, sans-serif;
+  font-weight: 600 !important; /* font-semibold */
+  font-size: var(--heroui-font-size-small) !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  color: white !important;
+}

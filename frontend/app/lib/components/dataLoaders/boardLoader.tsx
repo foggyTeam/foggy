@@ -13,6 +13,8 @@ import boardStore from '@/app/stores/board/boardStore';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import docBoardStore from '@/app/stores/board/docBoardStore';
+import userStore from '@/app/stores/userStore';
+import { themeColorsList } from '@/tailwind.config';
 
 type Normalized<T extends Board> = Omit<T, 'type'> & {
   type: Lowercase<T['type']>;
@@ -31,6 +33,7 @@ const BoardLoader = ({
   sectionData: any | undefined;
 }) => {
   useEffect(() => {
+    if (!userStore.user) return;
     if (sectionData && boardData) {
       const sectionIds = [...boardData.sectionIds];
       const sectionId = sectionIds.pop() as string;
@@ -55,7 +58,13 @@ const BoardLoader = ({
         });
       }
 
-      if (boardData.type === 'doc') docBoardStore.setDocData(true);
+      if (boardData.type === 'doc') {
+        const color =
+          themeColorsList[
+            1 + Math.floor(Math.random() * (themeColorsList.length - 1))
+          ];
+        docBoardStore.setDocData({ color, name: userStore.user.name });
+      }
     }
     return () => {
       boardStore.setActiveBoard(undefined);
