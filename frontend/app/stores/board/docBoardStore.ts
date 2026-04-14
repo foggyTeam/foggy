@@ -67,7 +67,6 @@ class DocBoardStore {
 
   // YJS
   private handleDocUpdate = (update: Uint8Array, origin: any) => {
-    // TODO: think on 'origin'
     if (origin !== this) socketRef?.emit('docUpdate', update);
   };
 

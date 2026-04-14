@@ -1,8 +1,39 @@
 'use client';
 
+import DOMPurify from 'dompurify';
 import QuillType from 'quill';
 import Quill from 'quill';
 import { uploadImage } from '@/app/lib/server/actions/handleImage';
+
+const allowedIframeDomains = [
+  // VIDEO
+  'youtube.com',
+  'youtube-nocookie.com',
+  'player.vimeo.com',
+  'vimeo.com',
+  // MUSIC
+  'open.spotify.com',
+  'w.soundcloud.com',
+  'embed.music.apple.com',
+  'music.yandex.ru',
+  // DESIGN
+  'figma.com',
+  'embed.figma.com',
+  'codepen.io',
+  'codesandbox.io',
+  'pinterest.com',
+  'assets.pinterest.com',
+  // GOOGLE
+  'maps.google.com',
+  'google.com',
+  'docs.google.com',
+  'calendar.google.com',
+  // YANDEX
+  'yandex.ru',
+  'music.yandex.ru',
+  // TRELLO
+  'trello.com',
+];
 
 async function uploadFile(imageFile: File | Blob) {
   try {
@@ -12,6 +43,97 @@ async function uploadFile(imageFile: File | Blob) {
   } catch (e: any) {
     return null;
   }
+}
+
+function cleanHtml(html: string) {
+  const cleanHtmlString = DOMPurify.sanitize(html, {
+    ADD_TAGS: ['iframe'],
+    // Разрешаем атрибуты размеров и стилей, чтобы iframe не схлопнулся
+    ADD_ATTR: [
+      'allow',
+      'allowfullscreen',
+      'frameborder',
+      'scrolling',
+      'width',
+      'height',
+      'style',
+      'class',
+    ],
+  });
+
+  const finalDoc = new DOMParser().parseFromString(
+    cleanHtmlString,
+    'text/html',
+  );
+  const iframes = finalDoc.querySelectorAll('iframe');
+
+  iframes.forEach((iframe) => {
+    iframe.removeAttribute('srcdoc');
+    iframe.innerHTML = '';
+
+    const src = iframe.getAttribute('src');
+
+    if (src) {
+      try {
+        const url = new URL(src, window.location.origin);
+
+        if (url.protocol !== 'https:') {
+          iframe.remove();
+          return;
+        }
+
+        const hostname = url.hostname.replace(/^www\./, '');
+        const pathname = url.pathname;
+
+        let isAllowedDomain = allowedIframeDomains.some(
+          (domain) => hostname === domain || hostname.endsWith(`.${domain}`),
+        );
+
+        // GOOGLE CHECK
+        if (hostname === 'google.com' || hostname.endsWith('.google.com')) {
+          const isSafeGoogleSubdomain = [
+            'docs.google.com',
+            'calendar.google.com',
+            'maps.google.com',
+          ].includes(hostname);
+
+          if (pathname.startsWith('/maps/') || isSafeGoogleSubdomain) {
+            isAllowedDomain = true;
+          } else {
+            isAllowedDomain = false;
+          }
+        }
+
+        // YANDEX CHECK
+        if (hostname === 'yandex.ru' || hostname.endsWith('.yandex.ru')) {
+          if (
+            pathname.startsWith('/map-widget/') ||
+            hostname === 'music.yandex.ru'
+          ) {
+            isAllowedDomain = true;
+          } else {
+            isAllowedDomain = false;
+          }
+        }
+
+        if (!isAllowedDomain) {
+          iframe.remove();
+        } else {
+          iframe.setAttribute(
+            'sandbox',
+            'allow-scripts allow-same-origin allow-presentation',
+          );
+          // iframe.classList.add('ql-video');
+        }
+      } catch (e) {
+        iframe.remove();
+      }
+    } else {
+      iframe.remove();
+    }
+  });
+
+  return finalDoc.body.innerHTML;
 }
 
 export default async function handleQuillPaste(
@@ -55,7 +177,7 @@ export default async function handleQuillPaste(
     }
   }
 
-  // INSERTING IMAGES
+  // INSERTING IMAGES AND IFRAMES
   if (finalHtml) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(finalHtml, 'text/html');
@@ -86,6 +208,10 @@ export default async function handleQuillPaste(
       finalHtml = doc.body.innerHTML;
     }
 
-    quill.clipboard.dangerouslyPasteHTML(currentIndex, finalHtml, 'user');
+    quill.clipboard.dangerouslyPasteHTML(
+      currentIndex,
+      cleanHtml(finalHtml),
+      'user',
+    );
   }
 }

@@ -52,7 +52,7 @@
 .ql-editor .ql-code-block-container,
 .ql-editor table,
 .ql-editor blockquote,
-.ql-editor hr {
+.ql-editor hr, .ql-editor iframe {
   margin: 8px 0 8px 0;
 }
 
@@ -137,4 +137,11 @@
 .ql-editor hr {
   margin: 16px 0 16px 0;
   border-top: 2px solid hsl(var(--heroui-primary-300));
+}
+
+.ql-editor iframe {
+  width: 100%;
+  min-height: 128px;
+  border-radius: var(--heroui-radius-small);
+  background: none;
 }
