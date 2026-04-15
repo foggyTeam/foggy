@@ -165,17 +165,24 @@ export function registerElementsNamespace(io: IOServer): void {
       socket.to(boardId).emit('edgesUpdate', changes);
     });
 
-    socket.on('nodeDataUpdate', (payload: any) => {
-      if (room.type !== 'GRAPH' || !payload?.nodeId) return;
-      graphUpdateNodeData(
-        room.state as GraphBoardState,
-        payload.nodeId,
-        payload.newAttrs,
-        payload.isNew,
-      );
-      markDirty(room);
-      socket.to(boardId).emit('nodeDataUpdate', payload);
-    });
+    socket.on(
+      'nodeDataUpdate',
+      (payload: {
+        nodeId: string;
+        newAttrs: Record<string, any>;
+        isNew?: boolean;
+      }) => {
+        if (room.type !== 'GRAPH' || !payload?.nodeId) return;
+        graphUpdateNodeData(
+          room.state as GraphBoardState,
+          payload.nodeId,
+          payload.newAttrs,
+          payload.isNew,
+        );
+        markDirty(room);
+        socket.to(boardId).emit('nodeDataUpdate', payload);
+      },
+    );
 
     // DOC
     socket.on('docUpdate', (update: ArrayBuffer) => {

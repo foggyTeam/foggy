@@ -119,10 +119,7 @@ function cleanHtml(html: string) {
         if (!isAllowedDomain) {
           iframe.remove();
         } else {
-          iframe.setAttribute(
-            'sandbox',
-            'allow-scripts allow-same-origin allow-presentation',
-          );
+          iframe.setAttribute('sandbox', 'allow-scripts allow-presentation');
           // iframe.classList.add('ql-video');
         }
       } catch (e) {

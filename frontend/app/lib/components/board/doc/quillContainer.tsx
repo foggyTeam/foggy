@@ -11,12 +11,13 @@ import { QuillBinding } from 'y-quill';
 import { addToast } from '@heroui/toast';
 import projectsStore from '@/app/stores/projectsStore';
 import handleQuillPaste from '@/app/lib/utils/handleQuillPaste';
-import Quill from 'quill';
 import { deleteImage } from '@/app/lib/server/actions/handleImage';
 
 export default function QuillContainer() {
   const editorContainerRef = useRef<HTMLDivElement>(null as any);
   const bindingRef = useRef<QuillBinding | null>(null);
+
+  const quillUser = useRef<string | null>(null);
   const { activeQuillRef, onSelectionChange, setIsLoading } =
     useDocBoardContext();
 
@@ -52,8 +53,7 @@ export default function QuillContainer() {
   }
 
   async function onTextChange(delta: any, oldDelta: any, source: string) {
-    if (activeQuillRef.current === null || source !== Quill.sources.USER)
-      return;
+    if (activeQuillRef.current === null || source !== quillUser.current) return;
 
     const deletedOps = delta.ops.filter((op: any) => op.delete);
 
@@ -117,6 +117,8 @@ export default function QuillContainer() {
       );
 
       if (projectsStore.myRole === 'reader') quill.disable();
+
+      quillUser.current = Quill.sources.USER;
 
       quill.clipboard.addMatcher('IMG', (node, delta) => delta);
 

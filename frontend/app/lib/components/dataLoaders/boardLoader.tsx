@@ -75,7 +75,7 @@ const BoardLoader = ({
       graphBoardStore.setGraphData(undefined);
       docBoardStore.setDocData(undefined);
     };
-  }, [sectionData, boardData]);
+  }, [sectionData, boardData, userStore.user?.id]);
 
   return null;
 };
