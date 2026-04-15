@@ -1,4 +1,10 @@
-import { GraphBoardState, Room, SimpleBoardState } from './types';
+import * as Y from 'yjs';
+import {
+  DocBoardState,
+  GraphBoardState,
+  Room,
+  SimpleBoardState,
+} from './types.js';
 
 const SNAPSHOT_INTERVAL_MS = 10_000;
 
@@ -11,7 +17,9 @@ const SNAPSHOT_INTERVAL_MS = 10_000;
  */
 export async function fetchInitialSnapshot(
   boardId: string,
-): Promise<SimpleBoardState | GraphBoardState | null> {
+): Promise<
+  SimpleBoardState | GraphBoardState | Omit<DocBoardState, 'yDoc'> | null
+> {
   const backendUrl = process.env.BACKEND_URI;
   if (!backendUrl) return null;
 
@@ -28,7 +36,10 @@ export async function fetchInitialSnapshot(
     }
     const data = await res.json();
     console.info(`[snapshot] loaded initial state for board ${boardId}`);
-    return data as SimpleBoardState | GraphBoardState;
+    return data as
+      | SimpleBoardState
+      | GraphBoardState
+      | Omit<DocBoardState, 'yDoc'>;
   } catch (err) {
     console.warn(
       `[snapshot] could not fetch initial state for ${boardId}:`,
@@ -49,6 +60,14 @@ export async function flushSnapshot(room: Room): Promise<void> {
   const backendUrl = process.env.BACKEND_URI;
   if (!backendUrl) return;
 
+  let payload: any = room.state;
+
+  if (room.type === 'DOC' && 'yDoc' in room.state && room.state.yDoc) {
+    const update = Y.encodeStateAsUpdate(room.state.yDoc);
+    const documentData = Buffer.from(update).toString('base64');
+    payload = { document: documentData };
+  }
+
   try {
     const res = await fetch(`${backendUrl}/boards/${room.boardId}/snapshot`, {
       method: 'POST',
@@ -56,7 +75,7 @@ export async function flushSnapshot(room: Room): Promise<void> {
         'Content-Type': 'application/json',
         'x-service-key': process.env.SYNC_VERIFICATION_KEY ?? '',
       },
-      body: JSON.stringify(room.state),
+      body: JSON.stringify(payload),
       signal: AbortSignal.timeout(8_000),
     });
     if (!res.ok) {
@@ -81,7 +100,7 @@ export async function flushSnapshot(room: Room): Promise<void> {
  * The timer is cleared automatically in deleteRoom().
  */
 export function startSnapshotTimer(room: Room): void {
-  if (room.snapshotTimer) return; // already running
+  if (room.snapshotTimer) return;
 
   room.snapshotTimer = setInterval(async () => {
     if (room.dirty) await flushSnapshot(room);

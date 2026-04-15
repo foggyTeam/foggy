@@ -17,6 +17,7 @@ export default function EditorToolDropdown({
   Icon,
   handleClick,
   isAccent,
+  isDisabled,
 }: {
   id?: string;
   options: any[];
@@ -24,6 +25,7 @@ export default function EditorToolDropdown({
   Icon: React.ComponentType<any>;
   handleClick: any;
   isAccent: boolean;
+  isDisabled?: boolean;
 }) {
   const { commonSize } = useAdaptiveParams();
   const [selectedOption, setSelectedOption] = useState(activeOption);
@@ -52,7 +54,13 @@ export default function EditorToolDropdown({
       onClose={() => requestAnimationFrame(reset)}
     >
       <DropdownTrigger>
-        <Button id={id} variant="light" isIconOnly size={commonSize}>
+        <Button
+          isDisabled={isDisabled}
+          id={id}
+          variant="light"
+          isIconOnly
+          size={commonSize}
+        >
           <Icon
             className={clsx(
               isAccent ? 'stroke-f_accent' : 'stroke-default-600',

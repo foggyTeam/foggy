@@ -2,12 +2,11 @@ import dotenv from 'dotenv';
 import path from 'path';
 import http from 'http';
 import { Server as IOServer } from 'socket.io';
-import { handleHttpRequest } from './http/router';
-import { registerElementsNamespace } from './namespaces/elements';
-import { registerCursorsNamespace } from './namespaces/cursors';
-import { attachDocWebSocketServer } from './namespaces/doc';
+import { handleHttpRequest } from './http/router.js';
+import { registerElementsNamespace } from './namespaces/elements.js';
+import { registerCursorsNamespace } from './namespaces/cursors.js';
 
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../.env') });
 
 const PORT = Number(process.env.PORT) || 1234;
 const FRONTEND_ORIGIN = process.env.FRONTEND_URI ?? '*';
@@ -27,7 +26,6 @@ const io = new IOServer(httpServer, {
 
 registerElementsNamespace(io);
 registerCursorsNamespace(io);
-attachDocWebSocketServer(httpServer);
 
 httpServer.listen(PORT, () => {
   console.info(`sync_service running on port ${PORT}`);

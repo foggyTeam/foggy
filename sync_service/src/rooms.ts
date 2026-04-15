@@ -1,4 +1,4 @@
-import { BoardType, GraphBoardState, Room, SimpleBoardState } from './types';
+import { BoardType, GraphBoardState, Room, SimpleBoardState } from './types.js';
 
 const rooms = new Map<string, Room>();
 
@@ -23,6 +23,10 @@ export function getRoom(boardId: string): Room | undefined {
 export function deleteRoom(boardId: string): void {
   const room = rooms.get(boardId);
   if (room?.snapshotTimer) clearInterval(room.snapshotTimer);
+
+  if (room?.type === 'DOC' && room.state && 'yDoc' in room.state)
+    room.state.yDoc?.destroy();
+
   rooms.delete(boardId);
   console.warn(`[rooms] deleted room ${boardId}`);
 }

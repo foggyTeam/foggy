@@ -17,7 +17,7 @@ RUN npm install -g pnpm
 COPY . .
 
 # Устанавливаем зависимости
-RUN pnpm install && cd backend && pnpm install
+RUN pnpm install --filter backend
 
 # Открываем порт
 EXPOSE 3001

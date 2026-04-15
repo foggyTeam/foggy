@@ -3,7 +3,6 @@ import { MousePointer2Icon } from 'lucide-react';
 import { ReactNode } from 'react';
 
 export type CursorColor =
-  | 'default'
   | 'danger'
   | 'primary'
   | 'secondary'
@@ -40,7 +39,7 @@ export default function CursorChip(
         startContent={
           (
             <MousePointer2Icon
-              className={`stroke-f_accent relative -top-1 -left-0.5 stroke-${props.color}-500`}
+              className={`relative -top-1 -left-0.5 stroke-${props.color}-500`}
             />
           ) as ReactNode
         }

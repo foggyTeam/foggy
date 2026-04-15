@@ -1,5 +1,5 @@
 import http from 'http';
-import { getRoom } from '../rooms';
+import { getRoom } from '../rooms.js';
 
 export function handleHttpRequest(
   req: http.IncomingMessage,

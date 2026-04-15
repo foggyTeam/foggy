@@ -65,9 +65,12 @@
       "deleteBoardSuccess": "Board deleted",
       "updateBoardError": "Failed to update board name",
       "updateBoardSuccess": "Board name updated",
+
       "generateBoardImageError": "Failed to generate board image",
       "uploadBoardImageError": "Failed to upload board image",
-      "uploadBoardImageSuccess": "Board image uploaded successfully!"
+      "uploadBoardImageSuccess": "Board image uploaded successfully!",
+
+      "quillError": "Failed to import text editor module"
     },
     "image": {
       "deleteImageWarning": "Failed to delete the image",
