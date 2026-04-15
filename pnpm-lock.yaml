@@ -273,9 +273,6 @@ importers:
       '@types/d3-force':
         specifier: ^3.0.10
         version: 3.0.10
-      '@types/dompurify':
-        specifier: ^3.2.0
-        version: 3.2.0
       '@types/lodash':
         specifier: ^4.17.23
         version: 4.17.23
@@ -3458,10 +3455,6 @@ packages:
 
   '@types/d3-zoom@3.0.8':
     resolution: {integrity: sha512-iqMC4/YlFCSlO8+2Ii1GGGliCAY4XdeG748w5vQUbevlbDu0zSjH/+jojorQVBK/se0j6DUFNPBGSqD3YWYnDw==}
-
-  '@types/dompurify@3.2.0':
-    resolution: {integrity: sha512-Fgg31wv9QbLDA0SpTOXO3MaxySc4DKGLi8sna4/Utjo4r3ZRPdCt4UQee8BWr+Q5z21yifghREPJGYaEOEIACg==}
-    deprecated: This is a stub types definition. dompurify provides its own type definitions, so you do not need this installed.
 
   '@types/eslint-scope@3.7.7':
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
@@ -12273,10 +12266,6 @@ snapshots:
     dependencies:
       '@types/d3-interpolate': 3.0.4
       '@types/d3-selection': 3.0.11
-
-  '@types/dompurify@3.2.0':
-    dependencies:
-      dompurify: 3.4.0
 
   '@types/eslint-scope@3.7.7':
     dependencies:

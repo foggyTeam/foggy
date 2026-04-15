@@ -151,9 +151,9 @@ export default function TextEditorToolBar({
 
   function handleTableActions(clickType: string, value?: number) {
     const quill = quillRef.current as Quill;
-    const tableModule = quill.getModule('table') as any;
+    const tableModule = quill?.getModule('table') as any;
 
-    if (!tableModule) return;
+    if (!tableModule || !quill) return;
 
     switch (clickType) {
       case 'insertTable':

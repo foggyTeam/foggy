@@ -326,7 +326,6 @@ export const themeColorsList = [
   foggy_accent.light.DEFAULT,
   primary.light.DEFAULT,
   secondary.light.DEFAULT,
-  secondary.light.DEFAULT,
   danger.light.DEFAULT,
   warning.light.DEFAULT,
   success.light.DEFAULT,

@@ -179,7 +179,12 @@ export function registerElementsNamespace(io: IOServer): void {
 
     // DOC
     socket.on('docUpdate', (update: ArrayBuffer) => {
-      if (room.type !== 'DOC' || !('yDoc' in room.state) || !room.state?.yDoc)
+      if (
+        room.type !== 'DOC' ||
+        !room.state ||
+        !('yDoc' in room.state) ||
+        !room.state.yDoc
+      )
         return;
 
       try {

@@ -45,7 +45,7 @@ export default function QuillContainer() {
       e.stopPropagation();
 
       setIsLoading(true);
-      handleQuillPaste(activeQuillRef.current, files, html, text).then(() =>
+      handleQuillPaste(activeQuillRef.current, files, html, text).finally(() =>
         setIsLoading(false),
       );
     }
