@@ -1,6 +1,12 @@
+@reference "../../../../../../globals.css";
+
 .ql-editor {
   font-family: 'Montserrat', sans-serif;
   padding: 16px;
+}
+
+.p-0 .ql-editor {
+  padding: 0;
 }
 
 .ql-container.ql-snow {
@@ -8,10 +14,135 @@
   padding: 0;
 }
 
-.ql-editor a {
-  color: #b67fe9;
-}
-
 .ql-editor.ql-blank::before {
   color: hsl(var(--heroui-foreground) / 0.6) !important;
+}
+
+.ql-editor a {
+  transition: color ease-in-out 100ms;
+  @apply text-f_accent;
+}
+.ql-editor a:hover {
+  text-decoration: underline;
+  @apply text-f_accent-400;
+}
+
+.ql-editor h1 {
+  font-size: var(--text-3xl);
+  line-height: var(--text-3xl--line-height);
+  font-weight: var(--font-weight-medium);
+  padding-top: 16px;
+  padding-bottom: 2px;
+}
+.ql-editor h2 {
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl--line-height);
+  font-weight: var(--font-weight-medium);
+  padding-top: 8px;
+  padding-bottom: 2px;
+}
+.ql-editor h3 {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  font-weight: var(--font-weight-medium);
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+
+.ql-editor .ql-code-block-container,
+.ql-editor table,
+.ql-editor blockquote,
+.ql-editor hr,
+.ql-editor iframe {
+  margin: 8px 0 8px 0;
+}
+
+.ql-editor .ql-code-block-container {
+  color: hsl(var(--heroui-default-700) / 1);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--heroui-font-size-small);
+  line-height: var(--heroui-line-height-small);
+
+  font-family:
+    var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+
+  padding-block: calc(var(--spacing) * 1);
+  padding-inline: calc(var(--spacing) * 2);
+
+  background-color: color-mix(
+    in oklab,
+    hsl(var(--heroui-default-300) / 1) 40%,
+    transparent
+  );
+  border-radius: var(--heroui-radius-small);
+}
+
+.ql-editor code {
+  color: hsl(var(--heroui-default-700) / 1);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--heroui-font-size-small);
+  line-height: var(--heroui-line-height-small);
+  padding: 1px 8px 1px 8px;
+  margin: 0 4px 0 4px;
+  font-family:
+    var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  background-color: color-mix(
+    in oklab,
+    hsl(var(--heroui-default-300) / 1) 40%,
+    transparent
+  );
+  border-radius: 4px;
+}
+
+.ql-editor table {
+  color: hsl(var(--heroui-default-700) / 1);
+  font-weight: var(--font-weight-normal);
+  font-size: var(--heroui-font-size-small);
+  line-height: var(--heroui-line-height-small);
+
+  background-color: color-mix(
+    in oklab,
+    hsl(var(--heroui-default-300) / 1) 40%,
+    transparent
+  );
+  border-radius: var(--heroui-radius-small);
+  overflow: clip;
+}
+
+.ql-editor table td {
+  transition: background-color ease-in-out 100ms;
+  background-color: hsl(var(--heroui-default-100) / 0);
+  border: 1px solid hsl(var(--heroui-default-100) / 0.3);
+  padding-block: calc(var(--spacing) * 1);
+  padding-inline: calc(var(--spacing) * 2);
+}
+
+.ql-editor table td:hover {
+  background-color: hsl(var(--heroui-default-100) / 0.3);
+}
+
+.ql-editor blockquote {
+  padding-left: 16px;
+  border-left: 2px solid hsl(var(--heroui-primary-300));
+}
+.ql-editor ol,
+.ql-editor ul {
+  padding-left: 16px;
+}
+.ql-editor li {
+  padding-left: 8px;
+}
+
+.ql-editor hr {
+  margin: 16px 0 16px 0;
+  border-top: 2px solid hsl(var(--heroui-primary-300));
+}
+
+.ql-editor iframe {
+  width: 100%;
+  min-height: 128px;
+  border-radius: var(--heroui-radius-small);
+  background: none;
 }

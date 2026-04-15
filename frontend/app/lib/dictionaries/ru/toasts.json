@@ -67,7 +67,9 @@
       "updateBoardSuccess": "Название доски обновлено",
       "generateBoardImageError": "Не удалось создать изображение доски",
       "uploadBoardImageError": "Не удалось загрузить изображение доски",
-      "uploadBoardImageSuccess": "Изображение доски успешно загружено!"
+      "uploadBoardImageSuccess": "Изображение доски успешно загружено!",
+
+      "quillError": "Не удалось импортировать модуль текстового редактора"
     },
     "image": {
       "deleteImageWarning": "Не удалось удалить изображение",

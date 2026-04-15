@@ -1,11 +1,13 @@
 import { Server as IOServer } from 'socket.io';
+import * as Y from 'yjs';
 import {
   BoardType,
+  DocBoardState,
   ElementsClientData,
   ElementsSocket,
   GraphBoardState,
   SimpleBoardState,
-} from '../types';
+} from '../types.js';
 import {
   deleteRoom,
   getOrCreateRoom,
@@ -18,12 +20,12 @@ import {
   simpleChangeElementLayer,
   simpleRemoveElement,
   simpleUpdateElement,
-} from '../rooms';
+} from '../rooms.js';
 import {
   fetchInitialSnapshot,
   finalFlushAndDelete,
   startSnapshotTimer,
-} from '../snapshot';
+} from '../snapshot.js';
 
 export function registerElementsNamespace(io: IOServer): void {
   const elements = io.of('/elements');
@@ -62,17 +64,47 @@ export function registerElementsNamespace(io: IOServer): void {
     if (isNew) {
       startSnapshotTimer(room);
       const initialState = await fetchInitialSnapshot(boardId);
-      if (initialState) {
-        room.state = initialState;
+
+      // Initializing DOC boards
+      if (boardType === 'DOC') {
+        room.state = { yDoc: new Y.Doc(), document: '' } as DocBoardState;
+        if (initialState && 'document' in initialState) {
+          const docState: DocBoardState = {
+            document: initialState.document,
+            yDoc: room.state.yDoc,
+          };
+          if (
+            typeof docState.document === 'string' &&
+            docState.document.length > 0
+          ) {
+            const update = Buffer.from(docState.document, 'base64');
+            Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
+          }
+        }
       } else {
-        room.state =
-          boardType === 'GRAPH'
-            ? ({ nodes: [], edges: [] } satisfies GraphBoardState)
-            : ({ layers: [[]] } satisfies SimpleBoardState);
+        if (initialState) {
+          room.state = initialState as GraphBoardState | SimpleBoardState;
+        } else {
+          room.state =
+            boardType === 'GRAPH'
+              ? ({ nodes: [], edges: [] } satisfies GraphBoardState)
+              : ({ layers: [[]] } satisfies SimpleBoardState);
+        }
       }
     }
 
     const socketsInRoom = await elements.in(boardId).fetchSockets();
+
+    if (
+      boardType === 'DOC' &&
+      room.state &&
+      'yDoc' in room.state &&
+      room.state.yDoc
+    ) {
+      const syncUpdate = Y.encodeStateAsUpdate(room.state.yDoc);
+      socket.emit('docSync', syncUpdate.buffer);
+    }
+
     console.info(
       `[elements] user ${userId} joined board ${boardId} (${boardType}), total: ${socketsInRoom.length}`,
     );
@@ -106,24 +138,17 @@ export function registerElementsNamespace(io: IOServer): void {
       socket.to(boardId).emit('elementRemoved', id);
     });
 
-    socket.on(
-      'changeElementLayer',
-      (data: {
-        id: string;
-        prevPosition: { layer: number; index: number };
-        newPosition: { layer: number; index: number };
-      }) => {
-        if (room.type !== 'SIMPLE' || !data?.id) return;
-        simpleChangeElementLayer(
-          room.state as SimpleBoardState,
-          data.id,
-          data.prevPosition,
-          data.newPosition,
-        );
-        markDirty(room);
-        socket.to(boardId).emit('changeElementLayer', data);
-      },
-    );
+    socket.on('changeElementLayer', (data: any) => {
+      if (room.type !== 'SIMPLE' || !data?.id) return;
+      simpleChangeElementLayer(
+        room.state as SimpleBoardState,
+        data.id,
+        data.prevPosition,
+        data.newPosition,
+      );
+      markDirty(room);
+      socket.to(boardId).emit('changeElementLayer', data);
+    });
 
     // GRAPH
     socket.on('nodesUpdate', (changes: any[]) => {
@@ -159,12 +184,38 @@ export function registerElementsNamespace(io: IOServer): void {
       },
     );
 
+    // DOC
+    socket.on('docUpdate', (update: ArrayBuffer) => {
+      if (
+        room.type !== 'DOC' ||
+        !room.state ||
+        !('yDoc' in room.state) ||
+        !room.state.yDoc
+      )
+        return;
+
+      try {
+        Y.applyUpdate(room.state.yDoc, new Uint8Array(update));
+        markDirty(room);
+        socket.to(boardId).emit('docUpdate', update);
+      } catch (err) {
+        console.error(
+          `[elements] Invalid Yjs update from user ${userId} in room ${boardId}`,
+        );
+      }
+    });
+
+    socket.on('awarenessUpdate', (update: ArrayBuffer) => {
+      if (room.type !== 'DOC') return;
+      socket.to(boardId).emit('awarenessUpdate', update);
+    });
+
     // Disconnect
     socket.on('disconnect', async () => {
       console.info(`[elements] user ${userId} left board ${boardId}`);
       const remaining = await elements.in(boardId).fetchSockets();
       if (remaining.length === 0) {
-        console.info(`[elements] room ${boardId} empty — flushing`);
+        console.info(`[elements] room ${boardId} empty - flushing`);
         await finalFlushAndDelete(room, deleteRoom);
       }
     });
