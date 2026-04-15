@@ -21,7 +21,7 @@ export default function QuillContainer() {
   const { activeQuillRef, onSelectionChange, setIsLoading } =
     useDocBoardContext();
 
-  function onPaste(e: ClipboardEvent) {
+  const onPaste = (e: ClipboardEvent) => {
     const clipboardData = e.clipboardData;
     if (!clipboardData || activeQuillRef.current === null) return;
 
@@ -50,7 +50,7 @@ export default function QuillContainer() {
         setIsLoading(false),
       );
     }
-  }
+  };
 
   async function onTextChange(delta: any, oldDelta: any, source: string) {
     if (activeQuillRef.current === null || source !== quillUser.current) return;
@@ -143,7 +143,9 @@ export default function QuillContainer() {
     return () => {
       bindingRef.current?.destroy();
       bindingRef.current = null;
+      activeQuillRef.current?.root.removeEventListener('paste', onPaste);
       activeQuillRef.current?.off('selection-change');
+      activeQuillRef.current?.off('text-change');
       activeQuillRef.current = null;
       if (editorContainerRef.current) {
         editorContainerRef.current.innerHTML = '';
