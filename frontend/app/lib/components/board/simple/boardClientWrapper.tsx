@@ -2,7 +2,10 @@
 
 import React, { useEffect, useRef } from 'react';
 import Cursors from '@/app/lib/components/board/simple/cursors';
-import { BoardProvider } from '@/app/lib/components/board/simple/boardContext';
+import {
+  BoardContext,
+  BoardProvider,
+} from '@/app/lib/components/board/simple/boardContext';
 import BoardStage from '@/app/lib/components/board/simple/boardStage';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -34,7 +37,13 @@ export default function BoardClientWrapper() {
     <BoardProvider>
       <BoardStage />
       <Cursors />
-      <BoardImageGenerator />
+      <BoardContext.Consumer>
+        {(context) => (
+          <BoardImageGenerator
+            boardData={{ type: 'SIMPLE', data: context!.stageRef }}
+          />
+        )}
+      </BoardContext.Consumer>
     </BoardProvider>
   );
 }
