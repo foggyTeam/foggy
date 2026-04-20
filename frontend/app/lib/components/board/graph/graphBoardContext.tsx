@@ -41,11 +41,12 @@ interface StableContextProps {
     e: MouseEvent,
     tool: GraphTool | undefined,
   ) => GNode | null;
-  createNewEdge: (connection: Connection) => GEdge | null;
+  createNewEdge: () => Partial<GEdge>;
   updateElement: (
     elementId: GNode['id'],
     newAttrs: Partial<GNode['data']>,
   ) => void;
+  deleteNode: (id: GNode['id']) => void;
   deleteSelectedElements: () => void;
 
   // ADDITIONAL
@@ -106,6 +107,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
     createNewEdge,
     updateElement,
     deleteSelectedElements,
+    deleteNode,
     isDuplicatedEdge,
   } = useGraphOperations(selectedElementsRef, allToolsDisabled);
 
@@ -134,6 +136,7 @@ export function GraphBoardProvider({ children }: { children: ReactNode }) {
       createNewElement,
       updateElement,
       deleteSelectedElements,
+      deleteNode,
       createNewEdge,
       isDuplicatedEdge,
       lockGraph,

@@ -19,7 +19,8 @@ type GNodeLinkNodeData = GNodeLinkNode['data'];
 
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
-  const { zoomNode, allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { zoomNode, allToolsDisabled, toolsDisabled, deleteNode } =
+    useGraphBoardContext();
   const data = graphBoardStore.nodesDataMap?.get(node.id) as GNodeLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
@@ -76,6 +77,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
     >
       {!isEditing && (
@@ -103,6 +105,9 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
             label={settingsStore.t.toolBar.linkLabel}
             type="url"
             value={nodeState.url}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             onValueChange={setUrl}
             autoFocus
             color="primary"
@@ -115,6 +120,9 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           />
 
           <Input
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.title}
             errorMessage={errors.current.title}

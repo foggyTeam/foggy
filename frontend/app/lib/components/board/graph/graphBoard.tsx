@@ -6,6 +6,7 @@ import './graphBoardCursors.css';
 import './graphBoardEdges.css';
 import {
   Background,
+  Connection,
   ConnectionMode,
   NodeTypes,
   Panel,
@@ -62,7 +63,7 @@ function GraphBoard() {
   const [initialNodes] = useState(() => toJS(graphBoardStore.boardNodes)!);
   const [initialEdges] = useState(() => toJS(graphBoardStore.boardEdges)!);
 
-  const { toolCursor, allToolsDisabled, toolsDisabled } =
+  const { toolCursor, allToolsDisabled, toolsDisabled, isDuplicatedEdge } =
     useGraphBoardContext();
 
   const { onSelectionChange } = useGraphBoardSelection();
@@ -162,6 +163,9 @@ function GraphBoard() {
         nodesConnectable={!(allToolsDisabled || toolsDisabled)}
         edgesFocusable={!(allToolsDisabled || toolsDisabled)}
         edgesReconnectable={!(allToolsDisabled || toolsDisabled)}
+        isValidConnection={(connection: Connection) =>
+          !isDuplicatedEdge(connection)
+        }
       >
         <Background size={1} gap={GRID_SIZE} color="#71717a" />
         <Panel position="bottom-center" className="toolbar w-full sm:w-fit">

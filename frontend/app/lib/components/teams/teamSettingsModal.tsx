@@ -212,6 +212,10 @@ const TeamSettingsModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
+        onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
+          if (e.key === 'Enter' && !Object.keys(errors).length)
+            await onSubmit();
+        }}
       >
         <ModalContent className="flex w-full max-w-md gap-2 overflow-visible p-6">
           {() =>
@@ -235,6 +239,7 @@ const TeamSettingsModal = observer(
                   </div>
                   <div className="flex h-full w-full flex-col items-start gap-2">
                     <Input
+                      autoFocus
                       isRequired
                       isInvalid={errors.name}
                       errorMessage={errors.name}

@@ -54,6 +54,9 @@ export default function ChangeRoleModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
+      onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
+        if (e.key === 'Enter' && !(newRole === member.role)) action();
+      }}
     >
       <ModalContent className="flex w-fit max-w-2xl gap-4 p-6">
         {(onClose) =>

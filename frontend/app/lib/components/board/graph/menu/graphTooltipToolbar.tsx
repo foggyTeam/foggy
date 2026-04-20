@@ -6,7 +6,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import settingsStore from '@/app/stores/settingsStore';
 import { Button } from '@heroui/button';
-import { LinkIcon, PencilIcon } from 'lucide-react';
+import { LinkIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
@@ -14,6 +14,7 @@ export interface GraphToolbarProps {
   isOpen: boolean;
   tools?: JSX.Element;
   onToggleEdit?: () => void;
+  onDelete?: () => void;
   onCopyNodeLink?: () => void;
 }
 
@@ -21,6 +22,7 @@ export default function GraphTooltipToolbar({
   isOpen,
   onToggleEdit,
   onCopyNodeLink,
+  onDelete,
   tools,
 }: GraphToolbarProps) {
   const { commonSize } = useAdaptiveParams();
@@ -62,6 +64,19 @@ export default function GraphTooltipToolbar({
           size={commonSize}
         >
           <PencilIcon className="stroke-default-600" />
+        </Button>
+      </FTooltip>
+      <FTooltip content={settingsStore.t.toolTips.tools.deleteTool}>
+        <Button
+          data-testid="delete-tool-btn"
+          onPress={onDelete}
+          isDisabled={allToolsDisabled}
+          variant="light"
+          color="danger"
+          isIconOnly
+          size={commonSize}
+        >
+          <TrashIcon className="stroke-danger-500" />
         </Button>
       </FTooltip>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GEdge } from '@/app/lib/types/definitions';
 import StepTypeTool from '@/app/lib/components/board/graph/tools/edgeTools/stepTypeTool';
 import LineStyleTool from '@/app/lib/components/board/graph/tools/edgeTools/lineStyleTool';
@@ -21,7 +21,7 @@ export default function GraphEdgeToolbar({
   onEdgeUpdate: (id: string, updatedEdge: GEdge) => void;
 }) {
   const { getEdge } = useReactFlow();
-  const edge = useRef(getEdge(edgeId));
+  const [edge, setEdge] = useState(getEdge(edgeId));
 
   const tools = [
     StepTypeTool,
@@ -32,19 +32,19 @@ export default function GraphEdgeToolbar({
   ];
 
   useEffect(() => {
-    edge.current = getEdge(edgeId);
+    setEdge(getEdge(edgeId));
   }, [edgeId]);
 
   const applyChange = (newAttrs: EdgeUpdate) => {
     const updatedEdge = { ...getEdge(edgeId), ...newAttrs } as GEdge;
     onEdgeUpdate(edgeId, updatedEdge);
-    edge.current = updatedEdge; // enables keeping edge state actual for each tool
+    setEdge(updatedEdge); // enables keeping edge state actual for each tool
   };
 
   return (
     <div className="flex justify-center gap-1">
       {tools.map((Tool: any, index) => (
-        <Tool key={index} edge={edge.current} onChange={applyChange} />
+        <Tool key={`${index}-${edge?.id}`} edge={edge} onChange={applyChange} />
       ))}
     </div>
   );

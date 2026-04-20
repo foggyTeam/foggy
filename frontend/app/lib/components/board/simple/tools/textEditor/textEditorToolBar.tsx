@@ -243,7 +243,11 @@ export default function TextEditorToolBar({
         return (
           <EditorToolButton
             id={tool.id}
-            value={selectionFormat[tool.id]}
+            value={
+              Array.isArray(selectionFormat[tool.id])
+                ? selectionFormat[tool.id][0]
+                : selectionFormat[tool.id]
+            }
             Icon={tool.ToolIcon}
             isAccent={!!selectionFormat[tool.id]}
             popover={true}
