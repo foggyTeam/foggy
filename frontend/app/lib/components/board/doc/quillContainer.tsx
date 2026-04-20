@@ -53,7 +53,7 @@ export default function QuillContainer() {
   };
 
   async function onTextChange(delta: any, oldDelta: any, source: string) {
-    if (activeQuillRef.current === null) return;
+    if (activeQuillRef.current === null || source !== quillUser.current) return;
 
     // preserve scroll position to prevent jumping
     if (source !== quillUser.current) {

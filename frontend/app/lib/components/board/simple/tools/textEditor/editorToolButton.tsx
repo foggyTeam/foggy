@@ -6,7 +6,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const to_rgba = (hex: string): string => {
-  hex = hex.replace(/^#/, '');
+  hex = hex?.replace(/^#/, '') || '';
 
   if (hex.length === 3 || hex.length === 4) {
     hex = hex
@@ -98,6 +98,10 @@ export default function EditorToolButton({
     if (open) saveSelection?.();
     setIsOpen(open);
   };
+
+  useEffect(() => {
+    if (value !== localValue) setLocalValue(value);
+  }, [value]);
 
   return popover ? (
     <Popover

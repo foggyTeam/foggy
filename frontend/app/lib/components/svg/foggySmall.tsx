@@ -10,8 +10,6 @@ function FoggySmall({
   className?: string;
   [key: string]: any;
 }) {
-  // Unique gradient ID per instance — prevents duplicate-ID collisions
-  // that break fill references when sibling SVGs are inside backdrop-filter containers
   const uid = React.useId().replace(/:/g, '');
   const gradientId = `logo-gradient-${uid}`;
 
