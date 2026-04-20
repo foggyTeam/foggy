@@ -41,7 +41,7 @@ interface StableContextProps {
     e: MouseEvent,
     tool: GraphTool | undefined,
   ) => GNode | null;
-  createNewEdge: (connection: Connection) => GEdge | null;
+  createNewEdge: () => Partial<GEdge>;
   updateElement: (
     elementId: GNode['id'],
     newAttrs: Partial<GNode['data']>,

@@ -120,6 +120,7 @@ export function graphApplyNodeChanges(
         if (node) node.selected = change.selected;
         break;
       }
+      case 'replace':
       case 'reset': {
         const idx = state.nodes.findIndex((n) => n.id === change.item?.id);
         if (idx !== -1) state.nodes[idx] = change.item;
@@ -146,6 +147,7 @@ export function graphApplyEdgeChanges(
         if (edge) edge.selected = change.selected;
         break;
       }
+      case 'replace':
       case 'reset': {
         const idx = state.edges.findIndex((e) => e.id === change.item?.id);
         if (idx !== -1) state.edges[idx] = change.item;
