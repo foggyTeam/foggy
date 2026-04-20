@@ -17,7 +17,7 @@ import { observer } from 'mobx-react-lite';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 import { Edge, Node, ReactFlowInstance } from '@xyflow/react';
 import GetGraphBoardImage from '@/app/lib/utils/getGraphBoardImage';
-import { GEdge, GNode } from '@/app/lib/types/definitions';
+import { GNode } from '@/app/lib/types/definitions';
 
 interface SimpleBoardData {
   type: 'SIMPLE';
@@ -26,10 +26,7 @@ interface SimpleBoardData {
 
 interface GraphBoardData {
   type: 'GRAPH';
-  data: Pick<
-    ReactFlowInstance<Node, Edge>,
-    'getNodes' | 'getEdges' | 'getNodesBounds'
-  >;
+  data: Pick<ReactFlowInstance<Node, Edge>, 'getNodes' | 'getNodesBounds'>;
 }
 
 type BoardData = SimpleBoardData | GraphBoardData;
@@ -62,7 +59,6 @@ const BoardImageGenerator = observer(
 
       const blob = await GetGraphBoardImage(
         boardData.data.getNodes() as GNode[],
-        boardData.data.getEdges() as GEdge[],
         boardData.data.getNodesBounds(boardData.data.getNodes()),
         resolvedTheme === 'light' ? '#e4e4e7' : '#27272a',
       );

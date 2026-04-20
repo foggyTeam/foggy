@@ -1,13 +1,12 @@
 import { Rect } from '@xyflow/react';
 import { toCanvas } from 'html-to-image';
 import { canvasToBlob } from './getBoardImage';
-import { GEdge, GNode } from '@/app/lib/types/definitions';
+import { GNode } from '@/app/lib/types/definitions';
 
 const MAX_SIZE = 2048;
 
 export default async function GetGraphBoardImage(
   nodes: GNode[],
-  edges: GEdge[],
   nodesBounds: Rect,
   backgroundColor: string,
 ): Promise<Blob | null> {

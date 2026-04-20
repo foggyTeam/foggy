@@ -8,12 +8,12 @@ import GraphBoardCursors from '@/app/lib/components/board/graph/graphBoardCursor
 import BoardImageGenerator from '@/app/lib/components/board/simple/ai/boardImageGenerator';
 
 const ImageGeneratorWrapper = () => {
-  const { getNodes, getEdges, getNodesBounds } = useReactFlow();
+  const { getNodes, getNodesBounds } = useReactFlow();
   return (
     <BoardImageGenerator
       boardData={{
         type: 'GRAPH',
-        data: { getNodes, getEdges, getNodesBounds },
+        data: { getNodes, getNodesBounds },
       }}
     />
   );
