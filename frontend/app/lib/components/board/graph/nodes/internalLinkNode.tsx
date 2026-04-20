@@ -12,6 +12,7 @@ import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import ProjectElementSelect from '@/app/lib/components/board/graph/nodes/projectElementSelect/projectElementSelect';
 import projectsStore from '@/app/stores/projectsStore';
 import { PressEvent } from '@heroui/button';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 type GInternalLinkNodeData = GInternalLinkNode['data'];
 
@@ -20,6 +21,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     node.id,
   ) as GInternalLinkNodeData;
 
+  const { deleteNode } = useGraphBoardContext();
   const { nodeState, dispatch, isEditing, onBlur, toggleEdit, onCopyLink } =
     useGraphNode<GInternalLinkNodeData>(
       node.id,
@@ -57,6 +59,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
     >
       {!isEditing && (

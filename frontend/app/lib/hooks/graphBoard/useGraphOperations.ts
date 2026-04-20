@@ -1,7 +1,7 @@
 'use client';
 
 import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
-import { RefObject, useCallback, useEffect, useMemo, MouseEvent } from 'react';
+import { MouseEvent, RefObject, useCallback, useEffect, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
@@ -79,6 +79,13 @@ export default function useGraphOperations(
     });
     await deleteElements({ nodes, edges });
   }, [deleteElements, isDisabled]);
+  const deleteNode = useCallback(
+    async (id: GNode['id']) => {
+      if (isDisabled) return;
+      await deleteElements({ nodes: [{ id }] });
+    },
+    [deleteElements, isDisabled],
+  );
 
   const isDuplicatedEdge = useCallback(
     (connection: Connection) => {
@@ -102,6 +109,7 @@ export default function useGraphOperations(
     createNewElement,
     createNewEdge,
     deleteSelectedElements,
+    deleteNode,
     isDuplicatedEdge,
   };
 }

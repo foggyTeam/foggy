@@ -33,7 +33,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   ) as GExternalLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
-  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { allToolsDisabled, toolsDisabled, deleteNode } =
+    useGraphBoardContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -111,6 +112,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
     >
       {(isEditing || data?.thumbnailUrl) && (

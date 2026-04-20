@@ -19,7 +19,8 @@ type GNodeLinkNodeData = GNodeLinkNode['data'];
 
 const NodeLinkNode = observer((node: GNodeLinkNode) => {
   const path = usePathname();
-  const { zoomNode, allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { zoomNode, allToolsDisabled, toolsDisabled, deleteNode } =
+    useGraphBoardContext();
   const data = graphBoardStore.nodesDataMap?.get(node.id) as GNodeLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
@@ -76,6 +77,7 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
     >
       {!isEditing && (

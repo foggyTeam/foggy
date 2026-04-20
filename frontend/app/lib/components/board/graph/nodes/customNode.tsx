@@ -42,7 +42,8 @@ function isLightColor(hex: string): boolean {
 const CustomNode = observer((node: GCustomNode) => {
   const data = graphBoardStore.nodesDataMap?.get(node.id) as GCustomNodeData;
   const { smallerSize } = useAdaptiveParams();
-  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { allToolsDisabled, toolsDisabled, deleteNode } =
+    useGraphBoardContext();
 
   const {
     nodeState,
@@ -118,6 +119,7 @@ const CustomNode = observer((node: GCustomNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
       toolbarTools={toolbarTools}
       className={clsx(shapeClass, themeClass)}
