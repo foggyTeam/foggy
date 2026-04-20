@@ -239,6 +239,7 @@ const TeamSettingsModal = observer(
                   </div>
                   <div className="flex h-full w-full flex-col items-start gap-2">
                     <Input
+                      autoFocus
                       isRequired
                       isInvalid={errors.name}
                       errorMessage={errors.name}

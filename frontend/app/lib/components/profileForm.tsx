@@ -191,6 +191,7 @@ const ProfileForm = observer((userData: ProfileData) => {
         <div className="flex h-fit w-full flex-wrap justify-between gap-2 sm:flex-nowrap sm:gap-6">
           <div className="flex h-fit w-full flex-col gap-2">
             <Input
+              autoFocus
               isInvalid={errors.nickname}
               errorMessage={errors.nickname}
               label={settingsStore.t.profile.nickname}

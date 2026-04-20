@@ -93,6 +93,7 @@ export default function AddProjectElementModal({
                 </h1>
                 <Input
                   value={name}
+                  autoFocus
                   onValueChange={setName}
                   isInvalid={error.name}
                   errorMessage={error.name}
