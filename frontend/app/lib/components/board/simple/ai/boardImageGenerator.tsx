@@ -15,15 +15,13 @@ import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { observer } from 'mobx-react-lite';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
-import Konva from 'konva';
 import { Edge, Node, ReactFlowInstance } from '@xyflow/react';
 import GetGraphBoardImage from '@/app/lib/utils/getGraphBoardImage';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
-import Stage = Konva.Stage;
 
 interface SimpleBoardData {
   type: 'SIMPLE';
-  data: RefObject<Stage | null>;
+  data: RefObject<any | null>;
 }
 
 interface GraphBoardData {
