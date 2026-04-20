@@ -34,12 +34,7 @@ interface GraphBoardData {
   >;
 }
 
-interface DocBoardData {
-  type: 'DOC';
-  data: RefObject<any | null>;
-}
-
-type BoardData = SimpleBoardData | GraphBoardData | DocBoardData;
+type BoardData = SimpleBoardData | GraphBoardData;
 
 const BoardImageGenerator = observer(
   ({ boardData }: { boardData: BoardData }) => {
@@ -76,7 +71,6 @@ const BoardImageGenerator = observer(
       if (!blob) return null;
       return blob;
     };
-    const handleDocUpload = async (): Promise<Blob | null> => {};
 
     async function handleUpload() {
       setIsLoading(true);
@@ -89,9 +83,6 @@ const BoardImageGenerator = observer(
             break;
           case 'GRAPH':
             blob = await handleGraphUpload();
-            break;
-          case 'DOC':
-            blob = await handleDocUpload();
             break;
         }
       } catch (e: any) {}
