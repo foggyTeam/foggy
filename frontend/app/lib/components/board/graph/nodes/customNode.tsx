@@ -166,6 +166,7 @@ const CustomNode = observer((node: GCustomNode) => {
             value={nodeState.title}
             onValueChange={setTitle}
             autoFocus
+            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
             color="primary"
             variant="underlined"
             size={smallerSize}
@@ -176,6 +177,7 @@ const CustomNode = observer((node: GCustomNode) => {
           />
 
           <Textarea
+            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.description}
             errorMessage={errors.current.description}
