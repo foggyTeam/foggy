@@ -41,7 +41,14 @@ export default function RemoveTeamMemberModal({
   }, [removeType, submitRemoveType]);
 
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange} hideCloseButton>
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === 'Enter') action();
+      }}
+    >
       <ModalContent className="flex w-fit max-w-md gap-4 p-6">
         {(onClose) =>
           (

@@ -51,6 +51,9 @@ export default function AddProjectElementModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
+      onKeyDown={async (e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !error?.name) await action(name, filetype);
+      }}
     >
       <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
         {() =>

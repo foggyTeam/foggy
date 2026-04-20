@@ -54,6 +54,9 @@ export default function SelectOwnerModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === 'Enter' && !!selectedOwner[0]) action();
+      }}
     >
       <ModalContent className="flex w-fit max-w-2xl gap-4 p-6">
         {(onClose) =>

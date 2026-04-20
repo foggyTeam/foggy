@@ -33,6 +33,9 @@ export default function AreYouSureModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === 'Enter') action();
+      }}
     >
       <ModalContent>
         {(onClose) =>

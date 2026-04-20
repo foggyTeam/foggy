@@ -232,6 +232,10 @@ const ProjectSettingsModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
+        onKeyDown={async (e: KeyboardEvent) => {
+          if (e.key === 'Enter' && !Object.keys(errors).length)
+            await onSubmit();
+        }}
       >
         <ModalContent className="flex w-full max-w-2xl gap-2 overflow-visible p-6">
           {() =>
