@@ -5,7 +5,7 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@heroui/modal';
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
@@ -33,7 +33,7 @@ export default function AreYouSureModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
-      onKeyDown={(e: KeyboardEvent) => {
+      onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === 'Enter') action();
       }}
     >

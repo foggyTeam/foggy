@@ -105,7 +105,9 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
             label={settingsStore.t.toolBar.linkLabel}
             type="url"
             value={nodeState.url}
-            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             onValueChange={setUrl}
             autoFocus
             color="primary"
@@ -118,7 +120,9 @@ const NodeLinkNode = observer((node: GNodeLinkNode) => {
           />
 
           <Input
-            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.title}
             errorMessage={errors.current.title}

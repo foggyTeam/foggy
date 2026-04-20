@@ -123,7 +123,7 @@ const AddMembersModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
-        onKeyDown={async (e: KeyboardEvent) => {
+        onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
           if (e.key === 'Enter' && selectedMembers.length && role)
             await handleAddMembers();
         }}

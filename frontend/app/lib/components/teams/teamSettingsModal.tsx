@@ -212,7 +212,7 @@ const TeamSettingsModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
-        onKeyDown={async (e: KeyboardEvent) => {
+        onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
           if (e.key === 'Enter' && !Object.keys(errors).length)
             await onSubmit();
         }}

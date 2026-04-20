@@ -51,7 +51,7 @@ export default function AddProjectElementModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
-      onKeyDown={async (e: KeyboardEvent) => {
+      onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === 'Enter' && !error?.name) await action(name, filetype);
       }}
     >

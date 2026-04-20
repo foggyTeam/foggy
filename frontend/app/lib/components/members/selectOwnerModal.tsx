@@ -54,7 +54,7 @@ export default function SelectOwnerModal({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       hideCloseButton
-      onKeyDown={(e: KeyboardEvent) => {
+      onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === 'Enter' && !!selectedOwner[0]) action();
       }}
     >

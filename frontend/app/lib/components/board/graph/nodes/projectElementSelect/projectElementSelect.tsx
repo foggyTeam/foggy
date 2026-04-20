@@ -44,7 +44,9 @@ export default function ProjectElementSelect({
       <PopoverTrigger>
         <div className="w-full">
           <Input
-            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             value={value?.title}
             startContent={
               value?.type ? (

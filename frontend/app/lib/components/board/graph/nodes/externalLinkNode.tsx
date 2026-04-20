@@ -163,7 +163,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         >
           <Input
             inputMode="url"
-            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.url}
             errorMessage={errors.current.url}
@@ -183,7 +185,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
-            onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.description}
             errorMessage={errors.current.description}
