@@ -68,6 +68,7 @@ export default function EditorToolButton({
 }) {
   const { commonSize } = useAdaptiveParams();
   const [localValue, setLocalValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setLocalValue(
@@ -93,13 +94,20 @@ export default function EditorToolButton({
     setTimeout(() => handleClick(id, newValue), 240);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) saveSelection?.();
+    setIsOpen(open);
+  };
+
   return popover ? (
-    <Popover onClose={handlePopoverClose}>
+    <Popover
+      isOpen={isOpen}
+      onOpenChange={handleOpenChange}
+      onClose={handlePopoverClose}
+    >
       <PopoverTrigger>
         <Button
-          onPress={() => {
-            saveSelection();
-          }}
+          onPress={() => {}}
           id={id}
           variant="light"
           isIconOnly

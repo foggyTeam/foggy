@@ -53,7 +53,20 @@ export default function QuillContainer() {
   };
 
   async function onTextChange(delta: any, oldDelta: any, source: string) {
-    if (activeQuillRef.current === null || source !== quillUser.current) return;
+    if (activeQuillRef.current === null) return;
+
+    // preserve scroll position to prevent jumping
+    if (source !== quillUser.current) {
+      const scrollEl =
+        editorContainerRef.current?.closest<HTMLElement>('.overflow-y-auto');
+      if (scrollEl) {
+        const savedTop = scrollEl.scrollTop;
+        requestAnimationFrame(() => {
+          scrollEl.scrollTop = savedTop;
+        });
+      }
+      return;
+    }
 
     const deletedOps = delta.ops.filter((op: any) => op.delete);
 
