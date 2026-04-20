@@ -75,7 +75,7 @@ const BoardImageGenerator = observer(
     async function handleUpload() {
       setIsLoading(true);
 
-      let blob: Blob | null;
+      let blob: Blob | null = null;
       try {
         switch (boardData.type) {
           case 'SIMPLE':
