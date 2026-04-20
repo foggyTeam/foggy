@@ -55,7 +55,9 @@ interface BoardContextProps {
   resetStage: () => void;
 }
 
-const BoardContext = createContext<BoardContextProps | undefined>(undefined);
+export const BoardContext = createContext<BoardContextProps | undefined>(
+  undefined,
+);
 
 export const BoardProvider = observer(
   ({ children }: { children: ReactNode }) => {

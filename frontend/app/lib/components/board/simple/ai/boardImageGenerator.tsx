@@ -2,10 +2,9 @@
 
 import { CloudUploadIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import React, { useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import { foggy_accent } from '@/tailwind.config';
-import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import GetBoardImage from '@/app/lib/utils/getBoardImage';
 import boardStore from '@/app/stores/board/boardStore';
 import { useTheme } from 'next-themes';
@@ -16,77 +15,143 @@ import { CopyToClipboard } from '@/app/lib/utils/copyToClipboard';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { observer } from 'mobx-react-lite';
 import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
+import Konva from 'konva';
+import { Edge, Node, ReactFlowInstance } from '@xyflow/react';
+import GetGraphBoardImage from '@/app/lib/utils/getGraphBoardImage';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
+import Stage = Konva.Stage;
 
-const BoardImageGenerator = observer(() => {
-  const { resolvedTheme } = useTheme();
-  const { commonSize } = useAdaptiveParams();
-  const { stageRef } = useBoardContext();
-  const [isLoading, setIsLoading] = useState(false);
+interface SimpleBoardData {
+  type: 'SIMPLE';
+  data: RefObject<Stage | null>;
+}
 
-  const handleUpload = async () => {
-    if (!boardStore.activeBoard || !simpleBoardStore.boardLayers) return;
+interface GraphBoardData {
+  type: 'GRAPH';
+  data: Pick<
+    ReactFlowInstance<Node, Edge>,
+    'getNodes' | 'getEdges' | 'getNodesBounds'
+  >;
+}
 
-    setIsLoading(true);
-    let blob = null;
-    try {
-      blob = await GetBoardImage(
-        stageRef,
+interface DocBoardData {
+  type: 'DOC';
+  data: RefObject<any | null>;
+}
+
+type BoardData = SimpleBoardData | GraphBoardData | DocBoardData;
+
+const BoardImageGenerator = observer(
+  ({ boardData }: { boardData: BoardData }) => {
+    const { resolvedTheme } = useTheme();
+    const { commonSize } = useAdaptiveParams();
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSimpleUpload = async (): Promise<Blob | null> => {
+      if (
+        boardData.type !== 'SIMPLE' ||
+        !boardStore.activeBoard ||
+        !simpleBoardStore.boardLayers
+      )
+        return null;
+
+      const blob = await GetBoardImage(
+        boardData.data,
         simpleBoardStore.boardLayers,
         resolvedTheme === 'light' ? '#e4e4e7' : '#27272a',
       );
-      if (!blob) throw new Error();
-    } catch (e: any) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.generateBoardImageError,
-        description: e.message || '',
-      });
-      setIsLoading(false);
-      return;
-    }
+      if (!blob) return null;
 
-    try {
-      const result = await uploadImage(
-        'board_images',
-        blob,
-        'board_temp_image_',
-        { type: 'hash', base: boardStore.activeBoard.id },
+      return blob;
+    };
+    const handleGraphUpload = async (): Promise<Blob | null> => {
+      if (boardData.type !== 'GRAPH') return null;
+
+      const blob = await GetGraphBoardImage(
+        boardData.data.getNodes() as GNode[],
+        boardData.data.getEdges() as GEdge[],
+        boardData.data.getNodesBounds(boardData.data.getNodes()),
+        resolvedTheme === 'light' ? '#e4e4e7' : '#27272a',
       );
-      if ('error' in result) throw new Error(result.error);
+      if (!blob) return null;
+      return blob;
+    };
+    const handleDocUpload = async (): Promise<Blob | null> => {};
 
-      addToast({
-        color: 'success',
-        severity: 'success',
-        title: settingsStore.t.toasts.board.uploadBoardImageSuccess,
-      });
-      await CopyToClipboard(result.url);
-    } catch (e: any) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.uploadBoardImageError,
-        description: e.message || '',
-      });
+    async function handleUpload() {
+      setIsLoading(true);
+
+      let blob: Blob | null;
+      try {
+        switch (boardData.type) {
+          case 'SIMPLE':
+            blob = await handleSimpleUpload();
+            break;
+          case 'GRAPH':
+            blob = await handleGraphUpload();
+            break;
+          case 'DOC':
+            blob = await handleDocUpload();
+            break;
+        }
+      } catch (e: any) {}
+
+      if (!blob) {
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.board.generateBoardImageError,
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const result = await uploadImage(
+          'board_images',
+          blob,
+          'board_temp_image_',
+          { type: 'hash', base: boardStore.activeBoard?.id },
+        );
+
+        if ('error' in result) throw new Error(result.error);
+
+        addToast({
+          color: 'success',
+          severity: 'success',
+          title: settingsStore.t.toasts.board.uploadBoardImageSuccess,
+        });
+        await CopyToClipboard(result.url);
+      } catch (e: any) {
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.board.uploadBoardImageError,
+          description: e.message || '',
+        });
+      }
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  };
 
-  return (
-    <FTooltip placement="right" content={settingsStore.t.toolTips.uploadButton}>
-      <Button
-        data-testid="save-board-image-btn"
-        onPress={handleUpload}
-        isIconOnly
-        isLoading={isLoading}
-        color={foggy_accent.light.DEFAULT as any}
-        size={commonSize}
-        className="accent-sh absolute bottom-3 left-3 z-50 font-semibold sm:bottom-6 sm:left-6"
+    return (
+      <FTooltip
+        placement="right"
+        content={settingsStore.t.toolTips.uploadButton}
       >
-        <CloudUploadIcon />
-      </Button>
-    </FTooltip>
-  );
-});
+        <Button
+          data-testid="save-board-image-btn"
+          onPress={handleUpload}
+          isIconOnly
+          isLoading={isLoading}
+          color={foggy_accent.light.DEFAULT as any}
+          size={commonSize}
+          className="accent-sh absolute bottom-3 left-3 z-50 font-semibold sm:bottom-6 sm:left-6"
+        >
+          <CloudUploadIcon />
+        </Button>
+      </FTooltip>
+    );
+  },
+);
 
 export default BoardImageGenerator;

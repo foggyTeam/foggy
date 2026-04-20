@@ -46,7 +46,7 @@ function getBoundingBox(stage: Stage, layers: SBoardElement[][]) {
   };
 }
 
-function canvasToBlob(
+export function canvasToBlob(
   canvas: HTMLCanvasElement,
   type: string,
   quality: number = 0.92,
