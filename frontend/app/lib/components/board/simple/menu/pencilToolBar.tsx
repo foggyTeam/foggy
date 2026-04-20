@@ -20,10 +20,20 @@ export default function PencilToolBar({
 
   const additionalTools = [LayerTool];
 
-  const [color, setColor] = useState(pencilParams.color);
-  const [width, setWidth] = useState(pencilParams.width);
-  const [tension, setTension] = useState(pencilParams.tension * 10);
-  const [lineCap, setLineCap] = useState(pencilParams.lineCap);
+  const [color, setColor] = useState<string>(
+    selectedElement?.attrs?.stroke || pencilParams.color,
+  );
+  const [width, setWidth] = useState<number>(
+    selectedElement?.attrs?.strokeWidth || pencilParams.width,
+  );
+  const [tension, setTension] = useState<number>(
+    selectedElement?.attrs
+      ? selectedElement.attrs.tension * 10
+      : pencilParams.tension * 10,
+  );
+  const [lineCap, setLineCap] = useState<LineElement['lineCap']>(
+    selectedElement?.attrs?.lineCap || pencilParams.lineCap,
+  );
 
   useEffect(() => {
     if (selectedElement?.attrs) {
@@ -50,7 +60,7 @@ export default function PencilToolBar({
         lineCap,
         tension: tension / 10,
       } as Partial<LineElement>);
-  }, [color, width, tension, lineCap, selectedElement, setPencilParams]);
+  }, [color, width, tension, lineCap]);
 
   return (
     <div className="flex justify-center gap-1">

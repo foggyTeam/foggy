@@ -30,7 +30,7 @@ export default function useInternalUpdates() {
     isDuplicatedEdge,
     selectedElementsRef,
   } = useGraphBoardContext();
-  const { addNodes, updateEdge, addEdges, deleteElements, getNodes } =
+  const { addNodes, updateEdge, addEdges, deleteElements, getNodes, getEdges } =
     useReactFlow();
 
   const pendingNodeChanges = useRef<NodeChange[]>([]);
@@ -210,15 +210,27 @@ export default function useInternalUpdates() {
   );
   const createEdge = useCallback(
     (connection: Connection) => {
-      const edge = createNewEdge(connection);
+      const edge = getEdges().find(
+        (e) =>
+          e.source === connection.source &&
+          e.target === connection.target &&
+          e.sourceHandle === connection.sourceHandle &&
+          e.targetHandle === connection.targetHandle,
+      ) as GEdge | undefined;
+
       if (!edge) return;
 
-      onEdgeAction({
-        type: 'add',
-        newItem: edge,
-      });
+      updateEdge(edge.id, createNewEdge());
+
+      const edgeToSync = {
+        ...edge,
+        ...createNewEdge(),
+      } as GEdge;
+
+      pendingEdgeChanges.current.push({ type: 'add', item: edgeToSync });
+      flushEdgeEmit();
     },
-    [createNewEdge, onEdgeAction],
+    [createNewEdge, onEdgeAction, flushEdgeEmit],
   );
   const reconnectEdge = useCallback(
     (oldEdge: GEdge, newConnection: Connection) => {

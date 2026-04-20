@@ -104,6 +104,7 @@ const LoginForm = observer(() => {
     >
       <Input
         isRequired
+        autoFocus
         isInvalid={errors.email}
         errorMessage={errors.email}
         label={settingsStore.t.login.email}

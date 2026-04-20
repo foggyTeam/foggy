@@ -123,6 +123,10 @@ const AddMembersModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
+        onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
+          if (e.key === 'Enter' && selectedMembers.length && role)
+            await handleAddMembers();
+        }}
       >
         <ModalContent className="flex w-full max-w-lg gap-2 p-6">
           {() => (

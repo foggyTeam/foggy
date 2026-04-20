@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@heroui/input';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -29,20 +29,24 @@ export default function ProjectElementSelect({
   const { smallerSize } = useAdaptiveParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  useEffect(() => {
-    if (!isMenuOpen && onMenuClose) onMenuClose();
-  }, [isMenuOpen]);
+  function handleOpenChange(open: boolean) {
+    if (allToolsDisabled || !isDraggable) return;
+    setIsMenuOpen(open);
+    if (!open) if (typeof onMenuClose === 'function') onMenuClose();
+  }
+
   return (
     <Popover
       placement="bottom"
       isOpen={isMenuOpen}
-      onOpenChange={(open) =>
-        allToolsDisabled || !isDraggable ? null : setIsMenuOpen(open)
-      }
+      onOpenChange={handleOpenChange}
     >
       <PopoverTrigger>
         <div className="w-full">
           <Input
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             value={value?.title}
             startContent={
               value?.type ? (

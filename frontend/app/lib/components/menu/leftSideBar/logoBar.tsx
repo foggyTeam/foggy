@@ -2,8 +2,11 @@ import FoggySmall from '@/app/lib/components/svg/foggySmall';
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function LogoBar() {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
       className={clsx(
@@ -14,7 +17,15 @@ export default function LogoBar() {
     >
       <Link href="/">
         <FoggySmall
-          className="fill-primary stroke-primary stroke-0 transition-all duration-300 hover:fill-[url(#logo-gradient)] hover:stroke-2"
+          withGradient={isHovered}
+          className={clsx(
+            'transition-all duration-300',
+            isHovered
+              ? 'stroke-primary stroke-2'
+              : 'fill-primary stroke-primary stroke-0',
+          )}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
           width={48}
           height={48}
         />

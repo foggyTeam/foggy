@@ -1,7 +1,7 @@
 'use client';
 
 import { GBaseNode, GEdge, GNode } from '@/app/lib/types/definitions';
-import { RefObject, useCallback, useEffect, useMemo, MouseEvent } from 'react';
+import { MouseEvent, RefObject, useCallback, useEffect, useMemo } from 'react';
 import debounce from 'lodash/debounce';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
 import { GraphTool } from '@/app/lib/components/board/graph/graphBoardContext';
@@ -44,17 +44,11 @@ export default function useGraphOperations(
     }
     return newNode as GNode;
   };
-  const createNewEdge = (connection: Connection): GEdge | null => {
-    if (isDuplicatedEdge(connection)) return null;
-
-    const newEdge = {
-      ...connection,
+  const createNewEdge = (): Partial<GEdge> => {
+    return {
       style: { strokeWidth: 1.5 },
-      id: `${connection.source}-${connection.target}-${Date.now().toString()}`,
       type: 'default',
     };
-
-    return newEdge as GEdge;
   };
 
   const updateElement = useMemo(
@@ -79,6 +73,13 @@ export default function useGraphOperations(
     });
     await deleteElements({ nodes, edges });
   }, [deleteElements, isDisabled]);
+  const deleteNode = useCallback(
+    async (id: GNode['id']) => {
+      if (isDisabled) return;
+      await deleteElements({ nodes: [{ id }] });
+    },
+    [deleteElements, isDisabled],
+  );
 
   const isDuplicatedEdge = useCallback(
     (connection: Connection) => {
@@ -86,8 +87,8 @@ export default function useGraphOperations(
         (edge) =>
           edge.source === connection.source &&
           edge.target === connection.target &&
-          edge.sourceHandle === connection.sourceHandle &&
-          edge.targetHandle === connection.targetHandle,
+          (edge.sourceHandle ?? null) === (connection.sourceHandle ?? null) &&
+          (edge.targetHandle ?? null) === (connection.targetHandle ?? null),
       );
     },
     [getEdges],
@@ -102,6 +103,7 @@ export default function useGraphOperations(
     createNewElement,
     createNewEdge,
     deleteSelectedElements,
+    deleteNode,
     isDuplicatedEdge,
   };
 }

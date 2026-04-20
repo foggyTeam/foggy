@@ -33,7 +33,8 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
   ) as GExternalLinkNodeData;
 
   const { smallerSize } = useAdaptiveParams();
-  const { allToolsDisabled, toolsDisabled } = useGraphBoardContext();
+  const { allToolsDisabled, toolsDisabled, deleteNode } =
+    useGraphBoardContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -111,6 +112,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
       toolbarProps={{
         onToggleEdit: toggleEdit,
         onCopyNodeLink: onCopyLink,
+        onDelete: () => deleteNode(node.id),
       }}
     >
       {(isEditing || data?.thumbnailUrl) && (
@@ -161,6 +163,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
         >
           <Input
             inputMode="url"
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.url}
             errorMessage={errors.current.url}
@@ -180,6 +185,9 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
           />
 
           <Textarea
+            onPointerDown={(e: React.PointerEvent<HTMLInputElement>) =>
+              e.stopPropagation()
+            }
             isReadOnly={allToolsDisabled || toolsDisabled || !node.draggable}
             isInvalid={!!errors.current.description}
             errorMessage={errors.current.description}

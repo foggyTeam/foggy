@@ -232,6 +232,10 @@ const ProjectSettingsModal = observer(
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         hideCloseButton
+        onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
+          if (e.key === 'Enter' && !Object.keys(errors).length)
+            await onSubmit();
+        }}
       >
         <ModalContent className="flex w-full max-w-2xl gap-2 overflow-visible p-6">
           {() =>
@@ -257,6 +261,7 @@ const ProjectSettingsModal = observer(
                   <div className="flex h-full w-full flex-wrap items-center justify-between gap-6 sm:flex-nowrap">
                     <div className="flex h-fit w-full flex-col gap-2">
                       <Input
+                        autoFocus
                         isRequired
                         isInvalid={errors.name}
                         errorMessage={errors.name}

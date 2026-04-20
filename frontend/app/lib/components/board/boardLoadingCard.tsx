@@ -23,7 +23,8 @@ const BoardLoadingCard = observer(() => {
               width={128}
               height={128}
               alt={'foggy logo'}
-              className="stroke-primary fill-[url(#logo-gradient)] stroke-0 transition-all duration-300"
+              withGradient
+              className="stroke-primary stroke-0 transition-all duration-300"
             />
             <Progress
               size="md"
