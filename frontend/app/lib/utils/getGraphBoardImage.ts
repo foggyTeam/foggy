@@ -1,4 +1,4 @@
-import { getViewportForBounds, Rect } from '@xyflow/react';
+import { Rect } from '@xyflow/react';
 import { toCanvas } from 'html-to-image';
 import { canvasToBlob } from './getBoardImage';
 import { GEdge, GNode } from '@/app/lib/types/definitions';
@@ -20,6 +20,7 @@ export default async function GetGraphBoardImage(
   if (!viewportElement) return null;
 
   const padding = 20;
+
   const srcW = nodesBounds.width + padding * 2;
   const srcH = nodesBounds.height + padding * 2;
 
@@ -29,23 +30,19 @@ export default async function GetGraphBoardImage(
   const outW = Math.max(1, Math.round(srcW * downScale));
   const outH = Math.max(1, Math.round(srcH * downScale));
 
-  const viewport = getViewportForBounds(
-    nodesBounds,
-    outW,
-    outH,
-    0.01,
-    10,
-    padding * downScale,
-  );
-
   const canvas = await toCanvas(viewportElement, {
     backgroundColor,
-    width: outW,
-    height: outH,
+    width: srcW,
+    height: srcH,
+    canvasWidth: outW,
+    canvasHeight: outH,
+    pixelRatio: 1,
+    imagePlaceholder:
+      'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
     style: {
-      width: `${outW}px`,
-      height: `${outH}px`,
-      transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
+      width: `${srcW}px`,
+      height: `${srcH}px`,
+      transform: `translate(${-nodesBounds.x + padding}px, ${-nodesBounds.y + padding}px) scale(1)`,
       transformOrigin: 'top left',
     },
   });
