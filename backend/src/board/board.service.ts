@@ -41,8 +41,15 @@ export class BoardService {
     try {
       const createdBoard = await this.boardModel.create(createBoardDto);
 
-      const layers = await this.createLayers(createdBoard._id);
-      createdBoard.layers = layers.map((layer) => layer._id);
+      if (
+        createBoardDto.type === 'simple' ||
+        createBoardDto.type === 'SIMPLE'
+      ) {
+        const layers = await this.createLayers(createdBoard._id);
+        createdBoard.layers = layers.map((layer) => layer._id);
+      } else {
+        createdBoard.layers = [];
+      }
       await createdBoard.save();
 
       await this.projectService.addBoardToSection(

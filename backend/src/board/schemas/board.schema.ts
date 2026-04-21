@@ -8,7 +8,10 @@ export interface BoardResponse {
   sectionIds: Types.ObjectId[];
   name: string;
   type: string;
-  layers: Array<Array<Types.Subdocument & BaseElement>>;
+  layers?: Array<Array<Types.Subdocument & BaseElement>>;
+  nodes?: any[];
+  edges?: any[];
+  document?: string;
   updatedAt: Date;
 }
 
@@ -26,8 +29,8 @@ export class Board {
   @Prop({ required: true })
   type: string;
 
-  @Prop({ required: true, ref: 'Layer' })
-  layers: Types.ObjectId[];
+  @Prop({ ref: 'Layer' })
+  layers?: Types.ObjectId[];
 
   @Prop({ type: mongoose.Schema.Types.Mixed })
   nodes?: any[];
