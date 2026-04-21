@@ -124,64 +124,70 @@ const ProjectTree = observer(() => {
     const parentSectionId = newNodeParentList[newNodeParentList.length - 1];
     switch (nodeType) {
       case 'SECTION':
-        await AddSection(projectsStore.activeProject.id, {
-          name: nodeName,
-          parentSectionId,
-        })
-          .catch(() =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.project.addSectionError,
-            }),
-          )
-          .then((response: { data: { id: string } }) => {
-            const newSection: ProjectSection = {
-              children: new Map(),
-              childrenNumber: 0,
-              id: response.data.id,
-              name: nodeName,
-            };
-            projectsStore.addProjectChild(newNodeParentList, newSection, true);
+        try {
+          const response = await AddSection(projectsStore.activeProject.id, {
+            name: nodeName,
+            parentSectionId,
           });
+          if ('errors' in response)
+            throw new Error(Object.values(response.errors)[0]);
+
+          const newSection: ProjectSection = {
+            children: new Map(),
+            childrenNumber: 0,
+            id: response.data.id,
+            name: nodeName,
+          };
+          projectsStore.addProjectChild(newNodeParentList, newSection, true);
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.project.addSectionError,
+            description: e?.message || undefined,
+          });
+        }
         break;
       default:
-        await AddBoard(projectsStore.activeProject.id, {
-          name: nodeName,
-          type: nodeType.toLowerCase(),
-          sectionId: parentSectionId,
-        })
-          .catch(() =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.board.addBoardError,
-            }),
-          )
-          .then((response: { data: { id: string } }) => {
-            const data:
-              | Pick<SimpleBoard, 'layers'>
-              | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
-              | object =
-              nodeType === 'SIMPLE'
-                ? { layers: [[], [], []] }
-                : nodeType === 'GRAPH'
-                  ? { graphEdges: [], graphNodes: [] }
-                  : {};
-
-            const newBoard = {
-              id: response.data.id,
-              name: nodeName,
-              type: nodeType,
-              sectionId: parentSectionId,
-              lastChange: new Date().toISOString(),
-            };
-            projectsStore.addProjectChild(
-              newNodeParentList,
-              Object.assign(newBoard, data) as Board,
-              false,
-            );
+        try {
+          const response = await AddBoard(projectsStore.activeProject.id, {
+            name: nodeName,
+            type: nodeType.toLowerCase(),
+            sectionId: parentSectionId,
           });
+          if ('errors' in response)
+            throw new Error(Object.values(response.errors)[0]);
+
+          const data:
+            | Pick<SimpleBoard, 'layers'>
+            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+            | object =
+            nodeType === 'SIMPLE'
+              ? { layers: [[], [], []] }
+              : nodeType === 'GRAPH'
+                ? { graphEdges: [], graphNodes: [] }
+                : {};
+
+          const newBoard = {
+            id: response.data.id,
+            name: nodeName,
+            type: nodeType,
+            sectionId: parentSectionId,
+            lastChange: new Date().toISOString(),
+          };
+          projectsStore.addProjectChild(
+            newNodeParentList,
+            Object.assign(newBoard, data) as Board,
+            false,
+          );
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.board.addBoardError,
+            description: e?.message || undefined,
+          });
+        }
     }
     onAddChildOpenChange();
   };

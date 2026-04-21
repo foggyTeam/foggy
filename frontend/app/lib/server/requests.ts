@@ -84,3 +84,20 @@ export const deleteRequest: any = async (
       return data.response.data;
     });
 };
+
+export const externalGetRequest: any = async (
+  url: string,
+  options: AxiosRequestConfig = {},
+) =>
+  axios
+    .get(`${url}`, {
+      ...options,
+      headers: { ...options.headers },
+    } as AxiosRequestConfig)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((e) => {
+      console.error(`error: ${e}`);
+      if (e.status === 403) return e;
+    });

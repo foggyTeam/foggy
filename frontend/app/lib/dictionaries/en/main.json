@@ -43,6 +43,13 @@
     "requestMessage": {
       "maxLength": "Message must be no more than 300 characters long",
       "invalidSymbols": "Message may contain only letters, digits and special symbols"
+    },
+    "graphNode": {
+      "maxUrlLength": "Link must be no more than 1024 characters long",
+      "invalidUrl": "Invalid link",
+      "maxTitleLength": "Title must be no more than 20 characters long",
+      "maxDescriptionLength": "Description name must be no more than 300 characters long",
+      "invalidSymbols": "Text may contain only letters, digits and special symbols"
     }
   },
 
@@ -379,7 +386,21 @@
     "rotation": "Rotation",
     "textToolPlaceholder": "Type something...",
     "linkPlaceholder": "https://hoggyfoggy.com",
-    "linkLabel": "Link"
+    "linkLabel": "Link",
+
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Web-app for you and your team",
+    "titleLabel": "Title",
+    "titlePlaceholder": "New note",
+
+    "emptyLinkDomain": "No domain",
+    "emptyLink": "No link",
+    "emptyLinkDescription": "No description",
+    "selectElementPlaceholder": "Select project item",
+
+    "edgeLabel": "Label",
+    "edgeLabelPlaceholder": "New edge",
+    "animateEdge": "Animate"
   },
 
   "toolTips": {
@@ -404,9 +425,22 @@
       "layerBack": "Move back",
       "layerForward": "Move forward",
       "layerTop": "Bring to front",
-      "deleteTool": "Delete"
+      "deleteTool": "Delete",
+
+      "customNodeTool": "Custom node",
+      "internalLinkTool": "Link to another project element",
+      "externalLinkTool": "Link to anywhere in the Web",
+      "nodeLinkTool": "Link to other node",
+      "toggleEdit": "Edit contents",
+      "copyNodeLink": "Copy link to node",
+      "edgeType": "Line type",
+      "edgeArrow": "Arrows",
+      "edgeDash": "Dashed line",
+      "edgeLabel": "Label"
     },
     "resetStage": "Reset position",
+    "lockGraph": "Lock graph view",
+    "unlockGraph": "Unlock graph view",
     "uploadButton": "Get board image temporary link"
   },
 

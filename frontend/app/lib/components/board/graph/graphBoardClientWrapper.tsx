@@ -1,20 +1,31 @@
 'use client';
 
-import { useEffect } from 'react';
-import settingsStore from '@/app/stores/settingsStore';
-import { ReactFlowProvider } from '@xyflow/react';
-import GraphBoard from '@/app/lib/components/board/graph/graphBoard';
+import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
+import GraphBoardObserver from '@/app/lib/components/board/graph/graphBoard';
 import { GraphBoardProvider } from '@/app/lib/components/board/graph/graphBoardContext';
+import React from 'react';
+import GraphBoardCursors from '@/app/lib/components/board/graph/graphBoardCursors';
+import BoardImageGenerator from '@/app/lib/components/board/simple/ai/boardImageGenerator';
+
+const ImageGeneratorWrapper = () => {
+  const { getNodes, getNodesBounds } = useReactFlow();
+  return (
+    <BoardImageGenerator
+      boardData={{
+        type: 'GRAPH',
+        data: { getNodes, getNodesBounds },
+      }}
+    />
+  );
+};
 
 export default function GraphBoardClientWrapper() {
-  useEffect(() => {
-    settingsStore.endLoading();
-  }, []);
-
   return (
     <ReactFlowProvider>
       <GraphBoardProvider>
-        <GraphBoard />
+        <GraphBoardObserver />
+        <GraphBoardCursors />
+        <ImageGeneratorWrapper />
       </GraphBoardProvider>
     </ReactFlowProvider>
   );

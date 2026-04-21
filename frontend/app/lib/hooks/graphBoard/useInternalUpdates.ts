@@ -1,26 +1,47 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { MouseEvent, useCallback, useEffect, useMemo, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import {
-  applyEdgeChanges,
-  applyNodeChanges,
+  Connection,
+  EdgeAddChange,
   EdgeChange,
+  EdgeRemoveChange,
+  NodeAddChange,
   NodeChange,
+  NodeRemoveChange,
+  useReactFlow,
 } from '@xyflow/react';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import debounce from 'lodash/debounce';
 
-interface InternalUpdatesParams {
-  setNodes: (value: ((prevState: any[]) => any[]) | any[]) => void;
-  setEdges: (value: ((prevState: any[]) => any[]) | any[]) => void;
-}
+type ItemAction<T extends { id: GEdge['id'] | GNode['id'] }> =
+  | { type: 'add'; newItem: T; external?: boolean }
+  | { type: 'remove'; id: T['id']; external?: boolean };
 
-export default function useInternalUpdates({
-  setNodes,
-  setEdges,
-}: InternalUpdatesParams) {
+export default function useInternalUpdates() {
+  const {
+    createNewElement,
+    createNewEdge,
+    activeTool,
+    setActiveTool,
+    isDuplicatedEdge,
+    selectedElementsRef,
+  } = useGraphBoardContext();
+  const { addNodes, updateEdge, addEdges, deleteElements, getNodes, getEdges } =
+    useReactFlow();
+
   const pendingNodeChanges = useRef<NodeChange[]>([]);
   const pendingEdgeChanges = useRef<EdgeChange[]>([]);
+
+  const debouncedClearNodesData = useCallback(
+    debounce(() => {
+      graphBoardStore.clearRemovedNodes(getNodes() as GNode[]);
+    }, 512) as any,
+    [graphBoardStore.clearRemovedNodes],
+  );
 
   // FLUSHED EMITTERS
   const flushNodeEmit = useMemo(
@@ -30,9 +51,8 @@ export default function useInternalUpdates({
         graphBoardStore.emitUpdates('nodesUpdate', pendingNodeChanges.current);
         pendingNodeChanges.current = [];
       }, 100),
-    [],
+    [graphBoardStore.emitUpdates],
   );
-
   const flushEdgeEmit = useMemo(
     () =>
       throttle(() => {
@@ -40,44 +60,221 @@ export default function useInternalUpdates({
         graphBoardStore.emitUpdates('edgesUpdate', pendingEdgeChanges.current);
         pendingEdgeChanges.current = [];
       }, 100),
-    [],
+    [graphBoardStore.emitUpdates],
   );
 
   // UPDATES HANDLERS
-  const onNodesChange = useCallback(
-    (changes: NodeChange[], external?: boolean) => {
-      setNodes((prev) => applyNodeChanges(changes, prev));
-      if (!external) {
-        pendingNodeChanges.current.push(...changes);
+  const onNodeAction = useCallback(
+    (action: ItemAction<GNode>) => {
+      let change: NodeAddChange | NodeRemoveChange;
+      switch (action.type) {
+        case 'add':
+          addNodes([action.newItem]);
+          change = { type: 'add', item: action.newItem };
+          break;
+        case 'remove':
+          deleteElements({ nodes: [{ id: action.id }] });
+          change = { type: 'remove', id: action.id };
+          break;
+      }
+      if (!action.external) {
+        pendingNodeChanges.current.push(change);
         flushNodeEmit();
       }
     },
+    [addNodes, deleteElements, flushNodeEmit],
+  );
+
+  const onNodeUpdate = useCallback(
+    (nodeId: string, updatedNode: GNode) => {
+      const changes: NodeChange[] = [];
+
+      changes.push({
+        type: 'position',
+        id: nodeId,
+        position: updatedNode.position,
+        dragging: false,
+      });
+
+      if (updatedNode.selected !== undefined) {
+        changes.push({
+          type: 'select',
+          id: nodeId,
+          selected: updatedNode.selected,
+        });
+      }
+      pendingNodeChanges.current.push(...changes);
+      flushNodeEmit();
+    },
     [flushNodeEmit],
   );
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange[], external?: boolean) => {
-      setEdges((prev) => applyEdgeChanges(changes, prev));
-      if (!external) {
-        pendingEdgeChanges.current.push(...changes);
+
+  const onEdgeAction = useCallback(
+    (action: ItemAction<GEdge>) => {
+      let change: EdgeAddChange | EdgeRemoveChange;
+      switch (action.type) {
+        case 'add':
+          addEdges([action.newItem]);
+          change = { type: 'add', item: action.newItem };
+          break;
+        case 'remove':
+          deleteElements({ edges: [{ id: action.id }] });
+          change = { type: 'remove', id: action.id };
+          break;
+      }
+      if (!action.external) {
+        pendingEdgeChanges.current.push(change);
         flushEdgeEmit();
       }
+    },
+    [addEdges, deleteElements, flushEdgeEmit],
+  );
+
+  const onEdgeUpdate = useCallback(
+    (edgeId: string, updatedEdge: GEdge) => {
+      updateEdge(edgeId, updatedEdge); // used for reconnections
+      const change: EdgeChange = {
+        type: 'replace',
+        id: edgeId,
+        item: updatedEdge,
+      };
+
+      pendingEdgeChanges.current.push(change);
+      flushEdgeEmit();
     },
     [flushEdgeEmit],
   );
 
-  // INITIAL STATE WATCHER
-  useEffect(() => {
-    setNodes(graphBoardStore.boardNodes ?? []);
-    setEdges(graphBoardStore.boardEdges ?? []);
-  }, [graphBoardStore.boardNodes, graphBoardStore.boardEdges]);
+  const emitSelectionChange = useCallback(
+    ({ nodes, edges }: { nodes: GNode[]; edges: GEdge[] }) => {
+      const newSelected = new Set<string>();
+      nodes.forEach((node) => newSelected.add(`node|${node.id}`));
+      edges.forEach((edge) => newSelected.add(`edge|${edge.id}`));
+
+      const all: Set<string> = new Set([
+        ...newSelected,
+        ...selectedElementsRef.current,
+      ]);
+
+      const nodeChanges: NodeChange[] = [];
+      const edgeChanges: EdgeChange[] = [];
+
+      all.forEach((key) => {
+        const [type, id] = key.split('|');
+        const selected = newSelected.has(key);
+        switch (type) {
+          case 'node':
+            nodeChanges.push({ type: 'select', id, selected });
+            break;
+          case 'edge':
+            edgeChanges.push({ type: 'select', id, selected });
+            break;
+        }
+      });
+
+      if (nodeChanges.length) {
+        pendingNodeChanges.current.push(...nodeChanges);
+        flushNodeEmit();
+      }
+      if (edgeChanges.length) {
+        pendingEdgeChanges.current.push(...edgeChanges);
+        flushEdgeEmit();
+      }
+    },
+    [flushNodeEmit, flushEdgeEmit, selectedElementsRef],
+  );
+
+  // ACTIONS
+  const createNode = useCallback(
+    (e: MouseEvent) => {
+      const newElement = createNewElement(e, activeTool);
+      if (!newElement) return;
+
+      const success = graphBoardStore.updateNodeData(
+        newElement.id,
+        newElement.data,
+        true,
+      );
+      if (success) onNodeAction({ type: 'add', newItem: newElement });
+
+      setActiveTool(undefined);
+      debouncedClearNodesData();
+    },
+    [
+      createNewElement,
+      onNodeAction,
+      setActiveTool,
+      debouncedClearNodesData,
+      graphBoardStore.updateNodeData,
+    ],
+  );
+  const createEdge = useCallback(
+    (connection: Connection) => {
+      const edge = getEdges().find(
+        (e) =>
+          e.source === connection.source &&
+          e.target === connection.target &&
+          e.sourceHandle === connection.sourceHandle &&
+          e.targetHandle === connection.targetHandle,
+      ) as GEdge | undefined;
+
+      if (!edge) return;
+
+      updateEdge(edge.id, createNewEdge());
+
+      const edgeToSync = {
+        ...edge,
+        ...createNewEdge(),
+      } as GEdge;
+
+      pendingEdgeChanges.current.push({ type: 'add', item: edgeToSync });
+      flushEdgeEmit();
+    },
+    [createNewEdge, onEdgeAction, flushEdgeEmit],
+  );
+  const reconnectEdge = useCallback(
+    (oldEdge: GEdge, newConnection: Connection) => {
+      if (isDuplicatedEdge(newConnection)) return;
+
+      onEdgeUpdate(oldEdge.id, {
+        ...oldEdge,
+        ...newConnection,
+      } as GEdge);
+    },
+    [isDuplicatedEdge, onEdgeUpdate],
+  );
+
+  const deleteNodes = useCallback(
+    (nodes: GNode[]) =>
+      nodes.forEach((node) => onNodeAction({ id: node.id, type: 'remove' })),
+    [onNodeAction],
+  );
+
+  const deleteEdges = useCallback(
+    (edges: GEdge[]) =>
+      edges.forEach((edge) => onEdgeAction({ id: edge.id, type: 'remove' })),
+    [onEdgeAction],
+  );
 
   // CLEANUP
   useEffect(() => {
     return () => {
       flushEdgeEmit.cancel();
       flushNodeEmit.cancel();
+      debouncedClearNodesData.cancel();
     };
-  }, [flushEdgeEmit, flushNodeEmit]);
+  }, [flushEdgeEmit, flushNodeEmit, debouncedClearNodesData]);
 
-  return { onNodesChange, onEdgesChange };
+  return {
+    createNode,
+    createEdge,
+    reconnectEdge,
+    onNodeAction,
+    onNodeUpdate,
+    deleteNodes,
+    onEdgeAction,
+    onEdgeUpdate,
+    deleteEdges,
+    emitSelectionChange,
+  };
 }

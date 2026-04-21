@@ -3,14 +3,15 @@ import {
   IObservableArray,
   makeAutoObservable,
   observable,
+  ObservableMap,
   reaction,
 } from 'mobx';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
-import { GBaseNode, GEdge } from '@/app/lib/types/definitions';
+import { GEdge, GNode } from '@/app/lib/types/definitions';
 import { EdgeChange, NodeChange } from '@xyflow/react';
 
-const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate'];
+const GraphBoardEvents = ['nodesUpdate', 'edgesUpdate', 'nodeDataUpdate'];
 
 let socketRef: Socket | null = null;
 
@@ -18,8 +19,11 @@ class GraphBoardStore {
   nodesExternalUpdatesQueue: NodeChange[][] = [];
   edgesExternalUpdatesQueue: EdgeChange[][] = [];
 
-  boardNodes: IObservableArray<GBaseNode> | undefined = undefined;
+  boardNodes: IObservableArray<GNode> | undefined = undefined;
   boardEdges: IObservableArray<GEdge> | undefined = undefined;
+
+  nodesDataMap: ObservableMap<GNode['id'], GNode['data']> | undefined =
+    undefined;
 
   nodesApplyUpdatesTrigger: boolean = false;
   edgesApplyUpdatesTrigger: boolean = false;
@@ -31,8 +35,10 @@ class GraphBoardStore {
       boardEdges: observable,
       nodesApplyUpdatesTrigger: observable,
       edgesApplyUpdatesTrigger: observable,
+      nodesDataMap: observable,
 
       setGraphData: action,
+      updateNodeData: action,
     });
 
     reaction(
@@ -68,6 +74,21 @@ class GraphBoardStore {
       this.edgesExternalUpdatesQueue.push(changes);
       this.edgesApplyUpdatesTrigger = !this.edgesApplyUpdatesTrigger;
     });
+
+    socket.on(
+      'nodeDataUpdate',
+      ({
+        nodeId,
+        newAttrs,
+        isNew,
+      }: {
+        nodeId: GNode['id'];
+        newAttrs: Partial<GNode['data']>;
+        isNew?: boolean;
+      }) => {
+        this.updateNodeData(nodeId, newAttrs, isNew, true);
+      },
+    );
   }
   private socketRemoveEventListeners(socket: Socket) {
     for (const event of GraphBoardEvents) socket.removeAllListeners(event);
@@ -88,16 +109,56 @@ class GraphBoardStore {
   // GENERAL
   setGraphData(
     data:
-      | { nodes: GBaseNode[] | undefined; edges: GEdge[] | undefined }
+      | { nodes: GNode[] | undefined; edges: GEdge[] | undefined }
       | undefined,
   ) {
     if (!data) {
       this.boardEdges = undefined;
       this.boardNodes = undefined;
+      this.nodesDataMap = undefined;
       return;
     }
+
+    const nodeData = data.nodes?.map((node): [string, GNode['data']] => {
+      return [node.id, observable(node.data)];
+    });
     this.boardNodes = observable.array(data.nodes || []);
+    this.nodesDataMap = observable.map(nodeData);
     this.boardEdges = observable.array(data.edges || []);
+  }
+
+  // NODE DATA
+  updateNodeData(
+    nodeId: GNode['id'],
+    newAttrs: Partial<GNode['data']>,
+    isNew?: boolean,
+    external?: boolean,
+  ) {
+    if (!this.nodesDataMap || !this.boardNodes) return false;
+    if (isNew) {
+      this.nodesDataMap.set(nodeId, observable(newAttrs));
+    } else {
+      if (!this.nodesDataMap.has(nodeId)) {
+        const nodeIndex = this.boardNodes?.findIndex(
+          (node) => node.id === nodeId,
+        );
+        if (nodeIndex < 0) return false;
+        this.nodesDataMap.set(nodeId, this.boardNodes[nodeIndex].data);
+      }
+      const node = this.nodesDataMap.get(nodeId);
+      if (node) Object.assign(node, newAttrs);
+    }
+    if (!external)
+      this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
+    return true;
+  }
+  clearRemovedNodes(nodes: GNode[]) {
+    // очистка устаревших нод, только если их число кратно 10
+    if (!this.nodesDataMap || this.nodesDataMap?.size % 10) return;
+    for (const id of [...this.nodesDataMap.keys()]) {
+      const nodeIndex = nodes?.findIndex((node) => node.id === id);
+      if (nodeIndex < 0) this.nodesDataMap?.delete(id);
+    }
   }
 }
 

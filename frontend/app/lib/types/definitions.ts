@@ -142,7 +142,7 @@ export interface Notification {
 
 // BOARDS
 export type BoardTypes = 'SIMPLE' | 'GRAPH' | 'DOC';
-export type Board = SimpleBoard | GraphBoard;
+export type Board = SimpleBoard | GraphBoard | DocBoard;
 
 interface BaseBoard {
   id: string;
@@ -158,8 +158,12 @@ export interface SimpleBoard extends BaseBoard {
 
 export interface GraphBoard extends BaseBoard {
   type: 'GRAPH';
-  graphNodes: GBaseNode[];
+  graphNodes: GNode[];
   graphEdges: GEdge[];
+}
+
+export interface DocBoard extends BaseBoard {
+  type: 'DOC';
 }
 
 // SIMPLE BOARD
@@ -206,21 +210,64 @@ export interface LineElement extends SBaseElement {
 }
 
 // GRAPH BOARD
-export interface GBaseNode {
+import type { Edge, Handle, MarkerType, Node } from '@xyflow/react';
+
+export interface GBaseNode extends Node {
   id: string;
-  type?: string;
+  type: string;
   position: { x: number; y: number };
-  data: GNodeData;
-  hidden?: boolean;
-  parentId?: string;
   handles?: GNodeHandle[];
 }
 
-interface GNodeData {
-  label?: string;
+export interface GCustomNode extends GBaseNode {
+  type: 'customNode';
+  data: {
+    title?: string;
+    description?: string;
+    shape: 'rect' | 'circle' | 'diamond' | 'triangle' | 'pentagon';
+    color?: string;
+    align: 'start' | 'center' | 'end';
+  };
 }
 
-interface GNodeHandle {
+export interface GExternalLinkNode extends GBaseNode {
+  type: 'externalLinkNode';
+  data: {
+    url?: string;
+    thumbnailUrl?: string;
+    favicon?: string;
+    domain?: string;
+    description?: string;
+  };
+}
+
+export interface GInternalLinkNode extends GBaseNode {
+  type: 'internalLinkNode';
+  data: {
+    element?: {
+      type: ProjectElementTypes;
+      title: string;
+      path: string[];
+    };
+  };
+}
+
+export interface GNodeLinkNode extends GBaseNode {
+  type: 'nodeLinkNode';
+  data: {
+    title?: string;
+    url?: string;
+    nodeId?: string;
+  };
+}
+
+export type GNode =
+  | GCustomNode
+  | GExternalLinkNode
+  | GInternalLinkNode
+  | GNodeLinkNode;
+
+interface GNodeHandle extends Handle {
   id?: string | null;
   nodeId: string;
   x: number;
@@ -228,13 +275,31 @@ interface GNodeHandle {
   type: 'source' | 'target';
 }
 
-export interface GEdge {
+export interface GEdge extends Edge {
   id: string;
   type: 'default' | 'smoothstep' | 'straight' | 'step' | 'simplebezier';
   source: string; // source node id
   target: string; // target node id
-  sourceHandle?: string; // source node handle id
-  targetHandle?: string; // target node handle id
+  sourceHandle: string; // source node handle id
+  targetHandle: string; // target node handle id
   label?: string;
-  data?: any;
+  style?: {
+    stroke?: string;
+    strokeWidth?: number;
+    strokeLinecap?: 'butt' | 'round' | 'square';
+    strokeDasharray?: string;
+  };
+  animated?: boolean;
+  markerStart?: {
+    type: MarkerType;
+    width: 20;
+    strokeWidth: 1.5 | 2;
+    color: string;
+  };
+  markerEnd?: {
+    type: MarkerType;
+    width: 20;
+    strokeWidth: 1.5 | 2;
+    color: string;
+  };
 }

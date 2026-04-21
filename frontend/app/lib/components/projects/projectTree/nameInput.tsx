@@ -15,10 +15,10 @@ export default function NameInput({
   maxW = 'sm',
 }: {
   isReadonly: boolean;
-  setIsReadonly: any;
-  onBlur: (newValue: string) => void;
+  setIsReadonly?: any;
+  onBlur?: (newValue: string) => void;
   value: string;
-  onValueChange: any;
+  onValueChange?: any;
   upperCase?: boolean;
   size?: 'sm' | 'md' | 'lg';
   maxW?: 'sm' | 'md' | 'lg';
@@ -32,7 +32,7 @@ export default function NameInput({
   const handleBlur = () => {
     if (Object.keys(error).length < 1) onValueChange(localValue);
     else setLocalValue(value);
-    onBlur(localValue);
+    if (onBlur) onBlur(localValue);
   };
 
   return (

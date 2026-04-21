@@ -4,7 +4,7 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
 import LogoBar from '@/app/lib/components/menu/leftSideBar/logoBar';
 import RecentBar from '@/app/lib/components/menu/leftSideBar/recentBar';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import projectsStore from '@/app/stores/projectsStore';
 import OpenedLeftSideBar from '@/app/lib/components/menu/leftSideBar/openedLeftSideBar';
 import { useDisclosure } from '@heroui/modal';
@@ -26,10 +26,11 @@ import boardStore from '@/app/stores/board/boardStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
-    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}+/(simple|graph|doc)$`,
+    `^/project/[^/]+/[^/]+/${boardStore.activeBoard?.id}/(simple|graph|doc)$`,
   );
   const [isOpened, setIsOpened] = useState(false);
   const path = usePathname();
+  const router = useRouter();
   const [parentList, setParentList] = useState<string[]>([]);
   const [parentSectionId, setParentSectionId] = useState('');
 
@@ -60,67 +61,77 @@ const LeftSideBar = observer(() => {
 
     switch (nodeType) {
       case 'SECTION':
-        await AddSection(projectsStore.activeProject.id, {
-          name: nodeName,
-          parentSectionId: isOpened
-            ? parentSectionId
-            : boardStore.activeBoard.sectionId,
-        })
-          .catch(() =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.project.addSectionError,
-            }),
-          )
-          .then((response: { data: { id: string } }) => {
-            const newSection: ProjectSection = {
-              children: new Map(),
-              childrenNumber: 0,
-              id: response.data.id,
-              name: nodeName,
-            };
-            projectsStore.addProjectChild(fullParentList, newSection, true);
+        try {
+          const response = await AddSection(projectsStore.activeProject.id, {
+            name: nodeName,
+            parentSectionId: isOpened
+              ? parentSectionId
+              : boardStore.activeBoard.sectionId,
           });
+          if ('errors' in response)
+            throw new Error(Object.values(response.errors)[0]);
+          const newSection: ProjectSection = {
+            children: new Map(),
+            childrenNumber: 0,
+            id: response.data.id,
+            name: nodeName,
+          };
+          projectsStore.addProjectChild(fullParentList, newSection, true);
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.project.addSectionError,
+            description: e?.message || undefined,
+          });
+        }
         break;
       default:
-        await AddBoard(projectsStore.activeProject.id, {
-          name: nodeName,
-          type: nodeType.toLowerCase(),
-          sectionId: isOpened
-            ? parentSectionId
-            : boardStore.activeBoard.sectionId,
-        })
-          .catch(() =>
-            addToast({
-              color: 'danger',
-              severity: 'danger',
-              title: settingsStore.t.toasts.board.addBoardError,
-            }),
-          )
-          .then((response: { data: { id: string } }) => {
-            const data:
-              | Pick<SimpleBoard, 'layers'>
-              | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
-              | object =
-              nodeType === 'SIMPLE'
-                ? { layers: [[], [], []] }
-                : nodeType === 'GRAPH'
-                  ? { graphEdges: [], graphNodes: [] }
-                  : {};
-            const newBoard = {
-              id: response.data.id,
-              name: nodeName,
-              type: nodeType,
-              sectionId: boardStore.activeBoard?.sectionId || '',
-              lastChange: new Date().toISOString(),
-            };
-            projectsStore.addProjectChild(
-              fullParentList,
-              Object.assign(newBoard, data) as Board,
-              false,
-            );
+        try {
+          const response = await AddBoard(projectsStore.activeProject.id, {
+            name: nodeName,
+            type: nodeType.toLowerCase(),
+            sectionId: isOpened
+              ? parentSectionId
+              : boardStore.activeBoard.sectionId,
           });
+          if ('errors' in response)
+            throw new Error(Object.values(response.errors)[0]);
+
+          const data:
+            | Pick<SimpleBoard, 'layers'>
+            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+            | string =
+            nodeType === 'SIMPLE'
+              ? { layers: [[], [], []] }
+              : nodeType === 'GRAPH'
+                ? { graphEdges: [], graphNodes: [] }
+                : '';
+          const newId = response.data.id;
+          const sectionId = boardStore.activeBoard?.sectionId || '';
+          const newBoard = {
+            id: newId,
+            name: nodeName,
+            type: nodeType,
+            sectionId,
+            lastChange: new Date().toISOString(),
+          };
+          projectsStore.addProjectChild(
+            fullParentList,
+            Object.assign(newBoard, data) as Board,
+            false,
+          );
+          router.push(
+            `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
+          );
+        } catch (e: any) {
+          addToast({
+            color: 'danger',
+            severity: 'danger',
+            title: settingsStore.t.toasts.board.addBoardError,
+            description: e?.message || undefined,
+          });
+        }
     }
     onAddChildOpenChange();
   };

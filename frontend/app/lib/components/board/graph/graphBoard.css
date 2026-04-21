@@ -1,6 +1,19 @@
+.react-flow__renderer {
+  touch-action: none;
+}
+
+.react-flow__node,
+[data-testid='board-toolbar'] button {
+  touch-action: manipulation;
+}
+
 .react-flow__selection {
   background: hsl(var(--heroui-primary-400) / 0.15);
   border: 1px solid hsl(var(--heroui-primary-400));
+}
+
+.react-flow__node.dragging {
+  will-change: transform;
 }
 
 .react-flow__nodesselection-rect {
@@ -27,4 +40,35 @@
 
 .react-flow__handle:hover {
   box-shadow: 0 0 0 3px hsl(var(--heroui-primary-400) / 0.4);
+}
+
+.shadow-none {
+  box-shadow: none !important;
+}
+
+.toolbar {
+  margin-bottom: 0 !important;
+  margin-top: 0 !important;
+}
+@media (min-width: 640px) {
+  .toolbar {
+    margin-top: 1rem !important; /* 16px */
+    margin-bottom: 1rem !important; /* 16px */
+  }
+}
+
+.shape-circle {
+  padding: 10% 10%;
+}
+
+.shape-diamond {
+  padding: 30% 20%;
+}
+
+.shape-triangle {
+  padding: 30% 25% 0;
+}
+
+.shape-pentagon {
+  padding: 20% 15% 0;
 }

@@ -1,8 +1,5 @@
 import { RefObject } from 'react';
-import Konva from 'konva';
 import { SBoardElement } from '@/app/lib/types/definitions';
-
-type Stage = Konva.Stage;
 
 const MAX_SIZE = 2048;
 
@@ -17,7 +14,7 @@ function unionRect(
   return { x: x1, y: y1, width: x2 - x1, height: y2 - y1 };
 }
 
-function getBoundingBox(stage: Stage, layers: SBoardElement[][]) {
+function getBoundingBox(stage: any, layers: SBoardElement[][]) {
   let box: { x: number; y: number; width: number; height: number } | null =
     null;
 
@@ -46,7 +43,7 @@ function getBoundingBox(stage: Stage, layers: SBoardElement[][]) {
   };
 }
 
-function canvasToBlob(
+export function canvasToBlob(
   canvas: HTMLCanvasElement,
   type: string,
   quality: number = 0.92,
@@ -57,7 +54,7 @@ function canvasToBlob(
 }
 
 export default async function GetBoardImage(
-  stageRef: RefObject<Stage | null>,
+  stageRef: RefObject<any | null>,
   boardLayers: SBoardElement[][],
   backgroundColor: string,
 ): Promise<Blob | null> {

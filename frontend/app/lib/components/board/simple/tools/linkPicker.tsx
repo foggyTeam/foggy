@@ -12,6 +12,7 @@ export default function LinkPicker({
   const { smallerSize } = useAdaptiveParams();
   return (
     <Input
+      autoFocus
       placeholder={settingsStore.t.toolBar.linkPlaceholder}
       label={settingsStore.t.toolBar.linkLabel}
       type="link"

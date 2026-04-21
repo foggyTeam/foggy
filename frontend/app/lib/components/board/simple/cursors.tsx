@@ -76,7 +76,7 @@ const Cursors = observer(() => {
 
     if (!boardId || !userId) return;
 
-    const socket = io(process.env.NEXT_PUBLIC_API_URI!, {
+    const socket = io(process.env.NEXT_PUBLIC_SYNC_URI!, {
       auth: { id: userId, nickname, avatar, color: userColor, boardId },
       reconnectionAttempts: 3,
       reconnectionDelay: 1000,
@@ -160,7 +160,7 @@ const Cursors = observer(() => {
         return (
           <CursorChip
             key={id}
-            ref={(el) => {
+            ref={(el: HTMLDivElement | null) => {
               nodeRef.current[id] = el;
               if (el) requestAnimationFrame(redraw);
             }}

@@ -1,5 +1,4 @@
 import { EdgeChange, NodeChange } from '@xyflow/react';
-import { toArray } from 'lodash';
 
 type Change = NodeChange | EdgeChange;
 type ChangeTypes = Change['type'];
@@ -42,7 +41,7 @@ export default function batchGraphUpdates(updatesQueue: Change[][]): {
     }
   }
 
-  const lockUpdatesArray = toArray(lockUpdates.entries()).map((entry) => {
+  const lockUpdatesArray = [...lockUpdates.entries()].map((entry) => {
     return { id: entry[0], lock: entry[1] };
   });
 

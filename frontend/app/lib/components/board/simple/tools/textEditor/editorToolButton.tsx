@@ -6,7 +6,7 @@ import { bg_container_no_padding } from '@/app/lib/types/styles';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 const to_rgba = (hex: string): string => {
-  hex = hex.replace(/^#/, '');
+  hex = hex?.replace(/^#/, '') || '';
 
   if (hex.length === 3 || hex.length === 4) {
     hex = hex
@@ -68,6 +68,7 @@ export default function EditorToolButton({
 }) {
   const { commonSize } = useAdaptiveParams();
   const [localValue, setLocalValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     setLocalValue(
@@ -93,13 +94,24 @@ export default function EditorToolButton({
     setTimeout(() => handleClick(id, newValue), 240);
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) saveSelection?.();
+    setIsOpen(open);
+  };
+
+  useEffect(() => {
+    if (value !== localValue) setLocalValue(value);
+  }, [value]);
+
   return popover ? (
-    <Popover onClose={handlePopoverClose}>
+    <Popover
+      isOpen={isOpen}
+      onOpenChange={handleOpenChange}
+      onClose={handlePopoverClose}
+    >
       <PopoverTrigger>
         <Button
-          onPress={() => {
-            saveSelection();
-          }}
+          onPress={() => {}}
           id={id}
           variant="light"
           isIconOnly

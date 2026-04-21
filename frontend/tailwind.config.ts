@@ -322,6 +322,15 @@ export const info = {
     foreground: 'hsl(var(--heroui-info-foreground))',
   },
 };
+export const themeColorsList = [
+  foggy_accent.light.DEFAULT,
+  primary.light.DEFAULT,
+  secondary.light.DEFAULT,
+  danger.light.DEFAULT,
+  warning.light.DEFAULT,
+  success.light.DEFAULT,
+  info.light.DEFAULT,
+];
 
 const foggy_accent_rgb = {
   light: {

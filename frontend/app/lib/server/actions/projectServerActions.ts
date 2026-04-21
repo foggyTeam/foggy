@@ -6,8 +6,13 @@ import {
   patchRequest,
   postRequest,
 } from '@/app/lib/server/requests';
-import { Project } from '@/app/lib/types/definitions';
+import { Board, Project, ProjectSection } from '@/app/lib/types/definitions';
 import getUserId from '@/app/lib/getUserId';
+
+type ErrorResponse = {
+  statusCode: number;
+  errors: Record<string, string>;
+};
 
 export async function GetAllProjects() {
   return await getRequest(`projects`, {
@@ -60,7 +65,7 @@ export async function DeleteProject(id: string) {
 export async function AddSection(
   projectId: string,
   data: { name: string; parentSectionId: string },
-) {
+): Promise<{ data: { id: ProjectSection['id'] } } | ErrorResponse> {
   return await postRequest(`projects/${projectId}/sections`, data, {
     headers: { 'x-user-id': await getUserId() },
   });
@@ -92,7 +97,7 @@ export async function DeleteSection(projectId: string, sectionId: string) {
 export async function AddBoard(
   projectId: string,
   data: { sectionId: string; name: string; type: string },
-) {
+): Promise<{ data: { id: Board['id'] } } | ErrorResponse> {
   return await postRequest(
     'boards',
     { projectId, ...data },

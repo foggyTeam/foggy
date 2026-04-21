@@ -2,7 +2,7 @@
 
 import { Handle } from '@xyflow/react';
 
-export default function DoubledHandle(props) {
+export default function DoubledHandle(props: any) {
   return (
     <>
       <Handle type="source" {...props} id={`${props.id}-source`} />
