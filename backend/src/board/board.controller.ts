@@ -11,6 +11,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -28,6 +29,7 @@ import { UpdateElementDto } from './dto/update-element.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Types } from 'mongoose';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { SyncServiceGuard } from '../common/guards/service-key.guard';
 
 @ApiTags('boards')
 @Controller('boards')
@@ -488,5 +490,101 @@ export class BoardController {
   })
   async deleteAll(): Promise<void> {
     return this.boardService.deleteAll();
+  }
+
+  @Get(':id/snapshot')
+  @UseGuards(SyncServiceGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get board snapshot for sync service' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the board',
+    type: String,
+  })
+  async getSnapshot(@Param('id') id: Types.ObjectId): Promise<any> {
+    return this.boardService.getSnapshot(id);
+  }
+
+  @Post(':id/snapshot')
+  @UseGuards(SyncServiceGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Save board snapshot from sync service' })
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the board',
+    type: String,
+  })
+  @ApiBody({
+    description: 'Snapshot data depending on board type',
+    examples: {
+      simple: {
+        summary: 'SIMPLE board state',
+        value: {
+          layers: [
+            [
+              {
+                id: '1',
+                draggable: true,
+                dragDistance: 10,
+                x: 10,
+                y: 20,
+                rotation: 0,
+                fill: 'red',
+                stroke: 'black',
+                strokeWidth: 1,
+                width: 100,
+                height: 50,
+                _id: '69e6a65396c71675c93d77f0',
+                type: 'rect',
+                cornerRadius: 5,
+              },
+            ],
+            [
+              {
+                id: '2',
+                draggable: true,
+                dragDistance: 10,
+                x: 30,
+                y: 40,
+                rotation: 0,
+                fill: 'blue',
+                stroke: 'black',
+                strokeWidth: 1,
+                width: 100,
+                height: 50,
+                _id: '69e6a65796c71675c93d77f8',
+                type: 'ellipse',
+              },
+            ],
+            [],
+          ],
+        },
+      },
+      graph: {
+        summary: 'GRAPH board state',
+        value: {
+          nodes: [
+            {
+              id: 'n-1',
+              position: { x: 100, y: 200 },
+              data: { label: 'Node 1' },
+            },
+          ],
+          edges: [{ id: 'e-1', source: 'n-1', target: 'n-2' }],
+        },
+      },
+      doc: {
+        summary: 'DOC board state',
+        value: {
+          document: 'U29tZSBiYXNlNjQgdGV4dA==',
+        },
+      },
+    },
+  })
+  async saveSnapshot(
+    @Param('id') id: Types.ObjectId,
+    @Body() snapshotData: any,
+  ): Promise<void> {
+    return this.boardService.saveSnapshot(id, snapshotData);
   }
 }

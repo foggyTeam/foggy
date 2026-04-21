@@ -25,6 +25,7 @@ import { UpdateSectionDto } from './dto/update-section.dto';
 import { Role, RoleLevel, ROLES } from '../shared/types/enums';
 import { NotificationService } from '../notifications/notifications.service';
 import { TeamService } from '../teams/team.service';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class ProjectService {
@@ -1046,6 +1047,96 @@ export class ProjectService {
       updatedAt: project.updatedAt,
       settings: project.settings,
     };
+  }
+
+  async generateInviteLink(
+    projectId: Types.ObjectId,
+    userId: Types.ObjectId,
+    role: Role,
+    expiresAt?: Date,
+  ): Promise<string> {
+    const project = (await this.validateUser(
+      userId,
+      projectId,
+      Role.ADMIN,
+    )) as ProjectDocument;
+
+    const secret = randomBytes(16).toString('hex');
+    const token = `${project._id.toHexString()}-${role}-${secret}`;
+    const expiry = expiresAt ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    project.inviteLinks = {
+      ...project.inviteLinks,
+      [role]: { token, expiresAt: expiry },
+    };
+
+    await this.saveProject(project);
+    return token;
+  }
+
+  async processInviteToken(
+    token: string,
+    userId: Types.ObjectId | undefined,
+    acceptInvite: boolean,
+  ): Promise<any> {
+    const parts = token.split('-');
+    if (
+      parts.length !== 3 ||
+      !Types.ObjectId.isValid(parts[0]) ||
+      !([Role.ADMIN, Role.EDITOR, Role.READER] as string[]).includes(parts[1])
+    ) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const [projectIdHex, roleFromToken] = parts;
+    const projectId = new Types.ObjectId(projectIdHex);
+    const inviteRole = roleFromToken as Role;
+    const project = await this.projectModel.findById(projectId).exec();
+
+    if (!project) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const storedToken = project.inviteLinks?.[inviteRole]?.token;
+    if (!storedToken || storedToken !== token) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (project.inviteLinks![inviteRole]!.expiresAt < new Date()) {
+      throw new CustomException(
+        getErrorMessages({ general: 'errorNotRecognized' }),
+        HttpStatus.GONE,
+      );
+    }
+
+    if (!acceptInvite) {
+      return await this.getProjectBriefInfo(projectId, undefined);
+    }
+
+    if (!userId) {
+      throw new CustomException(
+        getErrorMessages({ project: 'noPermission' }),
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const ownerEntry = project.accessControlUsers.find(
+      (u) => u.role === Role.OWNER,
+    );
+    const ownerId = ownerEntry!.userId;
+
+    await this.manageProjectUser(projectId, ownerId, userId, inviteRole, true);
+
+    return projectId;
   }
 
   private async removeTeamInternal(

@@ -65,6 +65,17 @@ const defaultSettings: ProjectSettings = {
   memberListIsPublic: false,
 };
 
+interface InviteLink {
+  token: string;
+  expiresAt: Date;
+}
+
+interface ProjectInviteLinks {
+  admin?: InviteLink;
+  editor?: InviteLink;
+  reader?: InviteLink;
+}
+
 @Schema({ timestamps: true })
 export class Project {
   @Prop({ required: true })
@@ -112,6 +123,25 @@ export class Project {
     default: [],
   })
   accessControlTeams: AccessControlTeam[];
+
+  @Prop({
+    type: {
+      admin: {
+        token: { type: String },
+        expiresAt: { type: Date },
+      },
+      editor: {
+        token: { type: String },
+        expiresAt: { type: Date },
+      },
+      reader: {
+        token: { type: String },
+        expiresAt: { type: Date },
+      },
+    },
+    default: {},
+  })
+  inviteLinks: ProjectInviteLinks;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'ChangeLog' }] })
   changeLogs: Types.ObjectId[];
