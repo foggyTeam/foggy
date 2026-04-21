@@ -17,7 +17,7 @@ import { Button } from '@heroui/button';
 import { SettingsIcon } from 'lucide-react';
 import projectsStore from '@/app/stores/projectsStore';
 import LeftSideBarElementCard from '@/app/lib/components/menu/leftSideBar/leftSideBarElementCard';
-import { SimpleBoard, ProjectSection } from '@/app/lib/types/definitions';
+import { Board, ProjectSection } from '@/app/lib/types/definitions';
 import { useRouter } from 'next/navigation';
 import AreYouSureModal from '@/app/lib/components/modals/areYouSureModal';
 import settingsStore from '@/app/stores/settingsStore';
@@ -148,7 +148,7 @@ const OpenedLeftSideBar = observer(
       }
     };
 
-    const handleChildClick = (child: ProjectSection | SimpleBoard) => {
+    const handleChildClick = (child: ProjectSection | Board) => {
       if ('children' in child) setParentList((prev) => [...prev, child.id]);
       else {
         settingsStore.startLoading();
@@ -295,7 +295,7 @@ const OpenedLeftSideBar = observer(
                         child:
                           | ProjectSection
                           | Pick<
-                              SimpleBoard,
+                              Board,
                               | 'id'
                               | 'type'
                               | 'name'
@@ -311,12 +311,10 @@ const OpenedLeftSideBar = observer(
                           return null;
                         return (
                           <LeftSideBarElementCard
-                            element={child as SimpleBoard}
+                            element={child as Board}
                             isActive={child.id === boardStore.activeBoard?.id}
                             key={child.id}
-                            handleClick={() =>
-                              handleChildClick(child as SimpleBoard)
-                            }
+                            handleClick={() => handleChildClick(child as Board)}
                             addNode={() => onAddOpen(child.id)}
                             removeNode={() =>
                               removeNode(child.id, 'children' in child)
