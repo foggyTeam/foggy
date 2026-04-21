@@ -493,4 +493,105 @@ export class BoardService {
       .updateOne({ _id: boardId }, { $currentDate: { updatedAt: true } })
       .exec();
   }
+
+  public async getSnapshot(boardId: Types.ObjectId): Promise<any> {
+    const board = await this.boardModel
+      .findById(boardId)
+      .select('type nodes edges document layers')
+      .lean()
+      .exec();
+
+    if (!board) {
+      throw new NotFoundException(`Board with ID "${boardId}" not found`);
+    }
+
+    const boardType = board.type?.toUpperCase();
+
+    if (boardType === 'GRAPH') {
+      return {
+        nodes: board.nodes || [],
+        edges: board.edges || [],
+      };
+    }
+
+    if (boardType === 'DOC') {
+      return {
+        document: board.document || '',
+      };
+    }
+
+    const layers = await this.layerModel
+      .find({ _id: { $in: board.layers } })
+      .sort({ layerNumber: 1 })
+      .select('elements -_id')
+      .lean()
+      .exec();
+
+    return {
+      layers: layers.map((layer) => layer.elements || []),
+    };
+  }
+
+  public async saveSnapshot(
+    boardId: Types.ObjectId | string,
+    snapshotData: any,
+  ): Promise<void> {
+    const validBoardId = new Types.ObjectId(boardId);
+
+    const boardUpdateInfo: mongoose.UpdateQuery<Board> = {
+      $currentDate: { updatedAt: true },
+    };
+
+    if (snapshotData.nodes !== undefined || snapshotData.edges !== undefined) {
+      boardUpdateInfo.$set = {
+        nodes: snapshotData.nodes || [],
+        edges: snapshotData.edges || [],
+      };
+
+      const result = await this.boardModel
+        .updateOne({ _id: validBoardId }, boardUpdateInfo)
+        .exec();
+      if (result.matchedCount === 0) {
+        throw new NotFoundException(`Board with ID "${boardId}" not found`);
+      }
+      return;
+    }
+
+    if (snapshotData.document !== undefined) {
+      boardUpdateInfo.$set = {
+        document: snapshotData.document || '',
+      };
+
+      const result = await this.boardModel
+        .updateOne({ _id: validBoardId }, boardUpdateInfo)
+        .exec();
+      if (result.matchedCount === 0) {
+        throw new NotFoundException(`Board with ID "${boardId}" not found`);
+      }
+      return;
+    }
+
+    if (Array.isArray(snapshotData.layers)) {
+      const bulkOps = snapshotData.layers.map((layerElements, index) => ({
+        updateOne: {
+          filter: { boardId: validBoardId, layerNumber: index },
+          update: { $set: { elements: layerElements } },
+        },
+      }));
+
+      if (bulkOps.length > 0) {
+        const [boardResult] = await Promise.all([
+          this.layerModel.bulkWrite(bulkOps),
+          this.boardModel
+            .updateOne({ _id: validBoardId }, boardUpdateInfo)
+            .exec(),
+        ]);
+
+        if (boardResult.matchedCount === 0) {
+          throw new NotFoundException(`Board with ID "${boardId}" not found`);
+        }
+      }
+      return;
+    }
+  }
 }
