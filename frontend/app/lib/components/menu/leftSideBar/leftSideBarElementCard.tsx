@@ -1,4 +1,4 @@
-import { Board, ProjectSection } from '@/app/lib/types/definitions';
+import { SimpleBoard, ProjectSection } from '@/app/lib/types/definitions';
 import { Button } from '@heroui/button';
 import { PlusIcon, TrashIcon } from 'lucide-react';
 import CheckAccess from '@/app/lib/utils/checkAccess';
@@ -11,7 +11,7 @@ export default function LeftSideBarElementCard({
   addNode,
   removeNode,
 }: {
-  element: ProjectSection | Board;
+  element: ProjectSection | SimpleBoard;
   isActive?: boolean;
   handleClick: () => void;
   addNode: () => void;

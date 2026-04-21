@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { BaseElement } from './element.schema';
 
 export interface BoardResponse {
@@ -28,6 +28,15 @@ export class Board {
 
   @Prop({ required: true, ref: 'Layer' })
   layers: Types.ObjectId[];
+
+  @Prop({ type: mongoose.Schema.Types.Mixed })
+  nodes?: any[];
+
+  @Prop({ type: mongoose.Schema.Types.Mixed })
+  edges?: any[];
+
+  @Prop()
+  document?: string;
 }
 
 export type BoardDocument = HydratedDocument<Board> & {

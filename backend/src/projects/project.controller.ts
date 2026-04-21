@@ -36,6 +36,7 @@ import { ChangeSectionParentDto } from './dto/change-section-parent.dto';
 import { ChangeBoardSectionDto } from './dto/change-board-section.dto';
 import { UpdateSectionDto } from './dto/update-section.dto';
 import { Role } from '../shared/types/enums';
+import { GenerateInviteLinkDto } from './dto/generate-invite-link.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -201,6 +202,141 @@ export class ProjectController {
       },
     );
     return { data: { id: sectionId } };
+  }
+
+  @Post(':id/invite-links')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Generate or refresh an invite link for a role' })
+  @ApiSecurity('x-user-id')
+  @ApiParam({
+    name: 'id',
+    description: 'ID of the project',
+    type: String,
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Invite link token generated (old token for this role is invalidated)',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            token: { type: 'string' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid role' })
+  @ApiResponse({ status: 403, description: 'Forbidden - requires admin role' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  @ApiBody({ type: GenerateInviteLinkDto })
+  async generateInviteLink(
+    @Param('id') projectId: Types.ObjectId,
+    @Body() dto: GenerateInviteLinkDto,
+    @Headers('x-user-id') userId: Types.ObjectId,
+  ): Promise<{ data: { token: string } }> {
+    const expiresAt = dto.expiresAt ? new Date(dto.expiresAt) : undefined;
+    const token = await this.projectService.generateInviteLink(
+      new Types.ObjectId(projectId),
+      new Types.ObjectId(userId),
+      dto.role,
+      expiresAt,
+    );
+    return { data: { token: token } };
+  }
+
+  @Get('invite/:token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Process an invite link token',
+    description:
+      'With `accept=false` (default) returns brief project info' +
+      'With `accept=true` adds the authenticated user to the project.',
+  })
+  @ApiParam({
+    name: 'token',
+    description: 'Invite token from the link',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'accept',
+    description: 'Set to true to join the project, omit or false to preview',
+    required: false,
+    type: Boolean,
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Brief project info (accept=false) or join confirmation (accept=true)',
+    schema: {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            name: { type: 'string' },
+            avatar: { type: 'string' },
+            description: { type: 'string', nullable: true },
+            members: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string' },
+                  nickname: { type: 'string' },
+                  avatar: { type: 'string' },
+                  role: {
+                    type: 'string',
+                    enum: ['owner', 'admin', 'editor', 'reader'],
+                  },
+                  team: { type: 'string', nullable: true },
+                  teamId: { type: 'string', nullable: true },
+                },
+              },
+            },
+            updatedAt: { type: 'string', format: 'date-time' },
+            settings: {
+              type: 'object',
+              properties: {
+                allowRequests: { type: 'boolean' },
+                memberListIsPublic: { type: 'boolean' },
+              },
+            },
+          },
+        },
+        {
+          type: 'object',
+          properties: {
+            accepted: { type: 'boolean', enum: [true] },
+            type: { type: 'string', enum: ['project'] },
+            id: { type: 'string' },
+          },
+        },
+      ],
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Token not found' })
+  @ApiResponse({ status: 410, description: 'Token expired' })
+  @ApiResponse({ status: 409, description: 'User already a member' })
+  @ApiResponse({
+    status: 401,
+    description: 'x-user-id required when accept=true',
+  })
+  async processInviteToken(
+    @Param('token') token: string,
+    @Query('accept') accept?: string,
+    @Headers('x-user-id') userId?: Types.ObjectId,
+  ): Promise<any> {
+    const acceptInvite = accept === 'true';
+    const userObjectId = userId ? new Types.ObjectId(userId) : undefined;
+    return this.projectService.processInviteToken(
+      token,
+      userObjectId,
+      acceptInvite,
+    );
   }
 
   @Get()

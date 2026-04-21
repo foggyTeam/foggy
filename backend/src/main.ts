@@ -4,9 +4,20 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationExceptionFilter } from './filters/validation-exception.filter';
+import { json, urlencoded } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+
+  app.use((req, res, next) => {
+    if (req.originalUrl.includes('/snapshot')) {
+      json({ limit: '50mb' })(req, res, next);
+    } else {
+      json({ limit: '2mb' })(req, res, next);
+    }
+  });
+  app.use(urlencoded({ extended: true, limit: '2mb' }));
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -31,7 +42,7 @@ async function bootstrap() {
     origin: configService.get<string>('FRONTEND_URI'),
     methods: 'GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS',
     credentials: true,
-    allowedHeaders: ['x-api-key', 'x-user-id'],
+    allowedHeaders: ['x-api-key', 'x-user-id', 'x-service-key'],
   });
 
   if (configService.get<string>('NODE_ENV') !== 'production') {
@@ -57,8 +68,18 @@ async function bootstrap() {
         },
         'x-user-id',
       )
+      .addApiKey(
+        {
+          type: 'apiKey',
+          name: 'x-service-key',
+          in: 'header',
+          description: 'Verification key for Sync Service',
+        },
+        'x-service-key',
+      )
       .addSecurityRequirements('x-api-key', [])
       .addSecurityRequirements('x-user-id', [])
+      .addSecurityRequirements('x-service-key', [])
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
