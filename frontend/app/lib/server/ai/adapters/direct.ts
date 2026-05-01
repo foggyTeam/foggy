@@ -6,6 +6,8 @@ import {
   AiFile,
   AiGEdge,
   AiGenerateTemplateArgs,
+  AiGenerateTemplateRequest,
+  AiGenerateTemplateResponse,
   AiGNode,
   AiJob,
   AiStructurizeArgs,
@@ -105,7 +107,7 @@ export class DirectAdapter implements IAiAdapter {
    *  @throws Error */
   async summarize(
     data: AiSummarizeArgs,
-  ): Promise<AiSummarizeResponse | string> {
+  ): Promise<AiSummarizeResponse | string | undefined> {
     const { boardId, imageUrl } = data;
 
     const requestBoard = await this.prepareAiBoard(boardId, imageUrl);
@@ -126,7 +128,7 @@ export class DirectAdapter implements IAiAdapter {
    *  @throws Error */
   async structurize(
     data: AiStructurizeArgs,
-  ): Promise<AiStructurizeResponse | string> {
+  ): Promise<AiStructurizeResponse | string | undefined> {
     const { boardId, imageUrl, projectId } = data;
 
     const requestBoard = await this.prepareAiBoard(boardId, imageUrl);
@@ -147,8 +149,23 @@ export class DirectAdapter implements IAiAdapter {
 
   /** @param data
    *  @throws Error */
-  async generateTemplate(data: AiGenerateTemplateArgs): Promise<any> {
-    return Promise.resolve(null);
+  async generateTemplate(
+    data: AiGenerateTemplateArgs,
+  ): Promise<AiGenerateTemplateResponse | string | undefined> {
+    const { boardName, boardType, prompt } = data;
+
+    const request = {
+      requestId: generateRequestId('template', { boardType }),
+      userId: await getUserId(),
+      requestType: 'generateTemplate',
+      boardId: 'someid',
+      boardType: boardType.toLowerCase(),
+      prompt: prompt || boardName,
+    } as AiGenerateTemplateRequest;
+
+    return externalPostRequest(`${apiUri}/template`, request, {
+      headers: { 'x-api-key': verificationKey },
+    });
   }
 
   /** @param jobId

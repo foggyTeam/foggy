@@ -107,15 +107,6 @@ const BoardImageGenerator = observer(
           title: settingsStore.t.toasts.board.uploadBoardImageSuccess,
         });
         await CopyToClipboard(result.url);
-
-        /*
-        // TODO: remove. temp check
-        const res = await GetProjectStructure(
-          boardStore.activeBoard?.id,
-          result.url,
-          projectsStore?.activeProject?.id,
-        );
-        console.log(res);*/
       } catch (e: any) {
         addToast({
           color: 'danger',
