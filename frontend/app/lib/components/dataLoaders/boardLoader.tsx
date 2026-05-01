@@ -5,8 +5,6 @@ import {
   Board,
   BoardTypes,
   DocBoard,
-  GEdge,
-  GNode,
   GraphBoard,
   SimpleBoard,
 } from '@/app/lib/types/definitions';
@@ -22,14 +20,10 @@ type Normalized<T extends Board> = Omit<T, 'type'> & {
   type: Lowercase<T['type']>;
   sectionIds: string[];
 };
+
 type BoardData =
   | Normalized<SimpleBoard>
-  | Normalized<
-      Omit<GraphBoard, 'graphNodes' | 'graphEdges'> & {
-        nodes: GNode[];
-        edges: GEdge[];
-      }
-    >
+  | Normalized<GraphBoard>
   | Normalized<DocBoard>;
 
 const BoardLoader = ({
@@ -59,7 +53,10 @@ const BoardLoader = ({
       }
 
       if (boardData.type === 'graph') {
-        graphBoardStore.setGraphData(boardData);
+        graphBoardStore.setGraphData({
+          nodes: boardData.nodes,
+          edges: boardData.edges,
+        });
       }
 
       if (boardData.type === 'doc') {
