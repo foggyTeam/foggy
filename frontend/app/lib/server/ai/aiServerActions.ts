@@ -3,18 +3,24 @@
 import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
 import { getAiAdapter } from '@/app/lib/server/ai/factory';
 
-export async function GetBoardSummary(boardId: Board['id']) {
+export async function GetBoardSummary(
+  boardId: Board['id'],
+  boardImageUrl: string,
+) {
   return getAiAdapter().summarize({
     boardId,
+    imageUrl: boardImageUrl,
   });
 }
 
 export async function GetProjectStructure(
   boardId: Board['id'],
+  boardImageUrl: string,
   projectId: Project['id'],
 ) {
   return getAiAdapter().structurize({
     boardId,
+    imageUrl: boardImageUrl,
     projectId,
   });
 }

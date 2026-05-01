@@ -1,18 +1,7 @@
 import 'server-only';
 
-/** Единый API для работы с AI Service напрямую или через бэкенд. */
-
-import type {
-  AiGenerateTemplateRequest,
-  AiGenerateTemplateResponse,
-  AiIncrementalRequest,
-  AiIncrementalResponse,
-  AiJob,
-  AiStructurizeRequest,
-  AiStructurizeResponse,
-  AiSummarizeRequest,
-  AiSummarizeResponse,
-} from './types';
+// Единый API для работы с AI Service напрямую или через бэкенд.
+import type { AiJob } from './types';
 import {
   AiGenerateTemplateArgs,
   AiStructurizeArgs,

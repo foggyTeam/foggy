@@ -18,6 +18,7 @@ import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 import { Edge, Node, ReactFlowInstance } from '@xyflow/react';
 import GetGraphBoardImage from '@/app/lib/utils/getGraphBoardImage';
 import { GNode } from '@/app/lib/types/definitions';
+import { GetBoardSummary } from '@/app/lib/server/ai/aiServerActions';
 
 interface SimpleBoardData {
   type: 'SIMPLE';
@@ -107,6 +108,9 @@ const BoardImageGenerator = observer(
           title: settingsStore.t.toasts.board.uploadBoardImageSuccess,
         });
         await CopyToClipboard(result.url);
+
+        // TODO: remove. temp check
+        await GetBoardSummary(boardStore.activeBoard?.id, result.url);
       } catch (e: any) {
         addToast({
           color: 'danger',
@@ -115,6 +119,7 @@ const BoardImageGenerator = observer(
           description: e.message || '',
         });
       }
+
       setIsLoading(false);
     }
 

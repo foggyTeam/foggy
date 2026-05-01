@@ -1,14 +1,16 @@
 import 'server-only';
 import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
 
-/** TS-адаптированные типы Go-моделей из AI Service. */
+// TS-адаптированные типы Go-моделей из AI Service.
 
 // COMMON REQUEST/RESPONSE TYPES
 export interface AiSummarizeArgs {
   boardId: Board['id'];
+  imageUrl: string;
 }
 export interface AiStructurizeArgs {
   boardId: Board['id'];
+  imageUrl: string;
   projectId: Project['id'];
 }
 export interface AiGenerateTemplateArgs {

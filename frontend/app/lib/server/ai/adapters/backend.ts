@@ -9,23 +9,23 @@ import {
 
 // TODO: implement all standard server actions via requests.ts
 export class BackendAdapter implements IAiAdapter {
-  structurize(request: AiStructurizeArgs): Promise<any> {
+  async structurize(request: AiStructurizeArgs): Promise<any> {
     throw new Error('Backend adapter not implemented yet');
   }
 
-  summarize(request: AiSummarizeArgs): Promise<any> {
+  async summarize(request: AiSummarizeArgs): Promise<any> {
     throw new Error('Backend adapter not implemented yet');
   }
 
-  abortJob(jobId: string): Promise<void> {
+  async abortJob(jobId: string): Promise<void> {
     throw new Error('Backend adapter not implemented yet');
   }
 
-  generateTemplate(request: AiGenerateTemplateArgs): Promise<any> {
+  async generateTemplate(request: AiGenerateTemplateArgs): Promise<any> {
     throw new Error('Backend adapter not implemented yet');
   }
 
-  getJobStatus(jobId: string): Promise<AiJob> {
+  async getJobStatus(jobId: string): Promise<AiJob> {
     throw new Error('Backend adapter not implemented yet');
   }
 }

@@ -101,3 +101,21 @@ export const externalGetRequest: any = async (
       console.error(`error: ${e}`);
       if (e.status === 403) return e;
     });
+
+export const externalPostRequest: any = async (
+  url: string,
+  data: any,
+  options: AxiosRequestConfig = {},
+) =>
+  axios
+    .post(`${url}`, data, {
+      ...options,
+      headers: { ...options.headers },
+    } as AxiosRequestConfig)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((e) => {
+      console.error(`error: ${e}`);
+      if (e.status === 403) return e;
+    });
