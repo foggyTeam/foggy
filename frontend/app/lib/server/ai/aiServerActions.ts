@@ -40,3 +40,7 @@ export async function GenerateBoardTemplate(
 export async function CheckGenerationStatus(jobId: string) {
   return getAiAdapter().getJobStatus(jobId);
 }
+
+export async function AbortJob(jobId: string) {
+  return getAiAdapter().abortJob(jobId);
+}
