@@ -13,23 +13,21 @@ import type {
   AiSummarizeRequest,
   AiSummarizeResponse,
 } from './types';
+import {
+  AiGenerateTemplateArgs,
+  AiStructurizeArgs,
+  AiSummarizeArgs,
+} from './types';
 
 export interface IAiAdapter {
   /** gets board summary */
-  summarize(req: AiSummarizeRequest): Promise<AiSummarizeResponse>;
+  summarize(request: AiSummarizeArgs): Promise<any>;
 
   /** gets structure based on board data */
-  structurize(req: AiStructurizeRequest): Promise<AiStructurizeResponse>;
+  structurize(request: AiStructurizeArgs): Promise<any>;
 
   /** gets board template based on prompt */
-  generateTemplate(
-    req: AiGenerateTemplateRequest,
-  ): Promise<AiGenerateTemplateResponse>;
-
-  /** incremental analysis of board updates */
-  summarizeIncremental(
-    req: AiIncrementalRequest,
-  ): Promise<AiIncrementalResponse>;
+  generateTemplate(request: AiGenerateTemplateArgs): Promise<any>;
 
   /** gets job status (polling) */
   getJobStatus(jobId: string): Promise<AiJob>;
