@@ -25,9 +25,6 @@ async function getSection(
 async function getBoard(board_id: string): Promise<any | undefined> {
   const board = await GetBoard(board_id);
   if (!board) notFound();
-  // TODO: remove when real data saved
-  if (board.type === 'graph')
-    return Object.assign(board, { graphEdges: [], graphNodes: [] });
   return board;
 }
 

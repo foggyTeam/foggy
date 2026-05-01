@@ -5,6 +5,7 @@ import {
   observable,
   ObservableMap,
   reaction,
+  toJS,
 } from 'mobx';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
@@ -37,8 +38,15 @@ class GraphBoardStore {
       edgesApplyUpdatesTrigger: observable,
       nodesDataMap: observable,
 
+      nodesExternalUpdatesQueue: observable.ref,
+      edgesExternalUpdatesQueue: observable.ref,
+
+      socketAddEventListeners: action,
+      socketRemoveEventListeners: action,
+      clearUpdatesQueue: action,
       setGraphData: action,
       updateNodeData: action,
+      clearRemovedNodes: action,
     });
 
     reaction(
@@ -62,7 +70,7 @@ class GraphBoardStore {
   }
 
   // WEBSOCKET
-  private socketAddEventListeners(socket: Socket) {
+  socketAddEventListeners(socket: Socket) {
     if (!socket) return;
 
     socket.on('nodesUpdate', (changes: any) => {
@@ -90,10 +98,10 @@ class GraphBoardStore {
       },
     );
   }
-  private socketRemoveEventListeners(socket: Socket) {
+  socketRemoveEventListeners(socket: Socket) {
     for (const event of GraphBoardEvents) socket.removeAllListeners(event);
   }
-  private emitSocketEvent(event: string, data: any) {
+  emitSocketEvent(event: string, data: any) {
     socketRef?.emit(event, data);
   }
 
@@ -148,8 +156,19 @@ class GraphBoardStore {
       const node = this.nodesDataMap.get(nodeId);
       if (node) Object.assign(node, newAttrs);
     }
-    if (!external)
+
+    if (external) {
+      this.nodesExternalUpdatesQueue.push([
+        {
+          type: 'replace',
+          id: nodeId,
+          item: { data: toJS(this.nodesDataMap.get(nodeId)) } as any,
+        },
+      ]);
+      this.nodesApplyUpdatesTrigger = !this.nodesApplyUpdatesTrigger;
+    } else {
       this.emitSocketEvent('nodeDataUpdate', { nodeId, newAttrs, isNew });
+    }
     return true;
   }
   clearRemovedNodes(nodes: GNode[]) {

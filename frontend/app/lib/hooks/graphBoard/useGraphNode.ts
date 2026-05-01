@@ -67,6 +67,23 @@ export default function useGraphNode<T>(
       );
   }, [nodeState]);
 
+  useEffect(() => {
+    if (
+      isSynced.current &&
+      JSON.stringify(nodeState) !== JSON.stringify(initialData)
+    ) {
+      dispatch(initialData);
+
+      if (hasContent) setIsEditing(false);
+    }
+  }, [
+    initialData.title,
+    initialData.description,
+    initialData.url,
+    initialData.element,
+    hasContent,
+  ]);
+
   const onBlur = (e: any) => {
     if (hasContent && !e.currentTarget.contains(e.relatedTarget as Element))
       setIsEditing(false);
