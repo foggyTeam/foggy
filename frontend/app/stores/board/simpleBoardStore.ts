@@ -11,6 +11,7 @@ import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
+import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 
 const SimpleBoardEvents = [
   'elementAdded',
@@ -102,7 +103,16 @@ class SimpleBoardStore {
       return;
     }
     this.boardLayers = layers.map((layer: SBoardElement[]) =>
-      observable.array(layer.map((element) => observable(element))),
+      observable.array(
+        layer.map((element) => {
+          if (element.type === 'text')
+            return observable({
+              ...element,
+              svg: HtmlToSvg(element.content, element.width, element.height),
+            });
+          return observable(element);
+        }),
+      ),
     );
     this.buildElementsMap();
   }

@@ -37,7 +37,7 @@
     },
     "boardPrompt": {
       "minLength": "Prompt must be at least 10 characters long",
-      "maxLength": "Prompt must be no more than 2000 characters long",
+      "maxLength": "Prompt must be no more than 1000 characters long",
       "invalidSymbols": "Prompt may contain only letters, digits and special symbols"
     },
     "teamName": {
