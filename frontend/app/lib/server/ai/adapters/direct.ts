@@ -151,18 +151,19 @@ export class DirectAdapter implements IAiAdapter {
     });
   }
 
+  // TODO: boolean response / error response
   /** @param data
    *  @throws Error */
   async generateTemplate(
     data: AiGenerateTemplateArgs,
   ): Promise<AiGenerateTemplateResponse | string | undefined> {
-    const { boardName, boardType, prompt } = data;
+    const { boardId, boardName, boardType, prompt } = data;
 
     const request = {
       requestId: generateRequestId('template', { boardType }),
       userId: await getUserId(),
       requestType: 'generateTemplate',
-      boardId: 'someid',
+      boardId: boardId,
       boardType: boardType.toLowerCase(),
       prompt: prompt || boardName,
     } as AiGenerateTemplateRequest;

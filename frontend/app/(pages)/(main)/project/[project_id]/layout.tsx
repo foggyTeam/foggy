@@ -3,6 +3,7 @@ import { RawProject } from '@/app/lib/types/definitions';
 import ProjectLoader from '@/app/lib/components/dataLoaders/projectLoader';
 import { GetProject } from '@/app/lib/server/actions/projectServerActions';
 import { notFound, redirect } from 'next/navigation';
+import AiLoadingCard from '@/app/lib/components/board/ai/aiLoadingCard';
 
 interface ProjectPageProps {
   project_id: string;
@@ -31,6 +32,7 @@ export default async function ProjectLayout({
   return (
     <>
       <ProjectLoader projectData={projectData} />
+      <AiLoadingCard />
       {children}
     </>
   );

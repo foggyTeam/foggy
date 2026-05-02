@@ -55,6 +55,7 @@
     },
     "board": {
       "addBoardError": "Не удалось создать доску",
+      "generateTemplateError": "Не удалось сгенерировать шаблон доски",
       "boardElementAddError": "Не удалось добавить элемент на доску",
       "boardElementDeleteError": "Не удалось удалить элемент с доски",
       "boardElementInvisible": "Элемент не виден",

@@ -80,6 +80,16 @@ export const projectElementNameSchema = z.object({
       aboutRegex,
       settingsStore.t.validationErrors.projectElementName.invalidSymbols,
     ),
+  prompt: z
+    .string()
+    .min(10, settingsStore.t.validationErrors.boardPrompt.minLength)
+    .max(2000, settingsStore.t.validationErrors.boardPrompt.maxLength)
+    .regex(
+      aboutRegex,
+      settingsStore.t.validationErrors.boardPrompt.invalidSymbols,
+    )
+    .or(z.literal(''))
+    .nullish(),
 });
 
 export const teamFormSchema = z.object({

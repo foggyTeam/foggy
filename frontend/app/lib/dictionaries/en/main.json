@@ -35,6 +35,11 @@
       "maxLength": "Name must be no more than 20 characters long",
       "invalidSymbols": "Name may contain only letters, digits and special symbols"
     },
+    "boardPrompt": {
+      "minLength": "Prompt must be at least 10 characters long",
+      "maxLength": "Prompt must be no more than 2000 characters long",
+      "invalidSymbols": "Prompt may contain only letters, digits and special symbols"
+    },
     "teamName": {
       "required": "Team name is required",
       "maxLength": "Team name must be no more than 20 characters long",
@@ -197,6 +202,13 @@
       "doc": {
         "new": "New document",
         "placeholder": "Document name"
+      },
+      "template": {
+        "generateTemplate": "Generate template with AI",
+        "prompt": {
+          "label": "Prompt for AI",
+          "placeholder": "Character relationship map for a fantasy novel or step-by-step roadmap for launching a creative blog..."
+        }
       },
       "create": "Create"
     },

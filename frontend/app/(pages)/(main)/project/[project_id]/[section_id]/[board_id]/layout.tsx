@@ -6,6 +6,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { notFound } from 'next/navigation';
 import BoardLoadingCard from '@/app/lib/components/board/boardLoadingCard';
+import AiLoadingCard from '@/app/lib/components/board/ai/aiLoadingCard';
 
 interface BoardLayoutProps {
   project_id: string;

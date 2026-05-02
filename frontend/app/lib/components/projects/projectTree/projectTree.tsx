@@ -9,6 +9,7 @@ import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {
   Board,
+  BoardTypes,
   GraphBoard,
   ProjectElementTypes,
   ProjectSection,
@@ -23,6 +24,7 @@ import {
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
+import { GenerateBoardTemplate } from '@/app/lib/server/ai/aiServerActions';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
@@ -118,7 +120,12 @@ const ProjectTree = observer(() => {
     onAddChildOpen();
   };
 
-  const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
+  const addNode = async (
+    nodeName: string,
+    nodeType: ProjectElementTypes,
+    needsTemplate?: boolean,
+    prompt?: string,
+  ) => {
     if (!projectsStore.activeProject) return;
 
     const parentSectionId = newNodeParentList[newNodeParentList.length - 1];
@@ -180,6 +187,16 @@ const ProjectTree = observer(() => {
             Object.assign(newBoard, data) as Board,
             false,
           );
+
+          onAddChildOpenChange();
+
+          if (needsTemplate)
+            await generateTemplate(
+              newBoard.id,
+              newBoard.name,
+              newBoard.type,
+              prompt,
+            );
         } catch (e: any) {
           addToast({
             color: 'danger',
@@ -189,8 +206,33 @@ const ProjectTree = observer(() => {
           });
         }
     }
-    onAddChildOpenChange();
   };
+
+  async function generateTemplate(
+    boardId: Board['id'],
+    boardName: string,
+    boardType: BoardTypes,
+    prompt?: string,
+  ) {
+    settingsStore.startAiLoading();
+    try {
+      const result = await GenerateBoardTemplate(
+        boardId,
+        boardName,
+        boardType,
+        prompt,
+      );
+      if (!result) throw new Error();
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.board.generateTemplateError,
+        description: e?.message || undefined,
+      });
+    }
+    settingsStore.endAiLoading();
+  }
 
   const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;

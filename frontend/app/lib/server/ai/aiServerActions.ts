@@ -26,11 +26,13 @@ export async function GetProjectStructure(
 }
 
 export async function GenerateBoardTemplate(
+  id: Board['id'],
   name: string,
   type: BoardTypes,
   prompt?: string,
 ) {
   return getAiAdapter().generateTemplate({
+    boardId: id,
     boardName: name,
     boardType: type,
     prompt,

@@ -4,11 +4,14 @@ import { Tab, Tabs } from '@heroui/tabs';
 import { ProjectElementTypes } from '@/app/lib/types/definitions';
 import ElementIcon from '@/app/lib/components/menu/leftSideBar/elementIcon';
 import settingsStore from '@/app/stores/settingsStore';
-import { Input } from '@heroui/input';
+import { Input, Textarea } from '@heroui/input';
 import { Button } from '@heroui/button';
 import IsFormValid from '@/app/lib/utils/isFormValid';
 import { projectElementNameSchema } from '@/app/lib/types/schemas';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { Checkbox } from '@heroui/checkbox';
+import { Divider } from '@heroui/divider';
+import AiLoadingCard from '@/app/lib/components/board/ai/aiLoadingCard';
 
 export default function AddProjectElementModal({
   isOpen,
@@ -19,12 +22,21 @@ export default function AddProjectElementModal({
 }: {
   isOpen: boolean;
   onOpenChange: any;
-  action: (nodeName: string, nodeType: ProjectElementTypes) => void;
+  action: (
+    nodeName: string,
+    nodeType: ProjectElementTypes,
+    needsTemplate?: boolean,
+    prompt?: string,
+  ) => void;
   boardOnly?: boolean;
   sectionOnly?: boolean;
 }) {
   const { smallerSize } = useAdaptiveParams();
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState<string>('');
+  const [generateTemplate, setGenerateTemplate] = useState<boolean>(false);
+  const [prompt, setPrompt] = useState<string>('');
+
   const [error, setError] = useState({} as any);
   const [filetype, setFiletype] = useState<ProjectElementTypes>(
     sectionOnly ? 'SECTION' : 'SIMPLE',
@@ -42,8 +54,12 @@ export default function AddProjectElementModal({
   ];
 
   useEffect(() => {
-    IsFormValid({ name }, projectElementNameSchema, setError);
-  }, [name, setError]);
+    IsFormValid({ name, prompt }, projectElementNameSchema, setError);
+  }, [name, prompt, setError]);
+
+  useEffect(() => {
+    if (!!prompt) setGenerateTemplate(true);
+  }, [prompt]);
 
   return (
     <Modal
@@ -52,10 +68,13 @@ export default function AddProjectElementModal({
       onOpenChange={onOpenChange}
       hideCloseButton
       onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
-        if (e.key === 'Enter' && !error?.name) await action(name, filetype);
+        if (e.key === 'Enter' && !error?.name) {
+          setIsLoading(true);
+          action(name, filetype, generateTemplate, prompt);
+        }
       }}
     >
-      <ModalContent className="flex w-fit max-w-xl gap-2 overflow-visible p-6 pt-0">
+      <ModalContent className="flex w-full max-w-lg gap-2 overflow-visible p-6 pt-0">
         {() =>
           (
             <>
@@ -79,7 +98,7 @@ export default function AddProjectElementModal({
                   ))}
                 </Tabs>
               </ModalHeader>
-              <ModalBody className="flex h-fit w-fit max-w-xl flex-col gap-4 pt-6">
+              <ModalBody className="flex h-fit w-full max-w-lg flex-col gap-4 pt-6">
                 <h1 className="font-medium">
                   {
                     settingsStore.t.projects.addElement[
@@ -100,7 +119,7 @@ export default function AddProjectElementModal({
                   radius="full"
                   size={smallerSize}
                   type="text"
-                  className="m-0 w-56 p-0"
+                  className="m-0 w-full p-0"
                   classNames={{
                     inputWrapper: 'sm:text-sm text-medium',
                     input: 'sm:text-sm text-medium',
@@ -115,12 +134,60 @@ export default function AddProjectElementModal({
                     ].placeholder
                   }
                 />
-                {/* Maybe some presets here*/}
+
+                {filetype !== 'SECTION' && (
+                  <>
+                    <Divider />
+
+                    <div className="flex flex-col gap-4">
+                      <Checkbox
+                        data-testid="generate-template-chb"
+                        className="w-full"
+                        isSelected={generateTemplate}
+                        onValueChange={setGenerateTemplate}
+                        size={smallerSize}
+                      >
+                        {
+                          settingsStore.t.projects.addElement.template
+                            .generateTemplate
+                        }
+                      </Checkbox>
+                      <Textarea
+                        isInvalid={error.prompt}
+                        errorMessage={error.prompt}
+                        maxRows={10}
+                        label={
+                          settingsStore.t.projects.addElement.template.prompt
+                            .label
+                        }
+                        labelPlacement="inside"
+                        name="prompt"
+                        placeholder={
+                          settingsStore.t.projects.addElement.template.prompt
+                            .placeholder
+                        }
+                        type="prompt"
+                        autoComplete="prompt"
+                        size={smallerSize}
+                        value={prompt}
+                        onValueChange={setPrompt}
+                        classNames={{
+                          inputWrapper: 'bg-[hsl(var(--heroui-background))]',
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
+
                 <Button
                   data-testid="create-btn"
-                  onPress={() => action(name, filetype)}
+                  onPress={() => {
+                    setIsLoading(true);
+                    action(name, filetype, generateTemplate, prompt);
+                  }}
                   isDisabled={error.name}
                   color="primary"
+                  isLoading={isLoading}
                 >
                   {settingsStore.t.projects.addElement.create}
                 </Button>

@@ -11,6 +11,7 @@ import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {
   Board,
+  BoardTypes,
   GraphBoard,
   ProjectElementTypes,
   ProjectSection,
@@ -23,6 +24,7 @@ import {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
+import { GenerateBoardTemplate } from '@/app/lib/server/ai/aiServerActions';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
@@ -51,7 +53,12 @@ const LeftSideBar = observer(() => {
   useEffect(() => {
     if (!isOpened) setParentList(projectsStore.activeBoardParentList);
   }, [isOpened]);
-  const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
+  const addNode = async (
+    nodeName: string,
+    nodeType: ProjectElementTypes,
+    needsTemplate?: boolean,
+    prompt?: string,
+  ) => {
     if (!projectsStore.activeProject || !boardStore.activeBoard) return;
     const fullParentList = isOpened
       ? parentSectionId
@@ -121,9 +128,19 @@ const LeftSideBar = observer(() => {
             Object.assign(newBoard, data) as Board,
             false,
           );
+          if (needsTemplate) {
+            onAddChildOpenChange();
+            await generateTemplate(
+              newBoard.id,
+              newBoard.name,
+              newBoard.type,
+              prompt,
+            );
+          }
           router.push(
             `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
           );
+          if (!needsTemplate) onAddChildOpenChange();
         } catch (e: any) {
           addToast({
             color: 'danger',
@@ -133,8 +150,33 @@ const LeftSideBar = observer(() => {
           });
         }
     }
-    onAddChildOpenChange();
   };
+
+  async function generateTemplate(
+    boardId: Board['id'],
+    boardName: string,
+    boardType: BoardTypes,
+    prompt?: string,
+  ) {
+    settingsStore.startAiLoading();
+    try {
+      const result = await GenerateBoardTemplate(
+        boardId,
+        boardName,
+        boardType,
+        prompt,
+      );
+      if (!result) throw new Error();
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.board.generateTemplateError,
+        description: e?.message || undefined,
+      });
+    }
+    settingsStore.endAiLoading();
+  }
 
   return (
     <>

@@ -14,6 +14,7 @@ export interface AiStructurizeArgs {
   projectId: Project['id'];
 }
 export interface AiGenerateTemplateArgs {
+  boardId: Board['id'];
   boardName: string;
   boardType: BoardTypes;
   prompt?: string;
