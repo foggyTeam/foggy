@@ -23,7 +23,11 @@ import {
   GetSection,
 } from '@/app/lib/server/actions/projectServerActions';
 import { Board, Project, ProjectSection } from '@/app/lib/types/definitions';
-import { externalPostRequest } from '@/app/lib/server/requests';
+import {
+  externalGetRequest,
+  externalPostRequest,
+  externalPutRequest,
+} from '@/app/lib/server/requests';
 import getUserId from '@/app/lib/getUserId';
 
 const apiUri = process.env.AI_URI;
@@ -171,12 +175,16 @@ export class DirectAdapter implements IAiAdapter {
   /** @param jobId
    *  @throws Error */
   async abortJob(jobId: string): Promise<void> {
-    return Promise.resolve(null);
+    return externalPutRequest(`${apiUri}/jobs/${jobId}/abort`, {
+      headers: { 'x-api-key': verificationKey },
+    });
   }
 
   /** @param jobId
    *  @throws Error */
   async getJobStatus(jobId: string): Promise<AiJob> {
-    return Promise.resolve(null);
+    return externalGetRequest(`${apiUri}/jobs/${jobId}`, {
+      headers: { 'x-api-key': verificationKey },
+    });
   }
 }
