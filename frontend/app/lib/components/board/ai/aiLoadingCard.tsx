@@ -5,11 +5,11 @@ import { Progress } from '@heroui/progress';
 import clsx from 'clsx';
 import { bg_container } from '@/app/lib/types/styles';
 import FoggySmall from '@/app/lib/components/svg/foggySmall';
-import settingsStore from '@/app/stores/settingsStore';
+import aiStore from '@/app/stores/board/aiStore';
 
 const AiLoadingCard = observer(() => {
   return (
-    settingsStore.isGeneratingBoard && (
+    aiStore.isLoading && (
       <div className="bg-background/50 absolute top-0 left-0 z-30 flex h-full w-full items-center justify-center backdrop-blur-xl">
         <div
           className={clsx(

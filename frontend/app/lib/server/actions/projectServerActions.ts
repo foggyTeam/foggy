@@ -6,7 +6,14 @@ import {
   patchRequest,
   postRequest,
 } from '@/app/lib/server/requests';
-import { Board, Project, ProjectSection } from '@/app/lib/types/definitions';
+import {
+  Board,
+  GEdge,
+  GNode,
+  Project,
+  ProjectSection,
+  SBoardElement,
+} from '@/app/lib/types/definitions';
 import getUserId from '@/app/lib/getUserId';
 
 type ErrorResponse = {
@@ -121,5 +128,16 @@ export async function UpdateBoard(id: string, data: { name: string }) {
 export async function DeleteBoard(id: string) {
   return await deleteRequest(`boards/${id}`, {
     headers: { 'x-user-id': await getUserId() },
+  });
+}
+
+// WARNING: SYNC SERVICE ENDPOINTS
+type BoardSnapshot =
+  | { layers: SBoardElement[][] }
+  | { edges: GEdge[]; nodes: GNode[] }
+  | { document: string };
+export async function SaveBoardSnapshot(id: string, snapshot: BoardSnapshot) {
+  return postRequest(`boards/${id}/snapshot`, snapshot, {
+    headers: { 'x-service-key': process.env.SYNC_VERIFICATION_KEY ?? '' },
   });
 }

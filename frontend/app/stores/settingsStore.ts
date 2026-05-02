@@ -14,7 +14,6 @@ import { addToast } from '@heroui/toast';
 class SettingsStore {
   locale: AvailableLocales = 'en';
   isLoading: boolean = false;
-  isGeneratingBoard: boolean = false;
 
   constructor() {
     makeAutoObservable(this, {
@@ -58,14 +57,6 @@ class SettingsStore {
   }
   endLoading() {
     this.isLoading = false;
-  }
-
-  // AI GENERATION LOADING
-  startAiLoading() {
-    this.isGeneratingBoard = true;
-  }
-  endAiLoading() {
-    this.isGeneratingBoard = false;
   }
 }
 

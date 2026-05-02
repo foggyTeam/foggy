@@ -11,7 +11,6 @@ import { projectElementNameSchema } from '@/app/lib/types/schemas';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import { Checkbox } from '@heroui/checkbox';
 import { Divider } from '@heroui/divider';
-import AiLoadingCard from '@/app/lib/components/board/ai/aiLoadingCard';
 
 export default function AddProjectElementModal({
   isOpen,
@@ -70,7 +69,8 @@ export default function AddProjectElementModal({
       onKeyDown={async (e: React.KeyboardEvent<HTMLElement>) => {
         if (e.key === 'Enter' && !error?.name) {
           setIsLoading(true);
-          action(name, filetype, generateTemplate, prompt);
+          await action(name, filetype, generateTemplate, prompt);
+          setIsLoading(false);
         }
       }}
     >
@@ -181,9 +181,10 @@ export default function AddProjectElementModal({
 
                 <Button
                   data-testid="create-btn"
-                  onPress={() => {
+                  onPress={async () => {
                     setIsLoading(true);
-                    action(name, filetype, generateTemplate, prompt);
+                    await action(name, filetype, generateTemplate, prompt);
+                    setIsLoading(false);
                   }}
                   isDisabled={error.name}
                   color="primary"

@@ -11,7 +11,6 @@ import { useDisclosure } from '@heroui/modal';
 import AddProjectElementModal from '@/app/lib/components/projects/addProjectElementModal';
 import {
   Board,
-  BoardTypes,
   GraphBoard,
   ProjectElementTypes,
   ProjectSection,
@@ -24,7 +23,7 @@ import {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
-import { GenerateBoardTemplate } from '@/app/lib/server/ai/aiServerActions';
+import aiStore from '@/app/stores/board/aiStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
@@ -128,18 +127,21 @@ const LeftSideBar = observer(() => {
             Object.assign(newBoard, data) as Board,
             false,
           );
+
           if (needsTemplate) {
             onAddChildOpenChange();
-            await generateTemplate(
+            await aiStore.generateTemplate(
               newBoard.id,
               newBoard.name,
               newBoard.type,
               prompt,
             );
           }
-          router.push(
-            `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
-          );
+
+          if (!aiStore.isPolling)
+            router.push(
+              `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
+            );
           if (!needsTemplate) onAddChildOpenChange();
         } catch (e: any) {
           addToast({
@@ -151,32 +153,6 @@ const LeftSideBar = observer(() => {
         }
     }
   };
-
-  async function generateTemplate(
-    boardId: Board['id'],
-    boardName: string,
-    boardType: BoardTypes,
-    prompt?: string,
-  ) {
-    settingsStore.startAiLoading();
-    try {
-      const result = await GenerateBoardTemplate(
-        boardId,
-        boardName,
-        boardType,
-        prompt,
-      );
-      if (!result) throw new Error();
-    } catch (e: any) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.generateTemplateError,
-        description: e?.message || undefined,
-      });
-    }
-    settingsStore.endAiLoading();
-  }
 
   return (
     <>

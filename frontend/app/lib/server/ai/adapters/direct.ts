@@ -21,8 +21,14 @@ import {
   GetBoard,
   GetProject,
   GetSection,
+  SaveBoardSnapshot,
 } from '@/app/lib/server/actions/projectServerActions';
-import { Board, Project, ProjectSection } from '@/app/lib/types/definitions';
+import {
+  Board,
+  BoardTypes,
+  Project,
+  ProjectSection,
+} from '@/app/lib/types/definitions';
 import {
   externalGetRequest,
   externalPostRequest,
@@ -107,6 +113,40 @@ export class DirectAdapter implements IAiAdapter {
     return projectFile;
   }
 
+  private async loadBoardTemplate(boardType: BoardTypes, aiBoard: AiBoard) {
+    // TODO: process DOC boards
+    const { boardId, graphNodes, graphEdges, elements } = aiBoard;
+
+    let payload;
+    switch (boardType) {
+      case 'SIMPLE':
+        payload = {
+          layers: [
+            (elements || []).map((el) => {
+              if (el.type === 'rectangle' && 'content' in el)
+                return {
+                  ...el,
+                  type: 'text',
+                  svg: '',
+                };
+
+              return el;
+            }),
+            [],
+            [],
+          ],
+        };
+        break;
+      case 'GRAPH':
+        payload = { edges: graphEdges, nodes: graphNodes };
+        break;
+      case 'DOC':
+        payload = { document: 'Failed to generate' };
+        break;
+    }
+    return SaveBoardSnapshot(boardId, payload);
+  }
+
   /** @param data
    *  @throws Error */
   async summarize(
@@ -151,12 +191,9 @@ export class DirectAdapter implements IAiAdapter {
     });
   }
 
-  // TODO: boolean response / error response
   /** @param data
    *  @throws Error */
-  async generateTemplate(
-    data: AiGenerateTemplateArgs,
-  ): Promise<AiGenerateTemplateResponse | string | undefined> {
+  async generateTemplate(data: AiGenerateTemplateArgs) {
     const { boardId, boardName, boardType, prompt } = data;
 
     const request = {
@@ -168,9 +205,12 @@ export class DirectAdapter implements IAiAdapter {
       prompt: prompt || boardName,
     } as AiGenerateTemplateRequest;
 
-    return externalPostRequest(`${apiUri}/template`, request, {
-      headers: { 'x-api-key': verificationKey },
-    });
+    const response: AiGenerateTemplateResponse | string | undefined =
+      await externalPostRequest(`${apiUri}/template`, request, {
+        headers: { 'x-api-key': verificationKey },
+      });
+    if (!response || typeof response === 'string') return response;
+    return this.loadBoardTemplate(boardType, response.board);
   }
 
   /** @param jobId

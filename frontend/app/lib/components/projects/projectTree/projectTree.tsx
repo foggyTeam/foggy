@@ -25,6 +25,7 @@ import {
 } from '@/app/lib/server/actions/projectServerActions';
 import { addToast } from '@heroui/toast';
 import { GenerateBoardTemplate } from '@/app/lib/server/ai/aiServerActions';
+import aiStore from '@/app/stores/board/aiStore';
 
 interface ActiveNodeContextType {
   activeNodes: { id: string; parentList: string[] }[];
@@ -188,10 +189,8 @@ const ProjectTree = observer(() => {
             false,
           );
 
-          onAddChildOpenChange();
-
           if (needsTemplate)
-            await generateTemplate(
+            await aiStore.generateTemplate(
               newBoard.id,
               newBoard.name,
               newBoard.type,
@@ -206,33 +205,8 @@ const ProjectTree = observer(() => {
           });
         }
     }
+    onAddChildOpenChange();
   };
-
-  async function generateTemplate(
-    boardId: Board['id'],
-    boardName: string,
-    boardType: BoardTypes,
-    prompt?: string,
-  ) {
-    settingsStore.startAiLoading();
-    try {
-      const result = await GenerateBoardTemplate(
-        boardId,
-        boardName,
-        boardType,
-        prompt,
-      );
-      if (!result) throw new Error();
-    } catch (e: any) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.generateTemplateError,
-        description: e?.message || undefined,
-      });
-    }
-    settingsStore.endAiLoading();
-  }
 
   const loadSection = async (id: string, parentList: string[]) => {
     if (!projectsStore.activeProject) return;
