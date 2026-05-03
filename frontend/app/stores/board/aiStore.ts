@@ -11,6 +11,7 @@ interface Job {
   requestId: string;
   jobId: string;
   status: 'pending' | 'running' | 'completed' | 'failed' | 'aborted';
+  jobAction?: () => any;
   onSuccessCallback?: (generationResult: any) => void;
 }
 
@@ -70,7 +71,19 @@ class AiStore {
       );
 
       if ('jobId' in result)
-        this.loadingJobsMap.set(result.requestId, Object.assign(job, result));
+        this.loadingJobsMap.set(result.requestId, {
+          ...job,
+          ...result,
+          jobAction: async () =>
+            await GenerateBoardTemplate(
+              projectId,
+              newBoard.sectionId,
+              newBoard.name,
+              newBoard.type,
+              prompt,
+              result.requestId,
+            ),
+        });
       else this.onGenerationSuccess(result, onSuccessCallback, job.prompt);
     } catch (e: any) {
       this.onGenerationError(e.message);
@@ -97,8 +110,8 @@ class AiStore {
             return;
 
           if (jobStatus.status === 'completed') {
-            // TODO: proceed job data
-            this.onGenerationSuccess(null, job.onSuccessCallback);
+            const result = await job.jobAction?.();
+            this.onGenerationSuccess(result, job.onSuccessCallback);
             this.loadingJobsMap.delete(requestId);
             return;
           }
