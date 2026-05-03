@@ -17,6 +17,7 @@ interface Job {
   status: 'pending' | 'running' | 'completed' | 'failed' | 'aborted';
   jobAction?: () => any;
   onSuccessCallback?: (generationResult: any) => void;
+  onErrorCallback?: (error?: any) => void;
 }
 
 interface TemplateJob extends Job {
@@ -65,6 +66,7 @@ class AiStore {
     newBoard: Omit<Board, 'id'>,
     prompt?: string,
     onSuccessCallback?: (generationResult: any) => void,
+    onErrorCallback?: (error?: any) => void,
   ) {
     let job: Omit<TemplateJob, 'jobId' | 'requestId'> = {
       type: 'generateTemplate',
@@ -75,6 +77,7 @@ class AiStore {
         id: `temp-id-${Date.now()}`,
       } as Board,
       onSuccessCallback,
+      onErrorCallback,
     };
 
     try {
@@ -85,6 +88,8 @@ class AiStore {
         newBoard.type,
         prompt,
       );
+
+      if (!result) throw new Error();
 
       if ('jobId' in result)
         this.loadingJobsMap.set(result.requestId, {
@@ -102,7 +107,7 @@ class AiStore {
         });
       else this.onGenerationSuccess(result, onSuccessCallback, job.prompt);
     } catch (e: any) {
-      this.onGenerationError(e.message);
+      this.onGenerationError(e.message, onErrorCallback);
     }
   }
 
@@ -110,6 +115,7 @@ class AiStore {
     boardId: string,
     boardImageUrl: string,
     onSuccessCallback?: (generationResult: any) => void,
+    onErrorCallback?: (error?: any) => void,
   ) {
     let job: Omit<SummarizeJob, 'jobId' | 'requestId'> = {
       type: 'summarize',
@@ -117,10 +123,13 @@ class AiStore {
       boardId,
       imageUrl: boardImageUrl,
       onSuccessCallback,
+      onErrorCallback,
     };
 
     try {
       const result = await GetBoardSummary(job.boardId, job.imageUrl);
+
+      if (!result) throw new Error();
 
       if ('jobId' in result)
         this.loadingJobsMap.set(result.requestId, {
@@ -131,7 +140,7 @@ class AiStore {
         });
       else this.onGenerationSuccess(result, onSuccessCallback);
     } catch (e: any) {
-      this.onGenerationError(e.message);
+      this.onGenerationError(e.message, onErrorCallback);
     }
   }
 
@@ -140,6 +149,7 @@ class AiStore {
     boardImageUrl: string,
     projectId: string,
     onSuccessCallback?: (generationResult: any) => void,
+    onErrorCallback?: (error?: any) => void,
   ) {
     let job: Omit<StructurizeJob, 'jobId' | 'requestId'> = {
       type: 'structurize',
@@ -157,6 +167,8 @@ class AiStore {
         job.projectId,
       );
 
+      if (!result) throw new Error();
+
       if ('jobId' in result)
         this.loadingJobsMap.set(result.requestId, {
           ...job,
@@ -171,7 +183,7 @@ class AiStore {
         });
       else this.onGenerationSuccess(result, onSuccessCallback);
     } catch (e: any) {
-      this.onGenerationError(e.message);
+      this.onGenerationError(e.message, onErrorCallback);
     }
   }
 
@@ -208,7 +220,7 @@ class AiStore {
         } catch (e: any) {
           // TODO: add abort
           this.loadingJobsMap.delete(requestId);
-          this.onGenerationError(e.message);
+          this.onGenerationError(e.message, job.onErrorCallback);
         }
       }),
     );
@@ -222,18 +234,19 @@ class AiStore {
     addToast({
       color: 'success',
       severity: 'success',
-      title: settingsStore.t.toasts.board.generateTemplateError,
+      title: settingsStore.t.toasts.board.generateSuccess,
       description,
     });
     if (callback) callback(result);
   }
-  onGenerationError(description?: string) {
+  onGenerationError(description?: string, callback?: (error?: any) => void) {
     addToast({
       color: 'danger',
       severity: 'danger',
-      title: settingsStore.t.toasts.board.generateTemplateError,
+      title: settingsStore.t.toasts.board.generateError,
       description: description || undefined,
     });
+    if (callback) callback(description);
   }
 }
 

@@ -27,6 +27,42 @@ import boardStore from '@/app/stores/board/boardStore';
 import { useTheme } from 'next-themes';
 import aiStore from '@/app/stores/board/aiStore';
 import projectsStore from '@/app/stores/projectsStore';
+import ProjectTreePreview from '@/app/lib/components/board/ai/projectTreePreview';
+
+export interface AiSummaryTextElement {
+  id: string;
+  type: 'text';
+  content: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  rotation: number;
+}
+
+export interface AiSummarizeResponse {
+  requestId: string;
+  userId: string;
+  requestType: 'summarize';
+  text: AiSummaryTextElement;
+}
+
+export interface AiFileNode {
+  name: string;
+  type: 'section' | 'simple' | 'graph' | 'doc';
+  children?: AiFileNode[];
+}
+
+export interface AiStructurizeResponse {
+  requestId: string;
+  userId: string;
+  requestType: 'structurize';
+  aiTreeResponse: string;
+  file: AiFileNode;
+}
 
 const AiAssistantModal = observer(
   ({
@@ -44,6 +80,9 @@ const AiAssistantModal = observer(
     const [step, setStep] = useState<0 | 1 | 2>(0);
     const [generationType, setGenerationType] = useState<
       null | keyof typeof generationTypeMap
+    >(null);
+    const [generationResult, setGenerationResult] = useState<
+      null | AiSummarizeResponse | AiStructurizeResponse
     >(null);
 
     const generationTypeMap = {
@@ -85,6 +124,7 @@ const AiAssistantModal = observer(
             boardStore.activeBoard.id,
             url,
             onSummaryGenerated,
+            onGenerationFail,
           );
           break;
         case 'structurize':
@@ -94,29 +134,51 @@ const AiAssistantModal = observer(
             url,
             projectsStore.activeProject.id,
             onStructureGenerated,
+            onGenerationFail,
           );
           break;
       }
     }
 
-    function onSummaryGenerated(result: any) {
+    function onSummaryGenerated(
+      result: { SummarizeResponse: AiSummarizeResponse } | null | undefined,
+    ) {
+      if (!result) {
+        onAbort(true);
+        return;
+      }
       setStep(2);
-      console.log(result);
+      setGenerationResult(result.SummarizeResponse);
     }
-    function onStructureGenerated(result: any) {
+    function onStructureGenerated(
+      result: AiStructurizeResponse | null | undefined,
+    ) {
+      if (!result) {
+        onAbort(true);
+        return;
+      }
       setStep(2);
-      console.log(result);
+      setGenerationResult(result);
     }
 
     function onAbort(local: boolean = false) {
       setStep(0);
       setGenerationType(null);
+      setGenerationResult(null);
+      // TODO: try to abort job (how?)
+    }
+
+    function onGenerationFail() {
+      setStep(0);
+      setGenerationType(null);
+      setGenerationResult(null);
     }
 
     function onSubmit() {
       console.log('Generation result submitted!');
       setStep(0);
       setGenerationType(null);
+      setGenerationResult(null);
     }
 
     return (
@@ -129,7 +191,7 @@ const AiAssistantModal = observer(
         className={clsx(
           bg_container,
           ai_sidebar_layout,
-          'h-fit w-full overflow-visible sm:w-lg',
+          'h-fit w-full overflow-visible sm:max-w-sm',
           'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-0.5',
         )}
       >
@@ -158,7 +220,7 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex h-72 flex-wrap items-start gap-2 overflow-y-auto sm:h-[360px] sm:flex-nowrap"
+                  className="flex h-72 flex-col gap-2 overflow-y-auto sm:h-[360px]"
                 >
                   {Object.entries(generationTypeMap).map(
                     ([type, { title, description, cardStyle, CardIcon }]) => (
@@ -193,7 +255,7 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex h-72 flex-col gap-2 overflow-y-auto sm:h-[360px]"
+                  className="flex h-72 flex-col gap-4 overflow-y-auto sm:h-[360px]"
                 >
                   <GenerationSkeleton type={generationType} />
                   <FButton
@@ -213,19 +275,51 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex h-72 flex-wrap items-start gap-2 overflow-y-auto sm:h-[360px] sm:flex-nowrap"
+                  className="flex h-72 flex-col gap-4 overflow-y-auto sm:h-[360px]"
                 >
-                  <FButton
-                    size={commonSize}
-                    onPress={() => onAbort(true)}
-                    variant="bordered"
-                    color="danger"
-                  >
-                    {settingsStore.t.ai.discardButton}
-                  </FButton>
-                  <FButton size={commonSize} onPress={onSubmit} color="primary">
-                    {settingsStore.t.ai.submitButton}
-                  </FButton>
+                  {generationType === 'summarize' &&
+                    'text' in generationResult && (
+                      <Card shadow="none" className="h-full pr-1">
+                        <CardBody>
+                          <div
+                            className="leading-relaxed [&>li]:mt-1 [&>ul]:mt-2 [&>ul]:list-disc [&>ul]:pl-5"
+                            dangerouslySetInnerHTML={{
+                              __html: generationResult.text.content,
+                            }}
+                          />
+                        </CardBody>
+                      </Card>
+                    )}
+
+                  {generationType === 'structurize' &&
+                    'aiTreeResponse' in generationResult && (
+                      <div className="flex flex-col gap-3 pr-1">
+                        <p className="text-default-500 text-sm italic">
+                          {generationResult.aiTreeResponse}
+                        </p>
+                        <div className="border-secondary/20 bg-secondary/5 overflow-x-auto rounded-xl border p-3">
+                          <ProjectTreePreview node={generationResult.file} />
+                        </div>
+                      </div>
+                    )}
+
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                    <FButton
+                      size={commonSize}
+                      onPress={() => onAbort(true)}
+                      variant="bordered"
+                      color="danger"
+                    >
+                      {settingsStore.t.ai.discardButton}
+                    </FButton>
+                    <FButton
+                      size={commonSize}
+                      onPress={onSubmit}
+                      color="primary"
+                    >
+                      {settingsStore.t.ai.submitButton}
+                    </FButton>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

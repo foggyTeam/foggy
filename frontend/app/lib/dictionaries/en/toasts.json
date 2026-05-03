@@ -55,7 +55,9 @@
     },
     "board": {
       "addBoardError": "Failed to create board",
-      "generateTemplateError": "Failed to generate board template",
+      "generateError": "Failed to generate",
+      "generateSuccess": "Successfully generated!",
+
       "boardElementAddError": "Failed to add board element",
       "boardElementDeleteError": "Failed to remove board element",
       "boardElementInvisible": "This element is invisible",
