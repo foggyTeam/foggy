@@ -114,6 +114,7 @@ const LeftSideBar = observer(() => {
 
           if (needsTemplate) {
             await aiStore.generateTemplate(
+              projectsStore.activeProject.id,
               newBoard,
               prompt,
               (result: { boardId: string } | null) => {

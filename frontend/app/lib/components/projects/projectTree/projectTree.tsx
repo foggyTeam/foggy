@@ -175,11 +175,12 @@ const ProjectTree = observer(() => {
 
           if (needsTemplate) {
             await aiStore.generateTemplate(
+              projectsStore.activeProject.id,
               newBoard,
               prompt,
-              (result: { boardId: string } | null) => {
+              (result: { boardId: string } | null | undefined) => {
                 // TODO: proceed
-                if (result === null) {
+                if (result === null || result === undefined) {
                   console.error('Failed to add board');
                   return;
                 }

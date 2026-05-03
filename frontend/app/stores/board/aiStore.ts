@@ -44,6 +44,7 @@ class AiStore {
 
   // ACTIONS
   async generateTemplate(
+    projectId: string,
     newBoard: Omit<Board, 'id'>,
     prompt?: string,
     onSuccessCallback?: (generationResult: any) => void,
@@ -61,7 +62,8 @@ class AiStore {
 
     try {
       const result = await GenerateBoardTemplate(
-        job.board.id,
+        projectId,
+        newBoard.sectionId,
         newBoard.name,
         newBoard.type,
         prompt,
@@ -69,7 +71,7 @@ class AiStore {
 
       if ('jobId' in result)
         this.loadingJobsMap.set(result.requestId, Object.assign(job, result));
-      else this.onGenerationSuccess(onSuccessCallback, null, job.prompt);
+      else this.onGenerationSuccess(result, onSuccessCallback, job.prompt);
     } catch (e: any) {
       this.onGenerationError(e.message);
     }
@@ -125,7 +127,7 @@ class AiStore {
       title: settingsStore.t.toasts.board.generateTemplateError,
       description,
     });
-    callback?.(result);
+    if (callback) callback(result);
   }
   onGenerationError(description?: string) {
     addToast({

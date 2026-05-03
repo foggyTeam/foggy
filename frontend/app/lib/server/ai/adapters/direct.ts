@@ -18,6 +18,7 @@ import {
   AiSummarizeResponse,
 } from '@/app/lib/server/ai/types';
 import {
+  AddBoard,
   GetBoard,
   GetProject,
   GetSection,
@@ -114,7 +115,7 @@ export class DirectAdapter implements IAiAdapter {
   }
 
   private async loadBoardTemplate(boardType: BoardTypes, aiBoard: AiBoard) {
-    // TODO: process DOC boards
+    // TODO: process DOC boards and check GRAPH boards
     const { boardId, graphNodes, graphEdges, elements } = aiBoard;
 
     let payload;
@@ -144,6 +145,7 @@ export class DirectAdapter implements IAiAdapter {
         payload = { document: 'Failed to generate' };
         break;
     }
+
     return SaveBoardSnapshot(boardId, payload);
   }
 
@@ -196,14 +198,15 @@ export class DirectAdapter implements IAiAdapter {
   async generateTemplate(
     data: AiGenerateTemplateArgs,
   ): Promise<any | { requestId: string; jobId: string }> {
-    const { boardId, boardName, boardType, prompt, requestId } = data;
+    const { projectId, sectionId, boardName, boardType, prompt, requestId } =
+      data;
 
     const id = requestId || generateRequestId('template', { boardType });
     const request = {
       requestId: id,
       userId: await getUserId(),
       requestType: 'generateTemplate',
-      boardId: boardId,
+      boardId: id,
       boardType: boardType.toLowerCase(),
       prompt: prompt || boardName,
     } as AiGenerateTemplateRequest;
@@ -216,7 +219,19 @@ export class DirectAdapter implements IAiAdapter {
 
     if (typeof response === 'string') return { requestId: id, jobId: response };
 
-    return this.loadBoardTemplate(boardType, response.board);
+    const createBoardResponse = await AddBoard(projectId, {
+      sectionId,
+      name: boardName,
+      type: boardType.toLowerCase(),
+    });
+
+    if ('errors' in createBoardResponse)
+      throw new Error(createBoardResponse.errors[0]);
+    await this.loadBoardTemplate(boardType, {
+      ...response.board,
+      boardId: createBoardResponse.data.id,
+    });
+    return { boardId: createBoardResponse.data.id };
   }
 
   /** @param jobId
