@@ -5,7 +5,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import {
   CheckGenerationStatus,
   GenerateBoardTemplate,
+  GetBoardSummary,
+  GetProjectStructure,
 } from '@/app/lib/server/ai/aiServerActions';
+
+const POLLING_INTERVAL = 10_000;
 
 interface Job {
   requestId: string;
@@ -20,8 +24,20 @@ interface TemplateJob extends Job {
   prompt: string;
   board: Board;
 }
+interface SummarizeJob extends Job {
+  type: 'summarize';
+  boardId: string;
+  imageUrl: string;
+}
 
-type AiJob = TemplateJob;
+interface StructurizeJob extends Job {
+  type: 'structurize';
+  boardId: string;
+  imageUrl: string;
+  projectId: string;
+}
+
+type AiJob = TemplateJob | SummarizeJob | StructurizeJob;
 
 class AiStore {
   /** requestId is key */
@@ -34,7 +50,7 @@ class AiStore {
       () => this.loadingJobsMap.size,
       (size: number) => {
         if (size > 0 && this.pollingInterval === null) {
-          this.pollingInterval = setInterval(this.checkJobs, 1000);
+          this.pollingInterval = setInterval(this.checkJobs, POLLING_INTERVAL);
         } else if (size === 0 && this.pollingInterval !== null) {
           clearInterval(this.pollingInterval);
           this.pollingInterval = null;
@@ -90,6 +106,75 @@ class AiStore {
     }
   }
 
+  async generateSummary(
+    boardId: string,
+    boardImageUrl: string,
+    onSuccessCallback?: (generationResult: any) => void,
+  ) {
+    let job: Omit<SummarizeJob, 'jobId' | 'requestId'> = {
+      type: 'summarize',
+      status: 'pending',
+      boardId,
+      imageUrl: boardImageUrl,
+      onSuccessCallback,
+    };
+
+    try {
+      const result = await GetBoardSummary(job.boardId, job.imageUrl);
+
+      if ('jobId' in result)
+        this.loadingJobsMap.set(result.requestId, {
+          ...job,
+          ...result,
+          jobAction: async () =>
+            await GetBoardSummary(job.boardId, job.imageUrl, result.requestId),
+        });
+      else this.onGenerationSuccess(result, onSuccessCallback);
+    } catch (e: any) {
+      this.onGenerationError(e.message);
+    }
+  }
+
+  async generateStructure(
+    boardId: string,
+    boardImageUrl: string,
+    projectId: string,
+    onSuccessCallback?: (generationResult: any) => void,
+  ) {
+    let job: Omit<StructurizeJob, 'jobId' | 'requestId'> = {
+      type: 'structurize',
+      status: 'pending',
+      boardId,
+      imageUrl: boardImageUrl,
+      projectId,
+      onSuccessCallback,
+    };
+
+    try {
+      const result = await GetProjectStructure(
+        job.boardId,
+        job.imageUrl,
+        job.projectId,
+      );
+
+      if ('jobId' in result)
+        this.loadingJobsMap.set(result.requestId, {
+          ...job,
+          ...result,
+          jobAction: async () =>
+            await GetProjectStructure(
+              job.boardId,
+              job.imageUrl,
+              job.projectId,
+              result.requestId,
+            ),
+        });
+      else this.onGenerationSuccess(result, onSuccessCallback);
+    } catch (e: any) {
+      this.onGenerationError(e.message);
+    }
+  }
+
   // POLLING
   async checkJobs() {
     await Promise.all(
@@ -100,7 +185,7 @@ class AiStore {
           this.loadingJobsMap.set(requestId, {
             ...job,
             status: jobStatus.status,
-          });
+          } as AiJob);
 
           if (
             (jobStatus.status === 'pending' ||

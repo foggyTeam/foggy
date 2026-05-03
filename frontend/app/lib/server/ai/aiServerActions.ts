@@ -6,10 +6,12 @@ import { getAiAdapter } from '@/app/lib/server/ai/factory';
 export async function GetBoardSummary(
   boardId: Board['id'],
   boardImageUrl: string,
+  requestId?: string,
 ) {
   return getAiAdapter().summarize({
     boardId,
     imageUrl: boardImageUrl,
+    requestId,
   });
 }
 
@@ -17,11 +19,13 @@ export async function GetProjectStructure(
   boardId: Board['id'],
   boardImageUrl: string,
   projectId: Project['id'],
+  requestId?: string,
 ) {
   return getAiAdapter().structurize({
     boardId,
     imageUrl: boardImageUrl,
     projectId,
+    requestId,
   });
 }
 

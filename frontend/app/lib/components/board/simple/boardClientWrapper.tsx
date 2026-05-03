@@ -44,7 +44,9 @@ export default function BoardClientWrapper() {
             <BoardImageGenerator
               boardData={{ type: 'SIMPLE', data: context!.stageRef }}
             />
-            <AiAssistantButton />
+            <AiAssistantButton
+              boardData={{ type: 'SIMPLE', data: context!.stageRef }}
+            />
           </>
         )}
       </BoardContext.Consumer>

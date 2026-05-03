@@ -7,11 +7,13 @@ import { Board, BoardTypes, Project } from '@/app/lib/types/definitions';
 export interface AiSummarizeArgs {
   boardId: Board['id'];
   imageUrl: string;
+  requestId?: string; // DirectProviderOnly: request id to receive job results
 }
 export interface AiStructurizeArgs {
   boardId: Board['id'];
   imageUrl: string;
   projectId: Project['id'];
+  requestId?: string; // DirectProviderOnly: request id to receive job results
 }
 export interface AiGenerateTemplateArgs {
   projectId: string;

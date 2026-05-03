@@ -18,7 +18,9 @@ const DocBoardClientWrapper = observer(() => {
 
   return (
     <DocBoardProvider>
-      <AiAssistantButton />
+      <AiAssistantButton
+        boardData={{ type: 'DOC', data: docBoardStore.yText }}
+      />
       <DocBoard />
     </DocBoardProvider>
   );

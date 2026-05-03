@@ -18,7 +18,12 @@ const AdditionsWrapper = () => {
           data: { getNodes, getNodesBounds },
         }}
       />
-      <AiAssistantButton />
+      <AiAssistantButton
+        boardData={{
+          type: 'GRAPH',
+          data: { getNodes, getNodesBounds },
+        }}
+      />
     </>
   );
 };

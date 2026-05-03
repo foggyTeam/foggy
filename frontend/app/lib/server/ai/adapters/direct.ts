@@ -154,12 +154,12 @@ export class DirectAdapter implements IAiAdapter {
   async summarize(
     data: AiSummarizeArgs,
   ): Promise<AiSummarizeResponse | string | undefined> {
-    const { boardId, imageUrl } = data;
+    const { boardId, imageUrl, requestId } = data;
 
     const requestBoard = await this.prepareAiBoard(boardId, imageUrl);
 
     const request = {
-      requestId: generateRequestId('summarize', { boardId }),
+      requestId: requestId || generateRequestId('summarize', { boardId }),
       userId: await getUserId(),
       requestType: 'summarize',
       board: requestBoard,
@@ -175,13 +175,14 @@ export class DirectAdapter implements IAiAdapter {
   async structurize(
     data: AiStructurizeArgs,
   ): Promise<AiStructurizeResponse | string | undefined> {
-    const { boardId, imageUrl, projectId } = data;
+    const { boardId, imageUrl, projectId, requestId } = data;
 
     const requestBoard = await this.prepareAiBoard(boardId, imageUrl);
     const requestProject = await this.prepareAiProject(projectId);
 
     const request = {
-      requestId: generateRequestId('structurize', { boardId, projectId }),
+      requestId:
+        requestId || generateRequestId('structurize', { boardId, projectId }),
       userId: await getUserId(),
       requestType: 'structurize',
       board: requestBoard,

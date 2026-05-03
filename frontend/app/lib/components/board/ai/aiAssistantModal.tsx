@@ -19,15 +19,32 @@ import GenerationSkeleton from '@/app/lib/components/skeletons/generationSkeleto
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
 import { Image } from '@heroui/image';
 import NextImage from 'next/image';
+import {
+  HandleBoardImageUpload,
+  UploadBoardData,
+} from '@/app/lib/utils/handleBoardImageUpload';
+import boardStore from '@/app/stores/board/boardStore';
+import { useTheme } from 'next-themes';
+import aiStore from '@/app/stores/board/aiStore';
+import projectsStore from '@/app/stores/projectsStore';
 
 const AiAssistantModal = observer(
-  ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenChange: any }) => {
+  ({
+    boardData,
+    isOpen,
+    onOpenChange,
+  }: {
+    boardData: UploadBoardData;
+    isOpen: boolean;
+    onOpenChange: any;
+  }) => {
     const { isMobile, commonSize } = useAdaptiveParams();
+    const { resolvedTheme } = useTheme();
+
     const [step, setStep] = useState<0 | 1 | 2>(0);
     const [generationType, setGenerationType] = useState<
       null | keyof typeof generationTypeMap
     >(null);
-    const [isLoading, setIsLoading] = useState(false);
 
     const generationTypeMap = {
       structurize: {
@@ -44,6 +61,52 @@ const AiAssistantModal = observer(
         cardStyle: 'bg-primary hover:bg-primary-400 text-primary-foreground',
       },
     };
+
+    async function onStartGeneration(type: 'structurize' | 'summarize') {
+      if (!boardStore.activeBoard?.id) return;
+
+      setGenerationType(type);
+      setStep(1);
+
+      const url = await HandleBoardImageUpload(
+        boardStore.activeBoard.id,
+        boardData,
+        resolvedTheme as 'light' | 'dark',
+        false,
+      );
+      if (url === null) {
+        onAbort(true);
+        return;
+      }
+
+      switch (type) {
+        case 'summarize':
+          await aiStore.generateSummary(
+            boardStore.activeBoard.id,
+            url,
+            onSummaryGenerated,
+          );
+          break;
+        case 'structurize':
+          if (!projectsStore.activeProject?.id) return;
+          await aiStore.generateStructure(
+            boardStore.activeBoard.id,
+            url,
+            projectsStore.activeProject.id,
+            onStructureGenerated,
+          );
+          break;
+      }
+    }
+
+    function onSummaryGenerated(result: any) {
+      setStep(2);
+      console.log(result);
+    }
+    function onStructureGenerated(result: any) {
+      setStep(2);
+      console.log(result);
+    }
 
     function onAbort(local: boolean = false) {
       setStep(0);
@@ -104,12 +167,11 @@ const AiAssistantModal = observer(
                         className={clsx(cardStyle, 'w-full')}
                         shadow="none"
                         isPressable
-                        onPress={() => {
-                          setGenerationType(
+                        onPress={() =>
+                          onStartGeneration(
                             type as keyof typeof generationTypeMap,
-                          );
-                          setStep(1);
-                        }}
+                          )
+                        }
                       >
                         <CardBody className="flex flex-col gap-1">
                           <p className="flex w-full items-end justify-between gap-1 font-semibold">
@@ -155,7 +217,7 @@ const AiAssistantModal = observer(
                 >
                   <FButton
                     size={commonSize}
-                    onPress={onAbort}
+                    onPress={() => onAbort(true)}
                     variant="bordered"
                     color="danger"
                   >

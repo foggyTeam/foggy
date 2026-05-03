@@ -9,8 +9,13 @@ import React from 'react';
 import { useDisclosure } from '@heroui/modal';
 import AiAssistantModal from '@/app/lib/components/board/ai/aiAssistantModal';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { UploadBoardData } from '@/app/lib/utils/handleBoardImageUpload';
 
-export default function AiAssistantButton() {
+export default function AiAssistantButton({
+  boardData,
+}: {
+  boardData: UploadBoardData;
+}) {
   const { commonSize } = useAdaptiveParams();
   const { isOpen, onOpenChange } = useDisclosure();
 
@@ -28,7 +33,11 @@ export default function AiAssistantButton() {
           <SparklesIcon />
         </Button>
       </FTooltip>
-      <AiAssistantModal isOpen={isOpen} onOpenChange={onOpenChange} />
+      <AiAssistantModal
+        boardData={boardData}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      />
     </>
   );
 }
