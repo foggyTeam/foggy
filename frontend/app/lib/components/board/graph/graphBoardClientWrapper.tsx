@@ -6,16 +6,20 @@ import { GraphBoardProvider } from '@/app/lib/components/board/graph/graphBoardC
 import React from 'react';
 import GraphBoardCursors from '@/app/lib/components/board/graph/graphBoardCursors';
 import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
+import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
 
-const ImageGeneratorWrapper = () => {
+const AdditionsWrapper = () => {
   const { getNodes, getNodesBounds } = useReactFlow();
   return (
-    <BoardImageGenerator
-      boardData={{
-        type: 'GRAPH',
-        data: { getNodes, getNodesBounds },
-      }}
-    />
+    <>
+      <BoardImageGenerator
+        boardData={{
+          type: 'GRAPH',
+          data: { getNodes, getNodesBounds },
+        }}
+      />
+      <AiAssistantButton />
+    </>
   );
 };
 
@@ -25,7 +29,7 @@ export default function GraphBoardClientWrapper() {
       <GraphBoardProvider>
         <GraphBoardObserver />
         <GraphBoardCursors />
-        <ImageGeneratorWrapper />
+        <AdditionsWrapper />
       </GraphBoardProvider>
     </ReactFlowProvider>
   );

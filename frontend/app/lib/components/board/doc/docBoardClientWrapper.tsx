@@ -6,6 +6,7 @@ import DocBoard from '@/app/lib/components/board/doc/docBoard';
 import { DocBoardProvider } from '@/app/lib/components/board/doc/docBoardContext';
 import docBoardStore from '@/app/stores/board/docBoardStore';
 import { observer } from 'mobx-react-lite';
+import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
 
 const DocBoardClientWrapper = observer(() => {
   const isReady =
@@ -17,6 +18,7 @@ const DocBoardClientWrapper = observer(() => {
 
   return (
     <DocBoardProvider>
+      <AiAssistantButton />
       <DocBoard />
     </DocBoardProvider>
   );

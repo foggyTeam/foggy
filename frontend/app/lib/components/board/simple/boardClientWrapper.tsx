@@ -12,6 +12,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 import Konva from 'konva';
 import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
+import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
 
 export default function BoardClientWrapper() {
   const { isMobile } = useAdaptiveParams();
@@ -39,9 +40,12 @@ export default function BoardClientWrapper() {
       <Cursors />
       <BoardContext.Consumer>
         {(context) => (
-          <BoardImageGenerator
-            boardData={{ type: 'SIMPLE', data: context!.stageRef }}
-          />
+          <>
+            <BoardImageGenerator
+              boardData={{ type: 'SIMPLE', data: context!.stageRef }}
+            />
+            <AiAssistantButton />
+          </>
         )}
       </BoardContext.Consumer>
     </BoardProvider>

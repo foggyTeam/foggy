@@ -415,6 +415,26 @@
     "animateEdge": "Animate"
   },
 
+  "ai": {
+    "title": "AI ASSISTANT",
+    "summarize": {
+      "buttonTitle": "Summary",
+      "description": "Prepare this board content summary as board text element."
+    },
+    "structurize": {
+      "buttonTitle": "Structure",
+      "description": "Offer a file structure for this project, based on this board topic."
+    },
+    "stepTitle": {
+      "0": "How can I help you today?",
+      "1": "Please, wait...",
+      "2": "Ready!"
+    },
+    "abortButton": "Cancel generation",
+    "discardButton": "Discard",
+    "submitButton": "Apply changes"
+  },
+
   "toolTips": {
     "tools": {
       "textTool": "Text",
@@ -453,7 +473,8 @@
     "resetStage": "Reset position",
     "lockGraph": "Lock graph view",
     "unlockGraph": "Unlock graph view",
-    "uploadButton": "Get board image temporary link"
+    "uploadButton": "Get board image temporary link",
+    "aiButton": "AI tools"
   },
 
   "errors": {
