@@ -30,12 +30,14 @@ export async function GenerateBoardTemplate(
   name: string,
   type: BoardTypes,
   prompt?: string,
+  requestId?: string,
 ) {
   return getAiAdapter().generateTemplate({
     boardId: id,
     boardName: name,
     boardType: type,
     prompt,
+    requestId,
   });
 }
 

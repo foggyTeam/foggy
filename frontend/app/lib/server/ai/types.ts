@@ -18,6 +18,7 @@ export interface AiGenerateTemplateArgs {
   boardName: string;
   boardType: BoardTypes;
   prompt?: string;
+  requestId?: string; // DirectProviderOnly: request id to receive job results
 }
 
 // BOARD ELEMENTS

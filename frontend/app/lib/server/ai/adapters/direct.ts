@@ -193,11 +193,14 @@ export class DirectAdapter implements IAiAdapter {
 
   /** @param data
    *  @throws Error */
-  async generateTemplate(data: AiGenerateTemplateArgs) {
-    const { boardId, boardName, boardType, prompt } = data;
+  async generateTemplate(
+    data: AiGenerateTemplateArgs,
+  ): Promise<any | { requestId: string; jobId: string }> {
+    const { boardId, boardName, boardType, prompt, requestId } = data;
 
+    const id = requestId || generateRequestId('template', { boardType });
     const request = {
-      requestId: generateRequestId('template', { boardType }),
+      requestId: id,
       userId: await getUserId(),
       requestType: 'generateTemplate',
       boardId: boardId,
@@ -209,7 +212,10 @@ export class DirectAdapter implements IAiAdapter {
       await externalPostRequest(`${apiUri}/template`, request, {
         headers: { 'x-api-key': verificationKey },
       });
-    if (!response || typeof response === 'string') return response;
+    if (!response) throw new Error('Failed to generate');
+
+    if (typeof response === 'string') return { requestId: id, jobId: response };
+
     return this.loadBoardTemplate(boardType, response.board);
   }
 

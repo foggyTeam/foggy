@@ -1,107 +1,139 @@
-import { action, makeAutoObservable, observable } from 'mobx';
-import { Board, BoardTypes } from '@/app/lib/types/definitions';
+import { makeAutoObservable, observable, reaction } from 'mobx';
+import { Board } from '@/app/lib/types/definitions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import {
-  AbortJob,
   CheckGenerationStatus,
   GenerateBoardTemplate,
 } from '@/app/lib/server/ai/aiServerActions';
 
+interface Job {
+  requestId: string;
+  jobId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'aborted';
+  onSuccessCallback?: (generationResult: any) => void;
+}
+
+interface TemplateJob extends Job {
+  type: 'generateTemplate';
+  prompt: string;
+  board: Board;
+}
+
+type AiJob = TemplateJob;
+
 class AiStore {
-  isLoading: boolean = false;
-  isPolling: boolean = false;
+  /** requestId is key */
+  loadingJobsMap = observable.map<string, AiJob>();
   pollingInterval: number | null;
 
   constructor() {
-    makeAutoObservable(this, {
-      isLoading: observable,
-      isPolling: observable,
-      pollingInterval: observable,
-
-      startLoading: action,
-      endLoading: action,
-      generateTemplate: action,
-      startPolling: action,
-      endPolling: action,
-    });
-  }
-
-  // LOADING BAR
-  startLoading() {
-    this.isLoading = true;
-  }
-  endLoading() {
-    this.isLoading = false;
+    makeAutoObservable(this, {});
+    reaction(
+      () => this.loadingJobsMap.size,
+      (size: number) => {
+        if (size > 0 && this.pollingInterval === null) {
+          this.pollingInterval = setInterval(this.checkJobs, 1000);
+        } else if (size === 0 && this.pollingInterval !== null) {
+          clearInterval(this.pollingInterval);
+          this.pollingInterval = null;
+        }
+      },
+    );
   }
 
   // ACTIONS
   async generateTemplate(
-    boardId: Board['id'],
-    boardName: string,
-    boardType: BoardTypes,
+    newBoard: Omit<Board, 'id'>,
     prompt?: string,
+    onSuccessCallback?: (generationResult: any) => void,
   ) {
-    this.startLoading();
+    let job: Omit<TemplateJob, 'jobId' | 'requestId'> = {
+      type: 'generateTemplate',
+      prompt: prompt || newBoard.name,
+      status: 'pending',
+      board: {
+        ...newBoard,
+        id: `temp-id-${Date.now()}`,
+      } as Board,
+      onSuccessCallback,
+    };
 
     try {
       const result = await GenerateBoardTemplate(
-        boardId,
-        boardName,
-        boardType,
+        job.board.id,
+        newBoard.name,
+        newBoard.type,
         prompt,
       );
 
-      if (result && typeof result === 'string') {
-        this.startPolling(result);
-        return;
-      }
+      if ('jobId' in result)
+        this.loadingJobsMap.set(result.requestId, Object.assign(job, result));
+      else this.onGenerationSuccess(onSuccessCallback, null, job.prompt);
     } catch (e: any) {
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.generateTemplateError,
-        description: e?.message || undefined,
-      });
+      this.onGenerationError(e.message);
     }
-    this.endLoading();
   }
 
   // POLLING
-  startPolling(jobId: string) {
-    this.isPolling = true;
+  async checkJobs() {
+    await Promise.all(
+      [...this.loadingJobsMap.entries()].map(async ([requestId, job]) => {
+        try {
+          const jobStatus = await CheckGenerationStatus(job.jobId);
 
-    this.pollingInterval = setInterval(async () => {
-      try {
-        const job = await CheckGenerationStatus(jobId);
-        if (job.status === 'completed') this.endPolling(jobId, 'success');
-        if (job.retries > 10) this.endPolling(jobId, 'timeout');
-        if (job.status !== 'pending' && job.status !== 'running')
-          this.endPolling(jobId, 'error');
-      } catch (e: any) {
-        addToast({
-          color: 'danger',
-          severity: 'danger',
-          title: settingsStore.t.toasts.board.generateTemplateError,
-          description: e?.message || undefined,
-        });
-        this.isPolling = false;
-      }
-    }, 1000);
+          this.loadingJobsMap.set(requestId, {
+            ...job,
+            status: jobStatus.status,
+          });
+
+          if (
+            (jobStatus.status === 'pending' ||
+              jobStatus.status === 'running') &&
+            jobStatus.retries <= 10
+          )
+            return;
+
+          if (jobStatus.status === 'completed') {
+            // TODO: proceed job data
+            this.onGenerationSuccess(null, job.onSuccessCallback);
+            this.loadingJobsMap.delete(requestId);
+            return;
+          }
+
+          if (jobStatus.retries > 10)
+            throw new Error('Maximum retries achieved!');
+
+          throw new Error(jobStatus.status);
+        } catch (e: any) {
+          // TODO: add abort
+          this.loadingJobsMap.delete(requestId);
+          this.onGenerationError(e.message);
+        }
+      }),
+    );
   }
 
-  endPolling(jobId: string, reason: 'success' | 'timeout' | 'error') {
-    if (reason === 'timeout') AbortJob(jobId);
-    if (reason !== 'success')
-      addToast({
-        color: 'danger',
-        severity: 'danger',
-        title: settingsStore.t.toasts.board.generateTemplateError,
-      });
-
-    if (this.pollingInterval !== null) clearInterval(this.pollingInterval);
-    this.isPolling = false;
-    this.endLoading();
+  onGenerationSuccess(
+    result: any,
+    callback?: (generationResult: any) => void,
+    description?: string,
+  ) {
+    addToast({
+      color: 'success',
+      severity: 'success',
+      title: settingsStore.t.toasts.board.generateTemplateError,
+      description,
+    });
+    callback?.(result);
+  }
+  onGenerationError(description?: string) {
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.board.generateTemplateError,
+      description: description || undefined,
+    });
   }
 }
 

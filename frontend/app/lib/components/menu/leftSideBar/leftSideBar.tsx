@@ -94,6 +94,48 @@ const LeftSideBar = observer(() => {
         break;
       default:
         try {
+          const boardData:
+            | Pick<SimpleBoard, 'layers'>
+            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+            | string =
+            nodeType === 'SIMPLE'
+              ? { layers: [[], [], []] }
+              : nodeType === 'GRAPH'
+                ? { graphEdges: [], graphNodes: [] }
+                : '';
+          const sectionId = boardStore.activeBoard?.sectionId || '';
+          const newBoard = {
+            name: nodeName,
+            type: nodeType,
+            sectionId,
+            lastChange: new Date().toISOString(),
+            ...boardData,
+          };
+
+          if (needsTemplate) {
+            await aiStore.generateTemplate(
+              newBoard,
+              prompt,
+              (result: { boardId: string } | null) => {
+                // TODO: proceed
+                if (result === null) {
+                  console.error('Failed to add board');
+                  return;
+                }
+                projectsStore.addProjectChild(
+                  fullParentList,
+                  Object.assign(newBoard, { id: result.boardId }) as Board,
+                  false,
+                );
+                router.push(
+                  `/project/${projectsStore.activeProject?.id}/${sectionId}/${result.boardId}/${nodeType.toLowerCase()}`,
+                );
+              },
+            );
+            onAddChildOpenChange();
+            return;
+          }
+
           const response = await AddBoard(projectsStore.activeProject.id, {
             name: nodeName,
             type: nodeType.toLowerCase(),
@@ -104,45 +146,16 @@ const LeftSideBar = observer(() => {
           if ('errors' in response)
             throw new Error(Object.values(response.errors)[0]);
 
-          const data:
-            | Pick<SimpleBoard, 'layers'>
-            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
-            | string =
-            nodeType === 'SIMPLE'
-              ? { layers: [[], [], []] }
-              : nodeType === 'GRAPH'
-                ? { graphEdges: [], graphNodes: [] }
-                : '';
           const newId = response.data.id;
-          const sectionId = boardStore.activeBoard?.sectionId || '';
-          const newBoard = {
-            id: newId,
-            name: nodeName,
-            type: nodeType,
-            sectionId,
-            lastChange: new Date().toISOString(),
-          };
           projectsStore.addProjectChild(
             fullParentList,
-            Object.assign(newBoard, data) as Board,
+            Object.assign(newBoard, { id: newId }) as Board,
             false,
           );
 
-          if (needsTemplate) {
-            onAddChildOpenChange();
-            await aiStore.generateTemplate(
-              newBoard.id,
-              newBoard.name,
-              newBoard.type,
-              prompt,
-            );
-          }
-
-          if (!aiStore.isPolling)
-            router.push(
-              `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
-            );
-          if (!needsTemplate) onAddChildOpenChange();
+          router.push(
+            `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
+          );
         } catch (e: any) {
           addToast({
             color: 'danger',
@@ -151,6 +164,7 @@ const LeftSideBar = observer(() => {
             description: e?.message || undefined,
           });
         }
+        onAddChildOpenChange();
     }
   };
 
