@@ -75,7 +75,7 @@ const AiAssistantModal = observer(
             <SparklesIcon className="stroke-f_accent font-semibold" />
             <h1 className="font-medium">{settingsStore.t.ai.title}</h1>
           </DrawerHeader>
-          <DrawerBody className="text-medium flex h-full max-h-72 flex-col gap-2 overflow-visible py-0 sm:max-h-96 sm:text-sm">
+          <DrawerBody className="text-medium flex flex-col gap-2 overflow-visible py-0 sm:text-sm">
             <div className="text-default-700 flex items-center gap-1 italic">
               <Image
                 alt="Gemini icon"
@@ -95,7 +95,7 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex h-full flex-wrap items-start gap-2 sm:flex-nowrap"
+                  className="flex h-72 flex-wrap items-start gap-2 overflow-y-auto sm:h-[360px] sm:flex-nowrap"
                 >
                   {Object.entries(generationTypeMap).map(
                     ([type, { title, description, cardStyle, CardIcon }]) => (
@@ -131,7 +131,7 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex flex-col gap-2"
+                  className="flex h-72 flex-col gap-2 overflow-y-auto sm:h-[360px]"
                 >
                   <GenerationSkeleton type={generationType} />
                   <FButton
@@ -151,7 +151,7 @@ const AiAssistantModal = observer(
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 50 }}
                   transition={{ duration: 0.2 }}
-                  className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
+                  className="flex h-72 flex-wrap items-start gap-2 overflow-y-auto sm:h-[360px] sm:flex-nowrap"
                 >
                   <FButton
                     size={commonSize}
