@@ -95,6 +95,9 @@ export class BoardService {
       name: board.name,
       type: board.type,
       layers: layers.map((layer) => layer.elements),
+      nodes: board.nodes || [],
+      edges: board.edges || [],
+      document: board.document || '',
       updatedAt: board.updatedAt,
     };
   }
