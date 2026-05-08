@@ -58,7 +58,7 @@
     "@types/react-dom": "^19.2.3",
     "@xyflow/react": "^12.10.1",
     "aws-sdk": "^2.1693.0",
-    "axios": "^1.15.0",
+    "axios": "^1.15.2",
     "canvas": "^3.2.3",
     "clsx": "^2.1.1",
     "d3-force": "^3.0.0",
