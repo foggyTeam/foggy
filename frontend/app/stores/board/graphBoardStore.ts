@@ -127,10 +127,27 @@ class GraphBoardStore {
       return;
     }
 
-    const nodeData = data.nodes?.map((node): [string, GNode['data']] => {
+    const mergedNodesMap = new Map<string, GNode>();
+    data.nodes?.forEach((node) => {
+      if (mergedNodesMap.has(node.id)) {
+        const existing = mergedNodesMap.get(node.id)!;
+        mergedNodesMap.set(node.id, {
+          ...existing,
+          ...node,
+          data: { ...(existing.data || {}), ...(node.data || {}) },
+        } as GNode);
+      } else {
+        mergedNodesMap.set(node.id, { ...node });
+      }
+    });
+
+    const uniqueNodes = Array.from(mergedNodesMap.values());
+
+    const nodeData = uniqueNodes.map((node): [string, GNode['data']] => {
       return [node.id, observable(node.data)];
     });
-    this.boardNodes = observable.array(data.nodes || []);
+
+    this.boardNodes = observable.array(uniqueNodes);
     this.nodesDataMap = observable.map(nodeData);
     this.boardEdges = observable.array(data.edges || []);
   }
