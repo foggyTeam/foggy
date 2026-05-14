@@ -98,9 +98,12 @@ export function graphApplyNodeChanges(
         );
         if (existingIndex !== -1) {
           state.nodes[existingIndex] = {
-            ...change.item,
             ...state.nodes[existingIndex],
-            data: { ...change.item.data, ...state.nodes[existingIndex].data },
+            ...change.item,
+            data: {
+              ...state.nodes[existingIndex].data,
+              ...change.item.data,
+            },
           };
         } else {
           state.nodes.push(change.item);
