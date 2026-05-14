@@ -92,9 +92,21 @@ export function graphApplyNodeChanges(
 ): void {
   for (const change of changes) {
     switch (change.type) {
-      case 'add':
-        state.nodes.push(change.item);
+      case 'add': {
+        const existingIndex = state.nodes.findIndex(
+          (n) => n.id === change.item.id,
+        );
+        if (existingIndex !== -1) {
+          state.nodes[existingIndex] = {
+            ...change.item,
+            ...state.nodes[existingIndex],
+            data: { ...change.item.data, ...state.nodes[existingIndex].data },
+          };
+        } else {
+          state.nodes.push(change.item);
+        }
         break;
+      }
       case 'remove':
         state.nodes = state.nodes.filter((n) => n.id !== change.id);
         break;
@@ -164,7 +176,14 @@ export function graphUpdateNodeData(
   isNew?: boolean,
 ): void {
   if (isNew) {
-    state.nodes.push({ id: nodeId, data: newAttrs, position: { x: 0, y: 0 } });
+    const existingNode = state.nodes.find((n) => n.id === nodeId);
+    if (!existingNode)
+      state.nodes.push({
+        id: nodeId,
+        data: newAttrs,
+        position: { x: 0, y: 0 },
+      });
+    else existingNode.data = { ...(existingNode.data ?? {}), ...newAttrs };
     return;
   }
   const node = state.nodes.find((n) => n.id === nodeId);
