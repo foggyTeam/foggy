@@ -20,6 +20,7 @@ type Normalized<T extends Board> = Omit<T, 'type'> & {
   type: Lowercase<T['type']>;
   sectionIds: string[];
 };
+
 type BoardData =
   | Normalized<SimpleBoard>
   | Normalized<GraphBoard>
@@ -53,8 +54,8 @@ const BoardLoader = ({
 
       if (boardData.type === 'graph') {
         graphBoardStore.setGraphData({
-          nodes: boardData.graphNodes,
-          edges: boardData.graphEdges,
+          nodes: boardData.nodes,
+          edges: boardData.edges,
         });
       }
 

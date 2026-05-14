@@ -7,11 +7,22 @@ import { getErrorMessages } from './errorMessages/errorMessages';
 export class ApiKeyMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     if (process.env.NODE_ENV !== 'development') {
+      if (req.originalUrl.includes('/snapshot')) {
+        return next();
+      }
+
       const apiKey = req.headers['x-api-key'];
+      if (!apiKey) {
+        throw new CustomException(
+          getErrorMessages({ general: 'API' }),
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
       if (apiKey !== process.env.VERIFICATION_KEY) {
         throw new CustomException(
           getErrorMessages({ general: 'API' }),
-          HttpStatus.CONFLICT,
+          HttpStatus.FORBIDDEN,
         );
       }
     }

@@ -160,6 +160,9 @@ export interface GraphBoard extends BaseBoard {
   type: 'GRAPH';
   graphNodes: GNode[];
   graphEdges: GEdge[];
+  // raw fields
+  nodes?: GNode[];
+  edges?: GEdge[];
 }
 
 export interface DocBoard extends BaseBoard {

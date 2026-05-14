@@ -14,6 +14,7 @@ export default function useGraphNode<T>(
   errorSchema: any | null,
   returnCallback?: () => void,
 ) {
+  const stringifiedInitialData = JSON.stringify(initialData);
   const link = `${window.location.origin}${usePathname()}?node_id=${nodeId}`;
   const isSynced = useRef(true);
   const [isEditing, setIsEditing] = useState(!hasContent);
@@ -66,6 +67,17 @@ export default function useGraphNode<T>(
         },
       );
   }, [nodeState]);
+
+  useEffect(() => {
+    if (
+      isSynced.current &&
+      JSON.stringify(nodeState) !== JSON.stringify(initialData)
+    ) {
+      dispatch(initialData);
+
+      if (hasContent) setIsEditing(false);
+    }
+  }, [stringifiedInitialData, hasContent]);
 
   const onBlur = (e: any) => {
     if (hasContent && !e.currentTarget.contains(e.relatedTarget as Element))
