@@ -13,8 +13,10 @@ import { UploadBoardData } from '@/app/lib/utils/handleBoardImageUpload';
 
 export default function AiAssistantButton({
   boardData,
+  addElementAction,
 }: {
   boardData: UploadBoardData;
+  addElementAction: (element: any) => void;
 }) {
   const { commonSize } = useAdaptiveParams();
   const { isOpen, onOpenChange } = useDisclosure();
@@ -34,6 +36,7 @@ export default function AiAssistantButton({
         </Button>
       </FTooltip>
       <AiAssistantModal
+        addElementAction={addElementAction}
         boardData={boardData}
         isOpen={isOpen}
         onOpenChange={onOpenChange}

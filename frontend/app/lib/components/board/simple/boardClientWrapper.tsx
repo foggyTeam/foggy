@@ -46,6 +46,7 @@ export default function BoardClientWrapper() {
             />
             <AiAssistantButton
               boardData={{ type: 'SIMPLE', data: context!.stageRef }}
+              addElementAction={context!.addElement}
             />
           </>
         )}

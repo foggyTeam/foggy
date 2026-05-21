@@ -28,6 +28,8 @@ import { useTheme } from 'next-themes';
 import aiStore from '@/app/stores/board/aiStore';
 import projectsStore from '@/app/stores/projectsStore';
 import ProjectTreePreview from '@/app/lib/components/board/ai/projectTreePreview';
+import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import { foggy_accent } from '@/tailwind.config';
 
 export interface AiSummaryTextElement {
   id: string;
@@ -67,10 +69,12 @@ export interface AiStructurizeResponse {
 const AiAssistantModal = observer(
   ({
     boardData,
+    addElementAction,
     isOpen,
     onOpenChange,
   }: {
     boardData: UploadBoardData;
+    addElementAction: (element: any) => void;
     isOpen: boolean;
     onOpenChange: any;
   }) => {
@@ -175,10 +179,58 @@ const AiAssistantModal = observer(
     }
 
     function onSubmit() {
-      console.log('Generation result submitted!');
+      if (generationType === 'summarize') {
+        submitSummarizeResult();
+      } else {
+      }
+
       setStep(0);
       setGenerationType(null);
       setGenerationResult(null);
+    }
+
+    function submitSummarizeResult() {
+      if (generationResult?.requestType !== 'summarize') return;
+      const aiBlock = generationResult.text;
+      let newElement;
+
+      switch (boardStore.activeBoard?.type) {
+        case 'SIMPLE':
+          newElement = {
+            id: `text-${Date.now()}`,
+            type: 'text',
+            content: aiBlock.content,
+            x: aiBlock.x || 100,
+            y: aiBlock.y || 100,
+            width: aiBlock.width || 300,
+            height: aiBlock.height || 100,
+            fill: `${foggy_accent.light[100]}85`,
+            stroke: foggy_accent.light.DEFAULT,
+            strokeWidth: 2,
+            rotation: aiBlock.rotation || 0,
+            draggable: true,
+            dragDistance: 4,
+            cornerRadius: 8,
+            svg: HtmlToSvg(
+              aiBlock.content,
+              aiBlock.width || 300,
+              aiBlock.height || 100,
+            ),
+          };
+          break;
+        case 'GRAPH':
+          newElement = {
+            position: { x: aiBlock.x, y: aiBlock.y },
+            data: {
+              description: aiBlock.content,
+              shape: 'rect',
+              align: 'start',
+              color: foggy_accent.light[100],
+            },
+          };
+          break;
+      }
+      addElementAction(newElement);
     }
 
     return (
@@ -209,7 +261,7 @@ const AiAssistantModal = observer(
                 width={24}
                 as={NextImage}
               />
-              {settingsStore.t.ai.stepTitle[step.toString()]}
+              {settingsStore.t.ai.stepTitle[step.toString() as '0' | '1' | '2']}
             </div>
 
             <AnimatePresence mode="wait">
@@ -278,6 +330,7 @@ const AiAssistantModal = observer(
                   className="flex h-72 flex-col gap-4 overflow-y-auto sm:h-[360px]"
                 >
                   {generationType === 'summarize' &&
+                    generationResult &&
                     'text' in generationResult && (
                       <Card shadow="none" className="h-full pr-1">
                         <CardBody>
@@ -292,6 +345,7 @@ const AiAssistantModal = observer(
                     )}
 
                   {generationType === 'structurize' &&
+                    generationResult &&
                     'aiTreeResponse' in generationResult && (
                       <Card shadow="none" className="h-full pr-1">
                         <CardBody>
