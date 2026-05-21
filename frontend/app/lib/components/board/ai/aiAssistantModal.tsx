@@ -293,14 +293,14 @@ const AiAssistantModal = observer(
 
                   {generationType === 'structurize' &&
                     'aiTreeResponse' in generationResult && (
-                      <div className="flex flex-col gap-3 pr-1">
-                        <p className="text-default-500 text-sm italic">
-                          {generationResult.aiTreeResponse}
-                        </p>
-                        <div className="border-secondary/20 bg-secondary/5 overflow-x-auto rounded-xl border p-3">
-                          <ProjectTreePreview node={generationResult.file} />
-                        </div>
-                      </div>
+                      <Card shadow="none" className="h-full pr-1">
+                        <CardBody>
+                          <ProjectTreePreview
+                            root
+                            node={generationResult.file}
+                          />
+                        </CardBody>
+                      </Card>
                     )}
 
                   <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">

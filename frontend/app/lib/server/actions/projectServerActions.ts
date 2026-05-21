@@ -131,11 +131,11 @@ export async function DeleteBoard(id: string) {
   });
 }
 
-// WARNING: SYNC SERVICE ENDPOINTS
 type BoardSnapshot =
   | { layers: SBoardElement[][] }
   | { edges: GEdge[]; nodes: GNode[] }
   | { document: string };
+/** WARNING: SYNC SERVICE ENDPOINT **/
 export async function SaveBoardSnapshot(id: string, snapshot: BoardSnapshot) {
   return postRequest(`boards/${id}/snapshot`, snapshot, {
     headers: { 'x-service-key': process.env.SYNC_VERIFICATION_KEY ?? '' },

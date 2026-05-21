@@ -81,6 +81,7 @@ export interface AiBoard {
   elements?: AiElement[];
   graphNodes?: AiGNode[];
   graphEdges?: AiGEdge[];
+  text?: string;
 }
 
 // FILE TREE
@@ -109,7 +110,7 @@ export interface AiStructurizeRequest {
 export interface AiGenerateTemplateRequest {
   requestId?: string;
   userId: string;
-  requestType?: 'generateTemplate';
+  requestType?: 'generateTemplate' | 'generateText';
   boardId: string;
   boardType: AiBoardType;
   prompt: string;
@@ -164,6 +165,7 @@ export interface AiGenerateTemplateResponse {
   userId: string;
   requestType: string;
   board: AiBoard;
+  content: string;
 }
 
 export interface AiIncrementalResponse {

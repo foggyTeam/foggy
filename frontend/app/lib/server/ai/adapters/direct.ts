@@ -17,6 +17,7 @@ import {
   AiSummarizeRequest,
   AiSummarizeResponse,
 } from '@/app/lib/server/ai/types';
+import { HtmlToDelta } from 'quill-delta-from-html';
 import {
   AddBoard,
   GetBoard,
@@ -36,6 +37,7 @@ import {
   externalPutRequest,
 } from '@/app/lib/server/requests';
 import getUserId from '@/app/lib/getUserId';
+import * as Y from 'yjs';
 
 const apiUri = process.env.AI_URI;
 const verificationKey = process.env.VERIFICATION_KEY;
@@ -114,9 +116,24 @@ export class DirectAdapter implements IAiAdapter {
     return projectFile;
   }
 
+  private prepareDocPayload(text: string) {
+    const yDoc = new Y.Doc();
+    const yText = yDoc.getText('quill-content');
+
+    const converter = new HtmlToDelta();
+    const parsedDelta = converter.convert(text);
+
+    let deltaOps = Array.isArray(parsedDelta) ? parsedDelta : parsedDelta.ops;
+
+    yText.applyDelta(deltaOps || []);
+
+    const update = Y.encodeStateAsUpdate(yDoc);
+
+    return Buffer.from(update).toString('base64');
+  }
+
   private async loadBoardTemplate(boardType: BoardTypes, aiBoard: AiBoard) {
-    // TODO: process DOC boards and check GRAPH boards
-    const { boardId, graphNodes, graphEdges, elements } = aiBoard;
+    const { boardId, graphNodes, graphEdges, elements, text } = aiBoard;
 
     let payload;
     switch (boardType) {
@@ -135,15 +152,20 @@ export class DirectAdapter implements IAiAdapter {
             }),
             [],
             [],
-          ],
+          ] as any[],
         };
         break;
       case 'GRAPH':
-        payload = { edges: graphEdges, nodes: graphNodes };
+        payload = {
+          edges: graphEdges as any[],
+          nodes: (graphNodes || []).map((node) => ({
+            position: { x: 0, y: 0 },
+            ...node,
+          })) as any[],
+        };
         break;
       case 'DOC':
-        payload = { document: 'Failed to generate' };
-        break;
+        payload = { document: this.prepareDocPayload(text || '') };
     }
 
     return SaveBoardSnapshot(boardId, payload);
@@ -206,7 +228,7 @@ export class DirectAdapter implements IAiAdapter {
     const request = {
       requestId: id,
       userId: await getUserId(),
-      requestType: 'generateTemplate',
+      requestType: boardType === 'DOC' ? 'generateText' : 'generateTemplate',
       boardId: id,
       boardType: boardType.toLowerCase(),
       prompt: prompt || boardName,
@@ -230,6 +252,7 @@ export class DirectAdapter implements IAiAdapter {
       throw new Error(createBoardResponse.errors[0]);
     await this.loadBoardTemplate(boardType, {
       ...response.board,
+      text: response.content,
       boardId: createBoardResponse.data.id,
     });
     return { boardId: createBoardResponse.data.id };
