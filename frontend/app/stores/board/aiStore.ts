@@ -3,6 +3,7 @@ import { Board } from '@/app/lib/types/definitions';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import {
+  AbortJob,
   CheckGenerationStatus,
   GenerateBoardTemplate,
   GetBoardSummary,
@@ -43,7 +44,7 @@ type AiJob = TemplateJob | SummarizeJob | StructurizeJob;
 class AiStore {
   /** requestId is key */
   loadingJobsMap = observable.map<string, AiJob>();
-  pollingInterval: number | null;
+  pollingInterval: number | null = null;
 
   constructor() {
     makeAutoObservable(this, {});
@@ -51,7 +52,10 @@ class AiStore {
       () => this.loadingJobsMap.size,
       (size: number) => {
         if (size > 0 && this.pollingInterval === null) {
-          this.pollingInterval = setInterval(this.checkJobs, POLLING_INTERVAL);
+          this.pollingInterval = setInterval(
+            this.checkJobs,
+            POLLING_INTERVAL,
+          ) as any;
         } else if (size === 0 && this.pollingInterval !== null) {
           clearInterval(this.pollingInterval);
           this.pollingInterval = null;
@@ -131,17 +135,19 @@ class AiStore {
 
       if (!result) throw new Error();
 
-      if ('jobId' in result)
+      if ('jobId' in result) {
         this.loadingJobsMap.set(result.requestId, {
           ...job,
           ...result,
           jobAction: async () =>
             await GetBoardSummary(job.boardId, job.imageUrl, result.requestId),
         });
-      else this.onGenerationSuccess(result, onSuccessCallback);
+        return result.requestId as string;
+      } else this.onGenerationSuccess(result, onSuccessCallback);
     } catch (e: any) {
       this.onGenerationError(e.message, onErrorCallback);
     }
+    return null;
   }
 
   async generateStructure(
@@ -169,7 +175,7 @@ class AiStore {
 
       if (!result) throw new Error();
 
-      if ('jobId' in result)
+      if ('jobId' in result) {
         this.loadingJobsMap.set(result.requestId, {
           ...job,
           ...result,
@@ -181,13 +187,28 @@ class AiStore {
               result.requestId,
             ),
         });
-      else this.onGenerationSuccess(result, onSuccessCallback);
+        return result.requestId as string;
+      } else this.onGenerationSuccess(result, onSuccessCallback);
     } catch (e: any) {
       this.onGenerationError(e.message, onErrorCallback);
     }
+    return null;
   }
 
   // POLLING
+  async abortJob(requestId: string) {
+    const job = this.loadingJobsMap.get(requestId);
+    if (!job) return;
+
+    try {
+      await AbortJob(job.jobId);
+    } catch (e) {
+      console.warn('[AI]: Failed to abort job', e);
+    }
+
+    this.loadingJobsMap.delete(requestId);
+  }
+
   async checkJobs() {
     await Promise.all(
       [...this.loadingJobsMap.entries()].map(async ([requestId, job]) => {
@@ -218,8 +239,7 @@ class AiStore {
 
           throw new Error(jobStatus.status);
         } catch (e: any) {
-          // TODO: add abort
-          this.loadingJobsMap.delete(requestId);
+          await this.abortJob(requestId);
           this.onGenerationError(e.message, job.onErrorCallback);
         }
       }),

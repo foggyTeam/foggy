@@ -85,6 +85,9 @@ const AiAssistantModal = observer(
     const [generationType, setGenerationType] = useState<
       null | keyof typeof generationTypeMap
     >(null);
+    const [generationRequestId, setGenerationRequestId] = useState<
+      string | null
+    >(null);
     const [generationResult, setGenerationResult] = useState<
       null | AiSummarizeResponse | AiStructurizeResponse
     >(null);
@@ -122,9 +125,10 @@ const AiAssistantModal = observer(
         return;
       }
 
+      let requestId;
       switch (type) {
         case 'summarize':
-          await aiStore.generateSummary(
+          requestId = await aiStore.generateSummary(
             boardStore.activeBoard.id,
             url,
             onSummaryGenerated,
@@ -133,7 +137,7 @@ const AiAssistantModal = observer(
           break;
         case 'structurize':
           if (!projectsStore.activeProject?.id) return;
-          await aiStore.generateStructure(
+          requestId = await aiStore.generateStructure(
             boardStore.activeBoard.id,
             url,
             projectsStore.activeProject.id,
@@ -142,6 +146,7 @@ const AiAssistantModal = observer(
           );
           break;
       }
+      setGenerationRequestId(requestId);
     }
 
     function onSummaryGenerated(
@@ -165,11 +170,12 @@ const AiAssistantModal = observer(
       setGenerationResult(result);
     }
 
-    function onAbort(local: boolean = false) {
+    async function onAbort(local: boolean = false) {
+      if (!local && generationRequestId)
+        await aiStore.abortJob(generationRequestId);
       setStep(0);
       setGenerationType(null);
       setGenerationResult(null);
-      // TODO: try to abort job (how?)
     }
 
     function onGenerationFail() {
@@ -182,6 +188,7 @@ const AiAssistantModal = observer(
       if (generationType === 'summarize') {
         submitSummarizeResult();
       } else {
+        submitStructurizeResult();
       }
 
       setStep(0);
@@ -231,6 +238,9 @@ const AiAssistantModal = observer(
           break;
       }
       addElementAction(newElement);
+    }
+    function submitStructurizeResult() {
+      // todo: proceed
     }
 
     return (
