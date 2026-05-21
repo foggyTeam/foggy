@@ -64,6 +64,9 @@ class TextElement extends BaseElement {
 
   @Prop({ required: true })
   content: string;
+
+  @Prop({ required: true })
+  cornerRadius: number;
 }
 
 export const TextElementSchema = SchemaFactory.createForClass(TextElement);

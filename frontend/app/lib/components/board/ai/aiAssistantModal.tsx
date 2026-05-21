@@ -367,6 +367,12 @@ const AiAssistantModal = observer(
                       </Card>
                     )}
 
+                  <div className="text-default-700 flex items-center italic">
+                    {generationType === 'summarize'
+                      ? settingsStore.t.ai.summarize.submitHint
+                      : settingsStore.t.ai.structurize.submitHint}
+                  </div>
+
                   <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
                     <FButton
                       size={commonSize}

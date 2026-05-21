@@ -419,11 +419,13 @@
     "title": "AI ASSISTANT",
     "summarize": {
       "buttonTitle": "Summary",
-      "description": "Prepare this board content summary as board text element."
+      "description": "Prepare this board content summary as board text element.",
+      "submitHint": "This summary will be added to the board as an text element. Apply?"
     },
     "structurize": {
       "buttonTitle": "Structure",
-      "description": "Offer a file structure for this project, based on this board topic."
+      "description": "Offer a file structure for this project, based on this board topic.",
+      "submitHint": "Missing sections and boards from this structure will be created. Apply?"
     },
     "stepTitle": {
       "0": "How can I help you today?",

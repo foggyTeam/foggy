@@ -30,7 +30,7 @@ export default function AiAssistantButton({
           isIconOnly
           color={foggy_accent.light.DEFAULT as any}
           size={commonSize}
-          className="accent-sh absolute bottom-3 left-6 z-50 font-semibold sm:bottom-6 sm:left-[68px]"
+          className="accent-sh absolute bottom-3 left-3 z-50 font-semibold sm:bottom-6 sm:left-14"
         >
           <SparklesIcon />
         </Button>
