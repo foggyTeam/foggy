@@ -30,6 +30,9 @@ import projectsStore from '@/app/stores/projectsStore';
 import ProjectTreePreview from '@/app/lib/components/board/ai/projectTreePreview';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { foggy_accent } from '@/tailwind.config';
+import { ApplyGeneratedProjectStructure } from '@/app/lib/server/ai/aiServerActions';
+import { addToast } from '@heroui/toast';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 
 export interface AiSummaryTextElement {
   id: string;
@@ -91,6 +94,8 @@ const AiAssistantModal = observer(
     const [generationResult, setGenerationResult] = useState<
       null | AiSummarizeResponse | AiStructurizeResponse
     >(null);
+
+    const [isApplying, setIsApplying] = useState(false);
 
     const generationTypeMap = {
       structurize: {
@@ -184,12 +189,11 @@ const AiAssistantModal = observer(
       setGenerationResult(null);
     }
 
-    function onSubmit() {
-      if (generationType === 'summarize') {
-        submitSummarizeResult();
-      } else {
-        submitStructurizeResult();
-      }
+    async function onSubmit() {
+      setIsApplying(true);
+      if (generationType === 'summarize') submitSummarizeResult();
+      else await submitStructurizeResult();
+      setIsApplying(false);
 
       setStep(0);
       setGenerationType(null);
@@ -239,8 +243,43 @@ const AiAssistantModal = observer(
       }
       addElementAction(newElement);
     }
-    function submitStructurizeResult() {
-      // todo: proceed
+    async function submitStructurizeResult() {
+      if (
+        generationResult?.requestType !== 'structurize' ||
+        !projectsStore.activeProject?.id
+      )
+        return;
+
+      try {
+        const result = await ApplyGeneratedProjectStructure(
+          projectsStore.activeProject.id,
+          generationResult.file,
+        );
+
+        for (const fail of result) {
+          addToast({
+            color: 'warning',
+            severity: 'warning',
+            title: settingsStore.t.toasts.ai.applyStructureFails[
+              fail.type === 'section' ? 'section' : 'board'
+            ]
+              .replace('_', fail.name)
+              .replace('_', fail.type.toUpperCase()),
+          });
+        }
+        addToast({
+          color: 'success',
+          severity: 'success',
+          title: settingsStore.t.toasts.ai.applyStructureSuccess,
+        });
+        projectsStore.revalidateProject();
+      } catch (e: any) {
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.ai.applyStructureFails.generalError,
+        });
+      }
     }
 
     return (
@@ -367,28 +406,32 @@ const AiAssistantModal = observer(
                       </Card>
                     )}
 
-                  <div className="text-default-700 flex items-center italic">
-                    {generationType === 'summarize'
-                      ? settingsStore.t.ai.summarize.submitHint
-                      : settingsStore.t.ai.structurize.submitHint}
-                  </div>
-
                   <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
                     <FButton
                       size={commonSize}
+                      isDisabled={isApplying}
                       onPress={() => onAbort(true)}
                       variant="bordered"
                       color="danger"
                     >
                       {settingsStore.t.ai.discardButton}
                     </FButton>
-                    <FButton
-                      size={commonSize}
-                      onPress={onSubmit}
-                      color="primary"
+                    <FTooltip
+                      content={
+                        generationType === 'summarize'
+                          ? settingsStore.t.ai.summarize.submitHint
+                          : settingsStore.t.ai.structurize.submitHint
+                      }
                     >
-                      {settingsStore.t.ai.submitButton}
-                    </FButton>
+                      <FButton
+                        size={commonSize}
+                        onPress={onSubmit}
+                        isLoading={isApplying}
+                        color="primary"
+                      >
+                        {settingsStore.t.ai.submitButton}
+                      </FButton>
+                    </FTooltip>
                   </div>
                 </motion.div>
               )}

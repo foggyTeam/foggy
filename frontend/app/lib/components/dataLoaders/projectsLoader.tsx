@@ -14,7 +14,11 @@ const ProjectsLoader = ({
 }: {
   projectsData: Project[] | undefined;
 }) => {
-  const { data: revalidatedData, error } = useSWR(
+  const {
+    data: revalidatedData,
+    error,
+    mutate,
+  } = useSWR(
     projectsData ? 'allProjects' : null,
     () => (projectsData ? GetAllProjects() : undefined),
     {
@@ -40,6 +44,10 @@ const ProjectsLoader = ({
         title: settingsStore.t.toasts.updateProjectsError,
       });
   }, [projectsData, revalidatedData]);
+
+  useEffect(() => {
+    mutate();
+  }, [projectsStore.revalidateProjectsTrigger, mutate]);
 
   return null;
 };

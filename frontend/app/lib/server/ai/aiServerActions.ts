@@ -54,3 +54,13 @@ export async function CheckGenerationStatus(jobId: string) {
 export async function AbortJob(jobId: string) {
   return getAiAdapter().abortJob(jobId);
 }
+
+export async function ApplyGeneratedProjectStructure(
+  projectId: string,
+  generatedStructure: any,
+) {
+  return getAiAdapter().applyGeneratedStructure({
+    projectId,
+    structure: generatedStructure,
+  });
+}

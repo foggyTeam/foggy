@@ -23,6 +23,10 @@ export interface AiGenerateTemplateArgs {
   prompt?: string;
   requestId?: string; // DirectProviderOnly: request id to receive job results
 }
+export interface ApplyGeneratedStructureArgs {
+  projectId: string;
+  structure: AiFile;
+}
 
 // BOARD ELEMENTS
 /** Simple board element */
@@ -86,7 +90,7 @@ export interface AiBoard {
 
 // FILE TREE
 export interface AiFile {
-  id: string;
+  id?: string;
   name: string;
   type: 'section' | 'doc' | 'graph' | 'simple';
   children?: AiFile[];

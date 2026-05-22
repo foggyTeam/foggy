@@ -13,7 +13,11 @@ export default function TeamLoader({
 }: {
   teamData: RawTeam | undefined;
 }) {
-  const { data: revalidatedData, error } = useSWR(
+  const {
+    data: revalidatedData,
+    error,
+    mutate,
+  } = useSWR(
     teamData ? teamData.id : null,
     () => (teamData ? GetTeam(teamData.id) : undefined),
     {
@@ -39,6 +43,10 @@ export default function TeamLoader({
         title: settingsStore.t.toasts.team.updateTeamError,
       });
   }, [teamData, revalidatedData, error]);
+
+  useEffect(() => {
+    mutate();
+  }, [teamsStore.revalidateTeamTrigger, mutate]);
 
   return null;
 }

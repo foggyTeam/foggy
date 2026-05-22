@@ -5,6 +5,7 @@ import {
   AiJob,
   AiStructurizeArgs,
   AiSummarizeArgs,
+  ApplyGeneratedStructureArgs,
 } from '@/app/lib/server/ai/types';
 
 // TODO: implement all standard server actions via requests.ts
@@ -22,6 +23,12 @@ export class BackendAdapter implements IAiAdapter {
   }
 
   async generateTemplate(request: AiGenerateTemplateArgs): Promise<any> {
+    throw new Error('Backend adapter not implemented yet');
+  }
+
+  async applyGeneratedStructure(
+    request: ApplyGeneratedStructureArgs,
+  ): Promise<any> {
     throw new Error('Backend adapter not implemented yet');
   }
 

@@ -16,10 +16,12 @@ import {
   AiSummarizeArgs,
   AiSummarizeRequest,
   AiSummarizeResponse,
+  ApplyGeneratedStructureArgs,
 } from '@/app/lib/server/ai/types';
 import { HtmlToDelta } from 'quill-delta-from-html';
 import {
   AddBoard,
+  AddSection,
   GetBoard,
   GetProject,
   GetSection,
@@ -38,6 +40,7 @@ import {
 } from '@/app/lib/server/requests';
 import getUserId from '@/app/lib/getUserId';
 import * as Y from 'yjs';
+import { projectElementNameSchema } from '@/app/lib/types/schemas';
 
 const apiUri = process.env.AI_URI;
 const verificationKey = process.env.VERIFICATION_KEY;
@@ -47,6 +50,46 @@ function generateRequestId(
   data: object,
 ) {
   return `${requestType}-${Object.values(data).join('-').slice(0, 16)}-${Date.now()}`;
+}
+
+function prepareProjectElementName(name: string) {
+  const nameSchema = projectElementNameSchema.shape.name;
+  const checks = nameSchema._def.checks;
+
+  let maxLength = 20;
+  let allowedRegex: RegExp | null = null;
+
+  for (const check of checks) {
+    if (check.kind === 'max') maxLength = check.value;
+    if (check.kind === 'regex') allowedRegex = check.regex;
+  }
+
+  let sanitized = name;
+
+  // cleansing from forbidden symbols
+  if (allowedRegex && !allowedRegex.test(sanitized)) {
+    const testRegex = new RegExp(
+      allowedRegex.source,
+      allowedRegex.flags.replace('g', ''),
+    );
+
+    sanitized = Array.from(sanitized)
+      .filter((char) => testRegex.test(char))
+      .join('');
+  }
+
+  // shortening if needed
+  if (sanitized.length > maxLength) sanitized = sanitized.slice(0, maxLength);
+
+  sanitized = sanitized.trim();
+
+  const result = projectElementNameSchema.safeParse({
+    name: sanitized,
+    prompt: '',
+  });
+
+  if (result.success) return sanitized;
+  return 'Untitled';
 }
 
 export class DirectAdapter implements IAiAdapter {
@@ -258,6 +301,57 @@ export class DirectAdapter implements IAiAdapter {
       boardId: createBoardResponse.data.id,
     });
     return { boardId: createBoardResponse.data.id };
+  }
+
+  /** @param data
+   *  @returns array of entities with failed generation */
+  async applyGeneratedStructure(data: ApplyGeneratedStructureArgs) {
+    const { projectId, structure } = data;
+    const failedToCreate: { name: string; type: string }[] = [];
+
+    async function createChildren(
+      item: AiFile,
+      parentId: string | undefined,
+    ): Promise<void> {
+      let itemId = item.id;
+      if (!itemId) {
+        try {
+          if (item.type === 'section') {
+            const response = await AddSection(projectId, {
+              parentSectionId: parentId as any,
+              name: prepareProjectElementName(item.name),
+            });
+            if ('errors' in response) throw new Error();
+            itemId = response.data.id;
+          } else {
+            const response = await AddBoard(projectId, {
+              sectionId: parentId as string,
+              name: prepareProjectElementName(item.name),
+              type: item.type.toUpperCase() as BoardTypes,
+            });
+            if ('errors' in response) throw new Error();
+            itemId = response.data.id;
+          }
+        } catch (e: any) {
+          failedToCreate.push({ name: item.name, type: item.type });
+          return;
+        }
+      }
+
+      await Promise.all(
+        (item.children || []).map(
+          async (child: AiFile) => await createChildren(child, itemId),
+        ),
+      );
+    }
+
+    await Promise.all(
+      (structure.children || []).map(
+        async (child: AiFile) => await createChildren(child, undefined),
+      ),
+    );
+
+    return failedToCreate;
   }
 
   /** @param jobId

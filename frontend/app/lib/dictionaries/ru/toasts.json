@@ -79,6 +79,14 @@
       "resizeImageError": "Не удалось обработать изображение",
       "uploadImageError": "Не удалось загрузить изображение"
     },
+    "ai": {
+      "applyStructureFails": {
+        "generalError": "Не удалось обновить структуру проекта",
+        "section": "Не удалось создать секцию _ и вложенные в нее элементы",
+        "board": "Не удалось создать доску _ типа _"
+      },
+      "applyStructureSuccess": "Структура проекта успешно обновлена!"
+    },
     "socket": {
       "socketConnectionError": {
         "title": "Ошибка подключения",
