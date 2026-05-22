@@ -97,12 +97,12 @@ const LeftSideBar = observer(() => {
           const boardData:
             | Pick<SimpleBoard, 'layers'>
             | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
-            | string =
+            | { document: string } =
             nodeType === 'SIMPLE'
               ? { layers: [[], [], []] }
               : nodeType === 'GRAPH'
                 ? { graphEdges: [], graphNodes: [] }
-                : '';
+                : { document: '' };
           const sectionId = boardStore.activeBoard?.sectionId || '';
           const newBoard = {
             name: nodeName,

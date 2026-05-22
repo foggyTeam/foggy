@@ -4,7 +4,8 @@ import { IAiAdapter } from './adapter';
 import { DirectAdapter } from './adapters/direct';
 import { BackendAdapter } from './adapters/backend';
 
-const mode: 'direct' | 'backend' = process.env.AI_MODE || 'backend';
+/** 'direct' or 'backend' */
+const mode = process.env.AI_MODE || 'backend';
 let aiAdapterInstance: IAiAdapter | null = null;
 
 export function getAiAdapter(): IAiAdapter {

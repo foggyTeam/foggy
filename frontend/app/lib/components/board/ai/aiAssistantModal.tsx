@@ -361,7 +361,7 @@ const AiAssistantModal = observer(
                   <GenerationSkeleton type={generationType} />
                   <FButton
                     size={commonSize}
-                    onPress={onAbort}
+                    onPress={() => onAbort()}
                     variant="ghost"
                     color="danger"
                   >
