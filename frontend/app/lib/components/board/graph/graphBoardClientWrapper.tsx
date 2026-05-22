@@ -17,6 +17,7 @@ const AdditionsWrapper = () => {
   const { createNewElement } = useGraphBoardContext();
 
   function addGraphNode(nodeParams: any) {
+    // TODO: if node text longer than 300, make a chain of blocks
     let newElement = createNewElement(
       { clientX: 0, clientY: 0 } as any,
       'custom-node',

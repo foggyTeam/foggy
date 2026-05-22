@@ -223,7 +223,7 @@ class AiStore {
           if (
             (jobStatus.status === 'pending' ||
               jobStatus.status === 'running') &&
-            jobStatus.retries <= 10
+            jobStatus.retries <= 50
           )
             return;
 
@@ -234,7 +234,7 @@ class AiStore {
             return;
           }
 
-          if (jobStatus.retries > 10)
+          if (jobStatus.retries > 50)
             throw new Error('Maximum retries achieved!');
 
           throw new Error(jobStatus.status);

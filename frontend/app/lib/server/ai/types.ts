@@ -86,6 +86,7 @@ export interface AiBoard {
 
 // FILE TREE
 export interface AiFile {
+  id: string;
   name: string;
   type: 'section' | 'doc' | 'graph' | 'simple';
   children?: AiFile[];

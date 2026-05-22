@@ -98,6 +98,7 @@ export class DirectAdapter implements IAiAdapter {
       }
 
       return {
+        id: item.id,
         name: item.name,
         type: 'type' in item ? item.type?.toLowerCase() : 'section',
         children,
@@ -108,6 +109,7 @@ export class DirectAdapter implements IAiAdapter {
       [...project.sections.values()].map(dfs),
     );
     const projectFile: AiFile = {
+      id: project.id,
       name: project.name,
       type: 'section',
       children: rootSections,
