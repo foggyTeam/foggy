@@ -4,13 +4,13 @@ import InvitationLoadingCard from '@/app/lib/components/members/invitationLoadin
 export default async function InvitationTokenPage({
   params,
 }: Readonly<{
-  params: Promise<{ token: string }>;
+  params: Promise<{ type: 'project' | 'team'; token: string }>;
 }>) {
-  const { token } = await params;
+  const { type, token } = await params;
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-8 px-24 py-8">
-      <InvitationLoadingCard token={token} />
+      <InvitationLoadingCard entityType={type} token={token} />
     </div>
   );
 }
