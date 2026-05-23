@@ -17,9 +17,12 @@ const AdditionsWrapper = () => {
     text: string;
     position: { x: number; y: number };
   }) {
+    const { x, y } = getNodesBounds(getNodes());
+    const startPosition = { x: x - 324, y };
+
     const { nodes, edges } = getGraphNodesChain(
       generatedElement.text,
-      generatedElement.position,
+      startPosition,
     );
 
     const updatesQueue: any[] = [];
