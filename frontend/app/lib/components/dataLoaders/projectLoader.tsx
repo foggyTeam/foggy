@@ -13,7 +13,11 @@ export default function ProjectLoader({
 }: {
   projectData: RawProject | undefined;
 }) {
-  const { data: revalidatedData, error } = useSWR(
+  const {
+    data: revalidatedData,
+    error,
+    mutate,
+  } = useSWR(
     projectData ? projectData.id : null,
     () => (projectData ? GetProject(projectData.id) : undefined),
     {
@@ -39,6 +43,10 @@ export default function ProjectLoader({
         title: settingsStore.t.toasts.project.updateProjectError,
       });
   }, [projectData, revalidatedData, error]);
+
+  useEffect(() => {
+    mutate();
+  }, [projectsStore.revalidateProjectTrigger, mutate]);
 
   return null;
 }

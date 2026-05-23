@@ -7,6 +7,8 @@ class NotificationsStore {
   notifications: Notification[] = [];
   unreadNumber: number = 0;
 
+  revalidateTrigger = false;
+
   constructor() {
     makeAutoObservable(this, {
       notifications: observable,
@@ -15,8 +17,15 @@ class NotificationsStore {
       setNotifications: action,
       changeNotificationType: action,
       deleteNotification: action,
+
+      revalidateTrigger: observable,
+      revalidate: action,
     });
   }
+
+  revalidate = () => {
+    this.revalidateTrigger = !this.revalidateTrigger;
+  };
 
   setUnreadNumber = (n: number) => {
     this.unreadNumber = n;

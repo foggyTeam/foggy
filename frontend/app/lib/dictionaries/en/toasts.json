@@ -55,6 +55,9 @@
     },
     "board": {
       "addBoardError": "Failed to create board",
+      "generateError": "Failed to generate",
+      "generateSuccess": "Successfully generated!",
+
       "boardElementAddError": "Failed to add board element",
       "boardElementDeleteError": "Failed to remove board element",
       "boardElementInvisible": "This element is invisible",
@@ -77,6 +80,14 @@
       "notImage": "The file is not a valid image",
       "resizeImageError": "Failed to process the image",
       "uploadImageError": "Failed to upload the image"
+    },
+    "ai": {
+      "applyStructureFails": {
+        "generalError": "Failed to update project structure",
+        "section": "Failed to create section _ and its children",
+        "board": "Failed to create board _ of type _"
+      },
+      "applyStructureSuccess": "Project structure updated successfully!"
     },
     "socket": {
       "socketConnectionError": {

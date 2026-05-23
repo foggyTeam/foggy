@@ -7,6 +7,9 @@ class TeamsStore {
   activeTeam: Team | undefined = undefined;
   allTeams: Team[] = [];
 
+  revalidateTeamsTrigger = false;
+  revalidateTeamTrigger = false;
+
   constructor() {
     makeAutoObservable(this, {
       myRole: observable,
@@ -17,8 +20,20 @@ class TeamsStore {
       setAllTeams: action,
       addTeam: action,
       updateTeam: action,
+
+      revalidateTeamsTrigger: observable,
+      revalidateTeamTrigger: observable,
+      revalidateTeam: action,
+      revalidateTeams: action,
     });
   }
+
+  revalidateTeam = () => {
+    this.revalidateTeamTrigger = !this.revalidateTeamTrigger;
+  };
+  revalidateTeams = () => {
+    this.revalidateTeamsTrigger = !this.revalidateTeamsTrigger;
+  };
 
   setActiveTeam = (team: RawTeam | null) => {
     if (!team) {

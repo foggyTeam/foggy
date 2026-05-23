@@ -27,7 +27,11 @@ export default function NameInput({
   const [localValue, setLocalValue] = useState(value);
 
   useEffect(() => {
-    IsFormValid({ name: localValue }, projectElementNameSchema, setError);
+    IsFormValid(
+      { name: localValue, prompt: undefined },
+      projectElementNameSchema,
+      setError,
+    );
   }, [localValue, setError]);
   const handleBlur = () => {
     if (Object.keys(error).length < 1) onValueChange(localValue);

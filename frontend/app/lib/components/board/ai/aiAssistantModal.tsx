@@ -1,0 +1,446 @@
+'use client';
+
+import { observer } from 'mobx-react-lite';
+import React, { useState } from 'react';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+} from '@heroui/drawer';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { FolderSyncIcon, LightbulbIcon, SparklesIcon } from 'lucide-react';
+import clsx from 'clsx';
+import { ai_sidebar_layout, bg_container } from '@/app/lib/types/styles';
+import settingsStore from '@/app/stores/settingsStore';
+import { Card, CardBody } from '@heroui/card';
+import { AnimatePresence, motion } from 'framer-motion';
+import GenerationSkeleton from '@/app/lib/components/skeletons/generationSkeleton';
+import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
+import { Image } from '@heroui/image';
+import NextImage from 'next/image';
+import {
+  HandleBoardImageUpload,
+  UploadBoardData,
+} from '@/app/lib/utils/handleBoardImageUpload';
+import boardStore from '@/app/stores/board/boardStore';
+import { useTheme } from 'next-themes';
+import aiStore from '@/app/stores/board/aiStore';
+import projectsStore from '@/app/stores/projectsStore';
+import ProjectTreePreview from '@/app/lib/components/board/ai/projectTreePreview';
+import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import { foggy_accent } from '@/tailwind.config';
+import { ApplyGeneratedProjectStructure } from '@/app/lib/server/ai/aiServerActions';
+import { addToast } from '@heroui/toast';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+
+export interface AiSummaryTextElement {
+  id: string;
+  type: 'text';
+  content: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fill: string;
+  stroke: string;
+  strokeWidth: number;
+  rotation: number;
+}
+
+export interface AiSummarizeResponse {
+  requestId: string;
+  userId: string;
+  requestType: 'summarize';
+  text: AiSummaryTextElement;
+}
+
+export interface AiFileNode {
+  name: string;
+  type: 'section' | 'simple' | 'graph' | 'doc';
+  children?: AiFileNode[];
+}
+
+export interface AiStructurizeResponse {
+  requestId: string;
+  userId: string;
+  requestType: 'structurize';
+  aiTreeResponse: string;
+  file: AiFileNode;
+}
+
+const AiAssistantModal = observer(
+  ({
+    boardData,
+    addElementAction,
+    isOpen,
+    onOpenChange,
+  }: {
+    boardData: UploadBoardData;
+    addElementAction: (element: any) => void;
+    isOpen: boolean;
+    onOpenChange: any;
+  }) => {
+    const { isMobile, commonSize } = useAdaptiveParams();
+    const { resolvedTheme } = useTheme();
+
+    const [step, setStep] = useState<0 | 1 | 2>(0);
+    const [generationType, setGenerationType] = useState<
+      null | keyof typeof generationTypeMap
+    >(null);
+    const [generationRequestId, setGenerationRequestId] = useState<
+      string | null
+    >(null);
+    const [generationResult, setGenerationResult] = useState<
+      null | AiSummarizeResponse | AiStructurizeResponse
+    >(null);
+
+    const [isApplying, setIsApplying] = useState(false);
+
+    const generationTypeMap = {
+      structurize: {
+        title: settingsStore.t.ai.structurize.buttonTitle,
+        description: settingsStore.t.ai.structurize.description,
+        CardIcon: <FolderSyncIcon className="stroke-secondary-300" />,
+        cardStyle:
+          'bg-secondary hover:bg-secondary-400 text-secondary-foreground',
+      },
+      summarize: {
+        title: settingsStore.t.ai.summarize.buttonTitle,
+        description: settingsStore.t.ai.summarize.description,
+        CardIcon: <LightbulbIcon className="stroke-primary-300 rotate-12" />,
+        cardStyle: 'bg-primary hover:bg-primary-400 text-primary-foreground',
+      },
+    };
+
+    async function onStartGeneration(type: 'structurize' | 'summarize') {
+      if (!boardStore.activeBoard?.id) return;
+
+      setGenerationType(type);
+      setStep(1);
+
+      const url = await HandleBoardImageUpload(
+        boardStore.activeBoard.id,
+        boardData,
+        resolvedTheme as 'light' | 'dark',
+        false,
+      );
+      if (url === null) {
+        onAbort(true);
+        return;
+      }
+
+      let requestId;
+      switch (type) {
+        case 'summarize':
+          requestId = await aiStore.generateSummary(
+            boardStore.activeBoard.id,
+            url,
+            onSummaryGenerated,
+            onGenerationFail,
+          );
+          break;
+        case 'structurize':
+          if (!projectsStore.activeProject?.id) return;
+          requestId = await aiStore.generateStructure(
+            boardStore.activeBoard.id,
+            url,
+            projectsStore.activeProject.id,
+            onStructureGenerated,
+            onGenerationFail,
+          );
+          break;
+      }
+      setGenerationRequestId(requestId);
+    }
+
+    function onSummaryGenerated(
+      result: { SummarizeResponse: AiSummarizeResponse } | null | undefined,
+    ) {
+      if (!result) {
+        onAbort(true);
+        return;
+      }
+      setStep(2);
+      setGenerationResult(result.SummarizeResponse);
+    }
+    function onStructureGenerated(
+      result: AiStructurizeResponse | null | undefined,
+    ) {
+      if (!result) {
+        onAbort(true);
+        return;
+      }
+      setStep(2);
+      setGenerationResult(result);
+    }
+
+    async function onAbort(local: boolean = false) {
+      if (!local && generationRequestId)
+        await aiStore.abortJob(generationRequestId);
+      setStep(0);
+      setGenerationType(null);
+      setGenerationResult(null);
+    }
+
+    function onGenerationFail() {
+      setStep(0);
+      setGenerationType(null);
+      setGenerationResult(null);
+    }
+
+    async function onSubmit() {
+      setIsApplying(true);
+      if (generationType === 'summarize') submitSummarizeResult();
+      else await submitStructurizeResult();
+      setIsApplying(false);
+
+      setStep(0);
+      setGenerationType(null);
+      setGenerationResult(null);
+    }
+
+    function submitSummarizeResult() {
+      if (generationResult?.requestType !== 'summarize') return;
+      const aiBlock = generationResult.text;
+      let newElement;
+
+      switch (boardStore.activeBoard?.type) {
+        case 'SIMPLE':
+          newElement = {
+            id: `text-${Date.now()}`,
+            type: 'text',
+            content: aiBlock.content,
+            x: aiBlock.x || 100,
+            y: aiBlock.y || 100,
+            width: aiBlock.width || 300,
+            height: aiBlock.height || 100,
+            fill: `${foggy_accent.light[100]}85`,
+            stroke: foggy_accent.light.DEFAULT,
+            strokeWidth: 2,
+            rotation: aiBlock.rotation || 0,
+            draggable: true,
+            dragDistance: 4,
+            cornerRadius: 8,
+            svg: HtmlToSvg(
+              aiBlock.content,
+              aiBlock.width || 300,
+              aiBlock.height || 100,
+            ),
+          };
+          break;
+        case 'GRAPH':
+          newElement = {
+            position: { x: aiBlock.x, y: aiBlock.y },
+            data: {
+              description: aiBlock.content,
+              shape: 'rect',
+              align: 'start',
+              color: foggy_accent.light[100],
+            },
+          };
+          break;
+      }
+      addElementAction(newElement);
+    }
+    async function submitStructurizeResult() {
+      if (
+        generationResult?.requestType !== 'structurize' ||
+        !projectsStore.activeProject?.id
+      )
+        return;
+
+      try {
+        const result = await ApplyGeneratedProjectStructure(
+          projectsStore.activeProject.id,
+          generationResult.file,
+        );
+
+        for (const fail of result) {
+          addToast({
+            color: 'warning',
+            severity: 'warning',
+            title: settingsStore.t.toasts.ai.applyStructureFails[
+              fail.type === 'section' ? 'section' : 'board'
+            ]
+              .replace('_', fail.name)
+              .replace('_', fail.type.toUpperCase()),
+          });
+        }
+        addToast({
+          color: 'success',
+          severity: 'success',
+          title: settingsStore.t.toasts.ai.applyStructureSuccess,
+        });
+        projectsStore.revalidateProject();
+      } catch (e: any) {
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.ai.applyStructureFails.generalError,
+        });
+      }
+    }
+
+    return (
+      <Drawer
+        data-testid="ai-modal"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        placement={isMobile ? 'bottom' : 'left'}
+        backdrop="transparent"
+        className={clsx(
+          bg_container,
+          ai_sidebar_layout,
+          'h-fit w-full overflow-visible sm:max-w-sm',
+          'transform transition-all hover:bg-[hsl(var(--heroui-background))]/65 hover:pl-0.5',
+        )}
+      >
+        <DrawerContent className="gap-4">
+          <DrawerHeader className="text-medium flex items-center justify-start gap-2 py-0 sm:text-sm">
+            <SparklesIcon className="stroke-f_accent font-semibold" />
+            <h1 className="font-medium">{settingsStore.t.ai.title}</h1>
+          </DrawerHeader>
+          <DrawerBody className="text-medium flex flex-col gap-2 overflow-visible py-0 sm:text-sm">
+            <div className="text-default-700 flex items-center gap-1 italic">
+              <Image
+                alt="Gemini icon"
+                src="/images/gemini-color.svg"
+                height={24}
+                width={24}
+                as={NextImage}
+              />
+              {settingsStore.t.ai.stepTitle[step.toString() as '0' | '1' | '2']}
+            </div>
+
+            <AnimatePresence mode="wait">
+              {step === 0 && (
+                <motion.div
+                  key="step-0"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex h-72 flex-col gap-2 overflow-y-auto sm:h-[360px]"
+                >
+                  {Object.entries(generationTypeMap).map(
+                    ([type, { title, description, cardStyle, CardIcon }]) => (
+                      <Card
+                        key={type}
+                        className={clsx(cardStyle, 'w-full')}
+                        shadow="none"
+                        isPressable
+                        onPress={() =>
+                          onStartGeneration(
+                            type as keyof typeof generationTypeMap,
+                          )
+                        }
+                      >
+                        <CardBody className="flex flex-col gap-1">
+                          <p className="flex w-full items-end justify-between gap-1 font-semibold">
+                            {title}
+                            {CardIcon}
+                          </p>
+                          <p className="italic">{description}</p>
+                        </CardBody>
+                      </Card>
+                    ),
+                  )}
+                </motion.div>
+              )}
+
+              {step === 1 && generationType !== null && (
+                <motion.div
+                  key="step-1"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex h-72 flex-col gap-4 overflow-y-auto sm:h-[360px]"
+                >
+                  <GenerationSkeleton type={generationType} />
+                  <FButton
+                    size={commonSize}
+                    onPress={() => onAbort()}
+                    variant="ghost"
+                    color="danger"
+                  >
+                    {settingsStore.t.ai.abortButton}
+                  </FButton>
+                </motion.div>
+              )}
+              {step === 2 && (
+                <motion.div
+                  key="step-2"
+                  initial={{ opacity: 0, x: -50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 50 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex h-72 flex-col gap-4 overflow-y-auto sm:h-[360px]"
+                >
+                  {generationType === 'summarize' &&
+                    generationResult &&
+                    'text' in generationResult && (
+                      <Card shadow="none" className="h-full pr-1">
+                        <CardBody>
+                          <div
+                            className="leading-relaxed [&>li]:mt-1 [&>ul]:mt-2 [&>ul]:list-disc [&>ul]:pl-5"
+                            dangerouslySetInnerHTML={{
+                              __html: generationResult.text.content,
+                            }}
+                          />
+                        </CardBody>
+                      </Card>
+                    )}
+
+                  {generationType === 'structurize' &&
+                    generationResult &&
+                    'aiTreeResponse' in generationResult && (
+                      <Card shadow="none" className="h-full pr-1">
+                        <CardBody>
+                          <ProjectTreePreview
+                            root
+                            node={generationResult.file}
+                          />
+                        </CardBody>
+                      </Card>
+                    )}
+
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+                    <FButton
+                      size={commonSize}
+                      isDisabled={isApplying}
+                      onPress={() => onAbort(true)}
+                      variant="bordered"
+                      color="danger"
+                    >
+                      {settingsStore.t.ai.discardButton}
+                    </FButton>
+                    <FTooltip
+                      content={
+                        generationType === 'summarize'
+                          ? settingsStore.t.ai.summarize.submitHint
+                          : settingsStore.t.ai.structurize.submitHint
+                      }
+                    >
+                      <FButton
+                        size={commonSize}
+                        onPress={onSubmit}
+                        isLoading={isApplying}
+                        color="primary"
+                      >
+                        {settingsStore.t.ai.submitButton}
+                      </FButton>
+                    </FTooltip>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    );
+  },
+);
+
+export default AiAssistantModal;
