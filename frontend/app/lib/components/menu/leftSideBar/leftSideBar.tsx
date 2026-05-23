@@ -23,6 +23,7 @@ import {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
+import aiStore from '@/app/stores/board/aiStore';
 
 const LeftSideBar = observer(() => {
   const pathRegex = new RegExp(
@@ -51,7 +52,12 @@ const LeftSideBar = observer(() => {
   useEffect(() => {
     if (!isOpened) setParentList(projectsStore.activeBoardParentList);
   }, [isOpened]);
-  const addNode = async (nodeName: string, nodeType: ProjectElementTypes) => {
+  const addNode = async (
+    nodeName: string,
+    nodeType: ProjectElementTypes,
+    needsTemplate?: boolean,
+    prompt?: string,
+  ) => {
     if (!projectsStore.activeProject || !boardStore.activeBoard) return;
     const fullParentList = isOpened
       ? parentSectionId
@@ -88,6 +94,49 @@ const LeftSideBar = observer(() => {
         break;
       default:
         try {
+          const boardData:
+            | Pick<SimpleBoard, 'layers'>
+            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
+            | { document: string } =
+            nodeType === 'SIMPLE'
+              ? { layers: [[], [], []] }
+              : nodeType === 'GRAPH'
+                ? { graphEdges: [], graphNodes: [] }
+                : { document: '' };
+          const sectionId = boardStore.activeBoard?.sectionId || '';
+          const newBoard = {
+            name: nodeName,
+            type: nodeType,
+            sectionId,
+            lastChange: new Date().toISOString(),
+            ...boardData,
+          };
+
+          if (needsTemplate) {
+            await aiStore.generateTemplate(
+              projectsStore.activeProject.id,
+              newBoard,
+              prompt,
+              (result: { boardId: string } | null) => {
+                // TODO: proceed
+                if (result === null) {
+                  console.error('Failed to add board');
+                  return;
+                }
+                projectsStore.addProjectChild(
+                  fullParentList,
+                  Object.assign(newBoard, { id: result.boardId }) as Board,
+                  false,
+                );
+                router.push(
+                  `/project/${projectsStore.activeProject?.id}/${sectionId}/${result.boardId}/${nodeType.toLowerCase()}`,
+                );
+              },
+            );
+            onAddChildOpenChange();
+            return;
+          }
+
           const response = await AddBoard(projectsStore.activeProject.id, {
             name: nodeName,
             type: nodeType.toLowerCase(),
@@ -98,29 +147,13 @@ const LeftSideBar = observer(() => {
           if ('errors' in response)
             throw new Error(Object.values(response.errors)[0]);
 
-          const data:
-            | Pick<SimpleBoard, 'layers'>
-            | Pick<GraphBoard, 'graphNodes' | 'graphEdges'>
-            | string =
-            nodeType === 'SIMPLE'
-              ? { layers: [[], [], []] }
-              : nodeType === 'GRAPH'
-                ? { graphEdges: [], graphNodes: [] }
-                : '';
           const newId = response.data.id;
-          const sectionId = boardStore.activeBoard?.sectionId || '';
-          const newBoard = {
-            id: newId,
-            name: nodeName,
-            type: nodeType,
-            sectionId,
-            lastChange: new Date().toISOString(),
-          };
           projectsStore.addProjectChild(
             fullParentList,
-            Object.assign(newBoard, data) as Board,
+            Object.assign(newBoard, { id: newId }) as Board,
             false,
           );
+
           router.push(
             `/project/${projectsStore.activeProject?.id}/${sectionId}/${newId}/${nodeType.toLowerCase()}`,
           );
@@ -132,8 +165,8 @@ const LeftSideBar = observer(() => {
             description: e?.message || undefined,
           });
         }
+        onAddChildOpenChange();
     }
-    onAddChildOpenChange();
   };
 
   return (

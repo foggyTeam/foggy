@@ -55,6 +55,8 @@
     },
     "board": {
       "addBoardError": "Не удалось создать доску",
+      "generateError": "Произошла ошибка генерации",
+      "generateSuccess": "Генерация успешна!",
       "boardElementAddError": "Не удалось добавить элемент на доску",
       "boardElementDeleteError": "Не удалось удалить элемент с доски",
       "boardElementInvisible": "Элемент не виден",
@@ -76,6 +78,14 @@
       "notImage": "Файл не является изображением",
       "resizeImageError": "Не удалось обработать изображение",
       "uploadImageError": "Не удалось загрузить изображение"
+    },
+    "ai": {
+      "applyStructureFails": {
+        "generalError": "Не удалось обновить структуру проекта",
+        "section": "Не удалось создать секцию _ и вложенные в нее элементы",
+        "board": "Не удалось создать доску _ типа _"
+      },
+      "applyStructureSuccess": "Структура проекта успешно обновлена!"
     },
     "socket": {
       "socketConnectionError": {

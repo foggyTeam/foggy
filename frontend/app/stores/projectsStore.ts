@@ -26,6 +26,9 @@ class ProjectsStore {
 
   recentBoards: { url: string; name: string; type: BoardTypes }[] = [];
 
+  revalidateProjectsTrigger = false;
+  revalidateProjectTrigger = false;
+
   constructor() {
     makeAutoObservable(this, {
       myRole: observable,
@@ -33,6 +36,11 @@ class ProjectsStore {
 
       activeProject: observable,
       allProjects: observable,
+
+      revalidateProjectsTrigger: observable,
+      revalidateProjectTrigger: observable,
+      revalidateProject: action,
+      revalidateProjects: action,
 
       setActiveProject: action,
       revalidateActiveProject: action,
@@ -73,6 +81,13 @@ class ProjectsStore {
     }
 
     this.recentBoards = boards;
+  };
+
+  revalidateProject = () => {
+    this.revalidateProjectTrigger = !this.revalidateProjectTrigger;
+  };
+  revalidateProjects = () => {
+    this.revalidateProjectsTrigger = !this.revalidateProjectsTrigger;
   };
 
   // PROJECT

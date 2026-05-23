@@ -12,6 +12,7 @@ const NotificationsLoader = observer(() => {
   const {
     data: { notificationCount },
     error,
+    mutate,
   } = useSWR('unreadNumber', () => GetUnreadNumber(), {
     fallbackData: notificationsStore.unreadNumber,
     revalidateOnFocus: true,
@@ -29,6 +30,10 @@ const NotificationsLoader = observer(() => {
           settingsStore.t.toasts.notifications.updateNotificationsNumberError,
       });
   }, [notificationCount]);
+
+  useEffect(() => {
+    mutate();
+  }, [notificationsStore.revalidateTrigger, mutate]);
 
   return null;
 });

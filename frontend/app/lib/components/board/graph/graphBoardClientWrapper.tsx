@@ -2,20 +2,58 @@
 
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import GraphBoardObserver from '@/app/lib/components/board/graph/graphBoard';
-import { GraphBoardProvider } from '@/app/lib/components/board/graph/graphBoardContext';
+import {
+  GraphBoardProvider,
+  useGraphBoardContext,
+} from '@/app/lib/components/board/graph/graphBoardContext';
 import React from 'react';
 import GraphBoardCursors from '@/app/lib/components/board/graph/graphBoardCursors';
-import BoardImageGenerator from '@/app/lib/components/board/simple/ai/boardImageGenerator';
+import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
+import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
+import graphBoardStore from '@/app/stores/board/graphBoardStore';
 
-const ImageGeneratorWrapper = () => {
-  const { getNodes, getNodesBounds } = useReactFlow();
+const AdditionsWrapper = () => {
+  const { getNodes, getNodesBounds, addNodes } = useReactFlow();
+  const { createNewElement } = useGraphBoardContext();
+
+  function addGraphNode(nodeParams: any) {
+    // TODO: if node text longer than 300, make a chain of blocks
+    let newElement = createNewElement(
+      { clientX: 0, clientY: 0 } as any,
+      'custom-node',
+    );
+    if (!newElement) return;
+
+    Object.assign(newElement, nodeParams);
+    const success = graphBoardStore.updateNodeData(
+      newElement.id,
+      newElement.data,
+      true,
+    );
+
+    if (success) {
+      addNodes([newElement]);
+      const change = { type: 'add', item: newElement };
+      graphBoardStore.emitUpdates('nodesUpdate', [change]);
+    }
+  }
+
   return (
-    <BoardImageGenerator
-      boardData={{
-        type: 'GRAPH',
-        data: { getNodes, getNodesBounds },
-      }}
-    />
+    <>
+      <BoardImageGenerator
+        boardData={{
+          type: 'GRAPH',
+          data: { getNodes, getNodesBounds },
+        }}
+      />
+      <AiAssistantButton
+        boardData={{
+          type: 'GRAPH',
+          data: { getNodes, getNodesBounds },
+        }}
+        addElementAction={addGraphNode}
+      />
+    </>
   );
 };
 
@@ -25,7 +63,7 @@ export default function GraphBoardClientWrapper() {
       <GraphBoardProvider>
         <GraphBoardObserver />
         <GraphBoardCursors />
-        <ImageGeneratorWrapper />
+        <AdditionsWrapper />
       </GraphBoardProvider>
     </ReactFlowProvider>
   );
