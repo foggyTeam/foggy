@@ -2,6 +2,7 @@
 
 import {
   deleteRequest,
+  getRequest,
   patchRequest,
   postRequest,
 } from '@/app/lib/server/requests';
@@ -169,24 +170,29 @@ export async function GetInvitationLink(
     expirationTime: keyof typeof expirationTimesMap;
   },
 ): Promise<string> {
-  // TODO: real request
-  const token = await new Promise((resolve) =>
-    setTimeout(() => resolve(`somestringhere${data}${type}`), 500),
-  );
-  return `${process.env.FRONTEND_URI}/invitation/${token}`;
+  const url = `${type === 'project' ? `projects` : 'teams'}/${data.id}/invite-links`;
+  const requestData = {
+    role: data.role,
+    expiresAt: getExpiresAt(data.expirationTime),
+  };
+  const result = await postRequest(url, requestData, {
+    headers: {
+      'x-user-id': await getUserId(),
+    },
+  });
+  if ('errors' in result) throw new Error(result.errors.toString());
+  return `${process.env.FRONTEND_URI}/invitation/${type}/${result.data.token}`;
 }
 
-export async function ProcessInvitationToken(token: string): Promise<any> {
-  // TODO: decrypt real request
-  return new Promise((resolve) =>
-    setTimeout(
-      () =>
-        resolve({
-          accepted: true,
-          type: 'project',
-          id: '693d249238ecad24dc5f4b71',
-        }),
-      3000,
-    ),
-  );
+export async function ProcessInvitationToken(
+  type: 'project' | 'team',
+  token: string,
+  accept: boolean = false,
+): Promise<any> {
+  const url = `${type === 'project' ? `projects` : 'teams'}/invite/${token}?accept=${accept}`;
+  return await getRequest(url, {
+    headers: {
+      'x-user-id': await getUserId(),
+    },
+  });
 }

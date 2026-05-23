@@ -100,7 +100,7 @@ const AddMembersModal = observer(
 
     const handleCopyInvitationLink = async () => {
       const entityId =
-        type === 'project'
+        type === 'project' || type === 'all'
           ? projectsStore.activeProject?.id
           : teamsStore.activeTeam?.id;
       if (!entityId || !role) return;
@@ -194,7 +194,6 @@ const AddMembersModal = observer(
                 </div>
               </ModalBody>
               <ModalFooter className="flex w-full flex-wrap justify-between gap-4 p-0 pt-2">
-                {/*TODO: add link*/}
                 <Button
                   isLoading={isGeneratingLink}
                   onPress={handleCopyInvitationLink}
