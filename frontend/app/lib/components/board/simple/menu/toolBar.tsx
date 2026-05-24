@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RectTool from '@/app/lib/components/board/simple/tools/baseTools/rectTool';
 import EllipseTool from '@/app/lib/components/board/simple/tools/baseTools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/simple/menu/elementToolBar';
@@ -21,7 +21,6 @@ import HeartTool from '@/app/lib/components/board/simple/tools/baseTools/heartTo
 import TriangleTool from '@/app/lib/components/board/simple/tools/baseTools/triangleTool';
 import StarTool from '@/app/lib/components/board/simple/tools/baseTools/starTool';
 import ArrowTool from '@/app/lib/components/board/simple/tools/baseTools/arrowTool';
-import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
 import { Button } from '@heroui/button';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import settingsStore from '@/app/stores/settingsStore';
@@ -57,8 +56,14 @@ export default function ToolBar() {
   const tools = [TextTool, PencilTool, EraserTool, ImageTool, ArrowTool];
   const shapeTools = [RectTool, EllipseTool, TriangleTool, StarTool, HeartTool];
 
+  const [shapesToolOpen, setShapesToolOpen] = useState(false);
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
+
+  useEffect(() => {
+    if (activeTool === 'pencil' || activeTool === 'arrow' || !!selectedElement)
+      setShapesToolOpen(false);
+  }, [activeTool, selectedElement]);
 
   return (
     <div
@@ -75,43 +80,43 @@ export default function ToolBar() {
         <ElementToolBar />
       )}
       {(activeTool === 'pencil' ||
+        activeTool === 'arrow' ||
         (selectedElement && selectedElement?.attrs.type === 'line')) && (
         <PencilToolBar
           pencilParams={pencilParams}
           setPencilParams={setPencilParams}
         />
       )}
-      {(selectedElement || activeTool === 'pencil') && <Divider />}
+
+      {shapesToolOpen && (
+        <div className="flex justify-center gap-1">
+          {shapeTools.map((Tool, index) => (
+            <Tool key={index} pencilParams={pencilParams} />
+          ))}
+        </div>
+      )}
+
+      {(selectedElement ||
+        activeTool === 'pencil' ||
+        activeTool === 'arrow' ||
+        shapesToolOpen) && <Divider />}
       <div className="flex justify-center gap-1">
         {tools.map((Tool, index) => (
           <Tool key={index} pencilParams={pencilParams} />
         ))}
 
-        <Popover>
-          <PopoverTrigger>
-            <Button
-              data-testid="shape-tools-btn"
-              variant="light"
-              color="default"
-              isIconOnly
-              size={commonSize}
-            >
-              <FTooltip content={settingsStore.t.toolTips.tools.shapeTools}>
-                <ShapesIcon className="stroke-default-600" />
-              </FTooltip>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            className={clsx(
-              bg_container_no_padding,
-              'flex w-fit flex-col gap-2 px-1 py-2 sm:px-1 sm:py-3',
-            )}
-          >
-            {shapeTools.map((Tool, index) => (
-              <Tool key={index} pencilParams={pencilParams} />
-            ))}
-          </PopoverContent>
-        </Popover>
+        <Button
+          data-testid="shape-tools-btn"
+          variant="light"
+          color="default"
+          isIconOnly
+          onPress={() => setShapesToolOpen((v) => !v)}
+          size={commonSize}
+        >
+          <FTooltip content={settingsStore.t.toolTips.tools.shapeTools}>
+            <ShapesIcon className="stroke-default-600" />
+          </FTooltip>
+        </Button>
 
         {selectedElement && (
           <>

@@ -66,7 +66,7 @@ const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
 const DEFAULT_STAR_POINTS = 5;
 const ERASER_RADIUS = 4;
-const MIN_IMAGE_SIZE = 1024;
+const MIN_IMAGE_SIZE = 640;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -123,6 +123,11 @@ export const handleMouseDown =
         width: 16,
         height: 16,
       } as SBoardElement;
+
+      if (activeTool === 'image')
+        Object.assign(element, {
+          url: null,
+        });
 
       if (activeTool === 'star')
         Object.assign(element, {
