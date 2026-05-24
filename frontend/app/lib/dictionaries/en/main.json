@@ -463,6 +463,7 @@
       "layerBack": "Move back",
       "layerForward": "Move forward",
       "layerTop": "Bring to front",
+      "imageTool": "Image",
       "deleteTool": "Delete",
 
       "customNodeTool": "Custom node",

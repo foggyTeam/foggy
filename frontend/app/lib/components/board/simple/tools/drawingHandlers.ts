@@ -1,12 +1,17 @@
 import {
-  SBoardElement,
   LineElement,
+  SBoardElement,
   TextElement,
 } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
 import Konva from 'konva';
+import { RefObject } from 'react';
+import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
+import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 interface DrawingHandlersProps {
   stageRef: any;
@@ -31,6 +36,11 @@ interface FreeDrawingHandlersProps {
   setNewElement: (element: LineElement | null) => void;
   newElement: LineElement | null;
   pencilParams: PencilParams;
+}
+
+interface ImageHandlersProps extends DrawingHandlersProps {
+  inputClickEventRef: RefObject<any | null>;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export interface PencilParams {
@@ -434,6 +444,40 @@ export const handleEndErasing =
     if (drawing) setDrawing(false);
   };
 
+export const handlePlaceImageUpload =
+  ({
+    newElement,
+    inputClickEventRef,
+    updateElement,
+    setDrawing,
+    setNewElement,
+    setActiveTool,
+    setIsLoading,
+    drawing,
+  }: ImageHandlersProps) =>
+  async (e: any) => {
+    if (e.evt.buttons === 2) return;
+    if (!inputClickEventRef?.current) return;
+
+    if (drawing) {
+      setDrawing(false);
+      setActiveTool('');
+
+      setIsLoading(true);
+      const url = await getImageUrl(inputClickEventRef.current);
+
+      if (url && newElement)
+        updateElement(newElement.id, {
+          url,
+          strokeWidth: 0,
+          fill: `${DEFAULT_FILL}00`,
+        });
+      setIsLoading(false);
+
+      setNewElement(null);
+    }
+  };
+
 const isTransparent = (color: string) => {
   if (!color) return true;
   return (
@@ -446,6 +490,7 @@ export const isElementVisible = (
   strokeColor: string,
   strokeWidth: number,
 ) => {
+  if (elementType === 'image') return true;
   if (strokeWidth == 0 && isTransparent(fillColor)) return false;
   return !(
     (!strokeColor || isTransparent(strokeColor)) &&
@@ -457,4 +502,28 @@ const getElementId = (tool: string) => {
   if (!userStore.user?.id) return '';
   const userId = userStore.user.id;
   return `${tool}_${Date.now()}_${userId.slice(userId.length - 5, userId.length - 1)}`;
+};
+
+const getImageUrl = async (event: any) => {
+  try {
+    const imageBlob = await HandleImageUpload(event);
+    if (!imageBlob) return null;
+
+    const response = await uploadImage(
+      'board_images',
+      imageBlob,
+      'board_simple_',
+      { type: 'random' },
+    );
+
+    if ('url' in response) return response.url as string;
+    throw new Error();
+  } catch (e: any) {
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.globalError,
+    });
+  }
+  return null;
 };

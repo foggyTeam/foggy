@@ -8,6 +8,7 @@ import { observer } from 'mobx-react-lite';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
+const IMAGE_PLACEHOLDER_URL = '/images/undraw_playful-cat_3ta5.png';
 
 const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
   const {
@@ -69,6 +70,39 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
     <Layer>
       {layer.map((element) => {
         switch (element.type) {
+          case 'image': {
+            const imageElement = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'image',
+            ) as SVGImageElement;
+            imageElement.setAttributeNS(
+              'http://www.w3.org/1999/xlink',
+              'href',
+              element.url || IMAGE_PLACEHOLDER_URL,
+            );
+
+            imageElement.setAttribute('width', element.width.toString());
+            imageElement.setAttribute('height', element.height.toString());
+
+            return (
+              <Image
+                onTap={handleSelect}
+                key={element.id}
+                image={imageElement}
+                {...element}
+                onClick={handleSelect}
+                onDragEnd={(e) =>
+                  updateElement(element.id, {
+                    x: e.target.x(),
+                    y: e.target.y(),
+                  })
+                }
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                alt={element.url}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
+          }
           case 'rect':
             return (
               <Rect
@@ -122,25 +156,25 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );
-          case 'text':
-            const imageElement = document.createElementNS(
+          case 'text': {
+            const textImageElement = document.createElementNS(
               'http://www.w3.org/2000/svg',
               'image',
             ) as SVGImageElement;
-            imageElement.setAttributeNS(
+            textImageElement.setAttributeNS(
               'http://www.w3.org/1999/xlink',
               'href',
               element.svg,
             );
 
-            imageElement.setAttribute('width', element.width.toString());
-            imageElement.setAttribute('height', element.height.toString());
+            textImageElement.setAttribute('width', element.width.toString());
+            textImageElement.setAttribute('height', element.height.toString());
 
             return (
               <Image
                 onTap={handleSelect}
                 key={element.id}
-                image={imageElement}
+                image={textImageElement}
                 {...element}
                 onClick={handleSelect}
                 onDblClick={handleTextEdit}
@@ -159,6 +193,7 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );
+          }
           default:
             return null;
         }

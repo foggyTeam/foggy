@@ -174,7 +174,8 @@ export type SBoardElement =
   | RectElement
   | EllipseElement
   | LineElement
-  | TextElement;
+  | TextElement
+  | ImageElement;
 
 interface SBaseElement {
   id: string;
@@ -193,6 +194,11 @@ interface SBaseElement {
 export interface RectElement extends SBaseElement {
   type: 'rect';
   cornerRadius: number;
+}
+export interface ImageElement extends SBaseElement {
+  type: 'image';
+  cornerRadius: number;
+  url: string | null;
 }
 export interface EllipseElement extends SBaseElement {
   type: 'ellipse';

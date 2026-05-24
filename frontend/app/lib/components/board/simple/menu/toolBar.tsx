@@ -16,6 +16,7 @@ import { foggy_accent } from '@/tailwind.config';
 import EraserTool from '@/app/lib/components/board/simple/tools/baseTools/eraserTool';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { useTheme } from 'next-themes';
+import ImageTool from '@/app/lib/components/board/simple/tools/baseTools/imageTool';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -42,7 +43,14 @@ export default function ToolBar() {
   };
 
   const { selectedElement, activeTool } = useBoardContext();
-  const tools = [TextTool, PencilTool, EraserTool, RectTool, EllipseTool];
+  const tools = [
+    TextTool,
+    PencilTool,
+    EraserTool,
+    ImageTool,
+    RectTool,
+    EllipseTool,
+  ];
 
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
