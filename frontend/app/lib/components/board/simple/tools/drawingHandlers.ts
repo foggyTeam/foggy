@@ -27,7 +27,7 @@ interface DrawingHandlersProps {
 
 interface FreeDrawingHandlersProps {
   stageRef: any;
-  activeTool: 'pencil' | 'eraser';
+  activeTool: 'pencil' | 'eraser' | 'arrow';
   setActiveTool: (tool: string) => void;
   addElement: (element: LineElement) => void;
   updateElement: (id: string, newAttrs: Partial<LineElement>) => void;
@@ -64,6 +64,7 @@ export interface TextEdit {
 const DEFAULT_FILL = primary.light['200'];
 const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
+const DEFAULT_STAR_POINTS = 5;
 const ERASER_RADIUS = 4;
 const MIN_IMAGE_SIZE = 1024;
 
@@ -123,6 +124,15 @@ export const handleMouseDown =
         height: 16,
       } as SBoardElement;
 
+      if (activeTool === 'star')
+        Object.assign(element, {
+          numPoints: DEFAULT_STAR_POINTS,
+          innerRadius: 3.2,
+          outerRadius: 8,
+        });
+      if (activeTool === 'triangle')
+        Object.assign(element, { points: [8, 0, 16, 16, 0, 16] });
+
       setNewElement(element);
       addElement(element);
       setDrawing(true);
@@ -144,6 +154,16 @@ export const handleMouseMove =
         width: Math.abs(width),
         height: Math.abs(height),
       } as SBoardElement;
+
+      if (newElement.type === 'star')
+        Object.assign(updatedElement, {
+          innerRadius: (Math.min(width, height) / 2) * 0.4,
+          outerRadius: Math.min(width, height) / 2,
+        });
+      if (newElement.type === 'triangle')
+        Object.assign(updatedElement, {
+          points: [width / 2, 0, width, height, 0, height],
+        });
 
       updateElement(newElement.id, updatedElement);
     }
@@ -294,7 +314,10 @@ export const handleStartDrawing =
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
     if (e.evt.buttons === 2) return;
-    if (activeTool === 'pencil' && stageRef.current) {
+    if (
+      (activeTool === 'pencil' || activeTool === 'arrow') &&
+      stageRef.current
+    ) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
@@ -316,6 +339,13 @@ export const handleStartDrawing =
         lineJoin: pencilParams.lineJoin,
         tension: pencilParams.tension,
       } as LineElement;
+
+      if (activeTool === 'arrow')
+        Object.assign(element, {
+          type: 'arrow',
+          pointerAtBeginning: false,
+          pointerAtEnding: true,
+        });
 
       setNewElement(element);
       addElement(element);

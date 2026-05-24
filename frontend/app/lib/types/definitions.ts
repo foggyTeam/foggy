@@ -173,6 +173,10 @@ export interface DocBoard extends BaseBoard {
 export type SBoardElement =
   | RectElement
   | EllipseElement
+  | TriangleElement
+  | StarElement
+  | HeartElement
+  | ArrowElement
   | LineElement
   | TextElement
   | ImageElement;
@@ -202,6 +206,28 @@ export interface ImageElement extends SBaseElement {
 }
 export interface EllipseElement extends SBaseElement {
   type: 'ellipse';
+}
+export interface TriangleElement extends SBaseElement {
+  type: 'triangle';
+  points: number[];
+}
+export interface StarElement extends SBaseElement {
+  type: 'star';
+  numPoints: number;
+  innerRadius: number;
+  outerRadius: number;
+}
+export interface HeartElement extends SBaseElement {
+  type: 'heart';
+}
+export interface ArrowElement extends SBaseElement {
+  type: 'arrow';
+  points: number[];
+  tension: number;
+  lineJoin: 'miter' | 'round' | 'bevel';
+  lineCap: 'butt' | 'round' | 'square';
+  pointerAtBeginning: boolean;
+  pointerAtEnding: boolean;
 }
 export interface TextElement extends SBaseElement {
   // basically it is a Konva.image

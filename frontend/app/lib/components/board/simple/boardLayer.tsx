@@ -1,6 +1,15 @@
 'use client';
 
-import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
+import {
+  Ellipse,
+  Image,
+  Layer,
+  Line,
+  Arrow,
+  Rect,
+  Star,
+  Path,
+} from 'react-konva';
 import {
   ImageElement,
   SBoardElement,
@@ -14,6 +23,14 @@ import { useRef, useState } from 'react';
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
 const IMAGE_PLACEHOLDER_URL = '/images/undraw_playful-cat_3ta5.png';
+
+const HEART_SVG_PATTERN = `M 50 30
+  C 50 20, 35 10, 20 20
+  C 5 30, 5 50, 20 65
+  L 50 95
+  L 80 65
+  C 95 50, 95 30, 80 20
+  C 65 10, 50 20, 50 30 Z`;
 
 function getPlaceholderImage() {
   const imageElement = document.createElementNS(
@@ -244,6 +261,81 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
               />
             );
           }
+          case 'star':
+            return (
+              <Star
+                key={element.id}
+                {...element}
+                onClick={handleSelect}
+                onDragEnd={(e) =>
+                  updateElement(element.id, {
+                    x: e.target.x(),
+                    y: e.target.y(),
+                  })
+                }
+                onTap={handleSelect}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
+          case 'triangle':
+            return (
+              <Line
+                key={element.id}
+                {...element}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+                closed
+              />
+            );
+          case 'heart':
+            const { width, height, ...rest } = element;
+            return (
+              <Path
+                key={element.id}
+                {...rest}
+                scaleX={width / 100}
+                scaleY={height / 100}
+                data={HEART_SVG_PATTERN}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+                closed
+              />
+            );
+          case 'arrow':
+            return (
+              <Arrow
+                key={element.id}
+                {...element}
+                fill={element.stroke}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
           default:
             return null;
         }

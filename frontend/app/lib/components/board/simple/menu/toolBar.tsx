@@ -17,6 +17,16 @@ import EraserTool from '@/app/lib/components/board/simple/tools/baseTools/eraser
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { useTheme } from 'next-themes';
 import ImageTool from '@/app/lib/components/board/simple/tools/baseTools/imageTool';
+import HeartTool from '@/app/lib/components/board/simple/tools/baseTools/heartTool';
+import TriangleTool from '@/app/lib/components/board/simple/tools/baseTools/triangleTool';
+import StarTool from '@/app/lib/components/board/simple/tools/baseTools/starTool';
+import ArrowTool from '@/app/lib/components/board/simple/tools/baseTools/arrowTool';
+import { Popover, PopoverContent, PopoverTrigger } from '@heroui/popover';
+import { Button } from '@heroui/button';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { ShapesIcon } from 'lucide-react';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -31,6 +41,7 @@ export type ToolProps = {
 
 export default function ToolBar() {
   const { resolvedTheme } = useTheme();
+  const { commonSize } = useAdaptiveParams();
 
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -43,14 +54,8 @@ export default function ToolBar() {
   };
 
   const { selectedElement, activeTool } = useBoardContext();
-  const tools = [
-    TextTool,
-    PencilTool,
-    EraserTool,
-    ImageTool,
-    RectTool,
-    EllipseTool,
-  ];
+  const tools = [TextTool, PencilTool, EraserTool, ImageTool, ArrowTool];
+  const shapeTools = [RectTool, EllipseTool, TriangleTool, StarTool, HeartTool];
 
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
@@ -81,6 +86,32 @@ export default function ToolBar() {
         {tools.map((Tool, index) => (
           <Tool key={index} pencilParams={pencilParams} />
         ))}
+
+        <Popover>
+          <PopoverTrigger>
+            <Button
+              data-testid="shape-tools-btn"
+              variant="light"
+              color="default"
+              isIconOnly
+              size={commonSize}
+            >
+              <FTooltip content={settingsStore.t.toolTips.tools.shapeTools}>
+                <ShapesIcon className="stroke-default-600" />
+              </FTooltip>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className={clsx(
+              bg_container_no_padding,
+              'flex w-fit flex-col gap-2 px-1 py-2 sm:px-1 sm:py-3',
+            )}
+          >
+            {shapeTools.map((Tool, index) => (
+              <Tool key={index} pencilParams={pencilParams} />
+            ))}
+          </PopoverContent>
+        </Popover>
 
         {selectedElement && (
           <>

@@ -184,6 +184,9 @@ export const BoardProvider = observer(
           case 'pencil':
             stage.container().style.cursor = `url(${cursorPencil}) 0 24, auto`;
             break;
+          case 'arrow':
+            stage.container().style.cursor = `url(${cursorPencil}) 0 24, auto`;
+            break;
           case 'text':
             stage.container().style.cursor = `url(${cursorText}) 12 12, auto`;
             break;
