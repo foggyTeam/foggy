@@ -49,7 +49,9 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
   const imagePlaceholderElement = useRef<SVGImageElement>(
     getPlaceholderImage(),
   );
-  const imageElementsMapRef = useRef<Map<string, SVGImageElement>>(new Map());
+  const imageElementsMapRef = useRef<
+    Map<string, SVGImageElement | HTMLImageElement>
+  >(new Map());
   const [_, setRerenderTrigger] = useState(false);
 
   const {
@@ -108,23 +110,33 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
   };
 
   function saveImageByUrl(element: ImageElement | TextElement) {
+    imageElementsMapRef.current.set(
+      element.id,
+      imagePlaceholderElement.current,
+    );
+
     switch (element.type) {
       case 'image': {
         if (!element.url) break;
 
-        const imageElement = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'image',
-        ) as SVGImageElement;
-        imageElement.setAttributeNS(
-          'http://www.w3.org/1999/xlink',
-          'href',
-          element.url,
-        );
-        imageElement.setAttribute('width', element.width.toString());
-        imageElement.setAttribute('height', element.height.toString());
+        const img = new window.Image();
+        img.crossOrigin = 'Anonymous';
 
-        imageElementsMapRef.current.set(element.id, imageElement);
+        img.onload = () => {
+          imageElementsMapRef.current.set(element.id, img);
+          setRerenderTrigger((v) => !v);
+        };
+
+        img.onerror = () => {
+          console.error(`Failed to load image: ${element.url}`);
+          imageElementsMapRef.current.set(
+            element.id,
+            imagePlaceholderElement.current,
+          );
+          setRerenderTrigger((v) => !v);
+        };
+
+        img.src = element.url;
         break;
       }
       case 'text': {
@@ -142,9 +154,13 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
         textImageElement.setAttribute('height', element.height.toString());
 
         imageElementsMapRef.current.set(element.id, textImageElement);
+
+        Promise.resolve().then(() => {
+          setRerenderTrigger((v) => !v);
+        });
+        break;
       }
     }
-    setRerenderTrigger((v) => !v);
   }
 
   return (
