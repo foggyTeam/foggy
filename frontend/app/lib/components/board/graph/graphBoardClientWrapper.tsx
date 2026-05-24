@@ -2,40 +2,44 @@
 
 import { ReactFlowProvider, useReactFlow } from '@xyflow/react';
 import GraphBoardObserver from '@/app/lib/components/board/graph/graphBoard';
-import {
-  GraphBoardProvider,
-  useGraphBoardContext,
-} from '@/app/lib/components/board/graph/graphBoardContext';
+import { GraphBoardProvider } from '@/app/lib/components/board/graph/graphBoardContext';
 import React from 'react';
 import GraphBoardCursors from '@/app/lib/components/board/graph/graphBoardCursors';
 import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
 import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
 import graphBoardStore from '@/app/stores/board/graphBoardStore';
+import getGraphNodesChain from '@/app/lib/utils/getGraphNodesChain';
 
 const AdditionsWrapper = () => {
-  const { getNodes, getNodesBounds, addNodes } = useReactFlow();
-  const { createNewElement } = useGraphBoardContext();
+  const { getNodes, getNodesBounds, addNodes, addEdges } = useReactFlow();
 
-  function addGraphNode(nodeParams: any) {
-    // TODO: if node text longer than 300, make a chain of blocks
-    let newElement = createNewElement(
-      { clientX: 0, clientY: 0 } as any,
-      'custom-node',
-    );
-    if (!newElement) return;
+  function addGraphNodes(generatedElement: {
+    text: string;
+    position: { x: number; y: number };
+  }) {
+    const { x, y } = getNodesBounds(getNodes());
+    const startPosition = { x: x - 324, y };
 
-    Object.assign(newElement, nodeParams);
-    const success = graphBoardStore.updateNodeData(
-      newElement.id,
-      newElement.data,
-      true,
+    const { nodes, edges } = getGraphNodesChain(
+      generatedElement.text,
+      startPosition,
     );
 
-    if (success) {
-      addNodes([newElement]);
-      const change = { type: 'add', item: newElement };
-      graphBoardStore.emitUpdates('nodesUpdate', [change]);
+    const updatesQueue: any[] = [];
+
+    for (const node of nodes) {
+      const success = graphBoardStore.updateNodeData(node.id, node.data, true);
+
+      if (success) updatesQueue.push({ type: 'add', item: node });
     }
+    addNodes(nodes);
+    addEdges(edges);
+
+    graphBoardStore.emitUpdates('nodesUpdate', updatesQueue);
+    graphBoardStore.emitUpdates(
+      'edgesUpdate',
+      edges.map((edge) => ({ type: 'add', item: edge })),
+    );
   }
 
   return (
@@ -51,7 +55,7 @@ const AdditionsWrapper = () => {
           type: 'GRAPH',
           data: { getNodes, getNodesBounds },
         }}
-        addElementAction={addGraphNode}
+        addElementAction={addGraphNodes}
       />
     </>
   );

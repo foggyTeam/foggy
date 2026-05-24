@@ -1,6 +1,6 @@
 import { PencilIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   handleDrawing,
   handleEndDrawing,
@@ -11,7 +11,6 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import useTool from '@/app/lib/hooks/simpleBoard/useTool';
-import debounce from 'lodash/debounce';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function PencilTool({
@@ -33,15 +32,18 @@ export default function PencilTool({
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
-  const mouseDownHandler = handleStartDrawing({
-    stageRef,
-    activeTool,
-    addElement,
-    setDrawing,
-    setNewElement,
-    pencilParams,
-  } as any);
-  const mouseMoveHandler = debounce(
+  const mouseDownHandler = useCallback(
+    handleStartDrawing({
+      stageRef,
+      activeTool,
+      addElement,
+      setDrawing,
+      setNewElement,
+      pencilParams,
+    } as any),
+    [activeTool, pencilParams],
+  );
+  const mouseMoveHandler = useCallback(
     handleDrawing({
       stageRef,
       drawing,
@@ -49,15 +51,18 @@ export default function PencilTool({
       newElement,
       updateElement,
     } as any),
-    4,
+    [drawing, newElement],
   );
-  const mouseUpHandler = handleEndDrawing({
-    drawing,
-    newElement,
-    setDrawing,
-    setNewElement,
-    updateElement,
-  } as any);
+  const mouseUpHandler = useCallback(
+    handleEndDrawing({
+      drawing,
+      newElement,
+      setDrawing,
+      setNewElement,
+      updateElement,
+    } as any),
+    [drawing, newElement],
+  );
 
   useTool({
     toolName: 'pencil',

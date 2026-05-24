@@ -8,7 +8,7 @@ import AdaptiveContainer from '@/app/lib/components/adaptiveContainer';
 export default async function TeamPage() {
   return (
     <AdaptiveContainer
-      desktopContainerClassName="flex h-full w-full flex-col items-center justify-center gap-8 p-4 px-24 py-8"
+      desktopContainerClassName="flex h-full w-full flex-col items-center justify-center gap-8 px-24 py-8"
       mobileTabs={[
         { key: 'team', titleKey: 'team' },
         { key: 'projects', titleKey: 'teamProjects' },

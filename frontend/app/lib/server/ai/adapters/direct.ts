@@ -327,7 +327,7 @@ export class DirectAdapter implements IAiAdapter {
             const response = await AddBoard(projectId, {
               sectionId: parentId as string,
               name: prepareProjectElementName(item.name),
-              type: item.type.toUpperCase() as BoardTypes,
+              type: item.type.toLowerCase() as Lowercase<BoardTypes>,
             });
             if ('errors' in response) throw new Error();
             itemId = response.data.id;

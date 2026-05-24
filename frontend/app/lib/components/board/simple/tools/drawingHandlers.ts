@@ -54,6 +54,7 @@ export interface TextEdit {
 const DEFAULT_FILL = primary.light['200'];
 const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
+const ERASER_RADIUS = 4;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -89,7 +90,8 @@ export const handleMouseDown =
     setDrawing,
     setNewElement,
   }: DrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -279,7 +281,8 @@ export const handleStartDrawing =
     setNewElement,
     pencilParams,
   }: FreeDrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (activeTool === 'pencil' && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -318,15 +321,15 @@ export const handleDrawing =
     updateElement,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
-      const updatedPoints = [
-        ...(e.evt.shiftKey ? newElement.points.slice(0, 2) : newElement.points),
-        x,
-        y,
-      ];
+      const updatedPoints = e.evt.shiftKey
+        ? newElement.points.slice(0, 2)
+        : newElement.points;
+      updatedPoints.push(x, y);
 
       setNewElement({ ...newElement, points: updatedPoints });
       updateElement(newElement.id, { points: updatedPoints });
@@ -341,7 +344,8 @@ export const handleEndDrawing =
     setNewElement,
     updateElement,
   }: FreeDrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (drawing && newElement) {
       const xPoints: number[] = [];
       const yPoints: number[] = [];
@@ -372,7 +376,8 @@ export const handleStartErasing =
     activeTool: string;
     setDrawing: (isDrawing: boolean) => void;
   }) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (activeTool === 'eraser' && stageRef.current) {
       setDrawing(true);
     }
@@ -389,8 +394,31 @@ export const handleErasing =
     removeElement: (id: string) => void;
   }) =>
   (e: any) => {
-    if (drawing && stageRef.current)
-      if (e.target && e.target.attrs.id) removeElement(e.target.attrs.id);
+    if (e.evt.buttons === 2) return;
+    if (drawing && stageRef.current) {
+      const stage = stageRef.current.getStage();
+      const pointer = stage.getPointerPosition();
+      if (!pointer) return;
+
+      const removed = new Set<string>();
+
+      for (let dx = -ERASER_RADIUS; dx <= ERASER_RADIUS; dx += 2) {
+        for (let dy = -ERASER_RADIUS; dy <= ERASER_RADIUS; dy += 2) {
+          if (dx * dx + dy * dy > ERASER_RADIUS * ERASER_RADIUS) continue;
+
+          const hit = stage.getIntersection({
+            x: pointer.x + dx,
+            y: pointer.y + dy,
+          });
+
+          const id = hit?.attrs?.id;
+          if (id && !removed.has(id)) {
+            removed.add(id);
+            removeElement(id);
+          }
+        }
+      }
+    }
   };
 
 export const handleEndErasing =
@@ -401,7 +429,8 @@ export const handleEndErasing =
     drawing: boolean;
     setDrawing: (isDrawing: boolean) => void;
   }) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (drawing) setDrawing(false);
   };
 

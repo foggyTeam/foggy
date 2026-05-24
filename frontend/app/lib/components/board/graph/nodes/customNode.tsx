@@ -141,7 +141,7 @@ const CustomNode = observer((node: GCustomNode) => {
           {data?.description && (
             <p
               className={clsx(
-                'line-clamp-6 h-fit w-full truncate text-xs whitespace-pre-wrap',
+                'h-fit w-full truncate text-xs whitespace-pre-wrap',
                 alignClass,
               )}
             >
