@@ -8,7 +8,7 @@ import AdaptiveContainer from '@/app/lib/components/adaptiveContainer';
 export default async function ProjectPage() {
   return (
     <AdaptiveContainer
-      desktopContainerClassName="flex h-full w-full items-end justify-center gap-8 py-8 pr-24 pl-8"
+      desktopContainerClassName="flex h-full w-full items-end justify-center gap-8 py-8 px-24"
       mobileTabs={[
         { key: 'structure', titleKey: 'project' },
         { key: 'allMembers', titleKey: 'participants' },
@@ -17,9 +17,9 @@ export default async function ProjectPage() {
       <div
         key="allMembers"
         className={clsx(
-          'flex h-full w-full flex-col items-center justify-center sm:max-h-[640px] sm:max-w-md',
+          'flex h-full w-full flex-col items-center justify-center sm:max-h-[75%] sm:max-w-md',
           bg_container_no_padding,
-          'px-4 pt-4 sm:rounded-br-[64px] sm:px-8 sm:pt-8',
+          'px-4 pt-4 sm:rounded-bl-[64px] sm:px-8 sm:pt-8',
         )}
       >
         <AllProjectMembers />
@@ -27,7 +27,7 @@ export default async function ProjectPage() {
       <div
         key="structure"
         className={clsx(
-          'flex h-full w-full flex-col items-center justify-center sm:max-w-4xl',
+          'flex h-full w-full flex-col items-center justify-center',
           bg_container_no_padding,
           'px-4 pt-4 sm:rounded-tr-[64px] sm:px-8 sm:pt-8',
         )}

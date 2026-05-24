@@ -15,7 +15,7 @@ export default function LogoBar() {
         bg_container,
       )}
     >
-      <Link href="/">
+      <Link href="/" className="px-1">
         <FoggySmall
           withGradient={isHovered}
           className={clsx(
