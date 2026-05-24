@@ -99,7 +99,23 @@ class MarkerElement extends BaseElement {
 
 export const MarkerElementSchema = SchemaFactory.createForClass(MarkerElement);
 
-export { RectElement, EllipseElement, TextElement, LineElement, MarkerElement };
+@Schema()
+class ImageElement extends BaseElement {
+  @Prop({ required: true })
+  cornerRadius: number;
+  @Prop({ required: false })
+  url: string;
+}
+export const ImageElementSchema = SchemaFactory.createForClass(ImageElement);
+
+export {
+  RectElement,
+  EllipseElement,
+  TextElement,
+  LineElement,
+  MarkerElement,
+  ImageElement,
+};
 
 export const BaseElementModel = model('BaseElement', BaseElementSchema);
 BaseElementModel.discriminator('rect', RectElementSchema);
@@ -107,3 +123,4 @@ BaseElementModel.discriminator('ellipse', EllipseElementSchema);
 BaseElementModel.discriminator('text', TextElementSchema);
 BaseElementModel.discriminator('line', LineElementSchema);
 BaseElementModel.discriminator('marker', MarkerElementSchema);
+BaseElementModel.discriminator('image', ImageElementSchema);
