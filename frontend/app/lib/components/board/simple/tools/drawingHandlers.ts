@@ -65,6 +65,7 @@ const DEFAULT_FILL = primary.light['200'];
 const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
 const ERASER_RADIUS = 4;
+const MIN_IMAGE_SIZE = 1024;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -463,10 +464,12 @@ export const handlePlaceImageUpload =
       setDrawing(false);
       setActiveTool('');
 
+      if (!newElement) return;
+
       setIsLoading(true);
       const url = await getImageUrl(inputClickEventRef.current);
 
-      if (url && newElement)
+      if (url)
         updateElement(newElement.id, {
           url,
           strokeWidth: 0,
@@ -506,7 +509,7 @@ const getElementId = (tool: string) => {
 
 const getImageUrl = async (event: any) => {
   try {
-    const imageBlob = await HandleImageUpload(event);
+    const imageBlob = await HandleImageUpload(event, MIN_IMAGE_SIZE);
     if (!imageBlob) return null;
 
     const response = await uploadImage(
