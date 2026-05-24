@@ -232,12 +232,7 @@ const AiAssistantModal = observer(
         case 'GRAPH':
           newElement = {
             position: { x: aiBlock.x, y: aiBlock.y },
-            data: {
-              description: aiBlock.content,
-              shape: 'rect',
-              align: 'start',
-              color: foggy_accent.light[100],
-            },
+            text: aiBlock.content,
           };
           break;
       }

@@ -1,6 +1,6 @@
 import { TypeIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import { handlePlaceText } from '@/app/lib/components/board/simple/tools/drawingHandlers';
 import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
@@ -31,21 +31,24 @@ export default function TextTool() {
   const [content, setContent] = useState('');
   const [textHeight, setTextHeight] = useState(0);
 
-  const placeTextHandler = handlePlaceText({
-    stageRef,
-    resetStage,
-    activeTool,
-    setActiveTool,
-    addElement,
-    clickPosition,
-    setClickPosition,
-    isEditing,
-    setIsEditing,
-    content,
-    setContent,
-    textHeight,
-    setTextHeight,
-  } as any);
+  const placeTextHandler = useCallback(
+    handlePlaceText({
+      stageRef,
+      resetStage,
+      activeTool,
+      setActiveTool,
+      addElement,
+      clickPosition,
+      setClickPosition,
+      isEditing,
+      setIsEditing,
+      content,
+      setContent,
+      textHeight,
+      setTextHeight,
+    } as any),
+    [activeTool, clickPosition, isEditing, content, textHeight],
+  );
 
   useTool({
     toolName: 'text',
