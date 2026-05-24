@@ -1,6 +1,6 @@
 import { SquareIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   handleMouseDown,
   handleMouseMove,
@@ -27,25 +27,34 @@ export default function RectTool() {
   const [drawing, setDrawing] = useState(false);
   const [newElement, setNewElement] = useState(null);
 
-  const mouseDownHandler = handleMouseDown({
-    stageRef,
-    activeTool,
-    addElement,
-    setDrawing,
-    setNewElement,
-  } as any);
-  const mouseMoveHandler = handleMouseMove({
-    stageRef,
-    drawing,
-    newElement,
-    updateElement,
-  } as any);
-  const mouseUpHandler = handleMouseUp({
-    drawing,
-    setDrawing,
-    setNewElement,
-    setActiveTool,
-  } as any);
+  const mouseDownHandler = useCallback(
+    handleMouseDown({
+      stageRef,
+      activeTool,
+      addElement,
+      setDrawing,
+      setNewElement,
+    } as any),
+    [activeTool],
+  );
+  const mouseMoveHandler = useCallback(
+    handleMouseMove({
+      stageRef,
+      drawing,
+      newElement,
+      updateElement,
+    } as any),
+    [drawing, newElement],
+  );
+  const mouseUpHandler = useCallback(
+    handleMouseUp({
+      drawing,
+      setDrawing,
+      setNewElement,
+      setActiveTool,
+    } as any),
+    [drawing],
+  );
 
   useTool({
     toolName: 'rect',

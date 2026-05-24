@@ -89,7 +89,8 @@ export const handleMouseDown =
     setDrawing,
     setNewElement,
   }: DrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (activeTool && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -279,7 +280,8 @@ export const handleStartDrawing =
     setNewElement,
     pencilParams,
   }: FreeDrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (activeTool === 'pencil' && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
@@ -318,15 +320,15 @@ export const handleDrawing =
     updateElement,
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
-      const updatedPoints = [
-        ...(e.evt.shiftKey ? newElement.points.slice(0, 2) : newElement.points),
-        x,
-        y,
-      ];
+      const updatedPoints = e.evt.shiftKey
+        ? newElement.points.slice(0, 2)
+        : newElement.points;
+      updatedPoints.push(x, y);
 
       setNewElement({ ...newElement, points: updatedPoints });
       updateElement(newElement.id, { points: updatedPoints });
@@ -341,7 +343,8 @@ export const handleEndDrawing =
     setNewElement,
     updateElement,
   }: FreeDrawingHandlersProps) =>
-  () => {
+  (e: any) => {
+    if (e.evt.buttons === 2) return;
     if (drawing && newElement) {
       const xPoints: number[] = [];
       const yPoints: number[] = [];

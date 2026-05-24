@@ -1,6 +1,6 @@
 import { EraserIcon } from 'lucide-react';
 import { Button } from '@heroui/button';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
   handleEndErasing,
   handleErasing,
@@ -10,7 +10,6 @@ import settingsStore from '@/app/stores/settingsStore';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import useTool from '@/app/lib/hooks/simpleBoard/useTool';
-import debounce from 'lodash/debounce';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 
 export default function EraserTool() {
@@ -25,12 +24,15 @@ export default function EraserTool() {
   } = useBoardContext();
   const [drawing, setDrawing] = useState(false);
 
-  const mouseDownHandler = handleStartErasing({
-    stageRef,
-    activeTool,
-    setDrawing,
-  } as any);
-  const mouseMoveHandler = debounce(
+  const mouseDownHandler = useCallback(
+    handleStartErasing({
+      stageRef,
+      activeTool,
+      setDrawing,
+    } as any),
+    [activeTool],
+  );
+  const mouseMoveHandler = useCallback(
     handleErasing({
       stageRef,
       activeTool,
@@ -38,12 +40,15 @@ export default function EraserTool() {
       setDrawing,
       removeElement,
     } as any),
-    4,
+    [activeTool, drawing],
   );
-  const mouseUpHandler = handleEndErasing({
-    drawing,
-    setDrawing,
-  } as any);
+  const mouseUpHandler = useCallback(
+    handleEndErasing({
+      drawing,
+      setDrawing,
+    } as any),
+    [drawing],
+  );
 
   useTool({
     toolName: 'eraser',
