@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import { bg_container_no_padding } from '@/app/lib/types/styles';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RectTool from '@/app/lib/components/board/simple/tools/baseTools/rectTool';
 import EllipseTool from '@/app/lib/components/board/simple/tools/baseTools/ellipseTool';
 import ElementToolBar from '@/app/lib/components/board/simple/menu/elementToolBar';
@@ -16,6 +16,16 @@ import { foggy_accent } from '@/tailwind.config';
 import EraserTool from '@/app/lib/components/board/simple/tools/baseTools/eraserTool';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { useTheme } from 'next-themes';
+import ImageTool from '@/app/lib/components/board/simple/tools/baseTools/imageTool';
+import HeartTool from '@/app/lib/components/board/simple/tools/baseTools/heartTool';
+import TriangleTool from '@/app/lib/components/board/simple/tools/baseTools/triangleTool';
+import StarTool from '@/app/lib/components/board/simple/tools/baseTools/starTool';
+import ArrowTool from '@/app/lib/components/board/simple/tools/baseTools/arrowTool';
+import { Button } from '@heroui/button';
+import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
+import settingsStore from '@/app/stores/settingsStore';
+import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import { ShapesIcon } from 'lucide-react';
 
 export type ToolProps = {
   isDisabled: boolean;
@@ -30,6 +40,7 @@ export type ToolProps = {
 
 export default function ToolBar() {
   const { resolvedTheme } = useTheme();
+  const { commonSize } = useAdaptiveParams();
 
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
@@ -42,10 +53,23 @@ export default function ToolBar() {
   };
 
   const { selectedElement, activeTool } = useBoardContext();
-  const tools = [TextTool, PencilTool, EraserTool, RectTool, EllipseTool];
+  const tools: any[] = [TextTool, PencilTool, EraserTool, ImageTool, ArrowTool];
+  const shapeTools: any[] = [
+    RectTool,
+    EllipseTool,
+    TriangleTool,
+    StarTool,
+    HeartTool,
+  ];
 
+  const [shapesToolOpen, setShapesToolOpen] = useState(false);
   const [pencilParams, setPencilParams] =
     useState<PencilParams>(DEFAULT_PENCIL);
+
+  useEffect(() => {
+    if (activeTool === 'pencil' || activeTool === 'arrow' || !!selectedElement)
+      setShapesToolOpen(false);
+  }, [activeTool, selectedElement]);
 
   return (
     <div
@@ -62,17 +86,43 @@ export default function ToolBar() {
         <ElementToolBar />
       )}
       {(activeTool === 'pencil' ||
+        activeTool === 'arrow' ||
         (selectedElement && selectedElement?.attrs.type === 'line')) && (
         <PencilToolBar
           pencilParams={pencilParams}
           setPencilParams={setPencilParams}
         />
       )}
-      {(selectedElement || activeTool === 'pencil') && <Divider />}
+
+      {shapesToolOpen && (
+        <div className="flex justify-center gap-1">
+          {shapeTools.map((Tool, index) => (
+            <Tool key={index} pencilParams={pencilParams} />
+          ))}
+        </div>
+      )}
+
+      {(selectedElement ||
+        activeTool === 'pencil' ||
+        activeTool === 'arrow' ||
+        shapesToolOpen) && <Divider />}
       <div className="flex justify-center gap-1">
         {tools.map((Tool, index) => (
           <Tool key={index} pencilParams={pencilParams} />
         ))}
+
+        <Button
+          data-testid="shape-tools-btn"
+          variant="light"
+          color="default"
+          isIconOnly
+          onPress={() => setShapesToolOpen((v) => !v)}
+          size={commonSize}
+        >
+          <FTooltip content={settingsStore.t.toolTips.tools.shapeTools}>
+            <ShapesIcon className="stroke-default-600" />
+          </FTooltip>
+        </Button>
 
         {selectedElement && (
           <>
