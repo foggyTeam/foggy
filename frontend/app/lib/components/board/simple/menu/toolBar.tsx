@@ -53,8 +53,14 @@ export default function ToolBar() {
   };
 
   const { selectedElement, activeTool } = useBoardContext();
-  const tools = [TextTool, PencilTool, EraserTool, ImageTool, ArrowTool];
-  const shapeTools = [RectTool, EllipseTool, TriangleTool, StarTool, HeartTool];
+  const tools: any[] = [TextTool, PencilTool, EraserTool, ImageTool, ArrowTool];
+  const shapeTools: any[] = [
+    RectTool,
+    EllipseTool,
+    TriangleTool,
+    StarTool,
+    HeartTool,
+  ];
 
   const [shapesToolOpen, setShapesToolOpen] = useState(false);
   const [pencilParams, setPencilParams] =
