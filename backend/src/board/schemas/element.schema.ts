@@ -50,12 +50,42 @@ class RectElement extends BaseElement {
 export const RectElementSchema = SchemaFactory.createForClass(RectElement);
 
 @Schema()
+class TriangleElement extends BaseElement {
+  @Prop({ required: true })
+  points: number[];
+}
+
+export const TriangleElementSchema =
+  SchemaFactory.createForClass(TriangleElement);
+
+@Schema()
 class EllipseElement extends BaseElement {
   //BaseElement
 }
 
 export const EllipseElementSchema =
   SchemaFactory.createForClass(EllipseElement);
+
+@Schema()
+class HeartElement extends BaseElement {
+  //BaseElement
+}
+
+export const HeartElementSchema = SchemaFactory.createForClass(HeartElement);
+
+@Schema()
+class StarElement extends BaseElement {
+  @Prop({ required: true })
+  numPoints: number;
+
+  @Prop({ required: true })
+  innerRadius: number;
+
+  @Prop({ required: true })
+  outerRadius: number;
+}
+
+export const StarElementSchema = SchemaFactory.createForClass(StarElement);
 
 @Schema()
 class TextElement extends BaseElement {
@@ -89,6 +119,29 @@ class LineElement extends BaseElement {
 export const LineElementSchema = SchemaFactory.createForClass(LineElement);
 
 @Schema()
+class ArrowElement extends BaseElement {
+  @Prop({ required: true })
+  points: number[];
+
+  @Prop({ required: true })
+  tension: number;
+
+  @Prop({ required: true, enum: ['miter', 'round', 'bevel'] })
+  lineJoin: 'miter' | 'round' | 'bevel';
+
+  @Prop({ required: true, enum: ['butt', 'round', 'square'] })
+  lineCap: 'butt' | 'round' | 'square';
+
+  @Prop({ required: true })
+  pointerAtBeginning: boolean;
+
+  @Prop({ required: true })
+  pointerAtEnding: boolean;
+}
+
+export const ArrowElementSchema = SchemaFactory.createForClass(ArrowElement);
+
+@Schema()
 class MarkerElement extends BaseElement {
   @Prop({ required: true })
   points: number[];
@@ -99,11 +152,36 @@ class MarkerElement extends BaseElement {
 
 export const MarkerElementSchema = SchemaFactory.createForClass(MarkerElement);
 
-export { RectElement, EllipseElement, TextElement, LineElement, MarkerElement };
+@Schema()
+class ImageElement extends BaseElement {
+  @Prop({ required: true })
+  cornerRadius: number;
+  @Prop({ required: false })
+  url: string;
+}
+export const ImageElementSchema = SchemaFactory.createForClass(ImageElement);
+
+export {
+  RectElement,
+  EllipseElement,
+  TriangleElement,
+  StarElement,
+  HeartElement,
+  TextElement,
+  LineElement,
+  ArrowElement,
+  MarkerElement,
+  ImageElement,
+};
 
 export const BaseElementModel = model('BaseElement', BaseElementSchema);
 BaseElementModel.discriminator('rect', RectElementSchema);
 BaseElementModel.discriminator('ellipse', EllipseElementSchema);
+BaseElementModel.discriminator('triangle', TriangleElementSchema);
+BaseElementModel.discriminator('heart', HeartElementSchema);
+BaseElementModel.discriminator('star', StarElementSchema);
 BaseElementModel.discriminator('text', TextElementSchema);
 BaseElementModel.discriminator('line', LineElementSchema);
+BaseElementModel.discriminator('arrow', ArrowElementSchema);
 BaseElementModel.discriminator('marker', MarkerElementSchema);
+BaseElementModel.discriminator('image', ImageElementSchema);

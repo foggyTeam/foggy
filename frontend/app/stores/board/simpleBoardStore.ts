@@ -12,6 +12,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
+import { deleteImage } from '@/app/lib/server/actions/handleImage';
 
 const SimpleBoardEvents = [
   'elementAdded',
@@ -316,11 +317,15 @@ class SimpleBoardStore {
   removeElement = (id: string, external?: boolean) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
+      const element = this.boardLayers[layer][index];
+      const url = 'url' in element ? element.url : null;
+
       this.boardLayers[layer].splice(index, 1);
       this.positionsMap.delete(id);
       this.reindexLayer(layer, index);
 
       if (!external) this.emitSocketEvent('removeElement', id);
+      if (url && !external) deleteImage(url);
     }
   };
 

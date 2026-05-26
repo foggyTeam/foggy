@@ -1,15 +1,59 @@
 'use client';
 
-import { Ellipse, Image, Layer, Line, Rect } from 'react-konva';
-import { SBoardElement, TextElement } from '@/app/lib/types/definitions';
+import {
+  Ellipse,
+  Image,
+  Layer,
+  Line,
+  Arrow,
+  Rect,
+  Star,
+  Path,
+} from 'react-konva';
+import {
+  ImageElement,
+  SBoardElement,
+  TextElement,
+} from '@/app/lib/types/definitions';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { useBoardContext } from '@/app/lib/components/board/simple/boardContext';
 import { observer } from 'mobx-react-lite';
+import { useRef, useState } from 'react';
 
 const MIN_WIDTH = 4;
 const MIN_HEIGHT = 4;
+const IMAGE_PLACEHOLDER_URL = '/images/undraw_playful-cat_3ta5.png';
+
+const HEART_SVG_PATTERN = `M 50 30
+  C 50 20, 35 10, 20 20
+  C 5 30, 5 50, 20 65
+  L 50 95
+  L 80 65
+  C 95 50, 95 30, 80 20
+  C 65 10, 50 20, 50 30 Z`;
+
+function getPlaceholderImage() {
+  const imageElement = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'image',
+  ) as SVGImageElement;
+  imageElement.setAttributeNS(
+    'http://www.w3.org/1999/xlink',
+    'href',
+    IMAGE_PLACEHOLDER_URL,
+  );
+  return imageElement;
+}
 
 const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
+  const imagePlaceholderElement = useRef<SVGImageElement>(
+    getPlaceholderImage(),
+  );
+  const imageElementsMapRef = useRef<
+    Map<string, SVGImageElement | HTMLImageElement>
+  >(new Map());
+  const [_, setRerenderTrigger] = useState(false);
+
   const {
     updateElement,
     handleSelect,
@@ -65,10 +109,90 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
     });
   };
 
+  function saveImageByUrl(element: ImageElement | TextElement) {
+    imageElementsMapRef.current.set(
+      element.id,
+      imagePlaceholderElement.current,
+    );
+
+    switch (element.type) {
+      case 'image': {
+        if (!element.url) break;
+
+        const img = new window.Image();
+        img.crossOrigin = 'Anonymous';
+
+        img.onload = () => {
+          imageElementsMapRef.current.set(element.id, img);
+          setRerenderTrigger((v) => !v);
+        };
+
+        img.onerror = () => {
+          console.error(`Failed to load image: ${element.url}`);
+          imageElementsMapRef.current.set(
+            element.id,
+            imagePlaceholderElement.current,
+          );
+          setRerenderTrigger((v) => !v);
+        };
+
+        img.src = element.url;
+        break;
+      }
+      case 'text': {
+        const textImageElement = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'image',
+        ) as SVGImageElement;
+        textImageElement.setAttributeNS(
+          'http://www.w3.org/1999/xlink',
+          'href',
+          element.svg,
+        );
+
+        textImageElement.setAttribute('width', element.width.toString());
+        textImageElement.setAttribute('height', element.height.toString());
+
+        imageElementsMapRef.current.set(element.id, textImageElement);
+
+        Promise.resolve().then(() => {
+          setRerenderTrigger((v) => !v);
+        });
+        break;
+      }
+    }
+  }
+
   return (
     <Layer>
       {layer.map((element) => {
         switch (element.type) {
+          case 'image': {
+            if (!imagePlaceholderElement.current) return null;
+            if (!imageElementsMapRef.current.has(element.id) && element.url)
+              saveImageByUrl(element);
+            return (
+              <Image
+                onTap={handleSelect}
+                key={element.id}
+                image={
+                  imageElementsMapRef.current.get(element.id) ||
+                  imagePlaceholderElement.current
+                }
+                {...element}
+                onClick={handleSelect}
+                onDragEnd={(e) =>
+                  updateElement(element.id, {
+                    x: e.target.x(),
+                    y: e.target.y(),
+                  })
+                }
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                alt={element.url}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
+          }
           case 'rect':
             return (
               <Rect
@@ -122,25 +246,18 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );
-          case 'text':
-            const imageElement = document.createElementNS(
-              'http://www.w3.org/2000/svg',
-              'image',
-            ) as SVGImageElement;
-            imageElement.setAttributeNS(
-              'http://www.w3.org/1999/xlink',
-              'href',
-              element.svg,
-            );
-
-            imageElement.setAttribute('width', element.width.toString());
-            imageElement.setAttribute('height', element.height.toString());
-
+          case 'text': {
+            if (!imagePlaceholderElement.current) return null;
+            if (!imageElementsMapRef.current.has(element.id) && element.svg)
+              saveImageByUrl(element);
             return (
               <Image
                 onTap={handleSelect}
                 key={element.id}
-                image={imageElement}
+                image={
+                  imageElementsMapRef.current.get(element.id) ||
+                  imagePlaceholderElement.current
+                }
                 {...element}
                 onClick={handleSelect}
                 onDblClick={handleTextEdit}
@@ -156,6 +273,82 @@ const BoardLayer = observer(({ layer }: { layer: SBoardElement[] }) => {
                 }
                 onTransformEnd={(e) => holdTransformEnd(e, element)}
                 alt={element.content}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
+          }
+          case 'star':
+            return (
+              <Star
+                key={element.id}
+                {...element}
+                onClick={handleSelect}
+                onDragEnd={(e) =>
+                  updateElement(element.id, {
+                    x: e.target.x(),
+                    y: e.target.y(),
+                  })
+                }
+                onTap={handleSelect}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+              />
+            );
+          case 'triangle':
+            return (
+              <Line
+                key={element.id}
+                {...element}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+                closed
+              />
+            );
+          case 'heart':
+            const { width, height, ...rest } = element;
+            return (
+              <Path
+                key={element.id}
+                {...rest}
+                scaleX={width / 100}
+                scaleY={height / 100}
+                data={HEART_SVG_PATTERN}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
+                draggable={transformAvailable && !allToolsDisabled}
+                closed
+              />
+            );
+          case 'arrow':
+            return (
+              <Arrow
+                key={element.id}
+                {...element}
+                fill={element.stroke}
+                onTap={handleSelect}
+                onClick={handleSelect}
+                onDragEnd={(e: any) => {
+                  updateElement(element.id, {
+                    x: e.target.attrs.x,
+                    y: e.target.attrs.y,
+                  });
+                }}
+                onTransformEnd={(e) => holdTransformEnd(e, element)}
                 draggable={transformAvailable && !allToolsDisabled}
               />
             );

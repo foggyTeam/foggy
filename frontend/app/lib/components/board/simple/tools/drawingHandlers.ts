@@ -1,12 +1,17 @@
 import {
-  SBoardElement,
   LineElement,
+  SBoardElement,
   TextElement,
 } from '@/app/lib/types/definitions';
 import { primary } from '@/tailwind.config';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
 import Konva from 'konva';
+import { RefObject } from 'react';
+import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
+import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { addToast } from '@heroui/toast';
+import settingsStore from '@/app/stores/settingsStore';
 
 interface DrawingHandlersProps {
   stageRef: any;
@@ -22,7 +27,7 @@ interface DrawingHandlersProps {
 
 interface FreeDrawingHandlersProps {
   stageRef: any;
-  activeTool: 'pencil' | 'eraser';
+  activeTool: 'pencil' | 'eraser' | 'arrow';
   setActiveTool: (tool: string) => void;
   addElement: (element: LineElement) => void;
   updateElement: (id: string, newAttrs: Partial<LineElement>) => void;
@@ -31,6 +36,11 @@ interface FreeDrawingHandlersProps {
   setNewElement: (element: LineElement | null) => void;
   newElement: LineElement | null;
   pencilParams: PencilParams;
+}
+
+interface ImageHandlersProps extends DrawingHandlersProps {
+  inputClickEventRef: RefObject<any | null>;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 export interface PencilParams {
@@ -54,7 +64,9 @@ export interface TextEdit {
 const DEFAULT_FILL = primary.light['200'];
 const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
+const DEFAULT_STAR_POINTS = 5;
 const ERASER_RADIUS = 4;
+const MIN_IMAGE_SIZE = 640;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -112,6 +124,20 @@ export const handleMouseDown =
         height: 16,
       } as SBoardElement;
 
+      if (activeTool === 'image')
+        Object.assign(element, {
+          url: null,
+        });
+
+      if (activeTool === 'star')
+        Object.assign(element, {
+          numPoints: DEFAULT_STAR_POINTS,
+          innerRadius: 3.2,
+          outerRadius: 8,
+        });
+      if (activeTool === 'triangle')
+        Object.assign(element, { points: [8, 0, 16, 16, 0, 16] });
+
       setNewElement(element);
       addElement(element);
       setDrawing(true);
@@ -133,6 +159,16 @@ export const handleMouseMove =
         width: Math.abs(width),
         height: Math.abs(height),
       } as SBoardElement;
+
+      if (newElement.type === 'star')
+        Object.assign(updatedElement, {
+          innerRadius: (Math.min(width, height) / 2) * 0.4,
+          outerRadius: Math.min(width, height) / 2,
+        });
+      if (newElement.type === 'triangle')
+        Object.assign(updatedElement, {
+          points: [width / 2, 0, width, height, 0, height],
+        });
 
       updateElement(newElement.id, updatedElement);
     }
@@ -283,7 +319,10 @@ export const handleStartDrawing =
   }: FreeDrawingHandlersProps) =>
   (e: any) => {
     if (e.evt.buttons === 2) return;
-    if (activeTool === 'pencil' && stageRef.current) {
+    if (
+      (activeTool === 'pencil' || activeTool === 'arrow') &&
+      stageRef.current
+    ) {
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
@@ -305,6 +344,13 @@ export const handleStartDrawing =
         lineJoin: pencilParams.lineJoin,
         tension: pencilParams.tension,
       } as LineElement;
+
+      if (activeTool === 'arrow')
+        Object.assign(element, {
+          type: 'arrow',
+          pointerAtBeginning: false,
+          pointerAtEnding: true,
+        });
 
       setNewElement(element);
       addElement(element);
@@ -434,6 +480,42 @@ export const handleEndErasing =
     if (drawing) setDrawing(false);
   };
 
+export const handlePlaceImageUpload =
+  ({
+    newElement,
+    inputClickEventRef,
+    updateElement,
+    setDrawing,
+    setNewElement,
+    setActiveTool,
+    setIsLoading,
+    drawing,
+  }: ImageHandlersProps) =>
+  async (e: any) => {
+    if (e.evt.buttons === 2) return;
+    if (!inputClickEventRef?.current) return;
+
+    if (drawing) {
+      setDrawing(false);
+      setActiveTool('');
+
+      if (!newElement) return;
+
+      setIsLoading(true);
+      const url = await getImageUrl(inputClickEventRef.current);
+
+      if (url)
+        updateElement(newElement.id, {
+          url,
+          strokeWidth: 0,
+          fill: `${DEFAULT_FILL}00`,
+        });
+      setIsLoading(false);
+
+      setNewElement(null);
+    }
+  };
+
 const isTransparent = (color: string) => {
   if (!color) return true;
   return (
@@ -446,6 +528,7 @@ export const isElementVisible = (
   strokeColor: string,
   strokeWidth: number,
 ) => {
+  if (elementType === 'image') return true;
   if (strokeWidth == 0 && isTransparent(fillColor)) return false;
   return !(
     (!strokeColor || isTransparent(strokeColor)) &&
@@ -457,4 +540,28 @@ const getElementId = (tool: string) => {
   if (!userStore.user?.id) return '';
   const userId = userStore.user.id;
   return `${tool}_${Date.now()}_${userId.slice(userId.length - 5, userId.length - 1)}`;
+};
+
+const getImageUrl = async (event: any) => {
+  try {
+    const imageBlob = await HandleImageUpload(event, MIN_IMAGE_SIZE);
+    if (!imageBlob) return null;
+
+    const response = await uploadImage(
+      'board_images',
+      imageBlob,
+      'board_simple_',
+      { type: 'random' },
+    );
+
+    if ('url' in response) return response.url as string;
+    throw new Error();
+  } catch (e: any) {
+    addToast({
+      color: 'danger',
+      severity: 'danger',
+      title: settingsStore.t.toasts.globalError,
+    });
+  }
+  return null;
 };
