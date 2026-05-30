@@ -514,17 +514,19 @@ export const handlePlaceImageUpload =
       if (!newElement) return;
 
       setIsLoading(true);
-      const url = await getImageUrl(inputClickEventRef.current);
+      try {
+        const url = await getImageUrl(inputClickEventRef.current);
 
-      if (url)
-        updateElement(newElement.id, {
-          url,
-          strokeWidth: 0,
-          fill: `${DEFAULT_FILL}00`,
-        });
-      setIsLoading(false);
-
-      setNewElement(null);
+        if (url)
+          updateElement(newElement.id, {
+            url,
+            strokeWidth: 0,
+            fill: `${DEFAULT_FILL}00`,
+          });
+      } finally {
+        setIsLoading(false);
+        setNewElement(null);
+      }
     }
   };
 
@@ -555,8 +557,14 @@ const getElementId = (tool: string) => {
 };
 
 const getImageUrl = async (event: any) => {
-  const url = await HandleBoardImageElementUpload(event.target.files[0]);
-  if (url) return url;
+  try {
+    const url = await HandleBoardImageElementUpload(event.target.files[0]);
+    if (!url) throw new Error('unknown error.');
+
+    if (url) return url;
+  } catch (e: any) {
+    console.error(`Failed to upload image: ${e.message}`);
+  }
 
   addToast({
     color: 'danger',
