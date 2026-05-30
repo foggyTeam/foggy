@@ -127,6 +127,7 @@ const ProjectSettingsModal = observer(
               title: settingsStore.t.toasts.project.deleteProjectSuccess,
             });
             router.push('/');
+            projectsStore.revalidateProjects();
           });
       } else {
         addToast({

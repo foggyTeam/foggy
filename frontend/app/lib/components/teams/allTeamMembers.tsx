@@ -16,6 +16,7 @@ import {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
+import userStore from '@/app/stores/userStore';
 
 const AllTeamMembers = observer(() => {
   const router = useRouter();
@@ -37,8 +38,11 @@ const AllTeamMembers = observer(() => {
       const response = await DeleteTeamMember(teamsStore.activeTeam.id, id);
       if (response.errors) throw new Error(JSON.stringify(response.errors));
 
-      teamsStore.removeTeamMember(id);
-      if (newOwnerId) router.push('/');
+      if (id === userStore.user?.id) {
+        router.push('/');
+        teamsStore.setActiveTeam(null);
+        teamsStore.revalidateTeams();
+      } else teamsStore.removeTeamMember(id);
     } catch (e: any) {
       addToast({
         color: 'danger',
