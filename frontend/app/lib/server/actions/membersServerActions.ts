@@ -106,7 +106,7 @@ export async function DeleteProjectMember(
   userId: string,
   newOwnerId?: string | null,
 ) {
-  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  const query = newOwnerId ? `?newOwner=${newOwnerId}` : '';
   return await deleteRequest(`projects/${projectId}/users/${userId}${query}`, {
     headers: { 'x-user-id': await getUserId() },
   });
@@ -135,7 +135,7 @@ export async function UpdateTeamMemberRole(
   data: { userId: string; role: Role },
   newOwnerId?: string,
 ) {
-  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  const query = newOwnerId ? `?newOwner=${newOwnerId}` : '';
   return await patchRequest(`teams/${teamId}/members/role${query}`, data, {
     headers: { 'x-user-id': await getUserId() },
   });
@@ -146,7 +146,7 @@ export async function DeleteTeamMember(
   userId: string,
   newOwnerId?: string | null,
 ) {
-  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  const query = newOwnerId ? `?newOwner=${newOwnerId}` : '';
   return await deleteRequest(`teams/${teamId}/members/${userId}${query}`, {
     headers: { 'x-user-id': await getUserId() },
   });
