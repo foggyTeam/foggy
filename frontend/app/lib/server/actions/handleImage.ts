@@ -31,3 +31,7 @@ export async function uploadImage(
 export async function deleteImage(fileURL: string) {
   return await deleteFileByURL(fileURL);
 }
+
+export async function deleteImages(fileURLs: string[]) {
+  return await Promise.all(fileURLs.map((fileURL) => deleteFileByURL(fileURL)));
+}

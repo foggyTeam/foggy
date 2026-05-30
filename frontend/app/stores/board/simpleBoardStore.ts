@@ -12,7 +12,11 @@ import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
-import { deleteImage } from '@/app/lib/server/actions/handleImage';
+import {
+  deleteImage,
+  deleteImages,
+} from '@/app/lib/server/actions/handleImage';
+import BoardEventList from '@/app/lib/utils/boardEventList';
 
 const SimpleBoardEvents = [
   'elementAdded',
@@ -21,9 +25,55 @@ const SimpleBoardEvents = [
   'changeElementLayer',
 ];
 
+interface AddElementEvent {
+  type: 'elementAdded';
+  element: SBoardElement;
+}
+interface UpdateElementEvent {
+  type: 'elementUpdated';
+  id: string;
+  oldAttrs: Partial<SBoardElement>;
+  newAttrs: Partial<SBoardElement>;
+}
+interface RemoveElementEvent {
+  type: 'elementRemoved';
+  element: SBoardElement;
+  prevPosition: { layer: number; index: number };
+}
+interface ChangeElementLayerEvent {
+  type: 'changeElementLayer';
+  id: string;
+  prevPosition: { layer: number; index: number };
+  newPosition: { layer: number; index: number };
+}
+type SimpleBoardEvent =
+  | AddElementEvent
+  | UpdateElementEvent
+  | RemoveElementEvent
+  | ChangeElementLayerEvent;
+
 let socketRef: Socket | null = null;
 
+export function pickExisting<T>(source: T, template: Partial<T>): Partial<T> {
+  const result: any = {};
+  for (const key in template) {
+    result[key] = source[key];
+  }
+  return result;
+}
+
 class SimpleBoardStore {
+  afterEventRemoveAction = (event: SimpleBoardEvent): void => {
+    if (event.type === 'elementRemoved') {
+      const { element } = event;
+      if ('url' in element && element.url) deleteImage(element.url);
+    }
+  };
+  history: BoardEventList<SimpleBoardEvent> = new BoardEventList(
+    128,
+    this.afterEventRemoveAction,
+  );
+
   boardLayers: IObservableArray<SBoardElement>[] | undefined;
   positionsMap = observable.map<string, { layer: number; index: number }>();
 
@@ -54,6 +104,8 @@ class SimpleBoardStore {
         }
       },
     );
+
+    window?.addEventListener('beforeunload', this.onDestroy);
   }
 
   // WEBSOCKET
@@ -98,6 +150,7 @@ class SimpleBoardStore {
 
   // GENERAL
   setBoardLayers(layers: SBoardElement[][] | undefined) {
+    this.onDestroy();
     if (!layers) {
       this.boardLayers = undefined;
       this.positionsMap.clear();
@@ -167,6 +220,7 @@ class SimpleBoardStore {
         layer: lastLayer,
         index: lastIndex,
       });
+      this.history.push({ type: 'elementAdded', element: newElement });
       if (!external) this.emitSocketEvent('addElement', newElement);
     }
   };
@@ -174,10 +228,21 @@ class SimpleBoardStore {
     id: string,
     newAttrs: Partial<SBoardElement>,
     external?: boolean,
+    skipHistory?: boolean,
   ) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
+
+      if (!skipHistory) {
+        this.history.push({
+          type: 'elementUpdated',
+          id,
+          oldAttrs: pickExisting(element, newAttrs),
+          newAttrs,
+        });
+      }
+
       if (element.type === 'text') {
         Object.assign(
           this.boardLayers[layer][index],
@@ -270,6 +335,12 @@ class SimpleBoardStore {
     this.boardLayers[targetLayer].splice(targetIndex, 0, element);
     this.reindexLayer(targetLayer, targetIndex);
 
+    this.history.push({
+      type: 'changeElementLayer',
+      id,
+      prevPosition: { layer, index },
+      newPosition: { layer: targetLayer, index: targetIndex },
+    });
     this.emitSocketEvent('changeElementLayer', {
       id: id,
       prevPosition: { layer, index },
@@ -324,8 +395,12 @@ class SimpleBoardStore {
       this.positionsMap.delete(id);
       this.reindexLayer(layer, index);
 
+      this.history.push({
+        type: 'elementRemoved',
+        prevPosition: { layer, index },
+        element,
+      });
       if (!external) this.emitSocketEvent('removeElement', id);
-      if (url && !external) deleteImage(url);
     }
   };
 
@@ -352,6 +427,20 @@ class SimpleBoardStore {
       },
       min: { layer: firstNonEmptyLayer, index: 0 },
     };
+  };
+
+  onDestroy = () => {
+    const { list, pointer } = this.history.eventsList;
+    const urlsToRemove: string[] = [];
+    for (let i = 0; i <= pointer; i++) {
+      const event = list[i];
+      if (event.type === 'elementRemoved') {
+        const { element } = event;
+        if ('url' in element && element.url) urlsToRemove.push(element.url);
+      }
+    }
+    this.history.clearList();
+    if (urlsToRemove.length) deleteImages(urlsToRemove);
   };
 }
 
