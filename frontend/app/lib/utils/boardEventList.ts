@@ -15,13 +15,6 @@ class LinkedListNode<T> {
     this.nextId = nextId;
     this.value = value;
   }
-
-  changeNext(newId: string) {
-    this.nextId = newId;
-  }
-  changePrev(newId: string) {
-    this.prevId = newId;
-  }
 }
 
 export default class BoardEventList<T> {

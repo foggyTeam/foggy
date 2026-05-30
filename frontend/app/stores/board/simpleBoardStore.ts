@@ -17,6 +17,7 @@ import {
   deleteImages,
 } from '@/app/lib/server/actions/handleImage';
 import BoardEventList from '@/app/lib/utils/boardEventList';
+import throttle from 'lodash/throttle';
 
 const SimpleBoardEvents = [
   'elementAdded',
@@ -46,7 +47,7 @@ interface ChangeElementLayerEvent {
   prevPosition: { layer: number; index: number };
   newPosition: { layer: number; index: number };
 }
-type SimpleBoardEvent =
+export type SimpleBoardEvent =
   | AddElementEvent
   | UpdateElementEvent
   | RemoveElementEvent
@@ -54,12 +55,17 @@ type SimpleBoardEvent =
 
 let socketRef: Socket | null = null;
 
-export function pickExisting<T>(source: T, template: Partial<T>): Partial<T> {
+export function pickExisting<T>(
+  source: T,
+  template: Partial<T>,
+): { result: Partial<T>; equal: boolean } {
   const result: any = {};
+  let equal = true;
   for (const key in template) {
+    if (source[key] != template[key]) equal = false;
     result[key] = source[key];
   }
-  return result;
+  return { result, equal };
 }
 
 class SimpleBoardStore {
@@ -210,7 +216,11 @@ class SimpleBoardStore {
   }
 
   // CRUD
-  addElement = (newElement: SBoardElement, external?: boolean) => {
+  addElement = (
+    newElement: SBoardElement,
+    external?: boolean,
+    isHistory?: boolean,
+  ) => {
     if (this.boardLayers) {
       const lastLayer = this.boardLayers.length - 1;
       const lastIndex = this.boardLayers[lastLayer].length;
@@ -220,27 +230,33 @@ class SimpleBoardStore {
         layer: lastLayer,
         index: lastIndex,
       });
-      this.history.push({ type: 'elementAdded', element: newElement });
-      if (!external) this.emitSocketEvent('addElement', newElement);
+
+      if (!external) {
+        if (!isHistory)
+          this.history.push({ type: 'elementAdded', element: newElement });
+        this.emitSocketEvent('addElement', newElement);
+      }
     }
   };
   updateElement = (
     id: string,
     newAttrs: Partial<SBoardElement>,
     external?: boolean,
-    skipHistory?: boolean,
+    isHistory?: boolean,
   ) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
 
-      if (!skipHistory) {
-        this.history.push({
-          type: 'elementUpdated',
-          id,
-          oldAttrs: pickExisting(element, newAttrs),
-          newAttrs,
-        });
+      if (!external && !isHistory) {
+        const { result: oldAttrs, equal } = pickExisting(element, newAttrs);
+        if (!equal)
+          this.throttledUpdateElementEvent(Object.keys(newAttrs), {
+            type: 'elementUpdated',
+            id,
+            oldAttrs,
+            newAttrs,
+          });
       }
 
       if (element.type === 'text') {
@@ -252,12 +268,15 @@ class SimpleBoardStore {
         Object.assign(this.boardLayers[layer][index], newAttrs);
       }
 
-      if (!external) this.emitSocketEvent('updateElement', { id, newAttrs });
+      if (!external) {
+        this.emitSocketEvent('updateElement', { id, newAttrs });
+      }
     }
   };
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
+    isHistory?: boolean,
   ): { layer: number; index: number } => {
     if (!this.boardLayers) return { layer: -1, index: -1 };
 
@@ -335,12 +354,13 @@ class SimpleBoardStore {
     this.boardLayers[targetLayer].splice(targetIndex, 0, element);
     this.reindexLayer(targetLayer, targetIndex);
 
-    this.history.push({
-      type: 'changeElementLayer',
-      id,
-      prevPosition: { layer, index },
-      newPosition: { layer: targetLayer, index: targetIndex },
-    });
+    if (!isHistory)
+      this.history.push({
+        type: 'changeElementLayer',
+        id,
+        prevPosition: { layer, index },
+        newPosition: { layer: targetLayer, index: targetIndex },
+      });
     this.emitSocketEvent('changeElementLayer', {
       id: id,
       prevPosition: { layer, index },
@@ -385,24 +405,68 @@ class SimpleBoardStore {
       });
     }
   };
-  removeElement = (id: string, external?: boolean) => {
+  removeElement = (id: string, external?: boolean, isHistory?: boolean) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
-      const url = 'url' in element ? element.url : null;
 
       this.boardLayers[layer].splice(index, 1);
       this.positionsMap.delete(id);
       this.reindexLayer(layer, index);
 
-      this.history.push({
-        type: 'elementRemoved',
-        prevPosition: { layer, index },
-        element,
-      });
-      if (!external) this.emitSocketEvent('removeElement', id);
+      if (!external) {
+        if (!isHistory)
+          this.history.push({
+            type: 'elementRemoved',
+            prevPosition: { layer, index },
+            element,
+          });
+        this.emitSocketEvent('removeElement', id);
+      }
     }
   };
+
+  // HISTORY
+  undo() {
+    const event = this.history.undo();
+    if (!event) return;
+    console.log('undo', event);
+    this.applyBoardEvent(event, true);
+  }
+  redo() {
+    const event = this.history.redo();
+    if (!event) return;
+    console.log('redo', event);
+    this.applyBoardEvent(event);
+  }
+  private applyBoardEvent(event: SimpleBoardEvent, invert: boolean = false) {
+    switch (event.type) {
+      case 'elementAdded': {
+        if (invert) this.removeElement(event.element.id, false, true);
+        else this.addElement(event.element, false, true);
+        return;
+      }
+      case 'elementUpdated': {
+        const { id, newAttrs, oldAttrs } = event;
+        this.updateElement(id, invert ? oldAttrs : newAttrs, false, true);
+        return;
+      }
+      case 'elementRemoved': {
+        const { element } = event;
+        if (invert) this.addElement(element, false, true);
+        else this.removeElement(element.id, false, true);
+        return;
+      }
+      case 'changeElementLayer': {
+        // todo: do
+        return;
+      }
+    }
+  }
+  private throttledUpdateElementEvent = throttle(
+    (keys: string[], e: UpdateElementEvent) => this.history.push(e),
+    256,
+  );
 
   getMaxMinElementPositions = (): {
     max: { layer: number; index: number };
