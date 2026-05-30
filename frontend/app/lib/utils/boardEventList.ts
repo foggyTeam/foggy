@@ -49,8 +49,9 @@ export default class BoardEventList<T> {
 
     let node = this.list[this.tail];
     let i = 0;
-    let pointer = i;
+    let pointer = -1;
     const list = [node.value];
+    if (this.pointer === node.id) pointer = 0;
     while (node.nextId) {
       i++;
       node = this.list[node.nextId];
