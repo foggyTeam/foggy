@@ -42,7 +42,7 @@ export default function CursorChip(
 ) {
   const { theme } = useTheme();
   const color: string =
-    cursorColorMap[props.color as CursorColor][theme as any].DEFAULT;
+    cursorColorMap[props.color as CursorColor][theme || 'light'].DEFAULT;
   return (
     <div {...props} className="pointer-events-none fixed top-0 left-0 z-40">
       <Chip
