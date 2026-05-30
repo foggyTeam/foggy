@@ -430,13 +430,11 @@ class SimpleBoardStore {
   undo() {
     const event = this.history.undo();
     if (!event) return;
-    console.log('undo', event);
     this.applyBoardEvent(event, true);
   }
   redo() {
     const event = this.history.redo();
     if (!event) return;
-    console.log('redo', event);
     this.applyBoardEvent(event);
   }
   private applyBoardEvent(event: SimpleBoardEvent, invert: boolean = false) {
@@ -458,7 +456,15 @@ class SimpleBoardStore {
         return;
       }
       case 'changeElementLayer': {
-        // todo: do
+        const { id, prevPosition, newPosition } = event;
+        const from = invert ? newPosition : prevPosition;
+        const to = invert ? prevPosition : newPosition;
+        this.changeElementLayerSocket(id, from, to);
+        this.emitSocketEvent('changeElementLayer', {
+          id,
+          prevPosition: from,
+          newPosition: to,
+        });
         return;
       }
     }

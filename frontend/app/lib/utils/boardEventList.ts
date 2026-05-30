@@ -116,15 +116,15 @@ export default class BoardEventList<T> {
   redo() {
     if (!this.pointer && !this.tail) return null;
 
-    if (!this.pointer && this.tail) {
+    if (!this.pointer) {
       this.pointer = this.tail;
     } else {
-      const pointerNode = this.list[this.pointer as string];
+      const pointerNode = this.list[this.pointer];
+      if (!pointerNode.nextId) return null;
       this.pointer = pointerNode.nextId;
-      if (!this.pointer) return null;
     }
-    const nextNode = this.list[this.pointer];
-    return nextNode.value;
+
+    return this.list[this.pointer!].value;
   }
 
   clearList() {
