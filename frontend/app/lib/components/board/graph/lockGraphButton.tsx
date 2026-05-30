@@ -9,7 +9,7 @@ import React from 'react';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 const LockGraphButton = observer(() => {
-  const { isGraphLocked, lockGraph } = useGraphBoardContext();
+  const { isGraphLocked, lockGraph, allToolsDisabled } = useGraphBoardContext();
   return (
     <FTooltip
       content={
@@ -20,6 +20,7 @@ const LockGraphButton = observer(() => {
     >
       <Button
         data-testid="lock-graph-btn"
+        isDisabled={allToolsDisabled}
         onPress={() => lockGraph(!isGraphLocked)}
         isIconOnly
         color="secondary"

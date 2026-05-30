@@ -7,10 +7,12 @@ import batchGraphUpdates from '@/app/lib/utils/batchGraphUpdates';
 import { EdgeChange, Node, NodeChange, useReactFlow } from '@xyflow/react';
 import { GNode } from '@/app/lib/types/definitions';
 import { autorun } from 'mobx';
+import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
 
 export default function useExternalUpdates(syncD3: () => void) {
   const { updateNode, addNodes, updateEdge, addEdges, deleteElements } =
     useReactFlow();
+  const { allToolsDisabled } = useGraphBoardContext();
   const nodesQueue = useMemo(
     () => graphBoardStore.nodesExternalUpdatesQueue,
     [graphBoardStore.nodesExternalUpdatesQueue],
@@ -62,15 +64,15 @@ export default function useExternalUpdates(syncD3: () => void) {
 
         for (const { id, lock } of lockUpdates) {
           updateNode(id, {
-            draggable: !lock,
-            selectable: !lock,
-            connectable: !lock,
+            draggable: allToolsDisabled ? false : !lock,
+            selectable: allToolsDisabled ? false : !lock,
+            connectable: allToolsDisabled ? false : !lock,
           });
         }
 
         if (needsSync) syncD3();
       }, 640),
-    [addNodes, deleteElements, updateNode, nodesQueue],
+    [addNodes, deleteElements, updateNode, nodesQueue, allToolsDisabled],
   );
 
   const onExternalEdgesChange = useMemo(

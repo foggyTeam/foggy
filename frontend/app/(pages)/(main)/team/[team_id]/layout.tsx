@@ -10,10 +10,8 @@ interface TeamPageProps {
 
 async function getTeam(id: string): Promise<RawTeam | undefined> {
   const team = await GetTeam(id);
-  if (team?.status === 403) {
-    redirect(`/team/request/${id}`);
-    return;
-  }
+  if (team?.status === 403) redirect(`/team/request/${id}`);
+
   if (!team) notFound();
 
   return team;
