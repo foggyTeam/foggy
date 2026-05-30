@@ -8,8 +8,7 @@ import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
 import Konva from 'konva';
 import { RefObject } from 'react';
-import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
-import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { HandleBoardImageElementUpload } from '@/app/lib/utils/handleImageUpload';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 
@@ -66,7 +65,6 @@ const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
 const DEFAULT_STAR_POINTS = 5;
 const ERASER_RADIUS = 4;
-const MIN_IMAGE_SIZE = 640;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -543,25 +541,13 @@ const getElementId = (tool: string) => {
 };
 
 const getImageUrl = async (event: any) => {
-  try {
-    const imageBlob = await HandleImageUpload(event, MIN_IMAGE_SIZE);
-    if (!imageBlob) return null;
+  const url = await HandleBoardImageElementUpload(event.target.files[0]);
+  if (url) return url;
 
-    const response = await uploadImage(
-      'board_images',
-      imageBlob,
-      'board_simple_',
-      { type: 'random' },
-    );
-
-    if ('url' in response) return response.url as string;
-    throw new Error();
-  } catch (e: any) {
-    addToast({
-      color: 'danger',
-      severity: 'danger',
-      title: settingsStore.t.toasts.globalError,
-    });
-  }
+  addToast({
+    color: 'danger',
+    severity: 'danger',
+    title: settingsStore.t.toasts.globalError,
+  });
   return null;
 };
