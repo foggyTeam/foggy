@@ -51,10 +51,13 @@ const AllTeamMembers = observer(() => {
   const handleUpdateMemberRole = async (id: string, newRole: Role) => {
     if (!teamsStore.activeTeam) return;
     try {
-      await UpdateTeamMemberRole(teamsStore.activeTeam.id, {
+      const response = await UpdateTeamMemberRole(teamsStore.activeTeam.id, {
         userId: id,
         role: newRole,
       });
+      if (response && 'errors' in response)
+        throw new Error(JSON.stringify(response.errors));
+
       teamsStore.updateTeamMember(id, { role: newRole });
     } catch (e: any) {
       addToast({

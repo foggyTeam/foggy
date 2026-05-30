@@ -106,14 +106,10 @@ export async function DeleteProjectMember(
   userId: string,
   newOwnerId?: string | null,
 ) {
-  return await deleteRequest(
-    newOwnerId
-      ? `projects/${projectId}/users/${userId}?newOwner=${newOwnerId}`
-      : `projects/${projectId}/users/${userId}`,
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
+  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  return await deleteRequest(`projects/${projectId}/users/${userId}${query}`, {
+    headers: { 'x-user-id': await getUserId() },
+  });
 }
 
 // TEAM
@@ -137,14 +133,12 @@ export async function AddTeamMember(
 export async function UpdateTeamMemberRole(
   teamId: string,
   data: { userId: string; role: Role },
+  newOwnerId?: string,
 ) {
-  return await patchRequest(
-    `teams/${teamId}/members/${data.userId}/role`,
-    data,
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
+  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  return await patchRequest(`teams/${teamId}/members/role${query}`, data, {
+    headers: { 'x-user-id': await getUserId() },
+  });
 }
 
 export async function DeleteTeamMember(
@@ -152,16 +146,13 @@ export async function DeleteTeamMember(
   userId: string,
   newOwnerId?: string | null,
 ) {
-  return await deleteRequest(
-    newOwnerId
-      ? `teams/${teamId}/members/${userId}?newOwner=${newOwnerId}`
-      : `teams/${teamId}/members/${userId}`,
-    {
-      headers: { 'x-user-id': await getUserId() },
-    },
-  );
+  const query = newOwnerId ? `?newOwnerId=${newOwnerId}` : '';
+  return await deleteRequest(`teams/${teamId}/members/${userId}${query}`, {
+    headers: { 'x-user-id': await getUserId() },
+  });
 }
 
+/** TEAMS not implemented yet. */
 export async function GetInvitationLink(
   type: 'project' | 'team',
   data: {
@@ -170,7 +161,7 @@ export async function GetInvitationLink(
     expirationTime: keyof typeof expirationTimesMap;
   },
 ): Promise<string> {
-  const url = `${type === 'project' ? `projects` : 'teams'}/${data.id}/invite-links`;
+  const url = `${type === 'project' ? 'projects' : 'teams'}/${data.id}/invite-links`;
   const requestData = {
     role: data.role,
     expiresAt: getExpiresAt(data.expirationTime),
