@@ -19,6 +19,7 @@ interface DrawingHandlersProps {
   addElement: (element: SBoardElement) => void;
   updateElement: (id: string, newAttrs: Partial<SBoardElement>) => void;
   drawing?: boolean;
+  aspectRatioRef?: RefObject<number>;
   setDrawing: (drawing: boolean) => void;
   setNewElement: (element: SBoardElement | null) => void;
   newElement: SBoardElement | null;
@@ -97,6 +98,7 @@ export const handleMouseDown =
     stageRef,
     activeTool,
     addElement,
+    aspectRatioRef,
     setDrawing,
     setNewElement,
   }: DrawingHandlersProps) =>
@@ -106,6 +108,8 @@ export const handleMouseDown =
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
+      const width = 16;
+      const height = aspectRatioRef?.current ? 16 / aspectRatioRef.current : 16;
       const element = {
         id: getElementId(activeTool),
         type: activeTool,
@@ -118,8 +122,8 @@ export const handleMouseDown =
         stroke: DEFAULT_STROKE,
         strokeWidth: DEFAULT_STROKE_WIDTH,
         cornerRadius: 4,
-        width: 16,
-        height: 16,
+        width,
+        height,
       } as SBoardElement;
 
       if (activeTool === 'image')
@@ -143,7 +147,13 @@ export const handleMouseDown =
   };
 
 export const handleMouseMove =
-  ({ stageRef, drawing, newElement, updateElement }: DrawingHandlersProps) =>
+  ({
+    stageRef,
+    drawing,
+    newElement,
+    aspectRatioRef,
+    updateElement,
+  }: DrawingHandlersProps) =>
   () => {
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
@@ -155,7 +165,11 @@ export const handleMouseMove =
         x: width < 0 ? x : newElement.x,
         y: height < 0 ? y : newElement.y,
         width: Math.abs(width),
-        height: Math.abs(height),
+        height: Math.abs(
+          aspectRatioRef?.current
+            ? Math.abs(width) / aspectRatioRef.current
+            : height,
+        ),
       } as SBoardElement;
 
       if (newElement.type === 'star')
