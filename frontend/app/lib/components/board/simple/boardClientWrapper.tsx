@@ -47,14 +47,14 @@ export default function BoardClientWrapper() {
       }
 
       const isCmdOrCtrl = e.ctrlKey || e.metaKey;
-      const key = e.key.toLowerCase();
+      const code = e.code;
 
       if (isCmdOrCtrl) {
-        if (key === 'z') {
+        if (code === 'KeyZ') {
           e.preventDefault();
           if (e.shiftKey) simpleBoardStore.redo();
           else simpleBoardStore.undo();
-        } else if (key === 'y') {
+        } else if (code === 'KeyY') {
           e.preventDefault();
           simpleBoardStore.redo();
         }
