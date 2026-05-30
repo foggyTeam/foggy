@@ -12,10 +12,7 @@ import settingsStore from '@/app/stores/settingsStore';
 import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
-import {
-  deleteImage,
-  deleteImages,
-} from '@/app/lib/server/actions/handleImage';
+import { deleteImage } from '@/app/lib/server/actions/handleImage';
 import BoardEventList from '@/app/lib/utils/boardEventList';
 import throttle from 'lodash/throttle';
 
@@ -510,7 +507,12 @@ class SimpleBoardStore {
       }
     }
     this.history.clearList();
-    if (urlsToRemove.length) deleteImages(urlsToRemove);
+    if (urlsToRemove.length) {
+      navigator.sendBeacon(
+        '/api/images/delete',
+        JSON.stringify({ urls: urlsToRemove }),
+      );
+    }
   };
 }
 
