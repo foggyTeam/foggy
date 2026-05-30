@@ -72,6 +72,7 @@ const OpenedLeftSideBar = observer(
 
     useEffect(() => {
       setParentList(projectsStore.getProjectChildParentList());
+      projectsStore.revalidateProject();
     }, []);
 
     useEffect(() => {

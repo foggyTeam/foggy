@@ -8,7 +8,8 @@ import { notFound, redirect } from 'next/navigation';
 
 async function getTeamInfo(id: string): Promise<Team | undefined> {
   const team = await GetShortTeamInfo(id);
-  if (!team.settings?.allowRequests) redirect(`/forbidden?type=team`);
+  if (!team?.settings?.allowRequests || team?.status === 403)
+    redirect(`/forbidden?type=team`);
 
   if (!team) notFound();
 

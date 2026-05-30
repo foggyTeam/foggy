@@ -3,7 +3,7 @@
 import DOMPurify from 'dompurify';
 import QuillType from 'quill';
 import Quill from 'quill';
-import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { HandleBoardImageElementUpload } from '@/app/lib/utils/handleImageUpload';
 
 const allowedIframeDomains = [
   // VIDEO
@@ -34,16 +34,6 @@ const allowedIframeDomains = [
   // TRELLO
   'trello.com',
 ];
-
-async function uploadFile(imageFile: File | Blob) {
-  try {
-    const response = await uploadImage('board_images', imageFile, 'board_doc_');
-    if (response && 'url' in response && response.url) return response.url;
-    return null;
-  } catch (e: any) {
-    return null;
-  }
-}
 
 function cleanHtml(html: string) {
   const cleanHtmlString = DOMPurify.sanitize(html, {
@@ -145,7 +135,7 @@ export default async function handleQuillPaste(
   // FILES
   if (files.length > 0 && !text) {
     for (const file of files) {
-      const imageUrl = await uploadFile(file);
+      const imageUrl = await HandleBoardImageElementUpload(file, 'board_doc_');
       if (imageUrl) {
         quill.insertEmbed(currentIndex, 'image', imageUrl, Quill.sources.USER);
         currentIndex += 1;
@@ -192,7 +182,10 @@ export default async function handleQuillPaste(
               const res = await fetch(src);
               const blob = await res.blob();
 
-              const uploadedUrl = await uploadFile(blob);
+              const uploadedUrl = await HandleBoardImageElementUpload(
+                blob,
+                'board_doc_',
+              );
 
               if (uploadedUrl) img.setAttribute('src', uploadedUrl);
               else img.remove();

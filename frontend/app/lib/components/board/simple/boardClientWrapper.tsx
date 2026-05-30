@@ -13,6 +13,7 @@ import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import Konva from 'konva';
 import BoardImageGenerator from '@/app/lib/components/board/ai/boardImageGenerator';
 import AiAssistantButton from '@/app/lib/components/board/ai/aiAssistantButton';
+import simpleBoardStore from '@/app/stores/board/simpleBoardStore';
 
 export default function BoardClientWrapper() {
   const { isMobile } = useAdaptiveParams();
@@ -33,6 +34,39 @@ export default function BoardClientWrapper() {
       Konva.pixelRatio = next;
     } catch {}
   }, [isMobile]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const isCmdOrCtrl = e.ctrlKey || e.metaKey;
+      const key = e.key.toLowerCase();
+
+      if (isCmdOrCtrl) {
+        if (key === 'z') {
+          e.preventDefault();
+          if (e.shiftKey) simpleBoardStore.redo();
+          else simpleBoardStore.undo();
+        } else if (key === 'y') {
+          e.preventDefault();
+          simpleBoardStore.redo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <BoardProvider>
