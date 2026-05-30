@@ -4,6 +4,7 @@ import {
   makeAutoObservable,
   observable,
   reaction,
+  toJS,
 } from 'mobx';
 import { SBoardElement, TextElement } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
@@ -230,7 +231,10 @@ class SimpleBoardStore {
 
       if (!external) {
         if (!isHistory)
-          this.history.push({ type: 'elementAdded', element: newElement });
+          this.history.push({
+            type: 'elementAdded',
+            element: toJS(newElement),
+          });
         this.emitSocketEvent('addElement', newElement);
       }
     }
@@ -416,7 +420,7 @@ class SimpleBoardStore {
           this.history.push({
             type: 'elementRemoved',
             prevPosition: { layer, index },
-            element,
+            element: toJS(element),
           });
         this.emitSocketEvent('removeElement', id);
       }
