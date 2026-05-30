@@ -16,6 +16,7 @@ import {
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 import { useRouter } from 'next/navigation';
+import userStore from '@/app/stores/userStore';
 
 const AllTeamMembers = observer(() => {
   const router = useRouter();
@@ -34,11 +35,18 @@ const AllTeamMembers = observer(() => {
   const handleRemoveMember = async (id: string, newOwnerId?: string | null) => {
     if (!teamsStore.activeTeam) return;
     try {
-      const response = await DeleteTeamMember(teamsStore.activeTeam.id, id);
+      const response = await DeleteTeamMember(
+        teamsStore.activeTeam.id,
+        id,
+        newOwnerId,
+      );
       if (response.errors) throw new Error(JSON.stringify(response.errors));
 
-      teamsStore.removeTeamMember(id);
-      if (newOwnerId) router.push('/');
+      if (id === userStore.user?.id) {
+        router.push('/');
+        teamsStore.setActiveTeam(null);
+        teamsStore.revalidateTeams();
+      } else teamsStore.removeTeamMember(id);
     } catch (e: any) {
       addToast({
         color: 'danger',
@@ -51,10 +59,13 @@ const AllTeamMembers = observer(() => {
   const handleUpdateMemberRole = async (id: string, newRole: Role) => {
     if (!teamsStore.activeTeam) return;
     try {
-      await UpdateTeamMemberRole(teamsStore.activeTeam.id, {
+      const response = await UpdateTeamMemberRole(teamsStore.activeTeam.id, {
         userId: id,
         role: newRole,
       });
+      if (response && 'errors' in response)
+        throw new Error(JSON.stringify(response.errors));
+
       teamsStore.updateTeamMember(id, { role: newRole });
     } catch (e: any) {
       addToast({

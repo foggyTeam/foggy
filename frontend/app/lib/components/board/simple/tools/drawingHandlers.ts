@@ -8,8 +8,7 @@ import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import userStore from '@/app/stores/userStore';
 import Konva from 'konva';
 import { RefObject } from 'react';
-import HandleImageUpload from '@/app/lib/utils/handleImageUpload';
-import { uploadImage } from '@/app/lib/server/actions/handleImage';
+import { HandleBoardImageElementUpload } from '@/app/lib/utils/handleImageUpload';
 import { addToast } from '@heroui/toast';
 import settingsStore from '@/app/stores/settingsStore';
 
@@ -20,6 +19,7 @@ interface DrawingHandlersProps {
   addElement: (element: SBoardElement) => void;
   updateElement: (id: string, newAttrs: Partial<SBoardElement>) => void;
   drawing?: boolean;
+  aspectRatioRef?: RefObject<number>;
   setDrawing: (drawing: boolean) => void;
   setNewElement: (element: SBoardElement | null) => void;
   newElement: SBoardElement | null;
@@ -66,7 +66,6 @@ const DEFAULT_STROKE = primary.light['300'];
 const DEFAULT_STROKE_WIDTH = 2;
 const DEFAULT_STAR_POINTS = 5;
 const ERASER_RADIUS = 4;
-const MIN_IMAGE_SIZE = 640;
 
 const getRelativePointerPosition = (stage: any) => {
   const transform = stage.getAbsoluteTransform().copy();
@@ -99,6 +98,7 @@ export const handleMouseDown =
     stageRef,
     activeTool,
     addElement,
+    aspectRatioRef,
     setDrawing,
     setNewElement,
   }: DrawingHandlersProps) =>
@@ -108,6 +108,8 @@ export const handleMouseDown =
       const stage = stageRef.current.getStage();
       const { x, y } = getRelativePointerPosition(stage).stagePosition;
 
+      const width = 16;
+      const height = aspectRatioRef?.current ? 16 / aspectRatioRef.current : 16;
       const element = {
         id: getElementId(activeTool),
         type: activeTool,
@@ -120,8 +122,8 @@ export const handleMouseDown =
         stroke: DEFAULT_STROKE,
         strokeWidth: DEFAULT_STROKE_WIDTH,
         cornerRadius: 4,
-        width: 16,
-        height: 16,
+        width,
+        height,
       } as SBoardElement;
 
       if (activeTool === 'image')
@@ -145,7 +147,13 @@ export const handleMouseDown =
   };
 
 export const handleMouseMove =
-  ({ stageRef, drawing, newElement, updateElement }: DrawingHandlersProps) =>
+  ({
+    stageRef,
+    drawing,
+    newElement,
+    aspectRatioRef,
+    updateElement,
+  }: DrawingHandlersProps) =>
   () => {
     if (drawing && newElement && stageRef.current) {
       const stage = stageRef.current.getStage();
@@ -157,7 +165,11 @@ export const handleMouseMove =
         x: width < 0 ? x : newElement.x,
         y: height < 0 ? y : newElement.y,
         width: Math.abs(width),
-        height: Math.abs(height),
+        height: Math.abs(
+          aspectRatioRef?.current
+            ? Math.abs(width) / aspectRatioRef.current
+            : height,
+        ),
       } as SBoardElement;
 
       if (newElement.type === 'star')
@@ -543,25 +555,13 @@ const getElementId = (tool: string) => {
 };
 
 const getImageUrl = async (event: any) => {
-  try {
-    const imageBlob = await HandleImageUpload(event, MIN_IMAGE_SIZE);
-    if (!imageBlob) return null;
+  const url = await HandleBoardImageElementUpload(event.target.files[0]);
+  if (url) return url;
 
-    const response = await uploadImage(
-      'board_images',
-      imageBlob,
-      'board_simple_',
-      { type: 'random' },
-    );
-
-    if ('url' in response) return response.url as string;
-    throw new Error();
-  } catch (e: any) {
-    addToast({
-      color: 'danger',
-      severity: 'danger',
-      title: settingsStore.t.toasts.globalError,
-    });
-  }
+  addToast({
+    color: 'danger',
+    severity: 'danger',
+    title: settingsStore.t.toasts.globalError,
+  });
   return null;
 };

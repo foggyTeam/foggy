@@ -17,6 +17,7 @@ import { addToast } from '@heroui/toast';
 import { useRouter } from 'next/navigation';
 import MembersContext from '@/app/lib/hooks/useMembersContext';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import userStore from '@/app/stores/userStore';
 
 const AllProjectMembers = observer(() => {
   const { isMobile } = useAdaptiveParams();
@@ -52,8 +53,11 @@ const AllProjectMembers = observer(() => {
             description: response.errors[Object.keys(response.errors)[0]],
           });
         } else {
-          projectsStore.removeProjectMember(id);
-          if (newOwnerId) router.push('/');
+          if (id === userStore.user?.id) {
+            router.push('/');
+            projectsStore.setActiveProject(null);
+            projectsStore.revalidateProjects();
+          } else projectsStore.removeProjectMember(id);
         }
       });
   };

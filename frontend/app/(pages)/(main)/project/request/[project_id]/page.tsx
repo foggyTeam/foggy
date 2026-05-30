@@ -9,7 +9,8 @@ import { notFound, redirect } from 'next/navigation';
 async function getProjectInfo(id: string): Promise<Project | undefined> {
   const project = await GetShortProjectInfo(id);
 
-  if (!project.settings.isPublic) redirect(`/forbidden?type=project`);
+  if (!project?.settings?.isPublic || project?.status === 403)
+    redirect(`/forbidden?type=project`);
 
   if (!project) notFound();
 

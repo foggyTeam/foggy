@@ -9,7 +9,7 @@ import projectsStore from '@/app/stores/projectsStore';
 import { Button } from '@heroui/button';
 import { SettingsIcon } from 'lucide-react';
 import settingsStore from '@/app/stores/settingsStore';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProjectTree from '@/app/lib/components/projects/projectTree/projectTree';
 import CheckAccess from '@/app/lib/utils/checkAccess';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
@@ -21,6 +21,10 @@ const ProjectStructure = observer(() => {
     onOpen: onSettingsOpen,
     onOpenChange: onSettingsOpenChange,
   } = useDisclosure();
+
+  useEffect(() => {
+    projectsStore.revalidateProject();
+  }, []);
 
   return (
     <>

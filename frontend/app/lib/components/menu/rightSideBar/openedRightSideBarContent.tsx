@@ -5,10 +5,11 @@ import { ChevronLeftIcon } from 'lucide-react';
 import settingsStore from '@/app/stores/settingsStore';
 import projectsStore from '@/app/stores/projectsStore';
 import RightSideBarElementCard from '@/app/lib/components/menu/rightSideBar/rightSideBarElementCard';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import teamsStore from '@/app/stores/teamsStore';
 import AllNotifications from '@/app/lib/components/notifications/allNotifications';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
+import notificationsStore from '@/app/stores/notificationsStore';
 
 const OpenedRightSideBarContent = observer(
   ({
@@ -19,6 +20,13 @@ const OpenedRightSideBarContent = observer(
     setActiveTab: Dispatch<SetStateAction<any>>;
   }) => {
     const { commonSize } = useAdaptiveParams();
+
+    useEffect(() => {
+      if (activeTab === 'notifications') notificationsStore.revalidate();
+      if (activeTab === 'projects') projectsStore.revalidateProjects();
+      if (activeTab === 'teams') teamsStore.revalidateTeams();
+    }, [activeTab]);
+
     return (
       <Tabs
         size={commonSize}

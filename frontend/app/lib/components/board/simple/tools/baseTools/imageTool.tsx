@@ -25,6 +25,7 @@ export default function ImageTool() {
   } = useBoardContext();
 
   const imageInputRef = useRef<any>(null);
+  const aspectRatioRef = useRef<number | null>(null);
 
   const [drawing, setDrawing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +43,7 @@ export default function ImageTool() {
       addElement,
       setDrawing,
       setNewElement,
+      aspectRatioRef,
     } as any),
     [activeTool],
   );
@@ -51,6 +53,7 @@ export default function ImageTool() {
       drawing,
       newElement,
       updateElement,
+      aspectRatioRef,
     } as any),
     [drawing, newElement],
   );
@@ -73,7 +76,17 @@ export default function ImageTool() {
     if (!image) {
       setDrawing(false);
       setActiveTool('');
-    } else inputClickEventRef.current = e;
+      aspectRatioRef.current = null;
+    } else {
+      inputClickEventRef.current = e;
+      const url = URL.createObjectURL(image);
+      const img = new Image();
+      img.onload = () => {
+        aspectRatioRef.current = img.width / img.height;
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
   }
 
   useTool({

@@ -101,13 +101,14 @@ const TeamSettingsModal = observer(
       if (teamsStore.activeTeam) {
         try {
           await DeleteTeam(teamsStore.activeTeam.id);
+          router.push('/');
           teamsStore.setActiveTeam(null);
+          teamsStore.revalidateTeams();
           addToast({
             color: 'success',
             severity: 'success',
             title: settingsStore.t.toasts.team.deleteTeamSuccess,
           });
-          router.push('/');
         } catch (e: any) {
           addToast({
             color: 'danger',

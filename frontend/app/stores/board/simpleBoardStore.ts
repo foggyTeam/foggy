@@ -4,6 +4,7 @@ import {
   makeAutoObservable,
   observable,
   reaction,
+  toJS,
 } from 'mobx';
 import { SBoardElement, TextElement } from '@/app/lib/types/definitions';
 import UpdateTextElement from '@/app/lib/utils/updateTextElement';
@@ -13,6 +14,8 @@ import boardStore from '@/app/stores/board/boardStore';
 import { Socket } from 'socket.io-client';
 import { HtmlToSvg } from '@/app/lib/utils/htmlToSvg';
 import { deleteImage } from '@/app/lib/server/actions/handleImage';
+import BoardEventList from '@/app/lib/utils/boardEventList';
+import throttle from 'lodash/throttle';
 
 const SimpleBoardEvents = [
   'elementAdded',
@@ -21,9 +24,60 @@ const SimpleBoardEvents = [
   'changeElementLayer',
 ];
 
+interface AddElementEvent {
+  type: 'elementAdded';
+  element: SBoardElement;
+}
+interface UpdateElementEvent {
+  type: 'elementUpdated';
+  id: string;
+  oldAttrs: Partial<SBoardElement>;
+  newAttrs: Partial<SBoardElement>;
+}
+interface RemoveElementEvent {
+  type: 'elementRemoved';
+  element: SBoardElement;
+  prevPosition: { layer: number; index: number };
+}
+interface ChangeElementLayerEvent {
+  type: 'changeElementLayer';
+  id: string;
+  prevPosition: { layer: number; index: number };
+  newPosition: { layer: number; index: number };
+}
+export type SimpleBoardEvent =
+  | AddElementEvent
+  | UpdateElementEvent
+  | RemoveElementEvent
+  | ChangeElementLayerEvent;
+
 let socketRef: Socket | null = null;
 
+export function pickExisting<T>(
+  source: T,
+  template: Partial<T>,
+): { result: Partial<T>; equal: boolean } {
+  const result: any = {};
+  let equal = true;
+  for (const key in template) {
+    if (source[key] != template[key]) equal = false;
+    result[key] = source[key];
+  }
+  return { result, equal };
+}
+
 class SimpleBoardStore {
+  afterEventRemoveAction = (event: SimpleBoardEvent): void => {
+    if (event.type === 'elementRemoved') {
+      const { element } = event;
+      if ('url' in element && element.url) deleteImage(element.url);
+    }
+  };
+  history: BoardEventList<SimpleBoardEvent> = new BoardEventList(
+    128,
+    this.afterEventRemoveAction,
+  );
+
   boardLayers: IObservableArray<SBoardElement>[] | undefined;
   positionsMap = observable.map<string, { layer: number; index: number }>();
 
@@ -54,6 +108,8 @@ class SimpleBoardStore {
         }
       },
     );
+
+    window?.addEventListener('beforeunload', this.onDestroy);
   }
 
   // WEBSOCKET
@@ -98,6 +154,7 @@ class SimpleBoardStore {
 
   // GENERAL
   setBoardLayers(layers: SBoardElement[][] | undefined) {
+    this.onDestroy();
     if (!layers) {
       this.boardLayers = undefined;
       this.positionsMap.clear();
@@ -157,7 +214,11 @@ class SimpleBoardStore {
   }
 
   // CRUD
-  addElement = (newElement: SBoardElement, external?: boolean) => {
+  addElement = (
+    newElement: SBoardElement,
+    external?: boolean,
+    isHistory?: boolean,
+  ) => {
     if (this.boardLayers) {
       const lastLayer = this.boardLayers.length - 1;
       const lastIndex = this.boardLayers[lastLayer].length;
@@ -167,17 +228,38 @@ class SimpleBoardStore {
         layer: lastLayer,
         index: lastIndex,
       });
-      if (!external) this.emitSocketEvent('addElement', newElement);
+
+      if (!external) {
+        if (!isHistory)
+          this.history.push({
+            type: 'elementAdded',
+            element: toJS(newElement),
+          });
+        this.emitSocketEvent('addElement', newElement);
+      }
     }
   };
   updateElement = (
     id: string,
     newAttrs: Partial<SBoardElement>,
     external?: boolean,
+    isHistory?: boolean,
   ) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
+
+      if (!external && !isHistory) {
+        const { result: oldAttrs, equal } = pickExisting(element, newAttrs);
+        if (!equal)
+          this.throttledUpdateElementEvent(Object.keys(newAttrs), {
+            type: 'elementUpdated',
+            id,
+            oldAttrs,
+            newAttrs,
+          });
+      }
+
       if (element.type === 'text') {
         Object.assign(
           this.boardLayers[layer][index],
@@ -187,12 +269,15 @@ class SimpleBoardStore {
         Object.assign(this.boardLayers[layer][index], newAttrs);
       }
 
-      if (!external) this.emitSocketEvent('updateElement', { id, newAttrs });
+      if (!external) {
+        this.emitSocketEvent('updateElement', { id, newAttrs });
+      }
     }
   };
   changeElementLayer = (
     id: string,
     action: 'back' | 'forward' | 'bottom' | 'top',
+    isHistory?: boolean,
   ): { layer: number; index: number } => {
     if (!this.boardLayers) return { layer: -1, index: -1 };
 
@@ -270,6 +355,13 @@ class SimpleBoardStore {
     this.boardLayers[targetLayer].splice(targetIndex, 0, element);
     this.reindexLayer(targetLayer, targetIndex);
 
+    if (!isHistory)
+      this.history.push({
+        type: 'changeElementLayer',
+        id,
+        prevPosition: { layer, index },
+        newPosition: { layer: targetLayer, index: targetIndex },
+      });
     this.emitSocketEvent('changeElementLayer', {
       id: id,
       prevPosition: { layer, index },
@@ -314,20 +406,74 @@ class SimpleBoardStore {
       });
     }
   };
-  removeElement = (id: string, external?: boolean) => {
+  removeElement = (id: string, external?: boolean, isHistory?: boolean) => {
     if (this.boardLayers) {
       const { layer, index } = this.getElementPosition(id);
       const element = this.boardLayers[layer][index];
-      const url = 'url' in element ? element.url : null;
 
       this.boardLayers[layer].splice(index, 1);
       this.positionsMap.delete(id);
       this.reindexLayer(layer, index);
 
-      if (!external) this.emitSocketEvent('removeElement', id);
-      if (url && !external) deleteImage(url);
+      if (!external) {
+        if (!isHistory)
+          this.history.push({
+            type: 'elementRemoved',
+            prevPosition: { layer, index },
+            element: toJS(element),
+          });
+        this.emitSocketEvent('removeElement', id);
+      }
     }
   };
+
+  // HISTORY
+  undo() {
+    const event = this.history.undo();
+    if (!event) return;
+    this.applyBoardEvent(event, true);
+  }
+  redo() {
+    const event = this.history.redo();
+    if (!event) return;
+    this.applyBoardEvent(event);
+  }
+  private applyBoardEvent(event: SimpleBoardEvent, invert: boolean = false) {
+    switch (event.type) {
+      case 'elementAdded': {
+        if (invert) this.removeElement(event.element.id, false, true);
+        else this.addElement(event.element, false, true);
+        return;
+      }
+      case 'elementUpdated': {
+        const { id, newAttrs, oldAttrs } = event;
+        this.updateElement(id, invert ? oldAttrs : newAttrs, false, true);
+        return;
+      }
+      case 'elementRemoved': {
+        const { element } = event;
+        if (invert) this.addElement(element, false, true);
+        else this.removeElement(element.id, false, true);
+        return;
+      }
+      case 'changeElementLayer': {
+        const { id, prevPosition, newPosition } = event;
+        const from = invert ? newPosition : prevPosition;
+        const to = invert ? prevPosition : newPosition;
+        this.changeElementLayerSocket(id, from, to);
+        this.emitSocketEvent('changeElementLayer', {
+          id,
+          prevPosition: from,
+          newPosition: to,
+        });
+        return;
+      }
+    }
+  }
+  private throttledUpdateElementEvent = throttle(
+    (keys: string[], e: UpdateElementEvent) => this.history.push(e),
+    256,
+  );
 
   getMaxMinElementPositions = (): {
     max: { layer: number; index: number };
@@ -352,6 +498,25 @@ class SimpleBoardStore {
       },
       min: { layer: firstNonEmptyLayer, index: 0 },
     };
+  };
+
+  onDestroy = () => {
+    const { list, pointer } = this.history.eventsList;
+    const urlsToRemove: string[] = [];
+    for (let i = 0; i <= pointer; i++) {
+      const event = list[i];
+      if (event.type === 'elementRemoved') {
+        const { element } = event;
+        if ('url' in element && element.url) urlsToRemove.push(element.url);
+      }
+    }
+    this.history.clearList();
+    if (urlsToRemove.length) {
+      navigator.sendBeacon(
+        '/api/images/delete',
+        JSON.stringify({ urls: urlsToRemove }),
+      );
+    }
   };
 }
 

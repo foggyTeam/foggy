@@ -103,6 +103,7 @@ const AddMembersModal = observer(
         type === 'project' || type === 'all'
           ? projectsStore.activeProject?.id
           : teamsStore.activeTeam?.id;
+
       if (!entityId || !role) return;
 
       setIsGeneratingLink(true);
@@ -193,17 +194,24 @@ const AddMembersModal = observer(
                   </div>
                 </div>
               </ModalBody>
-              <ModalFooter className="flex w-full flex-wrap justify-between gap-4 p-0 pt-2">
-                <Button
-                  isLoading={isGeneratingLink}
-                  onPress={handleCopyInvitationLink}
-                  isDisabled={!role}
-                  size={commonSize}
-                  className="w-full sm:w-fit"
-                  variant="light"
-                >
-                  {settingsStore.t.members.addMember.modalCopyLink}
-                </Button>
+              <ModalFooter
+                className={clsx(
+                  'flex w-full flex-wrap gap-4 p-0 pt-2',
+                  type === 'team' ? 'justify-end' : 'justify-between',
+                )}
+              >
+                {type !== 'team' && (
+                  <Button
+                    isLoading={isGeneratingLink}
+                    onPress={handleCopyInvitationLink}
+                    isDisabled={!role}
+                    size={commonSize}
+                    className="w-full sm:w-fit"
+                    variant="light"
+                  >
+                    {settingsStore.t.members.addMember.modalCopyLink}
+                  </Button>
+                )}
                 <Button
                   isDisabled={!selectedMembers.length || !role}
                   isLoading={isLoading}

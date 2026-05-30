@@ -84,6 +84,7 @@ const AllNotifications = observer(() => {
             );
             break;
         }
+        notificationsStore.revalidate();
       })
       .catch(() =>
         addToast({

@@ -1,6 +1,16 @@
 import { Chip } from '@heroui/chip';
 import { MousePointer2Icon } from 'lucide-react';
 import { ReactNode } from 'react';
+import {
+  danger,
+  foggy_accent,
+  info,
+  primary,
+  secondary,
+  success,
+  warning,
+} from '@/tailwind.config';
+import { useTheme } from 'next-themes';
 
 export type CursorColor =
   | 'danger'
@@ -8,17 +18,21 @@ export type CursorColor =
   | 'secondary'
   | 'success'
   | 'warning'
-  | 'f_accent'
-  | undefined;
+  | 'info'
+  | 'f_accent';
 
-export const cursorColors: CursorColor[] = [
-  'primary',
-  'secondary',
-  'warning',
-  'success',
-  'danger',
-  'f_accent',
-];
+const cursorColorMap: Record<CursorColor, any> = {
+  primary: primary,
+  secondary: secondary,
+  warning: warning,
+  success: success,
+  danger: danger,
+  info: info,
+  f_accent: foggy_accent,
+};
+export const cursorColors: CursorColor[] = Object.keys(
+  cursorColorMap,
+) as CursorColor[];
 
 export default function CursorChip(
   props: {
@@ -26,11 +40,14 @@ export default function CursorChip(
     nickname: string;
   } & any,
 ) {
+  const { theme } = useTheme();
+  const color: string =
+    cursorColorMap[props.color as CursorColor][theme || 'light'].DEFAULT;
   return (
     <div {...props} className="pointer-events-none fixed top-0 left-0 z-40">
       <Chip
+        style={{ color }}
         variant="light"
-        color={props.color}
         className="pointer-events-none flex h-fit items-center"
         classNames={{
           base: 'gap-0 p-0 m-0',
@@ -39,7 +56,8 @@ export default function CursorChip(
         startContent={
           (
             <MousePointer2Icon
-              className={`relative -top-1 -left-0.5 stroke-${props.color}-500`}
+              stroke={color}
+              className={`relative -top-1 -left-0.5`}
             />
           ) as ReactNode
         }
