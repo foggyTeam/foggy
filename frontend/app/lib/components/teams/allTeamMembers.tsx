@@ -35,7 +35,11 @@ const AllTeamMembers = observer(() => {
   const handleRemoveMember = async (id: string, newOwnerId?: string | null) => {
     if (!teamsStore.activeTeam) return;
     try {
-      const response = await DeleteTeamMember(teamsStore.activeTeam.id, id);
+      const response = await DeleteTeamMember(
+        teamsStore.activeTeam.id,
+        id,
+        newOwnerId,
+      );
       if (response.errors) throw new Error(JSON.stringify(response.errors));
 
       if (id === userStore.user?.id) {
