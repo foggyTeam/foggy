@@ -11,9 +11,11 @@ export default async function middleware(req: NextRequest) {
   const cookie = (await cookies()).get('session' as any)?.value;
   const session = await decrypt(cookie);
 
-  if (!isPublicRoute && !session?.userId)
-    return NextResponse.redirect(new URL('/login', req.nextUrl));
-
+  if (!isPublicRoute && !session?.userId) {
+    const redirectUrl = new URL('/login', req.nextUrl);
+    redirectUrl.searchParams.set('callbackUrl', req.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
   return NextResponse.next();
 }
 

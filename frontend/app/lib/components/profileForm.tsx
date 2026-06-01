@@ -170,12 +170,12 @@ const ProfileForm = observer((userData: ProfileData) => {
           <UploadAvatarButton
             classNames={{
               icon: 'w-32 h-32 sm:w-full sm:h-full',
-              avatar: 'w-32 h-32 sm:w-full sm:h-full',
+              avatar: 'w-32 h-32 sm:w-72 sm:h-72',
             }}
             isLoading={isAvatarLoading}
             handleImageUpload={handleImageUpload}
-            name={userStore.user?.name as string}
-            src={userStore.user?.image as string}
+            name={userStore.user?.name || ''}
+            src={userStore.user?.image || ''}
             tooltipContent={settingsStore.t.profile.uploadAvatarHint}
           />
           <Button
