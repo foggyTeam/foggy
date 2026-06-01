@@ -120,7 +120,10 @@ export async function GetBoard(id: string) {
     },
   });
 }
-export async function UpdateBoard(id: string, data: { name: string }) {
+export async function UpdateBoard(
+  id: string,
+  data: { name: string; projectId: string },
+) {
   return await patchRequest(`boards/${id}`, data, {
     headers: { 'x-user-id': await getUserId() },
   });

@@ -147,13 +147,12 @@ export class BoardController {
     },
   })
   async updateBoard(
-    @Param('id') projectId: Types.ObjectId,
-    @Param('boardId') boardId: Types.ObjectId,
+    @Param('id') boardId: Types.ObjectId,
     @Body() updateBoardDto: UpdateBoardDto,
     @Headers('x-user-id') userId: Types.ObjectId,
   ): Promise<void> {
     await this.boardService.updateBoard(
-      new Types.ObjectId(projectId),
+      new Types.ObjectId(updateBoardDto.projectId),
       new Types.ObjectId(boardId),
       updateBoardDto,
       new Types.ObjectId(userId),

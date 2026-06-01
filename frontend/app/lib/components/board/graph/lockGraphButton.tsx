@@ -7,9 +7,10 @@ import { LockIcon, UnlockIcon } from 'lucide-react';
 import FTooltip from '@/app/lib/components/foggyOverrides/fTooltip';
 import React from 'react';
 import { useGraphBoardContext } from '@/app/lib/components/board/graph/graphBoardContext';
+import projectsStore from '@/app/stores/projectsStore';
 
 const LockGraphButton = observer(() => {
-  const { isGraphLocked, lockGraph, allToolsDisabled } = useGraphBoardContext();
+  const { isGraphLocked, lockGraph } = useGraphBoardContext();
   return (
     <FTooltip
       content={
@@ -20,7 +21,7 @@ const LockGraphButton = observer(() => {
     >
       <Button
         data-testid="lock-graph-btn"
-        isDisabled={allToolsDisabled}
+        isDisabled={projectsStore.myRole === 'reader'}
         onPress={() => lockGraph(!isGraphLocked)}
         isIconOnly
         color="secondary"

@@ -33,22 +33,31 @@ export default function BoardCard({
     setIsReadonly(true);
     if (!projectsStore.activeProject) return;
 
-    await UpdateBoard(board.id, {
-      name: newName,
-    })
-      .catch(() =>
-        addToast({
-          color: 'danger',
-          severity: 'danger',
-          title: settingsStore.t.toasts.board.updateBoardError,
-        }),
-      )
-      .then(() =>
-        projectsStore.updateProjectChild(parentList, board.id, {
-          name: newName,
-          lastChange: new Date().toISOString(),
-        }),
-      );
+    try {
+      const response = await UpdateBoard(board.id, {
+        name: newName,
+        projectId: projectsStore.activeProject.id,
+      });
+      if (typeof response == 'object' && 'errors' in response)
+        throw new Error(Object.values(response.errors).toString());
+      projectsStore.updateProjectChild(parentList, board.id, {
+        name: newName,
+        lastChange: new Date().toISOString(),
+      });
+
+      addToast({
+        color: 'success',
+        severity: 'success',
+        title: settingsStore.t.toasts.board.updateBoardSuccess,
+      });
+    } catch (e: any) {
+      addToast({
+        color: 'danger',
+        severity: 'danger',
+        title: settingsStore.t.toasts.board.updateBoardError,
+        description: e.message,
+      });
+    }
   };
 
   function handleClick(event: any) {

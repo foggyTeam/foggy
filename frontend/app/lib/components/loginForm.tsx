@@ -5,7 +5,7 @@ import { Form } from '@heroui/form';
 import { Input } from '@heroui/input';
 import { Eye, EyeClosed, X } from 'lucide-react';
 import { FButton } from '@/app/lib/components/foggyOverrides/fButton';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@heroui/button';
 import { AvailableProviders } from '@/app/lib/types/definitions';
 import { loginFormSchema } from '@/app/lib/types/schemas';
@@ -34,6 +34,8 @@ const LoginForm = observer(() => {
   const theme = (resolvedTheme as 'light' | 'dark') ?? 'light';
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,18 +70,22 @@ const LoginForm = observer(() => {
             password: data.password,
           },
           true,
-        ).finally(() => {
-          setSignInButtonLoading(false);
-        });
+        )
+          .then(() => router.push(callbackUrl))
+          .finally(() => {
+            setSignInButtonLoading(false);
+          });
       } else if (action === ButtonAction.LOGIN) {
         setLoginButtonLoading(true);
 
         await SignUserIn({
           email: data.email,
           password: data.password,
-        }).finally(() => {
-          setLoginButtonLoading(false);
-        });
+        })
+          .then(() => router.push(callbackUrl))
+          .finally(() => {
+            setLoginButtonLoading(false);
+          });
       } else return;
 
       setAction(ButtonAction.UNDEFINED);
@@ -92,8 +98,6 @@ const LoginForm = observer(() => {
         });
       return;
     }
-
-    await router.push('/');
   };
 
   return (
@@ -205,7 +209,9 @@ const LoginForm = observer(() => {
 
       <div className="mt-1 flex w-full items-center justify-center gap-3">
         <Button
-          onPress={() => SignUserViaProviders(AvailableProviders.GOOGLE)}
+          onPress={() =>
+            SignUserViaProviders(AvailableProviders.GOOGLE, callbackUrl)
+          }
           isIconOnly
           variant="light"
           color="secondary"
@@ -221,7 +227,9 @@ const LoginForm = observer(() => {
         </Button>
         <Button
           data-testid="yandex-btn"
-          onPress={() => SignUserViaProviders(AvailableProviders.YANDEX)}
+          onPress={() =>
+            SignUserViaProviders(AvailableProviders.YANDEX, callbackUrl)
+          }
           isIconOnly
           variant="light"
           color="secondary"

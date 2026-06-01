@@ -22,10 +22,13 @@ export async function SignUserIn(
     throw error;
   });
 }
-export async function SignUserViaProviders(provider: AvailableProviders) {
+export async function SignUserViaProviders(
+  provider: AvailableProviders,
+  callbackUrl: string = '/',
+) {
   if (provider === AvailableProviders.GOOGLE)
-    await signIn('google', { redirectTo: '/' });
-  else await signIn('yandex', { redirectTo: '/' });
+    await signIn('google', { redirectTo: callbackUrl });
+  else await signIn('yandex', { redirectTo: callbackUrl });
 }
 export async function SignUserOut() {
   await signOut().catch((error: any) => {

@@ -31,22 +31,34 @@ const SubSectionCard = observer(
     const updateSectionName = async (newName: string) => {
       setIsReadonly(true);
       if (!projectsStore.activeProject) return;
-      await UpdateSection(projectsStore.activeProject.id, subSection.id, {
-        name: newName,
-      })
-        .catch(() =>
-          addToast({
-            color: 'danger',
-            severity: 'danger',
-            title: settingsStore.t.toasts.project.updateSectionError,
-          }),
-        )
-        .then(() => {
-          projectsStore.updateProjectChild(parentList, subSection.id, {
+      try {
+        const response = await UpdateSection(
+          projectsStore.activeProject.id,
+          subSection.id,
+          {
             name: newName,
-            lastChange: new Date().toISOString(),
-          });
+          },
+        );
+        if (typeof response == 'object' && 'errors' in response)
+          throw new Error(Object.values(response.errors).toString());
+        projectsStore.updateProjectChild(parentList, subSection.id, {
+          name: newName,
+          lastChange: new Date().toISOString(),
         });
+
+        addToast({
+          color: 'success',
+          severity: 'success',
+          title: settingsStore.t.toasts.project.updateSectionSuccess,
+        });
+      } catch (e: any) {
+        addToast({
+          color: 'danger',
+          severity: 'danger',
+          title: settingsStore.t.toasts.project.updateSectionError,
+          description: e.message,
+        });
+      }
     };
 
     return (
