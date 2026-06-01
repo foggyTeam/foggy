@@ -38,7 +38,7 @@ export default function BoardCard({
         name: newName,
         projectId: projectsStore.activeProject.id,
       });
-      if (typeof response == 'object' && 'errors' in response)
+      if (!!response && typeof response == 'object' && 'errors' in response)
         throw new Error(Object.values(response.errors).toString());
       projectsStore.updateProjectChild(parentList, board.id, {
         name: newName,

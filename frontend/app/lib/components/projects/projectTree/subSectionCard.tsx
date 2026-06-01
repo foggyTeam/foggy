@@ -39,7 +39,7 @@ const SubSectionCard = observer(
             name: newName,
           },
         );
-        if (typeof response == 'object' && 'errors' in response)
+        if (!!response && typeof response == 'object' && 'errors' in response)
           throw new Error(Object.values(response.errors).toString());
         projectsStore.updateProjectChild(parentList, subSection.id, {
           name: newName,
