@@ -112,6 +112,8 @@ const CustomNode = observer((node: GCustomNode) => {
     [data?.shape, data?.color, data?.align, setShape, setColor, setAlign],
   );
 
+  if (!data) return null;
+
   return (
     <NodeWrapper
       isSelected={!!node.selected}
