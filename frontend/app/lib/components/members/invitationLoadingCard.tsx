@@ -59,20 +59,34 @@ export default function InvitationLoadingCard({
 
   useEffect(() => {
     ProcessInvitationToken(entityType, token)
-      .then((result: Partial<Team> | Partial<Project>) => {
-        for (const member of result.members || [])
-          if (member.id === userStore.user?.id) {
-            router.push(`/${entityType}/${result.id}`);
-            return;
-          }
+      .then(
+        (
+          result:
+            | Partial<Team>
+            | Partial<Project>
+            | { errors: object }
+            | undefined,
+        ) => {
+          if (!result || (result && 'errors' in result))
+            throw new Error(
+              result
+                ? Object.values(result.errors)[0].toString()
+                : 'Incorrect invitation',
+            );
+          for (const member of result?.members || [])
+            if (member.id === userStore.user?.id) {
+              router.push(`/${entityType}/${result.id}`);
+              return;
+            }
 
-        setRequiredEntity(
-          Object.assign(result, {
-            settings: { ...result.settings, allowRequests: false },
-          }),
-        );
-        setIsLoading(false);
-      })
+          setRequiredEntity(
+            Object.assign(result, {
+              settings: { ...result.settings, allowRequests: false },
+            }),
+          );
+          setIsLoading(false);
+        },
+      )
       .catch((e: any) => {
         addToast({
           color: 'danger',
@@ -88,7 +102,7 @@ export default function InvitationLoadingCard({
     <div className="bg-background/50 absolute top-0 left-0 z-30 flex h-full w-full items-center justify-center backdrop-blur-xl">
       <div
         className={clsx(
-          'flex h-fit w-full flex-col items-center justify-center gap-4 transition-all',
+          'mx-8 flex h-fit w-full flex-col items-center justify-center gap-4 transition-all sm:mx-0',
           bg_container,
           'px-12',
           isLoading ? 'max-w-sm' : 'max-w-xl',

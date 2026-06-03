@@ -45,6 +45,7 @@ import { toJS } from 'mobx';
 import settingsStore from '@/app/stores/settingsStore';
 import useAdaptiveParams from '@/app/lib/hooks/useAdaptiveParams';
 import LockGraphButton from '@/app/lib/components/board/graph/lockGraphButton';
+import boardStore from '@/app/stores/board/boardStore';
 
 const GRID_SIZE = 16;
 
@@ -191,6 +192,6 @@ const GraphBoardObserver = observer(() => {
   }, [isReady]);
   if (!isReady) return null;
 
-  return <MemoizedGraphBoard />;
+  return <MemoizedGraphBoard key={boardStore.activeBoard?.id} />;
 });
 export default GraphBoardObserver;

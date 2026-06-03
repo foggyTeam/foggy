@@ -50,6 +50,7 @@ const InternalLinkNode = observer((node: GNodeLinkNode) => {
     }
   };
 
+  if (!data) return null;
   return (
     <NodeWrapper
       isSelected={node.selected}

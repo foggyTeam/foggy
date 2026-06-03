@@ -269,8 +269,8 @@
       "modalCopyLink": "Copy invite link",
       "modalSure": "Send invitation",
       "acceptInvitation": {
-        "project": "Accept invitation and join project?",
-        "team": "Accept invitation and join team?"
+        "project": "Join project?",
+        "team": "Join team?"
       }
     },
     "removeTeamMember": {

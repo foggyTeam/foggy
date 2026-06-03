@@ -103,6 +103,7 @@ const ExternalLinkNode = observer((node: GExternalLinkNode) => {
     }
   };
 
+  if (!data) return null;
   return (
     <NodeWrapper
       isSelected={node.selected}
