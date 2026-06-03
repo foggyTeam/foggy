@@ -46,7 +46,7 @@ const TeamRequest = observer(({ team }: { team: Team | undefined }) => {
         )}
       </div>
       {team?.settings.memberListIsPublic && (
-        <div className="mt-0.5 grid max-h-full w-full grid-cols-2 gap-1">
+        <div className="mt-0.5 grid max-h-full w-full grid-cols-1 gap-1 sm:grid-cols-2">
           {team?.members
             ?.sort(CompareByRole)
             .slice(0, 7)
