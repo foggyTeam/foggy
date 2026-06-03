@@ -59,26 +59,34 @@ export default function InvitationLoadingCard({
 
   useEffect(() => {
     ProcessInvitationToken(entityType, token)
-      .then((result: Partial<Team> | Partial<Project>) => {
-        if (!result || (result && 'errors' in result))
-          throw new Error(
-            result
-              ? Object.values(result.errors)[0].toString()
-              : 'Incorrect invitation',
-          );
-        for (const member of result?.members || [])
-          if (member.id === userStore.user?.id) {
-            router.push(`/${entityType}/${result.id}`);
-            return;
-          }
+      .then(
+        (
+          result:
+            | Partial<Team>
+            | Partial<Project>
+            | { errors: object }
+            | undefined,
+        ) => {
+          if (!result || (result && 'errors' in result))
+            throw new Error(
+              result
+                ? Object.values(result.errors)[0].toString()
+                : 'Incorrect invitation',
+            );
+          for (const member of result?.members || [])
+            if (member.id === userStore.user?.id) {
+              router.push(`/${entityType}/${result.id}`);
+              return;
+            }
 
-        setRequiredEntity(
-          Object.assign(result, {
-            settings: { ...result.settings, allowRequests: false },
-          }),
-        );
-        setIsLoading(false);
-      })
+          setRequiredEntity(
+            Object.assign(result, {
+              settings: { ...result.settings, allowRequests: false },
+            }),
+          );
+          setIsLoading(false);
+        },
+      )
       .catch((e: any) => {
         addToast({
           color: 'danger',
